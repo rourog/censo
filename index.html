@@ -152,13 +152,13 @@
       }
     }
 
-/* ENCABEZADO BASE (Tamaño perfecto y normal para Android y Computadoras) */
+/* ENCABEZADO BASE LIMPIO */
     .header { 
       position: relative; 
       flex-shrink: 0; 
       z-index: 50; 
       width: 100%; 
-      padding: 10px; 
+      padding: 10px 10px; /* Margen estándar para todos */
       margin: 0; 
       background: var(--panel-glass); 
       backdrop-filter: blur(12px); 
@@ -166,13 +166,6 @@
       border-bottom: 1px solid var(--line); 
       box-shadow: 0 4px 166px rgba(0,0,0,0.08); 
       overflow: hidden; 
-    }
-
-    /* FILTRO EXCLUSIVO PARA iPHONE (Aplica el parche del Notch SOLO en dispositivos Apple) */
-    @supports (-webkit-touch-callout: none) {
-      .header {
-        padding-top: max(12px, env(safe-area-inset-top));
-      }
     }
     
     .header-top { display: flex; align-items: center; justify-content: space-between; position: relative; width: 100%; min-height: 48px; z-index: 2; }
@@ -1307,7 +1300,27 @@ function initFirebaseListener() {
       clearTimeout(resizeTimer);
       resizeTimer = setTimeout(() => { if (!isFetchingData) render(pacientesGlobal); }, 200);
     });
+  
+// ARRANQUE FINAL
+    initTheme(); 
 
+    // ==========================================================
+    // PARCHE INTELIGENTE ANTI-NOTCH (SOLO PARA iOS)
+    // ==========================================================
+    function aplicarParcheNotch() {
+      // Detecta si es un iPhone/iPad
+      const esIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+      // Detecta si está instalada como PWA (fuera del navegador)
+      const esPWA = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
+      
+      if (esIOS && esPWA) {
+        const headerEl = document.querySelector('.header');
+        // Solo inyecta el margen extra si se cumplen ambas condiciones
+        if(headerEl) headerEl.style.paddingTop = 'calc(10px + env(safe-area-inset-top, 30px))';
+      }
+    }
+    aplicarParcheNotch();
+    // ==========================================================
     // ==========================================================
     // SISTEMA DE PARTÍCULAS NEURAL Y SINAPSIS
     // ==========================================================
