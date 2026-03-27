@@ -1,0 +1,1302 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <base target="_top">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0f172a">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#eef4fb">
+  
+  <title>Censo Urgencias</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <style>
+    :root {
+      --radius-xl: 16px;
+      --radius-lg: 12px;
+      --radius-md: 10px;
+      --radius-sm: 8px;
+      --transition: 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+      --transition-fast: 150ms ease;
+    }
+
+    html, body { margin: 0; padding: 0; width: 100%; height: 100vh; overflow: hidden; font-size: 16px; }
+    body { font-family: 'Fira Code', monospace; transition: background 0.5s ease, color 0.5s ease; font-variant-ligatures: contextual; }
+
+    /* ==========================================================
+       DEFINICIÓN DE TEMAS
+       ========================================================== */
+    body.dark {
+      --bg: #0f172a; --panel: #0b1220; --panel-glass: rgba(11, 18, 32, 0.85); --section-head: #0b1220;
+      --card: #1e293b; --card-open: #2d3e5a; --field: rgba(255,255,255,0.03);
+      --text: #e5e7eb; --muted: #94a3b8; --line: rgba(255,255,255,0.08);
+      --accent: #60a5fa; --accent-soft: rgba(96,165,250,0.12); --accent-border: rgba(96,165,250,0.24);
+      --chip-bg: rgba(96,165,250,0.12); --chip-text: #dbeafe; 
+      --search-bg: rgba(255,255,255,0.05); --error-bg: rgba(239,68,68,.10); --error-border: rgba(239,68,68,.22);
+      --error-text: #fecaca; --toggle-bg: rgba(255,255,255,0.06); --toggle-icon: #dbeafe;
+      --modal-overlay: rgba(0,0,0,0.6); --success: #34d399; 
+      --skeleton: #2d3e5a; --skeleton-shimmer: rgba(255, 255, 255, 0.05);
+    }
+
+    body.light {
+      --bg: #eef4fb; --panel: #ffffff; --panel-glass: rgba(255, 255, 255, 0.90); --section-head: #f8fbff;
+      --card: #ffffff; --card-open: #dbeafe; --field: rgba(37,99,235,0.03);
+      --text: #0f172a; --muted: #475569; --line: rgba(15,23,42,0.08);
+      --accent: #2563eb; --accent-soft: rgba(37,99,235,0.10); --accent-border: rgba(37,99,235,0.16);
+      --chip-bg: rgba(37,99,235,0.10); --chip-text: #1d4ed8; 
+      --search-bg: rgba(37,99,235,0.05); --error-bg: rgba(254,242,242,0.92); --error-border: rgba(239,68,68,.18);
+      --error-text: #b91c1c; --toggle-bg: rgba(37,99,235,0.08); --toggle-icon: #1d4ed8;
+      --modal-overlay: rgba(15,23,42,0.4); --success: #10b981; 
+      --skeleton: #e2e8f0; --skeleton-shimmer: rgba(255, 255, 255, 0.4);
+    }
+
+    body.pink {
+      --bg: #fdf2f8; --panel: #ffffff; --panel-glass: rgba(255, 255, 255, 0.90); --section-head: #fdf2f8;
+      --card: #ffffff; --card-open: #fce7f3; --field: rgba(219, 39, 119, 0.03);
+      --text: #831843; --muted: #be185d; --line: rgba(219, 39, 119, 0.15);
+      --accent: #db2777; --accent-soft: rgba(219, 39, 119, 0.12); --accent-border: rgba(219, 39, 119, 0.25);
+      --chip-bg: rgba(219, 39, 119, 0.15); --chip-text: #9d174d; 
+      --search-bg: rgba(219, 39, 119, 0.05); --error-bg: rgba(225, 29, 72, 0.1); --error-border: rgba(225, 29, 72, 0.2);
+      --error-text: #e11d48; --toggle-bg: rgba(219, 39, 119, 0.1); --toggle-icon: #db2777;
+      --modal-overlay: rgba(131, 24, 67, 0.5); --success: #10b981; 
+      --skeleton: #fce7f3; --skeleton-shimmer: rgba(255, 255, 255, 0.4);
+    }
+
+    /* ==========================================================
+       TEMA COLORFUL v3.0 (MAXIMALISTA / MULTICOLOR)
+       ========================================================== */
+    body.colorful {
+      --bg: #f8fafc; 
+      --panel: #fde68a;
+      --panel-glass: rgba(253, 230, 138, 0.90);
+      --section-head: #eab308; 
+      
+      --card: #1d4ed8;         
+      --card-open: #d946ef;    
+      
+      --field: rgba(0, 0, 0, 0.2); 
+      
+      --text: #001f3f;         
+      --muted: #475569;
+      --line: rgba(0, 0, 0, 0.1);
+      
+      --accent: #16a34a;       
+      --accent-soft: rgba(22, 163, 74, 0.1);
+      --accent-border: #15803d;
+      
+      --chip-bg: #bef264;      
+      --chip-text: #001f3f;    
+      
+      --search-bg: #ffffff;    
+      --error-bg: #fee2e2; 
+      --error-border: #ef4444;
+      --error-text: #b91c1c; 
+      
+      --toggle-bg: #f43f5e;    
+      --toggle-icon: #ffffff;
+      
+      --modal-overlay: rgba(23, 23, 23, 0.5); 
+      --success: #16a34a; 
+      
+      --skeleton: #bef264; 
+      --skeleton-shimmer: rgba(255, 255, 255, 0.5);
+    }
+
+    body.colorful { background-image: linear-gradient(135deg, #e0f2fe 0%, #d1fae5 50%, #ede9fe 100%) !important; background-attachment: fixed; }
+    body.colorful .header { background-image: linear-gradient(135deg, #f0abfc 0%, #bfdbfe 100%) !important; }
+    body.colorful .title-urgencias, body.colorful #meta-text, body.colorful .section-title { color: #001f3f !important; text-shadow: none; font-weight: 800; }
+    body.colorful .card .patient-name, body.colorful .card .value, body.colorful .card .caret { color: #ffffff !important; }
+    body.colorful .card .patient-bed, body.colorful .card .label { color: rgba(255, 255, 255, 0.8) !important; }
+    body.colorful .card .field { border: 1px solid rgba(255,255,255,0.2) !important; background: rgba(0,0,0,0.15) !important; }
+    body.colorful .card .btn-editar-tarjeta { background: #ffffff !important; color: #d946ef !important; border: none; font-weight: 800; box-shadow: 0 4px 6px rgba(0,0,0,0.15); }
+    body.colorful .card .btn-editar-tarjeta:active { background: #e0f2fe !important; color: #a21caf !important; }
+    body.colorful .fab-btn { background: linear-gradient(135deg, #bef264, #06b6d4) !important; color: #001f3f; }
+
+    body.midnight {
+      --bg: #000000; --panel: #0a0000; --panel-glass: rgba(0, 0, 0, 0.9); --section-head: #1a0000; 
+      --card: #120000; --card-open: #250000; --field: rgba(255, 0, 0, 0.05);
+      --text: #ff4d4d; --muted: #800000; --line: rgba(255, 0, 0, 0.15);
+      --accent: #ff0000; --accent-soft: rgba(255, 0, 0, 0.1); --accent-border: rgba(255, 0, 0, 0.3);
+      --chip-bg: #330000; --chip-text: #ff4d4d; 
+      --search-bg: #0a0000; --error-bg: #220000; --error-border: #aa0000; --error-text: #ff4d4d; 
+      --toggle-bg: #1a0000; --toggle-icon: #ff0000;
+      --modal-overlay: rgba(0,0,0,0.8); --success: #880000; 
+      --skeleton: #1a0000; --skeleton-shimmer: rgba(255, 0, 0, 0.1);
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    .app { display: flex; flex-direction: column; width: 100%; height: 100vh; background: var(--bg); }
+    .hide-on-mobile { display: none !important; }
+
+    .patient-name, .value, .truncate-text, .patient-bed, .chip, .section-title, .censo-table td, .input-control { text-transform: uppercase !important; }
+    body.midnight .section-title { color: #ff0000; }
+
+    /* ENCABEZADO Y CANVAS NEURAL/PLEXUS */
+    .header { position: relative; flex-shrink: 0; z-index: 50; width: 100%; padding: 10px 10px; margin: 0; background: var(--panel-glass); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); box-shadow: 0 4px 166px rgba(0,0,0,0.08); overflow: hidden; }
+    #plexusCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: 0.95; }
+    
+    .header-top { display: flex; align-items: center; justify-content: space-between; position: relative; width: 100%; min-height: 48px; z-index: 2; }
+    .header-top .header-left, .header-top .header-right { display: flex; align-items: center; gap: 8px; width: 130px; z-index: 2; }
+    .header-top .header-right { justify-content: flex-end; }
+    .main-title { position: absolute; left: 50%; transform: translateX(-50%); text-align: center; display: flex; flex-direction: column; align-items: center; z-index: 2; }
+    
+    .title-censo { font-family: 'Space Mono', monospace; font-size: 1.8rem; font-weight: 700; letter-spacing: 0.12em; line-height: 1.1; padding-bottom: 2px; background-image: linear-gradient(to right, #ef4444, #f97316, #eab308, #f97316, #ef4444); background-size: 200% auto; -webkit-background-clip: text; background-clip: text; color: transparent; animation: hypnoticGradient 8s linear infinite; }
+    .title-urgencias { font-size: 0.85rem; font-weight: 600; color: var(--muted); letter-spacing: 0.15em; text-transform: uppercase; margin-top: 0px; }
+    .patient-counter { display: none; }
+
+    .icon-btn { width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--accent-border); background: var(--toggle-bg); color: var(--text); display: flex; align-items: center; justify-content: center; font-size: 1rem; cursor: pointer; transition: all var(--transition-fast); padding: 0; }
+    .icon-btn:active { transform: scale(0.9); background: var(--accent-soft); }
+    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    @keyframes hypnoticGradient { from { background-position: 0% center; } to { background-position: 200% center; } }
+    .spin { animation: spin 1s linear infinite; display: inline-block; }
+
+    .search-wrapper { position: relative; z-index: 2; max-height: 60px; opacity: 1; transform: translateY(0); overflow: hidden; transition: all var(--transition); margin-top: 12px; }
+    .search-wrapper.collapsed { max-height: 0; opacity: 0; transform: translateY(-10px); margin-top: 0; pointer-events: none; }
+    .search { width: 100%; max-width: 100%; padding: 12px 10px; font-size: 1rem; border-radius: var(--radius-md); border: 1px solid var(--line); background: var(--search-bg); color: var(--text); outline: none; font-family: 'Fira Code', monospace; transition: border-color var(--transition-fast), box-shadow var(--transition-fast); }
+    .search:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+    .search::placeholder { color: var(--muted); }
+
+    #content { flex-grow: 1; overflow-y: auto; overflow-x: hidden; padding: 0; padding-bottom: 80px; }
+    
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-in { animation: fadeInUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards; opacity: 0; }
+    
+    .section { width: 100%; max-width: 100%; margin: 0 0 16px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); border-radius: 0; background: var(--bg); overflow: hidden; }
+    .section-header { width: 100%; padding: 12px 10px; background: var(--section-head); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 10; }
+    .section-title { font-size: 0.9rem; font-weight: 700; line-height: 1.12; color: var(--accent); text-transform: uppercase; letter-spacing: 0.08em; display: flex; align-items: center; gap: 6px; }
+    
+    /* ==========================================================
+       ANIMACIONES DE EMOJIS DE ÁREA
+       ========================================================== */
+    .area-icon { display: inline-block; font-size: 1.2rem; will-change: transform; transition: transform 0.2s ease; }
+    @keyframes heartbeat { 0%, 100% { transform: scale(1); } 15% { transform: scale(1.25); } 30% { transform: scale(1); } 45% { transform: scale(1.15); } 60% { transform: scale(1); } }
+    @keyframes lookAround { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-3px); } 75% { transform: translateX(3px); } }
+    @keyframes spinSlow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    @keyframes gentleWiggle { 0%, 100% { transform: rotate(0deg); } 25% { transform: rotate(-8deg); } 75% { transform: rotate(8deg); } }
+    @keyframes twinkle { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+    
+    .icon-heartbeat { animation: heartbeat 1.5s infinite; }
+    .icon-look { animation: lookAround 4s infinite ease-in-out; }
+    .icon-spin { animation: spinSlow 6s linear infinite; }
+    .icon-wiggle { animation: gentleWiggle 2s infinite ease-in-out; }
+    .icon-twinkle { animation: twinkle 1.5s infinite ease-in-out; }
+
+    /* ==========================================================
+       ANIMACIONES DE EASTER EGGS SURFERS CON HITBOX GIGANTE
+       ========================================================== */
+    .surfer-wrapper { 
+        position: absolute; 
+        bottom: 0; 
+        left: 0; 
+        animation: surf-across linear infinite; 
+        pointer-events: none; 
+        z-index: 9999; 
+    }
+    
+    .surfer-emoji { 
+        position: relative; 
+        display: inline-block; 
+        font-size: 1.7rem; 
+        animation: surf-bob 3s ease-in-out infinite alternate; 
+        filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3)); 
+        pointer-events: auto; 
+        cursor: pointer;
+        user-select: none;
+        -webkit-user-select: none;
+        touch-action: manipulation;
+    }
+    
+    .surfer-emoji::before {
+        content: '';
+        position: absolute;
+        top: -40px;
+        right: -40px;
+        bottom: -40px;
+        left: -40px;
+        border-radius: 50%;
+        z-index: 1;
+    }
+    
+    @keyframes surf-across { 0% { transform: translateX(-100px); } 100% { transform: translateX(calc(100vw + 100px)); } }
+    @keyframes surf-bob { 0% { transform: translateY(0px) scale(1) rotate(-15deg); } 100% { transform: translateY(-30px) scale(1.2) rotate(15deg); } }
+
+    /* TARJETAS Y LISTA */
+    .patient-list { display: grid; gap: 0; padding: 0; } 
+    .card { background: transparent !important; position: relative; border: none; border-bottom: 1px solid var(--line) !important; border-radius: 0; box-shadow: none; margin: 0; width: 100%; } 
+    
+    .swipe-bg { position: absolute; top: 1px; left: 0; width: 100%; height: calc(100% - 2px); display: flex; justify-content: space-between; z-index: 1; overflow: hidden; border-radius: 0; }
+    .swipe-action { display: flex; align-items: center; width: 50%; height: 100%; color: white; font-size: 1.5rem; transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); }
+    .swipe-delete { background: #ef4444; justify-content: flex-start; padding-left: 24px; }
+    .swipe-edit { background: #10b981; justify-content: flex-end; padding-right: 24px; }
+    .card.swipe-ready-delete .swipe-delete { transform: scale(1.3) translateX(10px); }
+    .card.swipe-ready-edit .swipe-edit { transform: scale(1.3) translateX(-10px); }
+
+    .card-content-wrapper { position: relative; z-index: 2; width: 100%; height: 100%; background: var(--card); border-radius: 0; border: none; transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), background var(--transition-fast); will-change: transform; touch-action: pan-y; }
+    .card.open .card-content-wrapper { background: var(--card-open); }
+    .card-content-wrapper.swiping { transition: none; }
+
+    .card-header { width: 100%; padding: 16px 10px; min-height: 92px; display: flex; justify-content: space-between; align-items: center; gap: 10px; cursor: pointer; }
+    .card-header:active { transform: scale(0.98); background-color: var(--accent-soft); }
+    .patient-main { min-width: 0; flex: 1 1 0%; padding-right: 12px; }
+    .patient-name { font-family: 'Space Mono', monospace; font-size: 1.15rem; font-weight: 700; line-height: 1.2; color: var(--text); white-space: normal; word-break: break-word; overflow: visible; text-overflow: clip; transition: all var(--transition-fast); }
+    .patient-bed { margin-top: 6px; font-size: 0.8rem; color: var(--muted); font-weight: 500; }
+    .card-header .header-right { display: flex; align-items: center; gap: 6px; flex: 0 0 auto; min-width: 0; }
+    .chip { display: inline-block; font-size: 0.65rem; font-weight: 600; padding: 4px 6px; border-radius: 6px; border: 1px solid var(--accent-border); background: var(--chip-bg); color: var(--chip-text); max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .caret { width: 24px; height: 24px; display: grid; place-items: center; border-radius: 999px; color: var(--muted); font-size: 1rem; transition: transform var(--transition), color var(--transition); flex-shrink: 0; }
+    .card.open .caret { transform: rotate(180deg) scale(1.1); color: var(--accent); }
+    
+    .details { display: grid; grid-template-rows: 0fr; opacity: 0; padding: 0 10px; transition: grid-template-rows var(--transition), opacity var(--transition), padding var(--transition); }
+    .card.open .details { grid-template-rows: 1fr; opacity: 1; padding: 0 10px 12px; }
+    .details-content { overflow: hidden; }
+    
+    @keyframes fieldFadeIn { from { opacity: 0; transform: translateX(-5px); } to { opacity: 1; transform: translateX(0); } }
+    .card.open .field { animation: fieldFadeIn 0.3s ease forwards; opacity: 0; }
+    .card.open .field:nth-child(1) { animation-delay: 0.1s; } .card.open .field:nth-child(2) { animation-delay: 0.15s; } .card.open .field:nth-child(3) { animation-delay: 0.2s; } .card.open .field:nth-child(4) { animation-delay: 0.25s; }
+    
+    .field { margin-top: 8px; padding: 12px; border-radius: var(--radius-sm); background: var(--field); border: 1px solid var(--line); }
+    .label { display: block; margin-bottom: 6px; font-size: 0.65rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
+    .value { font-size: 0.9rem; line-height: 1.3; white-space: pre-wrap; }
+
+    .error, .empty { width: 100%; max-width: 100%; padding: 20px 10px; margin: 0; text-align: center; background: transparent; font-size: 0.9rem; color: var(--muted); border-radius: 0; }
+    .error { color: var(--error-text); background: var(--error-bg); border-bottom: 1px solid var(--error-border); }
+    
+    @keyframes shimmer { 100% { transform: translateX(100%); } }
+    .skeleton-loader { display: grid; gap: 0; padding: 0; width: 100%; }
+    .skeleton-card { background: var(--card); border-bottom: 1px solid var(--line); padding: 16px 10px; min-height: 92px; display: flex; justify-content: space-between; align-items: center; }
+    .skeleton-block { position: relative; background-color: var(--skeleton); overflow: hidden; border-radius: 4px; }
+    .skeleton-block::after { content: ""; position: absolute; top: 0; right: 0; bottom: 0; left: 0; transform: translateX(-100%); background-image: linear-gradient(90deg, transparent, var(--skeleton-shimmer), transparent); animation: shimmer 1.5s infinite; }
+    .skeleton-main { flex: 1; padding-right: 12px; }
+    .skeleton-name { height: 1.15rem; width: 65%; margin-bottom: 8px; }
+    .skeleton-bed { height: 0.8rem; width: 35%; }
+    .skeleton-right { display: flex; align-items: center; gap: 8px; }
+    .skeleton-chip { height: 1.3rem; width: 55px; border-radius: 6px; }
+    .skeleton-caret { height: 24px; width: 24px; border-radius: 50%; }
+    
+    .skeleton-row { display: flex; align-items: center; padding: 14px 16px; border-bottom: 1px solid var(--line); gap: 16px; background: var(--bg); }
+    .skeleton-cell { height: 0.8rem; opacity: 0.6; }
+
+    .footer { flex-shrink: 0; display: block; text-align: center; padding: 8px 10px; color: var(--muted); font-size: 0.7rem; border-top: 1px solid var(--line); margin: 0; background: var(--panel-glass); }
+
+    .btn-editar-tarjeta { width: 100%; margin-top: 12px; padding: 12px; border-radius: var(--radius-sm); background: var(--accent-soft); border: 1px solid var(--accent-border); color: var(--accent); font-family: 'Space Mono', monospace; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; cursor: pointer; transition: all var(--transition-fast); }
+    .btn-editar-tarjeta:active { transform: scale(0.98); background: var(--accent); color: #fff; }
+    .fab-btn { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #ef4444, #f97316); color: white; border: none; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4); font-size: 2rem; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 40; transition: transform var(--transition-fast), box-shadow var(--transition-fast); line-height: 1; display: flex; }
+    .fab-btn:active { transform: scale(0.9); box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4); }
+
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--modal-overlay); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); z-index: 100; display: none; align-items: center; justify-content: center; padding: 16px; opacity: 0; transition: opacity 0.3s; }
+    .modal-overlay.active { display: flex; opacity: 1; }
+    .modal-content { background: var(--panel); width: 100%; max-width: 400px; border-radius: var(--radius-xl); border: 1px solid var(--line); box-shadow: 0 10px 25px rgba(0,0,0,0.2); padding: 20px; display: flex; flex-direction: column; gap: 12px; transform: translateY(20px); transition: transform 0.3s; max-height: 90vh; overflow-y: auto; }
+    .modal-overlay.active .modal-content { transform: translateY(0); }
+    .modal-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+    .modal-title { font-family: 'Space Mono', monospace; font-size: 1.1rem; font-weight: 700; color: var(--text); text-transform: uppercase; }
+    .modal-close { background: transparent; border: none; color: var(--muted); font-size: 1.5rem; cursor: pointer; padding: 0; line-height: 1; }
+    .input-group { display: flex; flex-direction: column; gap: 6px; }
+    .input-group label { font-size: 0.75rem; color: var(--accent); font-weight: 600; text-transform: uppercase; }
+    .input-control { width: 100%; padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--line); background: var(--bg); color: var(--text); font-family: 'Fira Code', monospace; font-size: 0.9rem; resize: vertical; transition: border-color var(--transition-fast); }
+    .input-control:focus { outline: none; border-color: var(--accent); }
+    .input-control:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    select.input-control { appearance: none; background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2394a3b8%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E"); background-repeat: no-repeat; background-position: right 12px top 50%; background-size: 12px auto; padding-right: 32px; }
+
+    .modal-actions { display: flex; gap: 10px; margin-top: 10px; width: 100%; }
+    .btn-cancelar { flex: 1; padding: 12px; border-radius: var(--radius-sm); background: var(--field); border: 1px solid var(--line); color: var(--text); font-weight: 600; cursor: pointer; text-transform: uppercase; font-family: 'Space Mono', monospace; }
+    .btn-guardar { flex: 2; padding: 12px; border-radius: var(--radius-sm); background: var(--accent); border: none; color: #fff; font-weight: 600; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; text-transform: uppercase; font-family: 'Space Mono', monospace; }
+    .btn-guardar:disabled { opacity: 0.7; cursor: not-allowed; }
+    .btn-borrar { flex: 1; padding: 12px; border-radius: var(--radius-sm); background: var(--error-bg); border: 1px solid var(--error-border); color: var(--error-text); font-weight: 600; cursor: pointer; text-transform: uppercase; font-family: 'Space Mono', monospace; transition: all var(--transition-fast); width: 100%;}
+    .btn-borrar:active { transform: scale(0.95); background: #ef4444; color: #fff; }
+    .btn-borrar:disabled { opacity: 0.7; cursor: not-allowed; }
+
+    .optional-label { color: var(--muted) !important; font-weight: 500 !important; }
+
+    @keyframes pulseWarning { 0% { transform: scale(1); } 50% { transform: scale(1.15); } 100% { transform: scale(1); } }
+    .warning-icon { font-size: 3.5rem; margin: 10px auto; height: 80px; width: 80px; display: flex; align-items: center; justify-content: center; animation: pulseWarning 1s infinite ease-in-out; }
+    .delete-text-highlight { color: var(--error-text); font-weight: 700; font-size: 1.1rem; text-align: center; font-family: 'Space Mono', monospace; line-height: 1.4; }
+
+    @media (min-width: 768px) { 
+      .hide-on-mobile { display: flex !important; }
+      #content { display: flex; flex-direction: row; gap: 24px; padding: 0; padding-bottom: 60px; align-items: flex-start; }
+      .section { min-width: 450px; flex: 1 0 450px; max-width: 800px; margin: 0; border-radius: var(--radius-lg); border: 1px solid var(--line); background: var(--bg); max-height: calc(100vh - 85px); display: flex; flex-direction: column; } 
+      .section-header { border-radius: var(--radius-lg) var(--radius-lg) 0 0; position: sticky; top: 0; z-index: 10; font-size: 1.1rem; padding: 16px; background: var(--bg); }
+      .patient-list { overflow-y: auto; flex-grow: 1; padding: 0 16px 16px; gap: 12px; }
+      .card { border-bottom: none !important; border-radius: var(--radius-md); box-shadow: 0 3px 8px rgba(0,0,0,0.06); width: auto; border: none !important; margin-bottom: 12px; }
+      .swipe-bg { border-radius: var(--radius-md); top: 1px; left: 1px; width: calc(100% - 2px); height: calc(100% - 2px); }
+      .card-content-wrapper { border-radius: var(--radius-md); border: 1px solid var(--line); }
+      .skeleton-loader { gap: 12px; padding: 0 16px 16px; }
+      .skeleton-card { border-bottom: none !important; border-radius: var(--radius-md); border: 1px solid var(--line); margin-bottom: 12px; }
+
+      ::-webkit-scrollbar { width: 8px; height: 8px; }
+      ::-webkit-scrollbar-track { background: transparent; }
+      ::-webkit-scrollbar-thumb { background: var(--muted); border-radius: 10px; opacity: 0.3; }
+      ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+      #content.view-table-mode { flex-direction: column !important; align-items: stretch !important; overflow-y: auto; padding: 0 !important; }
+      .table-wrapper { width: 100%; background: transparent; border-radius: 0; border: none; box-shadow: none; overflow: hidden; margin-bottom: 0; }
+      .censo-table { width: 100%; border-collapse: collapse; text-align: left; background: var(--bg); table-layout: fixed; }
+      .censo-table th { background: var(--section-head); color: var(--accent); padding: 14px 16px; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid var(--line); position: sticky; top: 0; z-index: 5; }
+      .censo-table td { padding: 12px 16px; border-bottom: 1px solid var(--line); color: var(--text); font-size: 0.95rem; vertical-align: middle; }
+      .censo-table tr:last-child td { border-bottom: none; }
+      .truncate-text { width: 100%; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
+      .patient-row { cursor: pointer; transition: background 0.2s ease; }
+      .patient-row:hover { background: var(--field) !important; }
+      .patient-row.expanded-row { background: var(--card-open) !important; }
+      .patient-row.expanded-row td { border-bottom: 1px solid var(--line); }
+      .patient-row.expanded-row .truncate-text { white-space: normal; overflow: visible; max-width: none; }
+      .patient-row.expanded-row .chip { max-width: none; white-space: normal; overflow: visible; display: inline-block; line-height: 1.2; }
+      .btn-table { background: transparent; border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 6px; cursor: pointer; font-size: 1.1rem; transition: all var(--transition-fast); margin-right: 4px; }
+      .btn-table:hover { transform: scale(1.1); }
+      .btn-table.edit { color: #10b981; }
+      .btn-table.edit:hover { background: rgba(16, 185, 129, 0.1); border-color: #10b981; }
+      .btn-table.delete { color: #ef4444; }
+      .btn-table.delete:hover { background: rgba(239, 68, 68, 0.1); border-color: #ef4444; }
+      .app.table-is-active ~ .fab-btn { display: none !important; }
+      .btn-add-table { display: block; width: 100%; padding: 16px; background: transparent; color: var(--muted); border: none; border-top: 1px dashed var(--line); font-family: 'Space Mono', monospace; font-size: 0.95rem; font-weight: 700; text-transform: uppercase; cursor: pointer; transition: all 0.2s ease; text-align: center; }
+      .btn-add-table:hover { background: var(--accent-soft); color: var(--accent); letter-spacing: 0.05em; }
+
+      /* ---------------------------------------------------
+         ESTILOS DE LAS CALMING WAVES (FONDO ESCRITORIO)
+         --------------------------------------------------- */
+      .desktop-waves-bg {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 15vh; 
+        z-index: 0;   
+        pointer-events: none; 
+      }
+      .waves {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        bottom: 0;
+      }
+      .wave-layer-1 { fill: var(--accent); opacity: 0.05; animation: move-forever 60s cubic-bezier(.55,.5,.45,.5) infinite; }
+      .wave-layer-2 { fill: var(--accent); opacity: 0.10; animation: move-forever 45s cubic-bezier(.55,.5,.45,.5) infinite; }
+      .wave-layer-3 { fill: var(--accent); opacity: 0.15; animation: move-forever 30s cubic-bezier(.55,.5,.45,.5) infinite; }
+      .wave-layer-4 { fill: var(--accent); opacity: 0.25; animation: move-forever 20s cubic-bezier(.55,.5,.45,.5) infinite; }
+
+      @keyframes move-forever {
+        0% { transform: translate3d(-90px, 0, 0); }
+        100% { transform: translate3d(85px, 0, 0); }
+      }
+
+      #content { position: relative; z-index: 10; } 
+      
+      .section { 
+        background: var(--panel-glass) !important; 
+        backdrop-filter: blur(12px); 
+        -webkit-backdrop-filter: blur(12px); 
+        border: 1px solid var(--accent-border);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      }
+      .section-header { background: transparent !important; border-bottom: 1px solid var(--line); }
+      
+      .table-wrapper { 
+        background: var(--panel-glass) !important; 
+        backdrop-filter: blur(12px); 
+        -webkit-backdrop-filter: blur(12px); 
+      }
+      .censo-table th { background: rgba(0,0,0,0.05) !important; backdrop-filter: blur(5px); }
+    }
+  </style>
+</head>
+<body class="dark">
+  <div class="app" id="mainAppContainer">
+    <div class="header">
+      <canvas id="plexusCanvas"></canvas>
+      
+      <div class="header-top">
+        <div class="header-left">
+          <button id="searchToggleBtn" class="icon-btn" aria-label="Buscar">
+            <span>🔍</span>
+          </button>
+        </div>
+
+        <div class="main-title">
+          <div class="title-censo">CENSO</div>
+          <div class="title-urgencias">Urgencias</div>
+          <div id="meta-text" class="patient-counter">Cargando...</div>
+        </div>
+
+        <div class="header-right">
+          <button id="viewToggleBtn" class="icon-btn hide-on-mobile" type="button" aria-label="Cambiar vista">
+            <span id="viewIcon">📋</span>
+          </button>
+          
+          <button id="reloadBtn" class="icon-btn" type="button" aria-label="Recargar">
+            <span id="reloadIcon">🔄</span>
+          </button>
+          <button id="themeToggle" class="icon-btn" type="button" aria-label="Cambiar tema">
+            <span id="themeIcon">☀️</span>
+          </button>
+        </div>
+      </div>
+
+      <div id="searchWrapper" class="search-wrapper collapsed">
+        <input id="search" class="search" type="search" placeholder="BUSCAR PACIENTE..." autocomplete="off" />
+      </div>
+    </div>
+    
+    <div class="desktop-waves-bg hide-on-mobile">
+      <svg class="waves" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto">
+        <defs>
+          <path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" />
+        </defs>
+        <g class="parallax">
+          <use xlink:href="#gentle-wave" x="48" y="0" class="wave-layer-1" />
+          <use xlink:href="#gentle-wave" x="48" y="3" class="wave-layer-2" />
+          <use xlink:href="#gentle-wave" x="48" y="5" class="wave-layer-3" />
+          <use xlink:href="#gentle-wave" x="48" y="7" class="wave-layer-4" />
+        </g>
+      </svg>
+    </div>
+    
+    <div id="content"></div>
+
+    <div class="footer">
+      Hospital Regional de Delicias - <span style="color: var(--accent); font-weight: 600;">Rourog Innovations</span>
+    </div>
+
+    <div id="easterEggContainer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; pointer-events: none; overflow: hidden;"></div>
+  </div>
+
+  <button class="fab-btn" id="mainFabBtn" onclick="abrirModalAgregar()">+</button>
+
+  <div id="editModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title" style="font-weight:700; font-family:'Space Mono';">EDITAR PACIENTE</div>
+        <button class="modal-close" onclick="cerrarModal('editModal')">&times;</button>
+      </div>
+      <input type="hidden" id="modalFila" value="">
+      <div class="input-group"><label>Nombre del Paciente</label><input id="modalNombre" class="input-control" type="text" /></div>
+      <div class="input-group"><label>Edad</label><input id="modalEdad" class="input-control" type="text" /></div>
+      <div class="input-group"><label>Diagnóstico</label><textarea id="modalDiagnostico" class="input-control" rows="2"></textarea></div>
+      <div class="input-group"><label>Pendientes</label><textarea id="modalPendientes" class="input-control" rows="3"></textarea></div>
+      <div class="input-group"><label>Destino</label><select id="modalDestino" class="input-control"></select></div>
+      <div class="input-group"><label class="optional-label">Mover a otra cama (Opcional)</label><select id="moverA_Select" class="input-control"></select></div>
+      <div class="modal-actions">
+        <button class="btn-cancelar" onclick="cerrarModal('editModal')">CANCELAR</button>
+        <button class="btn-guardar" id="btnGuardarEdit" onclick="guardarEdicion()">💾 GUARDAR</button>
+      </div>
+      <div class="modal-actions" style="margin-top: 4px;">
+        <button class="btn-borrar" id="btnBorrarEdit" onclick="borrarPacienteDialog()">🗑️ BORRAR PACIENTE</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="addModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title" style="font-weight:700; font-family:'Space Mono';">NUEVO INGRESO</div>
+        <button class="modal-close" onclick="cerrarModal('addModal')">&times;</button>
+      </div>
+      <div class="input-group"><label>Cama Disponible</label><select id="addCamaSelect" class="input-control"></select></div>
+      <div class="input-group"><label>Nombre del Paciente</label><input id="addNombre" class="input-control" type="text" /></div>
+      <div class="input-group"><label>Edad</label><input id="addEdad" class="input-control" type="text" placeholder="EJ: 45 AÑOS" /></div>
+      <div class="input-group"><label>Diagnóstico</label><textarea id="addDiagnostico" class="input-control" rows="2"></textarea></div>
+      <div class="input-group"><label>Pendientes</label><textarea id="addPendientes" class="input-control" rows="2"></textarea></div>
+      <div class="input-group"><label>Destino</label><select id="addDestino" class="input-control"></select></div>
+      <div class="modal-actions">
+        <button class="btn-cancelar" onclick="cerrarModal('addModal')">CANCELAR</button>
+        <button class="btn-guardar" id="btnGuardarAdd" onclick="guardarNuevo()">➕ INGRESAR</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="deleteConfirmModal" class="modal-overlay">
+    <div class="modal-content" style="border: 2px solid var(--error-border); box-shadow: 0 10px 30px rgba(239, 68, 68, 0.25);">
+      <div class="warning-icon" id="warningIconObj">🚨</div>
+      <div class="delete-text-highlight">ESTA ACCIÓN BORRARÁ LOS DATOS PERMANENTEMENTE</div>
+      <div id="deleteTargetName" style="text-align: center; color: var(--text); margin: 12px 0; font-weight: 700; font-size: 1.2rem; text-transform: uppercase;"></div>
+      <div style="text-align: center; color: var(--muted); font-size: 0.9rem; margin-bottom: 16px; text-transform: uppercase;">¿DESEAS CONTINUAR?</div>
+      <div class="modal-actions">
+        <button class="btn-cancelar" onclick="cerrarModalBorrado()">NO</button>
+        <button class="btn-borrar" id="btnConfirmDelete" onclick="ejecutarBorrado()">SÍ, BORRAR</button>
+      </div>
+    </div>
+  </div>
+
+<script type="module">
+    // ==========================================================
+    // 1. IMPORTACIONES DE FIREBASE (NÚCLEO Y BASE DE DATOS)
+    // ==========================================================
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-analytics.js";
+    import { getFirestore, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, serverTimestamp } 
+        from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+    // ==========================================================
+    // 2. CONFIGURACIÓN E INICIALIZACIÓN
+    // ==========================================================
+    const firebaseConfig = {
+      apiKey: "AIzaSyDyBGnwCaBaKEpqZshEcwbYJ8VHzbAQU48",
+      authDomain: "censo-de-urgencias.firebaseapp.com",
+      projectId: "censo-de-urgencias",
+      storageBucket: "censo-de-urgencias.firebasestorage.app",
+      messagingSenderId: "887013797611",
+      appId: "1:887013797611:web:555a63ce66aeb50b4a58ae",
+      measurementId: "G-Y8GRGC6ZP7"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const db = getFirestore(app);
+
+    // ==========================================================
+    // 3. CONFIGURACIÓN DEL HOSPITAL (EDITA ESTO SEGÚN NECESITES)
+    // ==========================================================
+    let destinosGlobal = [
+      "PISO / HOSPITALIZACIÓN", "ALTA POR MEJORÍA", "ALTA VOLUNTARIA", 
+      "QUIRÓFANO", "TRASLADO", "TERAPIA INTENSIVA", "DEFUNCIÓN"
+    ];
+
+    const masterCamas = [
+      { area: "SALA DE CHOQUE", cama: "CHOQUE 1" }, { area: "SALA DE CHOQUE", cama: "CHOQUE 2" },
+      { area: "OBSERVACIÓN", cama: "CAMA 1" }, { area: "OBSERVACIÓN", cama: "CAMA 2" },
+      { area: "OBSERVACIÓN", cama: "CAMA 3" }, { area: "OBSERVACIÓN", cama: "CAMA 4" },
+      { area: "OBSERVACIÓN", cama: "CAMA 5" }, { area: "OBSERVACIÓN", cama: "CAMA 6" },
+      { area: "OBSERVACIÓN", cama: "CAMA 7" }, { area: "OBSERVACIÓN", cama: "CAMA 8" },
+      { area: "TRAUMA MENOR", cama: "TRAUMA 1" }, { area: "TRAUMA MENOR", cama: "TRAUMA 2" },
+      { area: "PEDIATRÍA", cama: "CUNA 1" }, { area: "PEDIATRÍA", cama: "CUNA 2" },
+      { area: "EXTRAS", cama: "AISLADO" }, { area: "EXTRAS", cama: "SILLA DE RUEDAS" }, { area: "EXTRAS", cama: "PASILLO" }
+    ];
+
+    // ==========================================================
+    // VARIABLES GLOBALES DEL CENSO
+    // ==========================================================
+    let pacientesGlobal = [];
+    let camasLibresGlobal = []; 
+    let currentViewMode = localStorage.getItem('censo-view') || 'kanban'; 
+    let isFetchingData = true;
+    let syncPlexusPatients = () => {}; 
+
+    // --- MAPEO DE EMOJIS Y ANIMACIONES ---
+    const areaVisuals = {
+      'SALA DE CHOQUE': { emoji: '❤️', class: 'icon-heartbeat' },
+      'OBSERVACION': { emoji: '👀', class: 'icon-look' },
+      'OBSERVACIÓN': { emoji: '👀', class: 'icon-look' },
+      'TRAUMA MENOR': { emoji: '🦴', class: 'icon-spin' },
+      'PEDIATRIA': { emoji: '🧸', class: 'icon-wiggle' },
+      'PEDIATRÍA': { emoji: '🧸', class: 'icon-wiggle' },
+      'EXTRAS': { emoji: '✨', class: 'icon-twinkle' },
+      'SIN ÁREA ASIGNADA': { emoji: '🏥', class: '' }
+    };
+
+    function vibrar(patron) { if (navigator.vibrate) { navigator.vibrate(patron); } }
+    const themes = ['dark', 'light', 'pink', 'colorful', 'midnight'];
+    const themeIcons = { 'dark': '🌙', 'light': '☀️', 'pink': '🌸', 'colorful': '🎨', 'midnight': '🌑' };
+    const themeColors = { 'dark': '#0f172a', 'light': '#eef4fb', 'pink': '#fdf2f8', 'colorful': '#f8fafc', 'midnight': '#000000' };
+
+    function escapeHtml(texto) { return String(texto || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;'); }
+    function cerrarModal(id) { document.getElementById(id).classList.remove('active'); }
+    function cerrarModalBorrado() { document.getElementById('deleteConfirmModal').classList.remove('active'); }
+
+    /* ==========================================================
+       LÓGICA DE CHIPS ARCOÍRIS
+       ========================================================== */
+    const chipPalette = [
+      { bg: '#ffe4e6', text: '#9f1239' }, { bg: '#dcfce7', text: '#166534' }, 
+      { bg: '#fef9c3', text: '#854d0e' }, { bg: '#dbeafe', text: '#1e40af' }, 
+      { bg: '#ffedd5', text: '#9a3412' }, { bg: '#f3e8ff', text: '#6b21a8' }, { bg: '#e0f7fa', text: '#006064' }  
+    ];
+
+    function getChipColor(text) {
+      if (!text) return { bg: 'var(--chip-bg)', text: 'var(--chip-text)' };
+      let hash = 0;
+      for (let i = 0; i < text.length; i++) hash = text.charCodeAt(i) + ((hash << 5) - hash);
+      return chipPalette[Math.abs(hash) % chipPalette.length];
+    }
+
+    function getColorfulChipHtml(destino) {
+      if (!destino) return '';
+      const isColorful = document.body.classList.contains('colorful');
+      if (isColorful) {
+        const colors = getChipColor(destino);
+        return `<div class="chip" style="background-color: ${colors.bg}; color: ${colors.text}; border-color: rgba(0,0,0,0.1); font-weight: 700;">${escapeHtml(destino)}</div>`;
+      } else { return `<div class="chip">${escapeHtml(destino)}</div>`; }
+    }
+
+    function agruparPorArea(lista) {
+      const grupos = {};
+      lista.forEach(p => { 
+        const areaRaw = p.area || 'SIN ÁREA ASIGNADA';
+        const area = String(areaRaw).trim(); 
+        if (!grupos[area]) grupos[area] = []; 
+        grupos[area].push(p); 
+      }); 
+      return grupos;
+    }
+
+    function crearCampo(label, value) {
+      if (!value || !String(value).trim()) return '';
+      return `<div class="field field-fade-in"><span class="label">${label}</span><div class="value">${escapeHtml(value)}</div></div>`;
+    }
+
+    function generarSkeletonHtml() {
+      const isDesktop = window.innerWidth >= 768;
+      if (currentViewMode === 'table' && isDesktop) {
+        let rows = '';
+        for(let i=0; i<10; i++) rows += `<div class="skeleton-row"><div class="skeleton-block skeleton-cell" style="width: 5%"></div><div class="skeleton-block skeleton-cell" style="width: 25%"></div><div class="skeleton-block skeleton-cell" style="width: 5%"></div><div class="skeleton-block skeleton-cell" style="width: 30%"></div><div class="skeleton-block skeleton-cell" style="width: 20%"></div><div class="skeleton-block skeleton-cell" style="width: 15%"></div></div>`;
+        return `<div class="table-wrapper animate-in" style="background: transparent;"><div class="section-header" style="background: var(--section-head); border-bottom: 2px solid var(--line);"><div class="skeleton-block" style="height: 1rem; width: 150px;"></div></div><div class="skeleton-loader">${rows}</div></div>`;
+      } 
+      if (isDesktop) {
+        let columnsHtml = '';
+        ['SALA DE CHOQUE', 'OBSERVACIÓN', 'PEDIATRÍA'].forEach(titulo => {
+          let cards = '';
+          for(let i=0; i<3; i++) cards += `<div class="skeleton-card" style="margin-bottom: 12px; border-radius: var(--radius-md); border: 1px solid var(--line);"><div class="skeleton-main"><div class="skeleton-block skeleton-name" style="width: 80%"></div><div class="skeleton-block skeleton-bed" style="width: 40%"></div></div><div class="skeleton-right"><div class="skeleton-block skeleton-chip"></div><div class="skeleton-block skeleton-caret"></div></div></div>`;
+          columnsHtml += `<div class="section" style="min-width: 450px; flex: 1;"><div class="section-header"><div class="section-title">${titulo}</div></div><div class="patient-list" style="padding: 16px;">${cards}</div></div>`;
+        });
+        return `<div style="display: flex; flex-direction: row; gap: 24px; padding: 10px 16px;">${columnsHtml}</div>`;
+      }
+      let mobileCards = '';
+      for(let i=0; i<6; i++) mobileCards += `<div class="skeleton-card"><div class="skeleton-main"><div class="skeleton-block skeleton-name"></div><div class="skeleton-block skeleton-bed"></div></div><div class="skeleton-right"><div class="skeleton-block skeleton-chip"></div><div class="skeleton-block skeleton-caret"></div></div></div>`;
+      return `<div class="section animate-in" style="margin-top:0; border-top:none;"><div class="section-header"><div class="section-title">CONECTANDO A FIREBASE...</div></div><div class="skeleton-loader">${mobileCards}</div></div>`;
+    }
+
+    function render(lista) {
+      const content = document.getElementById('content');
+      const metaText = document.getElementById('meta-text');
+      const mainAppContainer = document.getElementById('mainAppContainer');
+      const fabBtn = document.getElementById('mainFabBtn');
+
+      if(metaText) metaText.innerHTML = `${lista.length} PACIENTES`;
+      content.classList.remove('view-table-mode'); 
+      mainAppContainer.classList.remove('table-is-active');
+      if(fabBtn) fabBtn.style.display = 'flex';
+
+      if (!lista.length) { 
+        if (isFetchingData) { content.innerHTML = generarSkeletonHtml(); } 
+        else { content.innerHTML = `<div class="empty animate-in">NO HAY PACIENTES EN EL CENSO.</div>`; }
+        if (typeof syncPlexusPatients === 'function') syncPlexusPatients(lista);
+        return; 
+      }
+
+      const grupos = agruparPorArea(lista);
+      const areas = Object.keys(grupos);
+      const isDesktop = window.innerWidth >= 768;
+
+      if (currentViewMode === 'table' && isDesktop) {
+        content.classList.add('view-table-mode');
+        mainAppContainer.classList.add('table-is-active'); 
+        if(fabBtn) fabBtn.style.display = 'none';
+
+        let tableHtml = `<div class="table-wrapper animate-in"><table class="censo-table"><thead><tr><th style="width: 7%">CAMA</th><th style="width: 23%">PACIENTE</th><th style="width: 4%">EDAD</th><th style="width: 25%">DIAGNÓSTICO</th><th style="width: 25%">PENDIENTES</th><th style="width: 8%">DESTINO</th><th style="width: 8%; text-align: center;">ACCIÓN</th></tr></thead><tbody>`;
+        
+        areas.forEach((area) => {
+          const areaNormalizada = String(area).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().trim();
+          const visual = areaVisuals[areaNormalizada] || areaVisuals[area.toUpperCase()] || { emoji: '🏥', class: '' };
+
+          tableHtml += `<tr style="background: var(--card-open);"><td colspan="7" style="padding: 6px 10px; font-weight: 800; font-size: 0.85rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--line);"><span class="area-icon ${visual.class}">${visual.emoji}</span> ${escapeHtml(area)}</td></tr>`;
+
+          grupos[area].forEach((p) => {
+            const destinoChip = getColorfulChipHtml(p.destino);
+            tableHtml += `<tr class="patient-row" onclick="toggleTableRow(this)"><td style="padding: 6px 10px;"><span style="color: var(--accent); font-weight: 700; font-size: 0.85rem;">${escapeHtml(p.cama || '-')}</span></td><td style="padding: 6px 10px; font-family: 'Space Mono', monospace; font-weight: 700; font-size: 0.9rem; line-height: 1.1;" class="patient-name">${escapeHtml(p.nombre)}</td><td style="padding: 6px 10px;"><span style="color: var(--muted); font-size: 0.85rem;" class="value">${escapeHtml(p.edad || '-')}</span></td><td style="padding: 6px 10px;"><div class="truncate-text" style="font-size: 0.8rem; line-height: 1.2;" title="${escapeHtml(p.diagnostico)}">${escapeHtml(p.diagnostico || '-')}</div></td><td style="padding: 6px 10px;"><div class="truncate-text" style="font-size: 0.8rem; line-height: 1.2;" title="${escapeHtml(p.pendientes)}">${escapeHtml(p.pendientes || '-')}</div></td><td style="padding: 6px 10px;">${destinoChip}</td><td style="padding: 4px 10px; text-align: center; white-space: nowrap;"><button class="btn-table edit" style="padding: 4px; font-size: 0.9rem; margin-right: 2px;" onclick="abrirModal('${p.fila}'); event.stopPropagation();" title="Editar">✏️</button><button class="btn-table delete" style="padding: 4px; font-size: 0.9rem;" onclick="borrarPacienteDirecto('${p.fila}', '${escapeHtml(p.nombre)}'); event.stopPropagation();" title="Borrar">🗑️</button></td></tr>`;
+          });
+        });
+
+        tableHtml += `</tbody></table><button class="btn-add-table" onclick="abrirModalAgregar()">➕ NUEVO INGRESO</button></div>`;
+        content.innerHTML = tableHtml;
+        if (typeof syncPlexusPatients === 'function') syncPlexusPatients(lista);
+        return;
+      }
+
+      content.innerHTML = '';
+      areas.forEach((area, indexArea) => {
+        const pacientes = grupos[area];
+        const delayBase = indexArea * 150; 
+        const areaNormalizada = String(area).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().trim();
+        const visual = areaVisuals[areaNormalizada] || areaVisuals[area.toUpperCase()] || { emoji: '🏥', class: '' };
+
+        const sectionHtml = `
+          <section class="section animate-in" style="animation-delay: ${delayBase}ms;">
+            <div class="section-header">
+              <div class="section-title">
+                <span class="area-icon ${visual.class}">${visual.emoji}</span> ${escapeHtml(area)}
+              </div>
+            </div>
+            <div class="patient-list">
+              ${pacientes.map((p, indexPatient) => {
+                const camaHtml = p.cama ? `<div class="patient-bed">${escapeHtml(p.cama)}</div>` : '';
+                const destinoChip = getColorfulChipHtml(p.destino);
+                const detailsHtml = [ crearCampo('EDAD', p.edad), crearCampo('DIAGNÓSTICO', p.diagnostico), crearCampo('PENDIENTES', p.pendientes), crearCampo('DESTINO', p.destino) ].filter(Boolean).join('');
+                const delayPatient = delayBase + (indexPatient * 50);
+                
+                return `<div class="card animate-in" data-fila="${p.fila}" data-nombre="${escapeHtml(p.nombre)}" style="animation-delay: ${delayPatient}ms;"><div class="swipe-bg"><div class="swipe-action swipe-delete">🗑️</div><div class="swipe-action swipe-edit">✏️</div></div><div class="card-content-wrapper"><div class="card-header" onclick="toggleCard(this)"><div class="patient-main"><div class="patient-name">${escapeHtml(p.nombre)}</div>${camaHtml}</div><div class="header-right">${destinoChip}<div class="caret">⌄</div></div></div><div class="details"><div class="details-content">${detailsHtml}<button class="btn-editar-tarjeta" onclick="abrirModal('${p.fila}'); event.stopPropagation();">✏️ EDITAR PACIENTE</button></div></div></div></div>`;
+              }).join('')}
+            </div>
+          </section>
+        `;
+        content.innerHTML += sectionHtml;
+      });
+      
+      if (typeof syncPlexusPatients === 'function') syncPlexusPatients(lista);
+    }
+
+    // ==========================================================
+    // CONEXIÓN EN TIEMPO REAL CON FIREBASE
+    // ==========================================================
+    let unsubscribe = null;
+    
+    function initFirebaseListener() {
+      isFetchingData = true;
+      document.getElementById('reloadIcon').classList.add('spin');
+      
+      // Escuchador en tiempo real: Se dispara cada vez que Firebase cambia
+      unsubscribe = onSnapshot(collection(db, "pacientes"), (snapshot) => {
+        pacientesGlobal = [];
+        let occupiedBeds = [];
+
+        snapshot.forEach((doc) => {
+          let data = doc.data();
+          data.fila = doc.id; // En Firebase el ID es alfanumérico
+          pacientesGlobal.push(data);
+          if(data.cama) occupiedBeds.push(data.cama.toUpperCase().trim());
+        });
+
+        // Calcular camas libres basándose en la lista maestra
+        camasLibresGlobal = masterCamas.filter(c => !occupiedBeds.includes(c.cama.toUpperCase().trim()));
+        // Asignarles un ID virtual para los selects
+        camasLibresGlobal = camasLibresGlobal.map((c, i) => ({ ...c, fila: 'cama_libre_'+i }));
+
+        isFetchingData = false;
+        filtrar(); 
+        document.getElementById('reloadIcon').classList.remove('spin');
+      }, (error) => {
+        isFetchingData = false;
+        mostrarError(error);
+        document.getElementById('reloadIcon').classList.remove('spin');
+      });
+    }
+
+    // ==========================================================
+    // LÓGICA DE INTERFAZ Y MODALES (CONEXIÓN A FIREBASE)
+    // ==========================================================
+    function toggleCard(headerEl) {
+      vibrar(15); 
+      const card = headerEl.closest('.card'); 
+      card.classList.toggle('open');
+      resetAllSwipes();
+      if (card.classList.contains('open')) { setTimeout(() => { card.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }, 350); }
+    }
+
+    function toggleTableRow(row) {
+      const yaEstaAbierta = row.classList.contains('expanded-row');
+      document.querySelectorAll('.patient-row').forEach(tr => { tr.classList.remove('expanded-row'); });
+      if (!yaEstaAbierta) { row.classList.add('expanded-row'); }
+    }
+
+    function abrirModal(fila) {
+      vibrar(30); 
+      const paciente = pacientesGlobal.find(p => p.fila === fila);
+      if(!paciente) return;
+      
+      document.getElementById('modalFila').value = paciente.fila;
+      document.getElementById('modalNombre').value = (paciente.nombre || '').toUpperCase();
+      document.getElementById('modalEdad').value = (paciente.edad || '').toUpperCase();
+      document.getElementById('modalDiagnostico').value = (paciente.diagnostico || '').toUpperCase();
+      document.getElementById('modalPendientes').value = (paciente.pendientes || '').toUpperCase();
+
+      const selectDestino = document.getElementById('modalDestino');
+      selectDestino.innerHTML = '<option value="">(SIN DESTINO)</option>';
+      const pDestinoStr = String(paciente.destino || '').toUpperCase().trim();
+      
+      destinosGlobal.forEach(d => {
+        const dStr = String(d).toUpperCase().trim();
+        const isSelected = (pDestinoStr === dStr) ? 'selected' : '';
+        selectDestino.innerHTML += `<option value="${escapeHtml(dStr)}" ${isSelected}>${escapeHtml(dStr)}</option>`;
+      });
+
+      const selectMoverA = document.getElementById('moverA_Select');
+      selectMoverA.innerHTML = '<option value="" selected>NO MOVER (MANTENER EN CAMA ACTUAL)</option>';
+      const gruposLibres = agruparPorArea(camasLibresGlobal);
+      for (const [area, camas] of Object.entries(gruposLibres)) {
+        let optgroup = `<optgroup label="${escapeHtml(area.toUpperCase())}">`;
+        camas.forEach(c => { optgroup += `<option value="${c.fila}">${escapeHtml(c.cama.toUpperCase())}</option>`; });
+        optgroup += `</optgroup>`; selectMoverA.innerHTML += optgroup;
+      }
+      document.getElementById('editModal').classList.add('active');
+    }
+
+    async function guardarEdicion() {
+      const btnGuardar = document.getElementById('btnGuardarEdit');
+      const filaId = document.getElementById('modalFila').value;
+      const moverAFila = document.getElementById('moverA_Select').value;
+
+      btnGuardar.disabled = true; btnGuardar.innerHTML = '<span class="spin">🔄</span> GUARDANDO...';
+      
+      try {
+        let updateData = {
+            nombre: document.getElementById('modalNombre').value.toUpperCase(),
+            edad: document.getElementById('modalEdad').value.toUpperCase(),
+            diagnostico: document.getElementById('modalDiagnostico').value.toUpperCase(),
+            pendientes: document.getElementById('modalPendientes').value.toUpperCase(),
+            destino: document.getElementById('modalDestino').value.toUpperCase()
+        };
+
+        // Si se solicitó un cambio de cama
+        if (moverAFila && moverAFila !== "") {
+            const nuevaCamaObj = camasLibresGlobal.find(c => c.fila === moverAFila);
+            if (nuevaCamaObj) {
+                updateData.cama = nuevaCamaObj.cama.toUpperCase();
+                updateData.area = nuevaCamaObj.area.toUpperCase();
+            }
+        }
+
+        // Se envía a Firebase
+        await updateDoc(doc(db, "pacientes", filaId), updateData);
+        vibrar(20); 
+        cerrarModal('editModal');
+      } catch (error) {
+        vibrar([100, 50, 100]); 
+        alert('ERROR AL GUARDAR: ' + error.message);
+      } finally {
+        btnGuardar.disabled = false; btnGuardar.innerHTML = '💾 GUARDAR';
+      }
+    }
+
+    let filaABorrar = null;
+    let iconoAlertaInterval = null;
+
+    function mostrarModalBorrar(fila, nombre) {
+      vibrar([60, 50, 60]);
+      filaABorrar = fila; // ID de Firebase
+      document.getElementById('deleteTargetName').innerText = nombre;
+      document.getElementById('deleteConfirmModal').classList.add('active');
+      
+      const iconEl = document.getElementById('warningIconObj');
+      let esSirena = true; iconEl.innerText = '🚨'; 
+      if(iconoAlertaInterval) clearInterval(iconoAlertaInterval);
+      iconoAlertaInterval = setInterval(() => { esSirena = !esSirena; iconEl.innerText = esSirena ? '🚨' : '⚠️'; }, 400); 
+    }
+
+    function borrarPacienteDialog() {
+      const fila = document.getElementById('modalFila').value;
+      const nom = document.getElementById('modalNombre').value;
+      cerrarModal('editModal'); mostrarModalBorrar(fila, nom); 
+    }
+
+    function borrarPacienteDirecto(fila, nombre) { mostrarModalBorrar(fila, nombre); }
+
+    async function ejecutarBorrado() {
+      const btnBorrar = document.getElementById('btnConfirmDelete');
+      if (!filaABorrar) return;
+
+      btnBorrar.disabled = true; btnBorrar.innerHTML = '<span class="spin">🔄</span>...';
+      vibrar(20);
+      
+      try {
+        await deleteDoc(doc(db, "pacientes", filaABorrar));
+        vibrar([30, 50, 30]); 
+        cerrarModalBorrado(); 
+        if (typeof confetti === 'function') { confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, colors: ['#ef4444', '#10b981', '#3b82f6', '#fbbf24'] }); }
+      } catch (error) {
+        vibrar([100, 50, 100]); 
+        alert('ERROR AL BORRAR: ' + error.message); 
+        cerrarModalBorrado();
+      } finally {
+        btnBorrar.disabled = false; btnBorrar.innerHTML = 'SÍ, BORRAR';
+      }
+    }
+
+    function abrirModalAgregar() {
+      vibrar(30); 
+      
+      const selectCama = document.getElementById('addCamaSelect');
+      selectCama.innerHTML = '<option value="" disabled selected>SELECCIONA UNA CAMA LIBRE...</option>';
+      if (camasLibresGlobal.length === 0) { 
+        selectCama.innerHTML += '<option value="" disabled>NO HAY CAMAS DISPONIBLES 🛑</option>'; 
+      } else {
+        const gruposLibres = agruparPorArea(camasLibresGlobal);
+        for (const [area, camas] of Object.entries(gruposLibres)) {
+          let optgroup = `<optgroup label="${escapeHtml(area.toUpperCase())}">`;
+          // value ahora lleva tanto el nombre de la cama como el área
+          camas.forEach(c => { optgroup += `<option value="${escapeHtml(c.cama.toUpperCase())}|${escapeHtml(c.area.toUpperCase())}">${escapeHtml(c.cama.toUpperCase())}</option>`; });
+          optgroup += `</optgroup>`; selectCama.innerHTML += optgroup;
+        }
+      }
+
+      const selectDestino = document.getElementById('addDestino');
+      selectDestino.innerHTML = '<option value="">(SIN DESTINO)</option>';
+      destinosGlobal.forEach(d => {
+        selectDestino.innerHTML += `<option value="${escapeHtml(d.toUpperCase())}">${escapeHtml(d.toUpperCase())}</option>`;
+      });
+
+      document.getElementById('addNombre').value = ''; 
+      document.getElementById('addEdad').value = ''; 
+      document.getElementById('addDiagnostico').value = ''; 
+      document.getElementById('addPendientes').value = '';
+      document.getElementById('addDestino').value = '';
+      
+      document.getElementById('addModal').classList.add('active');
+    }
+
+    async function guardarNuevo() {
+      const btnGuardar = document.getElementById('btnGuardarAdd');
+      const selectCama = document.getElementById('addCamaSelect');
+      
+      if(!selectCama.value) { alert("POR FAVOR SELECCIONA UNA CAMA DISPONIBLE."); return; }
+      
+      // Separar cama y area del value seleccionado
+      const [nombreCamaReal, areaReal] = selectCama.value.split('|');
+      
+      const nom = document.getElementById('addNombre').value.toUpperCase(); 
+      if(!nom) { alert("EL NOMBRE ES OBLIGATORIO."); return; }
+
+      btnGuardar.disabled = true; 
+      btnGuardar.innerHTML = '<span class="spin">🔄</span> PROCESANDO...';
+
+      try {
+        await addDoc(collection(db, "pacientes"), {
+            nombre: nom,
+            edad: document.getElementById('addEdad').value.toUpperCase(),
+            diagnostico: document.getElementById('addDiagnostico').value.toUpperCase(),
+            pendientes: document.getElementById('addPendientes').value.toUpperCase(),
+            destino: document.getElementById('addDestino').value.toUpperCase(),
+            cama: nombreCamaReal,
+            area: areaReal,
+            creado: serverTimestamp()
+        });
+        vibrar(20); 
+        cerrarModal('addModal');
+      } catch (error) {
+        vibrar([100, 50, 100]); 
+        alert("ERROR: " + error.message); 
+      } finally {
+        btnGuardar.disabled = false; btnGuardar.innerHTML = '➕ INGRESAR';
+      }
+    }
+
+    // ==========================================================
+    // EXPORTAR FUNCIONES AL WINDOW (Requisito para <script type="module">)
+    // ==========================================================
+    window.cerrarModal = cerrarModal;
+    window.cerrarModalBorrado = cerrarModalBorrado;
+    window.toggleCard = toggleCard;
+    window.toggleTableRow = toggleTableRow;
+    window.abrirModal = abrirModal;
+    window.guardarEdicion = guardarEdicion;
+    window.borrarPacienteDialog = borrarPacienteDialog;
+    window.borrarPacienteDirecto = borrarPacienteDirecto;
+    window.ejecutarBorrado = ejecutarBorrado;
+    window.abrirModalAgregar = abrirModalAgregar;
+    window.guardarNuevo = guardarNuevo;
+
+    // ==========================================================
+    // UTILIDADES GLOBALES (Filtros, Temas, etc)
+    // ==========================================================
+    function normalizar(texto) { return String(texto || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim(); }
+    
+    const easterEggsMap = {
+      'yehernandez': ['❤️', '🐶', '🐕', '🦴', '🐾', '🐩', '💖', '🦮', '🎾', '💕'],
+      'rodrrodriguez': ['🤖', '💻', '👾', '⚙️', '🖨️', '🔈', '🕹️', '🐺', '🎧', '🛠️'],
+      'alfrojas': ['🔪', '🩸', '🗡️', '🩹', '🚑', '⚔️', '🪓', '🏥', '🚨', '💉'],
+      'iharo': ['🐱', '🐈', '🧶', '😻', '🐾', '😽', '🐭', '🙀', '😼', '🐟']
+    };
+    
+    let activeEasterEggs = new Set();
+
+    function checkEasterEggs(query) {
+      const q = query.toLowerCase().replace(/\s+/g, '');
+      let isEasterEggTriggered = false;
+      
+      for (const key in easterEggsMap) {
+        if (q.includes(key) && !activeEasterEggs.has(key)) {
+          activeEasterEggs.add(key);
+          const cantidadEmojis = easterEggsMap[key].length;
+          for(let i=0; i < cantidadEmojis; i++) { spawnSurfer(key, i); }
+          isEasterEggTriggered = true;
+        }
+      }
+      return isEasterEggTriggered;
+    }
+
+    function spawnSurfer(key, index) {
+      const container = document.getElementById('easterEggContainer');
+      if (!container) return;
+      const emoji = easterEggsMap[key][index];
+      const wrapper = document.createElement('div');
+      wrapper.className = 'surfer-wrapper';
+      const duration = 15 + Math.random() * 15; 
+      wrapper.style.animationDuration = `${duration}s`;
+      wrapper.style.animationDelay = `-${Math.random() * duration}s`; 
+      wrapper.style.bottom = `${5 + Math.random() * 40}px`; 
+      
+      const inner = document.createElement('span');
+      inner.className = 'surfer-emoji';
+      inner.innerText = emoji;
+      const bobDuration = 2 + Math.random() * 2; 
+      inner.style.animationDuration = `${bobDuration}s`;
+      inner.style.animationDelay = `-${Math.random() * 2}s`; 
+      
+      inner.onpointerdown = (e) => {
+         e.stopPropagation(); e.preventDefault(); vibrar(15);
+         inner.style.animation = 'none'; inner.style.transform = 'scale(0)'; inner.style.opacity = '0'; inner.style.transition = 'all 0.2s ease';
+         setTimeout(() => wrapper.remove(), 200); 
+      };
+      wrapper.appendChild(inner); container.appendChild(wrapper);
+    }
+
+    function filtrar() {
+      const searchInput = document.getElementById('search');
+      const q = normalizar(searchInput.value);
+      const eggFound = checkEasterEggs(q); 
+      
+      if (eggFound) {
+        searchInput.value = ''; searchInput.blur();
+        document.getElementById('searchWrapper').classList.add('collapsed');
+        vibrar([40, 60, 40]);
+        render(pacientesGlobal); return;
+      }
+      if (isFetchingData) return; 
+      if (!q) { render(pacientesGlobal); return; }
+      
+      const filtrados = pacientesGlobal.filter(p => { 
+        return normalizar([p.nombre, p.cama, p.area || '', p.edad, p.diagnostico, p.pendientes, p.destino].join(' ')).includes(q); 
+      });
+      render(filtrados);
+      document.querySelectorAll('.animate-in').forEach(el => { el.classList.remove('animate-in'); el.style.animationDelay = '0ms'; el.style.opacity = '1'; });
+    }
+
+    function mostrarError(error) { 
+      document.getElementById('content').innerHTML = `<div class="error animate-in">ERROR:\n${escapeHtml(error && error.message ? error.message : error)}</div>`; 
+      if(document.getElementById('meta-text')) document.getElementById('meta-text').innerHTML = `ERROR DE CONEXIÓN`; 
+    }
+
+    function applyTheme(theme) {
+      if (!themes.includes(theme)) theme = 'dark';
+      const body = document.body; const themeIcon = document.getElementById('themeIcon');
+      body.classList.remove(...themes); body.classList.add(theme);
+      const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+      if(metaThemeColor) metaThemeColor.setAttribute('content', themeColors[theme]);
+      if(themeIcon) themeIcon.textContent = themeIcons[theme];
+      localStorage.setItem('censo-theme', theme);
+    }
+
+    function initTheme() {
+      const saved = localStorage.getItem('censo-theme');
+      document.getElementById('viewIcon').textContent = currentViewMode === 'kanban' ? '📋' : '🗂️'; 
+      if (themes.includes(saved)) { applyTheme(saved); return; }
+      const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches; 
+      applyTheme(prefersLight ? 'light' : 'dark');
+    }
+
+    // EVENTOS UI
+    document.getElementById('search').addEventListener('input', filtrar);
+    document.getElementById('search').addEventListener('search', (e) => { if (e.target.value === '') render(pacientesGlobal); });
+    
+    document.getElementById('themeToggle').addEventListener('click', () => { 
+      vibrar(15); let currentTheme = 'dark';
+      themes.forEach(t => { if(document.body.classList.contains(t)) currentTheme = t; });
+      let nextIndex = (themes.indexOf(currentTheme) + 1) % themes.length; applyTheme(themes[nextIndex]);
+    });
+
+    document.getElementById('viewToggleBtn').addEventListener('click', () => {
+      vibrar(15);
+      currentViewMode = currentViewMode === 'kanban' ? 'table' : 'kanban';
+      localStorage.setItem('censo-view', currentViewMode);
+      document.getElementById('viewIcon').textContent = currentViewMode === 'kanban' ? '📋' : '🗂️';
+      render(pacientesGlobal);
+    });
+    
+    document.getElementById('searchToggleBtn').addEventListener('click', () => {
+      vibrar(15); const wrapper = document.getElementById('searchWrapper'); const searchInput = document.getElementById('search');
+      wrapper.classList.toggle('collapsed');
+      if (!wrapper.classList.contains('collapsed')) { setTimeout(() => searchInput.focus(), 300); } else { searchInput.value = ''; render(pacientesGlobal); }
+    });
+    
+    // Ahora el ReloadBtn solo fuerza un render (ya que Firebase siempre está en vivo)
+    document.getElementById('reloadBtn').addEventListener('click', () => { 
+        vibrar(15); 
+        document.getElementById('reloadIcon').classList.add('spin'); 
+        render(pacientesGlobal); 
+        setTimeout(() => document.getElementById('reloadIcon').classList.remove('spin'), 800); 
+    });
+
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => { if (!isFetchingData) render(pacientesGlobal); }, 200);
+    });
+
+    // ==========================================================
+    // SISTEMA DE PARTÍCULAS NEURAL Y SINAPSIS (v4.0 Multi-Salto)
+    // ==========================================================
+    function initPlexus() {
+      const canvas = document.getElementById('plexusCanvas');
+      const ctx = canvas.getContext('2d');
+      let width, height, standardParticles = [], patientParticles = [];
+
+      function resize() { width = canvas.width = canvas.offsetWidth; height = canvas.height = canvas.offsetHeight; }
+
+      const plexusAreaColors = {
+        'SALA DE CHOQUE': { solid: '#ef4444', glow: 'rgba(239, 68, 68, 0.6)' },
+        'OBSERVACION': { solid: '#10b981', glow: 'rgba(16, 185, 129, 0.6)' },
+        'OBSERVACIÓN': { solid: '#10b981', glow: 'rgba(16, 185, 129, 0.6)' },
+        'TRAUMA MENOR': { solid: '#eab308', glow: 'rgba(234, 179, 8, 0.6)' },
+        'PEDIATRIA': { solid: '#3b82f6', glow: 'rgba(59, 130, 246, 0.6)' },
+        'PEDIATRÍA': { solid: '#3b82f6', glow: 'rgba(59, 130, 246, 0.6)' },
+        'EXTRAS': { solid: '#d946ef', glow: 'rgba(217, 70, 239, 0.6)' }
+      };
+
+      class Particle {
+        constructor(isPatient = false, colorSet = null, index = 0) {
+          this.id = isPatient ? 'p_' + index : 's_' + index;
+          this.isPatient = isPatient;
+          this.x = Math.random() * width; this.y = Math.random() * height;
+          this.vx = (Math.random() - 0.5) * 0.4; this.vy = (Math.random() - 0.5) * 0.4;
+          
+          if (isPatient) { this.radius = Math.random() * 2 + 4.5; this.color = colorSet || { solid: '#ffffff', glow: 'rgba(255,255,255,0.4)' }; } 
+          else { this.radius = Math.random() * 1.5 + 0.5; this.color = null; }
+        }
+        update() { this.x += this.vx; this.y += this.vy; if (this.x < 0 || this.x > width) this.vx *= -1; if (this.y < 0 || this.y > height) this.vy *= -1; }
+        draw(defaultFill) {
+          if (this.isPatient) {
+            ctx.beginPath(); ctx.arc(this.x, this.y, this.radius + 3, 0, Math.PI * 2); ctx.fillStyle = this.color.glow; ctx.fill();
+            ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2); ctx.fillStyle = this.color.solid; ctx.fill();
+          } else {
+            ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2); ctx.fillStyle = defaultFill; ctx.fill();
+          }
+        }
+      }
+
+      function createStandardParticles() { standardParticles = []; let num = Math.floor(width / 35); for (let i = 0; i < num; i++) standardParticles.push(new Particle(false, null, i)); }
+
+      syncPlexusPatients = (listaPacientes) => {
+        patientParticles = [];
+        (listaPacientes || []).forEach((p, index) => {
+          let areaNormalizada = String(p.area || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().trim();
+          let colorSet = plexusAreaColors[areaNormalizada] || { solid: '#ffffff', glow: 'rgba(255,255,255,0.4)' };
+          patientParticles.push(new Particle(true, colorSet, index));
+        });
+      };
+
+      function getConnections(particles) {
+        let connections = new Map();
+        for (let i = 0; i < particles.length; i++) {
+          connections.set(particles[i].id, []);
+          for (let j = 0; j < particles.length; j++) {
+            if (i !== j) {
+              let dx = particles[i].x - particles[j].x, dy = particles[i].y - particles[j].y;
+              if (Math.sqrt(dx*dx + dy*dy) < 80) connections.get(particles[i].id).push(particles[j]);
+            }
+          }
+        }
+        return connections;
+      }
+
+      function animate() {
+        ctx.clearRect(0, 0, width, height);
+        let defaultFill = 'rgba(255, 255, 255, 0.4)', defaultStroke = 'rgba(255, 255, 255, 0.2)';
+        
+        if (document.body.classList.contains('light')) { defaultFill = 'rgba(15, 23, 42, 0.4)'; defaultStroke = 'rgba(15, 23, 42, 0.2)'; } 
+        else if (document.body.classList.contains('pink')) { defaultFill = 'rgba(219, 39, 119, 0.6)'; defaultStroke = 'rgba(219, 39, 119, 0.4)'; } 
+        else if (document.body.classList.contains('colorful')) { defaultFill = 'rgba(0, 31, 63, 0.4)'; defaultStroke = 'rgba(0, 31, 63, 0.25)'; }
+        
+        let allParticles = standardParticles.concat(patientParticles); ctx.lineWidth = 0.8; 
+
+        // 1. DIBUJAR LA RED
+        for (let i = 0; i < allParticles.length; i++) {
+          allParticles[i].update(); allParticles[i].draw(defaultFill);
+          for (let j = i + 1; j < allParticles.length; j++) {
+            const dx = allParticles[j].x - allParticles[i].x, dy = allParticles[j].y - allParticles[i].y;
+            if (Math.sqrt(dx * dx + dy * dy) < 80) {
+              ctx.beginPath(); ctx.strokeStyle = defaultStroke; ctx.moveTo(allParticles[i].x, allParticles[i].y); ctx.lineTo(allParticles[j].x, allParticles[j].y); ctx.stroke();
+            }
+          }
+        }
+
+        // 2. LÓGICA DE CASCADA DE DATOS
+        let timeNow = Date.now() * 0.001;
+        let connections = getConnections(allParticles);
+
+        patientParticles.forEach((patient, pIndex) => {
+           let patientHash = (pIndex * 73), cycleLength = 15 + (patientHash % 15), cycleTime = (timeNow + (patientHash % 100)) % cycleLength, cascadeDuration = 1.2; 
+           if (cycleTime <= cascadeDuration) {
+             let path = [patient], current = patient;
+             for(let step=0; step<2; step++) {
+               let neighbors = connections.get(current.id) || [], validNeighbors = neighbors.filter(n => !path.includes(n));
+               if (validNeighbors.length > 0) {
+                 let nextNode = validNeighbors[(patientHash + step) % validNeighbors.length];
+                 path.unshift(nextNode); current = nextNode;
+               } else { break; }
+             }
+
+             if (path.length > 1) {
+               let numJumps = path.length - 1, timePerJump = 0.3, totalTravelTime = numJumps * timePerJump, glowDuration = 1.2; 
+               if (cycleTime <= totalTravelTime) {
+                 let currentJumpIndex = Math.floor(cycleTime / timePerJump);
+                 if(currentJumpIndex < numJumps) {
+                   let startNode = path[currentJumpIndex], endNode = path[currentJumpIndex + 1], localT = (cycleTime % timePerJump) / timePerJump;
+                   let px = startNode.x + (endNode.x - startNode.x) * localT, py = startNode.y + (endNode.y - startNode.y) * localT;
+                   ctx.fillStyle = patient.color.solid; ctx.beginPath(); ctx.arc(px, py, 2, 0, Math.PI * 2); ctx.fill();
+                 }
+               } else if (cycleTime > totalTravelTime && cycleTime <= totalTravelTime + glowDuration) {
+                 let progress = (cycleTime - totalTravelTime) / glowDuration, ease = Math.sin(progress * Math.PI); 
+                 ctx.beginPath(); ctx.arc(patient.x, patient.y, patient.radius + (1 + 2 * ease), 0, Math.PI * 2);
+                 ctx.save(); ctx.globalAlpha = 0.5 + (0.3 * ease); ctx.fillStyle = patient.color.solid; ctx.fill(); ctx.restore();
+               }
+             }
+           }
+        });
+        requestAnimationFrame(animate);
+      }
+      window.addEventListener('resize', () => { resize(); createStandardParticles(); });
+      resize(); createStandardParticles(); animate();
+    }
+
+    // ARRANQUE FINAL
+    initTheme(); 
+    initFirebaseListener(); // Se conecta en vivo a Firestore
+    setTimeout(initPlexus, 100);
+
+    // ==========================================================
+    // LÓGICA DE SWIPE (DESLIZAMIENTO) PARA MÓVIL
+    // ==========================================================
+    function resetAllSwipes() { document.querySelectorAll('.card-content-wrapper').forEach(el => { el.style.transform = 'translateX(0px)'; }); }
+    let swipeStartX = 0, swipeStartY = 0, isSwiping = false, currentSwipeCard = null, swipeActionReady = false; 
+    const ACTION_THRESHOLD = 110; 
+
+    document.addEventListener('touchstart', e => {
+      if (e.target.closest('.swipe-action')) return; 
+      const wrapper = e.target.closest('.card-content-wrapper'); if (!wrapper) return;
+      document.querySelectorAll('.card-content-wrapper').forEach(el => { if (el !== wrapper) { el.style.transform = 'translateX(0px)'; el.closest('.card').classList.remove('swipe-ready-delete', 'swipe-ready-edit'); } });
+      swipeStartX = e.touches[0].clientX; swipeStartY = e.touches[0].clientY;
+      isSwiping = true; swipeActionReady = false; currentSwipeCard = wrapper; currentSwipeCard.classList.add('swiping');
+    }, {passive: true});
+
+    document.addEventListener('touchmove', e => {
+      if (!isSwiping || !currentSwipeCard) return;
+      const deltaX = e.touches[0].clientX - swipeStartX, deltaY = e.touches[0].clientY - swipeStartY;
+      if (Math.abs(deltaY) > Math.abs(deltaX)) { isSwiping = false; currentSwipeCard.style.transform = 'translateX(0px)'; return; }
+      let moveX = deltaX;
+      if (moveX > ACTION_THRESHOLD) { moveX = ACTION_THRESHOLD + (moveX - ACTION_THRESHOLD) * 0.3; } else if (moveX < -ACTION_THRESHOLD) { moveX = -ACTION_THRESHOLD + (moveX + ACTION_THRESHOLD) * 0.3; }
+      const cardEl = currentSwipeCard.closest('.card');
+      if (Math.abs(deltaX) >= ACTION_THRESHOLD && !swipeActionReady) {
+          swipeActionReady = true; vibrar(25); 
+          if (deltaX > 0) cardEl.classList.add('swipe-ready-delete');
+          if (deltaX < 0) cardEl.classList.add('swipe-ready-edit');
+      } else if (Math.abs(deltaX) < ACTION_THRESHOLD && swipeActionReady) {
+          swipeActionReady = false; cardEl.classList.remove('swipe-ready-delete', 'swipe-ready-edit');
+      }
+      currentSwipeCard.style.transform = `translateX(${moveX}px)`;
+    }, {passive: true});
+
+    document.addEventListener('touchend', e => {
+      if (!isSwiping || !currentSwipeCard) return;
+      isSwiping = false; currentSwipeCard.classList.remove('swiping');
+      const deltaX = e.changedTouches[0].clientX - swipeStartX, cardEl = currentSwipeCard.closest('.card');
+      const fila = cardEl.getAttribute('data-fila'); const nombre = cardEl.getAttribute('data-nombre');
+      currentSwipeCard.style.transform = 'translateX(0px)'; cardEl.classList.remove('swipe-ready-delete', 'swipe-ready-edit');
+      if (deltaX >= ACTION_THRESHOLD) { setTimeout(() => borrarPacienteDirecto(fila, nombre), 150); } else if (deltaX <= -ACTION_THRESHOLD) { setTimeout(() => abrirModal(fila), 150); }
+      currentSwipeCard = null; swipeActionReady = false;
+    });
+</script>
+</body>
+</html>
