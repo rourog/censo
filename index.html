@@ -153,7 +153,22 @@
     }
 
 /* ENCABEZADO Y CANVAS NEURAL/PLEXUS (CON SOPORTE PARA NOTCH DE iPHONE) */
-    .header { position: relative; flex-shrink: 0; z-index: 50; width: 100%; padding: max(12px, env(safe-area-inset-top)) 10px 10px 10px; margin: 0; background: var(--panel-glass); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); box-shadow: 0 4px 166px rgba(0,0,0,0.08); overflow: hidden; }
+    /* ENCABEZADO Y CANVAS NEURAL/PLEXUS (CON SOPORTE PRECISO PARA NOTCH) */
+    .header { 
+      position: relative; 
+      flex-shrink: 0; 
+      z-index: 50; 
+      width: 100%; 
+      padding: 10px; /* Respaldo para navegadores antiguos */
+      padding-top: calc(10px + env(safe-area-inset-top, 0px)); /* Suma 10px exactos al espacio del Notch (si existe) */
+      margin: 0; 
+      background: var(--panel-glass); 
+      backdrop-filter: blur(12px); 
+      -webkit-backdrop-filter: blur(12px); 
+      border-bottom: 1px solid var(--line); 
+      box-shadow: 0 4px 166px rgba(0,0,0,0.08); 
+      overflow: hidden; 
+    }
     .header-top { display: flex; align-items: center; justify-content: space-between; position: relative; width: 100%; min-height: 48px; z-index: 2; }
     .header-top .header-left, .header-top .header-right { display: flex; align-items: center; gap: 8px; z-index: 2; }
     .header-top .header-right { justify-content: flex-end; }
