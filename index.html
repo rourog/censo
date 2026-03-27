@@ -594,7 +594,6 @@
       pacientesGlobal = []; camasLibresGlobal = []; render([]); 
     }
 
-    // Botón Iniciar Sesión con Google
     document.getElementById('btnGoogleLogin').addEventListener('click', async () => {
       try {
         document.getElementById('btnGoogleLogin').innerHTML = '<span class="spin">🔄</span> CONECTANDO...';
@@ -605,21 +604,17 @@
       }
     });
 
-    // Escuchador de estado de sesión
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         try {
-          // Revisamos si el usuario ya está en la lista blanca de la base de datos
           const userDoc = await getDoc(doc(db, "authorized_users", user.uid));
           if (userDoc.exists()) {
-            showMainApp(); // ¡Ya estaba autorizado!
+            showMainApp(); 
           } else {
-            // Es la primera vez que entra, le pedimos el código secreto
             loginScreen.classList.remove('active');
             authCodeScreen.classList.add('active');
           }
         } catch (error) {
-          // Si las reglas rechazan la lectura, asumimos que no está autorizado
           loginScreen.classList.remove('active');
           authCodeScreen.classList.add('active');
         }
@@ -628,25 +623,21 @@
       }
     });
 
-    // Botón Verificar Código Secreto
     document.getElementById('btnSubmitCode').addEventListener('click', async () => {
       const codeInput = document.getElementById('inputSecretCode').value.trim().toUpperCase();
       const btn = document.getElementById('btnSubmitCode');
       
       if (!codeInput) { alert("Ingresa el código primero."); return; }
-      
       btn.disabled = true; btn.innerHTML = '<span class="spin">🔄</span>...';
       
       try {
-        // Intentamos crear su registro de autorizado mandando el código que escribió
         await setDoc(doc(db, "authorized_users", auth.currentUser.uid), {
           nombre: auth.currentUser.displayName,
           email: auth.currentUser.email,
-          codigo: codeInput, // Firebase verificará que esto diga "DELICIAS2026"
+          codigo: codeInput, 
           fecha_ingreso: serverTimestamp()
         });
         
-        // Si no dio error, ¡el código era correcto!
         vibrar([30, 50, 30]);
         document.getElementById('inputSecretCode').value = '';
         showMainApp();
@@ -658,20 +649,13 @@
       }
     });
 
-    // Botón Cancelar en pantalla de Código
-    document.getElementById('btnCancelAuth').addEventListener('click', () => {
-      signOut(auth);
-    });
-
-    // Botón Cerrar Sesión (Menú Principal)
+    document.getElementById('btnCancelAuth').addEventListener('click', () => { signOut(auth); });
     document.getElementById('btnLogoutBtn').addEventListener('click', () => {
       vibrar(15);
-      if(confirm("¿Seguro que deseas salir del censo?")) {
-          signOut(auth);
-      }
+      if(confirm("¿Seguro que deseas salir del censo?")) { signOut(auth); }
     });
 
-// ==========================================================
+    // ==========================================================
     // 4. CONFIGURACIÓN DEL HOSPITAL
     // ==========================================================
     let destinosGlobal = [
@@ -826,7 +810,7 @@
 
           grupos[area].forEach((p) => {
             const destinoChip = getColorfulChipHtml(p.destino);
-            tableHtml += `<tr class="patient-row" onclick="toggleTableRow(this)"><td style="padding: 6px 10px;"><span style="color: var(--accent); font-weight: 700; font-size: 0.85rem;">${escapeHtml(p.cama || '-')}</span></td><td style="padding: 6px 10px; font-family: 'Space Mono', monospace; font-weight: 700; font-size: 0.9rem; line-height: 1.1;" class="patient-name">${escapeHtml(p.nombre)}</td><td style="padding: 6px 10px;"><span style="color: var(--muted); font-size: 0.85rem;" class="value">${escapeHtml(p.edad || '-')}</span></td><td style="padding: 6px 10px;"><div class="truncate-text" style="font-size: 0.8rem; line-height: 1.2;" title="${escapeHtml(p.diagnostico)}">${escapeHtml(p.diagnostico || '-')}</div></td><td style="padding: 6px 10px;"><div class="truncate-text" style="font-size: 0.8rem; line-height: 1.2;" title="${escapeHtml(p.pendientes)}">${escapeHtml(p.pendientes || '-')}</div></td><td style="padding: 6px 10px;">${destinoChip}</td><td style="padding: 4px 10px; text-align: center; white-space: nowrap;"><button class="btn-table edit" style="padding: 4px; font-size: 0.9rem; margin-right: 2px;" onclick="abrirModal('${p.fila}'); event.stopPropagation();" title="Editar">✏️</button><button class="btn-table delete" style="padding: 4px; font-size: 0.9rem;" onclick="borrarPacienteDirecto('${p.fila}', '${escapeHtml(p.nombre)}'); event.stopPropagation();" title="Borrar">🗑️</button></td></tr>`;
+            tableHtml += `<tr class="patient-row" onclick="toggleTableRow(this)"><td style="padding: 6px 10px;"><span style="color: var(--accent); font-weight: 700; font-size: 0.85rem;">${escapeHtml(p.cama || '-')}</span></td><td style="padding: 6px 10px; font-family: 'Space Mono', monospace; line-height: 1.2;" class="patient-name"><div style="font-weight: 700; font-size: 0.9rem;">${escapeHtml(p.nombre)}</div><div style="font-size: 0.7rem; color: var(--muted); margin-top: 4px; font-family: 'Fira Code', monospace;">⏱️ ${escapeHtml(p.fechaIngresoFormateada || '')}</div></td><td style="padding: 6px 10px;"><span style="color: var(--muted); font-size: 0.85rem;" class="value">${escapeHtml(p.edad || '-')}</span></td><td style="padding: 6px 10px;"><div class="truncate-text" style="font-size: 0.8rem; line-height: 1.2;" title="${escapeHtml(p.diagnostico)}">${escapeHtml(p.diagnostico || '-')}</div></td><td style="padding: 6px 10px;"><div class="truncate-text" style="font-size: 0.8rem; line-height: 1.2;" title="${escapeHtml(p.pendientes)}">${escapeHtml(p.pendientes || '-')}</div></td><td style="padding: 6px 10px;">${destinoChip}</td><td style="padding: 4px 10px; text-align: center; white-space: nowrap;"><button class="btn-table edit" style="padding: 4px; font-size: 0.9rem; margin-right: 2px;" onclick="abrirModal('${p.fila}'); event.stopPropagation();" title="Editar">✏️</button><button class="btn-table delete" style="padding: 4px; font-size: 0.9rem;" onclick="borrarPacienteDirecto('${p.fila}', '${escapeHtml(p.nombre)}'); event.stopPropagation();" title="Borrar">🗑️</button></td></tr>`;
           });
         });
 
@@ -854,7 +838,13 @@
               ${pacientes.map((p, indexPatient) => {
                 const camaHtml = p.cama ? `<div class="patient-bed">${escapeHtml(p.cama)}</div>` : '';
                 const destinoChip = getColorfulChipHtml(p.destino);
-                const detailsHtml = [ crearCampo('EDAD', p.edad), crearCampo('DIAGNÓSTICO', p.diagnostico), crearCampo('PENDIENTES', p.pendientes), crearCampo('DESTINO', p.destino) ].filter(Boolean).join('');
+                const detailsHtml = [ 
+                    crearCampo('INGRESO', p.fechaIngresoFormateada),
+                    crearCampo('EDAD', p.edad), 
+                    crearCampo('DIAGNÓSTICO', p.diagnostico), 
+                    crearCampo('PENDIENTES', p.pendientes), 
+                    crearCampo('DESTINO', p.destino) 
+                ].filter(Boolean).join('');
                 const delayPatient = delayBase + (indexPatient * 50);
                 
                 return `<div class="card animate-in" data-fila="${p.fila}" data-nombre="${escapeHtml(p.nombre)}" style="animation-delay: ${delayPatient}ms;"><div class="swipe-bg"><div class="swipe-action swipe-delete">🗑️</div><div class="swipe-action swipe-edit">✏️</div></div><div class="card-content-wrapper"><div class="card-header" onclick="toggleCard(this)"><div class="patient-main"><div class="patient-name">${escapeHtml(p.nombre)}</div>${camaHtml}</div><div class="header-right">${destinoChip}<div class="caret">⌄</div></div></div><div class="details"><div class="details-content">${detailsHtml}<button class="btn-editar-tarjeta" onclick="abrirModal('${p.fila}'); event.stopPropagation();">✏️ EDITAR PACIENTE</button></div></div></div></div>`;
@@ -879,6 +869,17 @@
         snapshot.forEach((doc) => {
           let data = doc.data();
           data.fila = doc.id; 
+
+          // Magia temporal: Convertimos la hora del servidor a formato legible
+          if (data.creado && typeof data.creado.toDate === 'function') {
+            const fechaObj = data.creado.toDate();
+            data.fechaIngresoFormateada = fechaObj.toLocaleString('es-MX', { 
+              day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: true 
+            }).toUpperCase();
+          } else {
+            data.fechaIngresoFormateada = 'RECIÉN INGRESADO';
+          }
+
           pacientesGlobal.push(data);
           if(data.cama) occupiedBeds.push(data.cama.toUpperCase().trim());
         });
