@@ -407,15 +407,36 @@
   </style>
 </head>
 <body class="dark">
-  <div class="app" id="mainAppContainer">
+
+  <div id="loginScreen" class="modal-overlay active" style="z-index: 10000; background: var(--bg); flex-direction: column; justify-content: center; align-items: center; gap: 20px;">
+    <div style="font-size: 4rem;">🏥</div>
+    <div class="title-censo" style="font-size: 2.5rem; text-align: center;">CENSO URGENCIAS</div>
+    <div style="color: var(--muted); font-family: 'Space Mono', monospace; margin-bottom: 20px; text-align: center; font-size: 0.9rem; max-width: 300px;">SISTEMA CLÍNICO DEL HOSPITAL REGIONAL</div>
+    <button id="btnGoogleLogin" class="btn-guardar" style="font-size: 1.1rem; padding: 16px 24px; box-shadow: 0 4px 15px rgba(37,99,235,0.3); max-width: 350px;">
+      <span style="background: white; border-radius: 50%; padding: 4px; display: inline-flex; margin-right: 8px;">
+        <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2045c0-.6381-.0573-1.2518-.1636-1.8409H9v3.4814h4.8436c-.2086 1.125-.8427 2.0782-1.7959 2.7164v2.2581h2.9082c1.7018-1.5668 2.6836-3.874 2.6836-6.615z"></path><path fill="#34A853" d="M9 18c2.43 0 4.4673-.806 5.9564-2.1805l-2.9082-2.2581c-.8059.54-1.8368.859-3.0482.859-2.344 0-4.3282-1.5831-5.036-3.7104H.9574v2.3318C2.4382 15.9832 5.4818 18 9 18z"></path><path fill="#FBBC05" d="M3.964 10.71c-.18-.54-.2822-1.1168-.2822-1.71s.1023-1.17.2823-1.71V4.9582H.9573A8.9965 8.9965 0 0 0 0 9c0 1.4523.3477 2.8268.9573 4.0418L3.964 10.71z"></path><path fill="#EA4335" d="M9 3.5795c1.3214 0 2.5077.4541 3.4405 1.346l2.5813-2.5814C13.4632.8918 11.426 0 9 0 5.4818 0 2.4382 2.0168.9573 4.9582L3.964 7.29C4.6718 5.1627 6.656 3.5795 9 3.5795z"></path></svg>
+      </span>
+      ENTRAR CON GOOGLE
+    </button>
+  </div>
+
+  <div id="authCodeScreen" class="modal-overlay" style="z-index: 10001; background: var(--bg); flex-direction: column; justify-content: center; align-items: center; gap: 20px;">
+    <div style="font-size: 3rem;">🔐</div>
+    <div style="color: var(--text); font-family: 'Space Mono', monospace; font-size: 1.2rem; font-weight: 700; text-align: center;">VERIFICACIÓN REQUERIDA</div>
+    <div style="color: var(--muted); text-align: center; font-size: 0.9rem; max-width: 300px; margin-bottom: 10px;">Tu correo no está autorizado. Ingresa el código de acceso proporcionado por el área de Urgencias.</div>
+    <input id="inputSecretCode" type="password" class="input-control" placeholder="CÓDIGO DE ACCESO" style="max-width: 300px; text-align: center; font-size: 1.2rem; letter-spacing: 0.2em; text-transform: uppercase;">
+    <div style="display: flex; gap: 10px; width: 100%; max-width: 300px;">
+      <button id="btnCancelAuth" class="btn-cancelar">SALIR</button>
+      <button id="btnSubmitCode" class="btn-guardar">VERIFICAR</button>
+    </div>
+  </div>
+  <div class="app" id="mainAppContainer" style="display: none;">
     <div class="header">
       <canvas id="plexusCanvas"></canvas>
       
       <div class="header-top">
         <div class="header-left">
-          <button id="searchToggleBtn" class="icon-btn" aria-label="Buscar">
-            <span>🔍</span>
-          </button>
+          <button id="searchToggleBtn" class="icon-btn" aria-label="Buscar"><span>🔍</span></button>
         </div>
 
         <div class="main-title">
@@ -425,16 +446,10 @@
         </div>
 
         <div class="header-right">
-          <button id="viewToggleBtn" class="icon-btn hide-on-mobile" type="button" aria-label="Cambiar vista">
-            <span id="viewIcon">📋</span>
-          </button>
-          
-          <button id="reloadBtn" class="icon-btn" type="button" aria-label="Recargar">
-            <span id="reloadIcon">🔄</span>
-          </button>
-          <button id="themeToggle" class="icon-btn" type="button" aria-label="Cambiar tema">
-            <span id="themeIcon">☀️</span>
-          </button>
+          <button id="viewToggleBtn" class="icon-btn hide-on-mobile" type="button" aria-label="Vista"><span id="viewIcon">📋</span></button>
+          <button id="reloadBtn" class="icon-btn" type="button" aria-label="Recargar"><span id="reloadIcon">🔄</span></button>
+          <button id="themeToggle" class="icon-btn" type="button" aria-label="Tema"><span id="themeIcon">☀️</span></button>
+          <button id="btnLogoutBtn" class="icon-btn" type="button" aria-label="Cerrar Sesión" title="Cerrar Sesión"><span>🚪</span></button>
         </div>
       </div>
 
@@ -445,9 +460,7 @@
     
     <div class="desktop-waves-bg hide-on-mobile">
       <svg class="waves" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto">
-        <defs>
-          <path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" />
-        </defs>
+        <defs><path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" /></defs>
         <g class="parallax">
           <use xlink:href="#gentle-wave" x="48" y="0" class="wave-layer-1" />
           <use xlink:href="#gentle-wave" x="48" y="3" class="wave-layer-2" />
@@ -466,7 +479,7 @@
     <div id="easterEggContainer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; pointer-events: none; overflow: hidden;"></div>
   </div>
 
-  <button class="fab-btn" id="mainFabBtn" onclick="abrirModalAgregar()">+</button>
+  <button class="fab-btn" id="mainFabBtn" onclick="abrirModalAgregar()" style="display: none;">+</button>
 
   <div id="editModal" class="modal-overlay">
     <div class="modal-content">
@@ -525,12 +538,14 @@
 
 <script type="module">
     // ==========================================================
-    // 1. IMPORTACIONES DE FIREBASE (NÚCLEO Y BASE DE DATOS)
+    // 1. IMPORTACIONES DE FIREBASE (NÚCLEO, BD Y AUTENTICACIÓN)
     // ==========================================================
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-analytics.js";
-    import { getFirestore, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, serverTimestamp } 
+    import { initializeFirestore, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, serverTimestamp, getDoc, setDoc } 
         from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } 
+        from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
 
     // ==========================================================
     // 2. CONFIGURACIÓN E INICIALIZACIÓN
@@ -547,10 +562,117 @@
 
     const app = initializeApp(firebaseConfig);
     const analytics = getAnalytics(app);
-    const db = getFirestore(app);
+    const db = initializeFirestore(app, { experimentalForceLongPolling: true });
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
 
     // ==========================================================
-    // 3. CONFIGURACIÓN DEL HOSPITAL (EDITA ESTO SEGÚN NECESITES)
+    // 3. LÓGICA DE LOGIN Y AUTORIZACIÓN POR CÓDIGO
+    // ==========================================================
+    const loginScreen = document.getElementById('loginScreen');
+    const authCodeScreen = document.getElementById('authCodeScreen');
+    const mainAppContainer = document.getElementById('mainAppContainer');
+    const mainFabBtn = document.getElementById('mainFabBtn');
+    let unsubscribe = null; 
+
+    function showMainApp() {
+      loginScreen.classList.remove('active');
+      authCodeScreen.classList.remove('active');
+      mainAppContainer.style.display = 'flex';
+      mainFabBtn.style.display = currentViewMode === 'table' && window.innerWidth >= 768 ? 'none' : 'flex';
+      initFirebaseListener(); 
+      setTimeout(initPlexus, 100);
+    }
+
+    function showLoginScreen() {
+      loginScreen.classList.add('active');
+      authCodeScreen.classList.remove('active');
+      mainAppContainer.style.display = 'none';
+      mainFabBtn.style.display = 'none';
+      document.getElementById('btnGoogleLogin').innerHTML = 'ENTRAR CON GOOGLE';
+      if(unsubscribe) unsubscribe();
+      pacientesGlobal = []; camasLibresGlobal = []; render([]); 
+    }
+
+    // Botón Iniciar Sesión con Google
+    document.getElementById('btnGoogleLogin').addEventListener('click', async () => {
+      try {
+        document.getElementById('btnGoogleLogin').innerHTML = '<span class="spin">🔄</span> CONECTANDO...';
+        await signInWithPopup(auth, provider);
+      } catch (error) {
+        alert("Error al iniciar sesión: " + error.message);
+        document.getElementById('btnGoogleLogin').innerHTML = 'ENTRAR CON GOOGLE';
+      }
+    });
+
+    // Escuchador de estado de sesión
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        try {
+          // Revisamos si el usuario ya está en la lista blanca de la base de datos
+          const userDoc = await getDoc(doc(db, "authorized_users", user.uid));
+          if (userDoc.exists()) {
+            showMainApp(); // ¡Ya estaba autorizado!
+          } else {
+            // Es la primera vez que entra, le pedimos el código secreto
+            loginScreen.classList.remove('active');
+            authCodeScreen.classList.add('active');
+          }
+        } catch (error) {
+          // Si las reglas rechazan la lectura, asumimos que no está autorizado
+          loginScreen.classList.remove('active');
+          authCodeScreen.classList.add('active');
+        }
+      } else {
+        showLoginScreen();
+      }
+    });
+
+    // Botón Verificar Código Secreto
+    document.getElementById('btnSubmitCode').addEventListener('click', async () => {
+      const codeInput = document.getElementById('inputSecretCode').value.trim().toUpperCase();
+      const btn = document.getElementById('btnSubmitCode');
+      
+      if (!codeInput) { alert("Ingresa el código primero."); return; }
+      
+      btn.disabled = true; btn.innerHTML = '<span class="spin">🔄</span>...';
+      
+      try {
+        // Intentamos crear su registro de autorizado mandando el código que escribió
+        await setDoc(doc(db, "authorized_users", auth.currentUser.uid), {
+          nombre: auth.currentUser.displayName,
+          email: auth.currentUser.email,
+          codigo: codeInput, // Firebase verificará que esto diga "DELICIAS2026"
+          fecha_ingreso: serverTimestamp()
+        });
+        
+        // Si no dio error, ¡el código era correcto!
+        vibrar([30, 50, 30]);
+        document.getElementById('inputSecretCode').value = '';
+        showMainApp();
+      } catch (error) {
+        vibrar([100, 50, 100]);
+        alert("ACCESO DENEGADO: Código incorrecto.");
+      } finally {
+        btn.disabled = false; btn.innerHTML = 'VERIFICAR';
+      }
+    });
+
+    // Botón Cancelar en pantalla de Código
+    document.getElementById('btnCancelAuth').addEventListener('click', () => {
+      signOut(auth);
+    });
+
+    // Botón Cerrar Sesión (Menú Principal)
+    document.getElementById('btnLogoutBtn').addEventListener('click', () => {
+      vibrar(15);
+      if(confirm("¿Seguro que deseas salir del censo?")) {
+          signOut(auth);
+      }
+    });
+
+    // ==========================================================
+    // 4. CONFIGURACIÓN DEL HOSPITAL
     // ==========================================================
     let destinosGlobal = [
       "PISO / HOSPITALIZACIÓN", "ALTA POR MEJORÍA", "ALTA VOLUNTARIA", 
@@ -577,7 +699,6 @@
     let isFetchingData = true;
     let syncPlexusPatients = () => {}; 
 
-    // --- MAPEO DE EMOJIS Y ANIMACIONES ---
     const areaVisuals = {
       'SALA DE CHOQUE': { emoji: '❤️', class: 'icon-heartbeat' },
       'OBSERVACION': { emoji: '👀', class: 'icon-look' },
@@ -598,9 +719,6 @@
     function cerrarModal(id) { document.getElementById(id).classList.remove('active'); }
     function cerrarModalBorrado() { document.getElementById('deleteConfirmModal').classList.remove('active'); }
 
-    /* ==========================================================
-       LÓGICA DE CHIPS ARCOÍRIS
-       ========================================================== */
     const chipPalette = [
       { bg: '#ffe4e6', text: '#9f1239' }, { bg: '#dcfce7', text: '#166534' }, 
       { bg: '#fef9c3', text: '#854d0e' }, { bg: '#dbeafe', text: '#1e40af' }, 
@@ -657,7 +775,7 @@
       }
       let mobileCards = '';
       for(let i=0; i<6; i++) mobileCards += `<div class="skeleton-card"><div class="skeleton-main"><div class="skeleton-block skeleton-name"></div><div class="skeleton-block skeleton-bed"></div></div><div class="skeleton-right"><div class="skeleton-block skeleton-chip"></div><div class="skeleton-block skeleton-caret"></div></div></div>`;
-      return `<div class="section animate-in" style="margin-top:0; border-top:none;"><div class="section-header"><div class="section-title">CONECTANDO A FIREBASE...</div></div><div class="skeleton-loader">${mobileCards}</div></div>`;
+      return `<div class="section animate-in" style="margin-top:0; border-top:none;"><div class="section-header"><div class="section-title">CARGANDO CENSO...</div></div><div class="skeleton-loader">${mobileCards}</div></div>`;
     }
 
     function render(lista) {
@@ -669,7 +787,7 @@
       if(metaText) metaText.innerHTML = `${lista.length} PACIENTES`;
       content.classList.remove('view-table-mode'); 
       mainAppContainer.classList.remove('table-is-active');
-      if(fabBtn) fabBtn.style.display = 'flex';
+      if(fabBtn && mainAppContainer.style.display !== 'none') fabBtn.style.display = 'flex';
 
       if (!lista.length) { 
         if (isFetchingData) { content.innerHTML = generarSkeletonHtml(); } 
@@ -739,30 +857,22 @@
       if (typeof syncPlexusPatients === 'function') syncPlexusPatients(lista);
     }
 
-    // ==========================================================
-    // CONEXIÓN EN TIEMPO REAL CON FIREBASE
-    // ==========================================================
-    let unsubscribe = null;
-    
     function initFirebaseListener() {
       isFetchingData = true;
       document.getElementById('reloadIcon').classList.add('spin');
       
-      // Escuchador en tiempo real: Se dispara cada vez que Firebase cambia
       unsubscribe = onSnapshot(collection(db, "pacientes"), (snapshot) => {
         pacientesGlobal = [];
         let occupiedBeds = [];
 
         snapshot.forEach((doc) => {
           let data = doc.data();
-          data.fila = doc.id; // En Firebase el ID es alfanumérico
+          data.fila = doc.id; 
           pacientesGlobal.push(data);
           if(data.cama) occupiedBeds.push(data.cama.toUpperCase().trim());
         });
 
-        // Calcular camas libres basándose en la lista maestra
         camasLibresGlobal = masterCamas.filter(c => !occupiedBeds.includes(c.cama.toUpperCase().trim()));
-        // Asignarles un ID virtual para los selects
         camasLibresGlobal = camasLibresGlobal.map((c, i) => ({ ...c, fila: 'cama_libre_'+i }));
 
         isFetchingData = false;
@@ -775,9 +885,6 @@
       });
     }
 
-    // ==========================================================
-    // LÓGICA DE INTERFAZ Y MODALES (CONEXIÓN A FIREBASE)
-    // ==========================================================
     function toggleCard(headerEl) {
       vibrar(15); 
       const card = headerEl.closest('.card'); 
@@ -840,7 +947,6 @@
             destino: document.getElementById('modalDestino').value.toUpperCase()
         };
 
-        // Si se solicitó un cambio de cama
         if (moverAFila && moverAFila !== "") {
             const nuevaCamaObj = camasLibresGlobal.find(c => c.fila === moverAFila);
             if (nuevaCamaObj) {
@@ -849,7 +955,6 @@
             }
         }
 
-        // Se envía a Firebase
         await updateDoc(doc(db, "pacientes", filaId), updateData);
         vibrar(20); 
         cerrarModal('editModal');
@@ -866,7 +971,7 @@
 
     function mostrarModalBorrar(fila, nombre) {
       vibrar([60, 50, 60]);
-      filaABorrar = fila; // ID de Firebase
+      filaABorrar = fila; 
       document.getElementById('deleteTargetName').innerText = nombre;
       document.getElementById('deleteConfirmModal').classList.add('active');
       
@@ -916,7 +1021,6 @@
         const gruposLibres = agruparPorArea(camasLibresGlobal);
         for (const [area, camas] of Object.entries(gruposLibres)) {
           let optgroup = `<optgroup label="${escapeHtml(area.toUpperCase())}">`;
-          // value ahora lleva tanto el nombre de la cama como el área
           camas.forEach(c => { optgroup += `<option value="${escapeHtml(c.cama.toUpperCase())}|${escapeHtml(c.area.toUpperCase())}">${escapeHtml(c.cama.toUpperCase())}</option>`; });
           optgroup += `</optgroup>`; selectCama.innerHTML += optgroup;
         }
@@ -943,7 +1047,6 @@
       
       if(!selectCama.value) { alert("POR FAVOR SELECCIONA UNA CAMA DISPONIBLE."); return; }
       
-      // Separar cama y area del value seleccionado
       const [nombreCamaReal, areaReal] = selectCama.value.split('|');
       
       const nom = document.getElementById('addNombre').value.toUpperCase(); 
@@ -973,9 +1076,6 @@
       }
     }
 
-    // ==========================================================
-    // EXPORTAR FUNCIONES AL WINDOW (Requisito para <script type="module">)
-    // ==========================================================
     window.cerrarModal = cerrarModal;
     window.cerrarModalBorrado = cerrarModalBorrado;
     window.toggleCard = toggleCard;
@@ -988,9 +1088,6 @@
     window.abrirModalAgregar = abrirModalAgregar;
     window.guardarNuevo = guardarNuevo;
 
-    // ==========================================================
-    // UTILIDADES GLOBALES (Filtros, Temas, etc)
-    // ==========================================================
     function normalizar(texto) { return String(texto || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim(); }
     
     const easterEggsMap = {
@@ -1111,11 +1208,8 @@
       if (!wrapper.classList.contains('collapsed')) { setTimeout(() => searchInput.focus(), 300); } else { searchInput.value = ''; render(pacientesGlobal); }
     });
     
-    // Ahora el ReloadBtn solo fuerza un render (ya que Firebase siempre está en vivo)
     document.getElementById('reloadBtn').addEventListener('click', () => { 
-        vibrar(15); 
-        document.getElementById('reloadIcon').classList.add('spin'); 
-        render(pacientesGlobal); 
+        vibrar(15); document.getElementById('reloadIcon').classList.add('spin'); render(pacientesGlobal); 
         setTimeout(() => document.getElementById('reloadIcon').classList.remove('spin'), 800); 
     });
 
@@ -1126,7 +1220,7 @@
     });
 
     // ==========================================================
-    // SISTEMA DE PARTÍCULAS NEURAL Y SINAPSIS (v4.0 Multi-Salto)
+    // SISTEMA DE PARTÍCULAS NEURAL Y SINAPSIS
     // ==========================================================
     function initPlexus() {
       const canvas = document.getElementById('plexusCanvas');
@@ -1201,7 +1295,6 @@
         
         let allParticles = standardParticles.concat(patientParticles); ctx.lineWidth = 0.8; 
 
-        // 1. DIBUJAR LA RED
         for (let i = 0; i < allParticles.length; i++) {
           allParticles[i].update(); allParticles[i].draw(defaultFill);
           for (let j = i + 1; j < allParticles.length; j++) {
@@ -1212,7 +1305,6 @@
           }
         }
 
-        // 2. LÓGICA DE CASCADA DE DATOS
         let timeNow = Date.now() * 0.001;
         let connections = getConnections(allParticles);
 
@@ -1253,12 +1345,8 @@
 
     // ARRANQUE FINAL
     initTheme(); 
-    initFirebaseListener(); // Se conecta en vivo a Firestore
-    setTimeout(initPlexus, 100);
 
-    // ==========================================================
-    // LÓGICA DE SWIPE (DESLIZAMIENTO) PARA MÓVIL
-    // ==========================================================
+    // LÓGICA DE SWIPE
     function resetAllSwipes() { document.querySelectorAll('.card-content-wrapper').forEach(el => { el.style.transform = 'translateX(0px)'; }); }
     let swipeStartX = 0, swipeStartY = 0, isSwiping = false, currentSwipeCard = null, swipeActionReady = false; 
     const ACTION_THRESHOLD = 110; 
@@ -1299,4 +1387,3 @@
     });
 </script>
 </body>
-</html>
