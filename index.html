@@ -708,7 +708,7 @@ const masterCamas = [
       return `<div class="section animate-in" style="margin-top:0; border-top:none;"><div class="section-header"><div class="section-title">CARGANDO CENSO...</div></div><div class="skeleton-loader">${mobileCards}</div></div>`;
     }
 
-    function render(lista) {
+function render(lista) {
       const content = document.getElementById('content');
       const metaText = document.getElementById('meta-text');
       const mainAppContainer = document.getElementById('mainAppContainer');
@@ -727,15 +727,38 @@ const masterCamas = [
       }
 
       const grupos = agruparPorArea(lista);
-      const areas = Object.keys(grupos);
+      let areas = Object.keys(grupos);
       const isDesktop = window.innerWidth >= 768;
+
+      // =========================================================
+      // NUEVO: ORDEN ESTRICTO DE PRIORIDAD CLÍNICA
+      // =========================================================
+      const ordenEstricto = [
+        "SALA DE CHOQUE",
+        "OBSERVACIÓN", "OBSERVACION", // Por si alguien lo escribe sin acento
+        "TRAUMA MENOR",
+        "PEDIATRÍA", "PEDIATRIA",
+        "EXTRAS",
+        "SIN ÁREA ASIGNADA"
+      ];
+
+      areas.sort((a, b) => {
+        const indexA = ordenEstricto.indexOf(a.toUpperCase().trim());
+        const indexB = ordenEstricto.indexOf(b.toUpperCase().trim());
+        
+        // Si hay un área nueva o rara que no esté en la lista, la manda al fondo (999)
+        const posA = indexA === -1 ? 999 : indexA;
+        const posB = indexB === -1 ? 999 : indexB;
+        
+        return posA - posB;
+      });
+      // =========================================================
 
       if (currentViewMode === 'table' && isDesktop) {
         content.classList.add('view-table-mode');
         mainAppContainer.classList.add('table-is-active'); 
         if(fabBtn) fabBtn.style.display = 'none';
 
-        // Nueva estructura de tabla maximizando los porcentajes
         let tableHtml = `<div class="table-wrapper animate-in"><table class="censo-table"><thead><tr><th style="width: 6%">CAMA</th><th style="width: 9%">INGRESO</th><th style="width: 18%">PACIENTE</th><th style="width: 4%">EDAD</th><th style="width: 25%">DIAGNÓSTICO</th><th style="width: 25%">PENDIENTES</th><th style="width: 8%">DESTINO</th><th style="width: 5%; text-align: center;">⚙️</th></tr></thead><tbody>`;
         
         areas.forEach((area) => {
