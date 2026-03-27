@@ -152,7 +152,7 @@
       }
     }
 
-    /* ENCABEZADO BASE LIMPIO - REVERTIDO */
+    /* ENCABEZADO BASE LIMPIO */
     .header { 
       position: relative; 
       flex-shrink: 0; 
@@ -353,7 +353,7 @@
       .table-wrapper { background: var(--panel-glass) !important; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
       .censo-table th { background: rgba(0,0,0,0.05) !important; backdrop-filter: blur(5px); }
 
-/* ========================================================= 
+      /* ========================================================= 
          MODALES MÁS AMPLIOS PARA ESCRITORIO
          ========================================================= */
       .modal-content { 
@@ -378,7 +378,6 @@
         font-size: 1rem;
         padding: 14px;
       }
-      
     }
   </style>
 </head>
@@ -403,6 +402,7 @@
 
     <div style="position: absolute; bottom: 30px; font-size: 0.7rem; font-family: 'Space Mono', monospace; font-weight: 700; letter-spacing: 0.1em;">
       <span style="color: var(--muted);">ROUROG</span> <span style="color: var(--text); opacity: 0.5;">Innovations</span>
+      <span style="opacity: 0.3; margin-left: 6px;">v1.2</span>
     </div>
   </div>
   <div class="app" id="mainAppContainer" style="display: none;">
@@ -449,6 +449,7 @@
 
     <div class="footer">
       Hospital Regional de Delicias - <span style="color: var(--accent); font-weight: 600;">Rourog Innovations</span>
+      <span style="opacity: 0.4; font-size: 0.8em; margin-left: 8px;">v1.2</span>
     </div>
 
     <div id="easterEggContainer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; pointer-events: none; overflow: hidden;"></div>
@@ -542,10 +543,6 @@
     const db = initializeFirestore(app, { experimentalForceLongPolling: true });
     const auth = getAuth(app);
 
-CONFIGURACIÓN E INICIALIZACIÓN
-    // ==========================================================
-    const APP_VERSION = "v1.0 (Camas limpias y sin notch)"; // <--- CAMBIA ESTO CADA QUE ACTUALICES
-  
     // ==========================================================
     // 3. LÓGICA DE LOGIN SILENCIOSO Y ROLES
     // ==========================================================
@@ -1291,35 +1288,7 @@ CONFIGURACIÓN E INICIALIZACIÓN
       clearTimeout(resizeTimer);
       resizeTimer = setTimeout(() => { if (!isFetchingData) render(pacientesGlobal); }, 200);
     });
-// EVENTOS UI
 
-    // ==========================================================
-    // 🛠️ MODO DEBUG: CONTROL DE VERSIONES 🛠️
-    // ==========================================================
-    // 1. Atajo de teclado para PC (Ctrl + Alt + V)
-    document.addEventListener('keydown', (e) => {
-      if (e.ctrlKey && e.altKey && e.key.toLowerCase() === 'v') {
-        alert(`🛠️ DEBUG MODO 🛠️\n\nVersión: ${APP_VERSION}\nVista: ${currentViewMode}\nPantalla: ${window.innerWidth}x${window.innerHeight}`);
-      }
-    });
-
-    // 2. Toque secreto para Celulares (5 toques en "URGENCIAS")
-    let tapCount = 0;
-    let tapTimer;
-    const titleUrgenciasArr = document.querySelectorAll('.title-urgencias');
-    titleUrgenciasArr.forEach(el => {
-      el.addEventListener('click', () => {
-        tapCount++;
-        clearTimeout(tapTimer);
-        if (tapCount >= 5) {
-          vibrar([50, 50, 50]);
-          alert(`🛠️ DEBUG MODO 🛠️\n\nVersión: ${APP_VERSION}\nVista: ${currentViewMode}\nPantalla: ${window.innerWidth}x${window.innerHeight}`);
-          tapCount = 0;
-        }
-        tapTimer = setTimeout(() => { tapCount = 0; }, 400); // Se reinicia si tardas mucho en tocar
-      });
-    });
-    // ==========================================================
     // ARRANQUE FINAL
     initTheme(); 
 
