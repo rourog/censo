@@ -459,23 +459,14 @@
       Hospital Regional de Delicias
     </div>
     
-    <button id="btnGoogleLogin" class="btn-login-sober" disabled>
-      <span class="spin">🔄</span>
+    <input id="nipInput" type="password" class="input-control" placeholder="CÓDIGO" style="max-width: 220px; text-align: center; font-size: 1.2rem; letter-spacing: 0.2em; margin-bottom: 10px;">
+    
+    <button id="btnEnter" class="btn-login-sober">
+      ENTRAR
     </button>
 
     <div style="position: absolute; bottom: 30px; font-size: 0.7rem; font-family: 'Space Mono', monospace; font-weight: 700; letter-spacing: 0.1em;">
       <span style="color: var(--muted);">ROUROG</span> <span style="color: var(--text); opacity: 0.5;">Innovations</span>
-    </div>
-  </div>
-
-  <div id="authCodeScreen" class="modal-overlay" style="z-index: 10001; background: var(--bg); flex-direction: column; justify-content: center; align-items: center; gap: 20px;">
-    <div style="font-size: 3rem;">🔐</div>
-    <div style="color: var(--text); font-family: 'Space Mono', monospace; font-size: 1.2rem; font-weight: 700; text-align: center;">VERIFICACIÓN REQUERIDA</div>
-    <div style="color: var(--muted); text-align: center; font-size: 0.9rem; max-width: 300px; margin-bottom: 10px;">Tu correo no está autorizado. Ingresa el código de acceso proporcionado por el área de Urgencias.</div>
-    <input id="inputSecretCode" type="password" class="input-control" placeholder="CÓDIGO DE ACCESO" style="max-width: 300px; text-align: center; font-size: 1.2rem; letter-spacing: 0.2em; text-transform: uppercase;">
-    <div style="display: flex; gap: 10px; width: 100%; max-width: 300px;">
-      <button id="btnCancelAuth" class="btn-cancelar">SALIR</button>
-      <button id="btnSubmitCode" class="btn-guardar">VERIFICAR</button>
     </div>
   </div>
   <div class="app" id="mainAppContainer" style="display: none;">
@@ -590,9 +581,10 @@
     // ==========================================================
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-analytics.js";
-    import { initializeFirestore, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, serverTimestamp, getDoc, setDoc } 
+    import { initializeFirestore, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, serverTimestamp } 
         from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } 
+    // IMPORTANTE: Cambiamos a Email/Password nativo
+    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } 
         from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
 
     // ==========================================================
@@ -612,114 +604,86 @@
     const analytics = getAnalytics(app);
     const db = initializeFirestore(app, { experimentalForceLongPolling: true });
     const auth = getAuth(app);
-    const provider = new GoogleAuthProvider();
 
     // ==========================================================
-    // 3. LÓGICA DE LOGIN Y AUTORIZACIÓN POR CÓDIGO
+    // 3. LÓGICA DE LOGIN SILENCIOSO Y ROLES
     // ==========================================================
     const loginScreen = document.getElementById('loginScreen');
-    const authCodeScreen = document.getElementById('authCodeScreen');
     const mainAppContainer = document.getElementById('mainAppContainer');
     const mainFabBtn = document.getElementById('mainFabBtn');
     let unsubscribe = null; 
+    let rolUsuario = "INTERNO"; // Variable lista para el futuro
 
     function showMainApp() {
       loginScreen.classList.remove('active');
-      authCodeScreen.classList.remove('active');
       mainAppContainer.style.display = 'flex';
       mainFabBtn.style.display = currentViewMode === 'table' && window.innerWidth >= 768 ? 'none' : 'flex';
       initFirebaseListener(); 
       setTimeout(initPlexus, 100);
     }
 
-function showLoginScreen() {
+    function showLoginScreen() {
       loginScreen.classList.add('active');
-      authCodeScreen.classList.remove('active');
       mainAppContainer.style.display = 'none';
       mainFabBtn.style.display = 'none';
       
-      // Habilitamos el botón y mostramos el texto solo si Firebase confirma que no hay sesión
-      const btn = document.getElementById('btnGoogleLogin');
+      const btn = document.getElementById('btnEnter');
       btn.innerHTML = 'ENTRAR';
       btn.disabled = false;
+      document.getElementById('nipInput').value = '';
 
       if(unsubscribe) unsubscribe();
       pacientesGlobal = []; camasLibresGlobal = []; render([]); 
     }
 
-    // Botón Iniciar Sesión con Google
-    document.getElementById('btnGoogleLogin').addEventListener('click', async () => {
-      const btn = document.getElementById('btnGoogleLogin');
+    // Evento del botón ENTRAR (Sin Pop-ups)
+    document.getElementById('btnEnter').addEventListener('click', async () => {
+      const nip = document.getElementById('nipInput').value.trim();
+      const btn = document.getElementById('btnEnter');
+      let correoMagico = "";
+
+      if (nip === "Censo2026") {
+        correoMagico = "interno@hrd.censo";
+      } else if (nip === "Censo2026HRD") {
+        correoMagico = "adscrito@hrd.censo";
+      } else {
+        vibrar([50, 50, 50]);
+        alert("Código de acceso incorrecto.");
+        return;
+      }
+
       try {
         btn.disabled = true;
         btn.innerHTML = '<span class="spin">🔄</span>';
-        await signInWithPopup(auth, provider);
+        // Inicia sesión de manera invisible usando el código como contraseña
+        await signInWithEmailAndPassword(auth, correoMagico, nip);
       } catch (error) {
-        alert("Error al iniciar sesión: " + error.message);
+        vibrar([50, 50, 50]);
+        alert("Error de conexión. Verifica el código e intenta de nuevo.");
         btn.disabled = false;
         btn.innerHTML = 'ENTRAR';
       }
     });
 
-    document.getElementById('btnGoogleLogin').addEventListener('click', async () => {
-      try {
-        document.getElementById('btnGoogleLogin').innerHTML = '<span class="spin">🔄</span> CONECTANDO...';
-        await signInWithPopup(auth, provider);
-      } catch (error) {
-        alert("Error al iniciar sesión: " + error.message);
-        document.getElementById('btnGoogleLogin').innerHTML = 'ENTRAR CON GOOGLE';
-      }
+    // Permite presionar "Enter" en el teclado para iniciar sesión
+    document.getElementById('nipInput').addEventListener('keypress', function (e) {
+      if (e.key === 'Enter') { document.getElementById('btnEnter').click(); }
     });
 
-    onAuthStateChanged(auth, async (user) => {
+    // Escuchador automático: Mantiene la sesión iniciada
+    onAuthStateChanged(auth, (user) => {
       if (user) {
-        try {
-          const userDoc = await getDoc(doc(db, "authorized_users", user.uid));
-          if (userDoc.exists()) {
-            showMainApp(); 
-          } else {
-            loginScreen.classList.remove('active');
-            authCodeScreen.classList.add('active');
-          }
-        } catch (error) {
-          loginScreen.classList.remove('active');
-          authCodeScreen.classList.add('active');
-        }
+        // Detectar si es Adscrito o Interno para uso futuro
+        rolUsuario = user.email.includes('adscrito') ? "ADSCRITO" : "INTERNO";
+        showMainApp(); 
       } else {
         showLoginScreen();
       }
     });
 
-    document.getElementById('btnSubmitCode').addEventListener('click', async () => {
-      const codeInput = document.getElementById('inputSecretCode').value.trim().toUpperCase();
-      const btn = document.getElementById('btnSubmitCode');
-      
-      if (!codeInput) { alert("Ingresa el código primero."); return; }
-      btn.disabled = true; btn.innerHTML = '<span class="spin">🔄</span>...';
-      
-      try {
-        await setDoc(doc(db, "authorized_users", auth.currentUser.uid), {
-          nombre: auth.currentUser.displayName,
-          email: auth.currentUser.email,
-          codigo: codeInput, 
-          fecha_ingreso: serverTimestamp()
-        });
-        
-        vibrar([30, 50, 30]);
-        document.getElementById('inputSecretCode').value = '';
-        showMainApp();
-      } catch (error) {
-        vibrar([100, 50, 100]);
-        alert("ACCESO DENEGADO: Código incorrecto.");
-      } finally {
-        btn.disabled = false; btn.innerHTML = 'VERIFICAR';
-      }
-    });
-
-    document.getElementById('btnCancelAuth').addEventListener('click', () => { signOut(auth); });
     document.getElementById('btnLogoutBtn').addEventListener('click', () => {
       vibrar(15);
-      if(confirm("¿Seguro que deseas salir del censo?")) { signOut(auth); }
+      if(confirm("¿Seguro que deseas cerrar la sesión?")) { signOut(auth); }
     });
 
     // ==========================================================
@@ -937,7 +901,6 @@ function showLoginScreen() {
           let data = doc.data();
           data.fila = doc.id; 
 
-          // Magia temporal: Convertimos la hora del servidor a formato legible
           if (data.creado && typeof data.creado.toDate === 'function') {
             const fechaObj = data.creado.toDate();
             data.fechaIngresoFormateada = fechaObj.toLocaleString('es-MX', { 
