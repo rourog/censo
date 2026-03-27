@@ -542,6 +542,10 @@
     const db = initializeFirestore(app, { experimentalForceLongPolling: true });
     const auth = getAuth(app);
 
+CONFIGURACIÓN E INICIALIZACIÓN
+    // ==========================================================
+    const APP_VERSION = "v1.0 (Camas limpias y sin notch)"; // <--- CAMBIA ESTO CADA QUE ACTUALICES
+  
     // ==========================================================
     // 3. LÓGICA DE LOGIN SILENCIOSO Y ROLES
     // ==========================================================
@@ -1287,7 +1291,35 @@
       clearTimeout(resizeTimer);
       resizeTimer = setTimeout(() => { if (!isFetchingData) render(pacientesGlobal); }, 200);
     });
+// EVENTOS UI
 
+    // ==========================================================
+    // 🛠️ MODO DEBUG: CONTROL DE VERSIONES 🛠️
+    // ==========================================================
+    // 1. Atajo de teclado para PC (Ctrl + Alt + V)
+    document.addEventListener('keydown', (e) => {
+      if (e.ctrlKey && e.altKey && e.key.toLowerCase() === 'v') {
+        alert(`🛠️ DEBUG MODO 🛠️\n\nVersión: ${APP_VERSION}\nVista: ${currentViewMode}\nPantalla: ${window.innerWidth}x${window.innerHeight}`);
+      }
+    });
+
+    // 2. Toque secreto para Celulares (5 toques en "URGENCIAS")
+    let tapCount = 0;
+    let tapTimer;
+    const titleUrgenciasArr = document.querySelectorAll('.title-urgencias');
+    titleUrgenciasArr.forEach(el => {
+      el.addEventListener('click', () => {
+        tapCount++;
+        clearTimeout(tapTimer);
+        if (tapCount >= 5) {
+          vibrar([50, 50, 50]);
+          alert(`🛠️ DEBUG MODO 🛠️\n\nVersión: ${APP_VERSION}\nVista: ${currentViewMode}\nPantalla: ${window.innerWidth}x${window.innerHeight}`);
+          tapCount = 0;
+        }
+        tapTimer = setTimeout(() => { tapCount = 0; }, 400); // Se reinicia si tardas mucho en tocar
+      });
+    });
+    // ==========================================================
     // ARRANQUE FINAL
     initTheme(); 
 
