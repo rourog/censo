@@ -827,13 +827,13 @@
       if (typeof syncPlexusPatients === 'function') syncPlexusPatients(lista);
     }
 
-    function initFirebaseListener() {
+function initFirebaseListener() {
       isFetchingData = true;
       document.getElementById('reloadIcon').classList.add('spin');
       
       unsubscribe = onSnapshot(collection(db, "pacientes"), (snapshot) => {
         pacientesGlobal = [];
-        let occupiedBeds = [];
+        let occupiedBeds = []; // Aquí guardaremos las camas ocupadas
 
         snapshot.forEach((doc) => {
           let data = doc.data();
@@ -861,7 +861,9 @@
           // Pasamos el filtro para limpiar el nombre y asignarlo directamente a la UI
           if(data.cama) {
             data.cama = limpiarNombreCama(data.cama);
-            occupiedBeds.push(data.cama); // Lo manda ultra limpio para descartar la cama
+            let areaName = String(data.area || '').toUpperCase().trim();
+            // SOLUCIÓN: Combinamos Área + Cama para crear un ID único (ej. "TRAUMA MENOR|CAMA 1")
+            occupiedBeds.push(`${areaName}|${data.cama}`); 
           }
 
           pacientesGlobal.push(data);
@@ -874,7 +876,13 @@
             return dateB - dateA; 
         });
 
-        camasLibresGlobal = masterCamas.filter(c => !occupiedBeds.includes(c.cama.toUpperCase().trim()));
+        // Verificamos usando nuestro nuevo ID único
+        camasLibresGlobal = masterCamas.filter(c => {
+            let areaName = c.area.toUpperCase().trim();
+            let camaName = c.cama.toUpperCase().trim();
+            return !occupiedBeds.includes(`${areaName}|${camaName}`);
+        });
+
         camasLibresGlobal = camasLibresGlobal.map((c, i) => ({ ...c, fila: 'cama_libre_'+i }));
 
         isFetchingData = false;
