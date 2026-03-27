@@ -12,7 +12,7 @@
   <meta name="theme-color" media="(prefers-color-scheme: light)" content="#eef4fb">
   
   <title>Censo Urgencias</title>
- <link rel="manifest" href="manifest.json">
+  <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icono.png">
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -84,7 +84,7 @@
     }
 
     body.colorful { background-image: linear-gradient(135deg, #e0f2fe 0%, #d1fae5 50%, #ede9fe 100%) !important; background-attachment: fixed; }
-    body.colorful .app-header { background-image: linear-gradient(135deg, #f0abfc 0%, #bfdbfe 100%) !important; }
+    body.colorful .header { background-image: linear-gradient(135deg, #f0abfc 0%, #bfdbfe 100%) !important; }
     body.colorful .title-urgencias, body.colorful #meta-text, body.colorful .section-title { color: #001f3f !important; text-shadow: none; font-weight: 800; }
     body.colorful .card .patient-name, body.colorful .card .value, body.colorful .card .caret { color: #ffffff !important; }
     body.colorful .card .patient-bed, body.colorful .card .label { color: rgba(255, 255, 255, 0.8) !important; }
@@ -152,13 +152,13 @@
       }
     }
 
-    /* ENCABEZADO BASE LIMPIO (Renombrado para forzar el borrado de caché) */
-    .app-header { 
+    /* ENCABEZADO BASE LIMPIO - REVERTIDO */
+    .header { 
       position: relative; 
       flex-shrink: 0; 
       z-index: 50; 
       width: 100%; 
-      padding: 10px; 
+      padding: 10px 10px; 
       margin: 0; 
       background: var(--panel-glass); 
       backdrop-filter: blur(12px); 
@@ -406,7 +406,7 @@
     </div>
   </div>
   <div class="app" id="mainAppContainer" style="display: none;">
-    <div class="app-header" id="appHeader">
+    <div class="header">
       <canvas id="plexusCanvas"></canvas>
       
       <div class="header-top">
@@ -1291,25 +1291,6 @@
     // ARRANQUE FINAL
     initTheme(); 
 
-    // ==========================================================
-    // PARCHE INTELIGENTE ANTI-NOTCH (INFALIBLE)
-    // ==========================================================
-    function aplicarParcheNotch() {
-      // Detecta si es un dispositivo Apple
-      const esIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-      // Detecta si está instalada como App en la pantalla de inicio
-      const esPWA = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
-      
-      if (esIOS && esPWA) {
-        const headerEl = document.getElementById('appHeader');
-        // Asignamos 45px fijos en lugar de usar variables matemáticas (env)
-        // Esto evita que Chrome o Safari se confundan y generen banners gigantes.
-        if(headerEl) headerEl.style.paddingTop = '45px';
-      }
-    }
-    aplicarParcheNotch();
-    // ==========================================================
-    
     // SISTEMA DE PARTÍCULAS NEURAL Y SINAPSIS
     function initPlexus() {
       const canvas = document.getElementById('plexusCanvas');
