@@ -152,7 +152,7 @@
       }
     }
 
-/* ENCABEZADO BASE (Tamaño normal y perfecto para navegadores web) */
+/* ENCABEZADO BASE (Tamaño perfecto y normal para Android y Computadoras) */
     .header { 
       position: relative; 
       flex-shrink: 0; 
@@ -168,12 +168,13 @@
       overflow: hidden; 
     }
 
-    /* ESCUDO ANTI-NOTCH INTELIGENTE (Solo se activa al instalarse como App) */
-    @media all and (display-mode: standalone) {
+    /* FILTRO EXCLUSIVO PARA iPHONE (Aplica el parche del Notch SOLO en dispositivos Apple) */
+    @supports (-webkit-touch-callout: none) {
       .header {
         padding-top: max(12px, env(safe-area-inset-top));
       }
     }
+    
     .header-top { display: flex; align-items: center; justify-content: space-between; position: relative; width: 100%; min-height: 48px; z-index: 2; }
     .header-top .header-left, .header-top .header-right { display: flex; align-items: center; gap: 8px; z-index: 2; }
     .header-top .header-right { justify-content: flex-end; }
