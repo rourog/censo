@@ -478,7 +478,7 @@
     // ==========================================================
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-analytics.js";
-    import { initializeFirestore, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc } 
+    import { initializeFirestore, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, serverTimestamp } 
         from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
     import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } 
         from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
@@ -578,7 +578,7 @@
     });
 
     // ==========================================================
-    // 4. CONFIGURACIÓN DEL HOSPITAL
+    // 4. CONFIGURACIÓN DEL HOSPITAL Y CAMAS LIMPIAS
     // ==========================================================
     let destinosGlobal = [
       "🟡 Observación", "🟢 Alta a domicilio", "⭕ Alta Voluntaria", "⚫ Defunción",
@@ -596,29 +596,36 @@
       "🍎 Ingreso a Gastroenterologia"
     ];
 
-const masterCamas = [
-      // SALA DE CHOQUE
-      { area: "SALA DE CHOQUE", cama: "🔴 Choque 1" }, 
-      { area: "SALA DE CHOQUE", cama: "🔴 Choque 2" },
-      
-      // OBSERVACIÓN
-      { area: "OBSERVACIÓN", cama: "🟢 Observacion 1" }, { area: "OBSERVACIÓN", cama: "🟢 Observacion 1-2" }, { area: "OBSERVACIÓN", cama: "🟢 Observacion Silla 1" },
-      { area: "OBSERVACIÓN", cama: "🟢 Observacion 2" }, { area: "OBSERVACIÓN", cama: "🟢 Observacion 2-2" }, { area: "OBSERVACIÓN", cama: "🟢 Observacion Silla 2" },
-      { area: "OBSERVACIÓN", cama: "🟢 Observacion 3" }, { area: "OBSERVACIÓN", cama: "🟢 Observacion 3-2" }, { area: "OBSERVACIÓN", cama: "🟢 Observacion Silla 3" },
-      { area: "OBSERVACIÓN", cama: "🟢 Observacion 4" }, { area: "OBSERVACIÓN", cama: "🟢 Observacion 4-2" }, { area: "OBSERVACIÓN", cama: "🟢 Observacion Silla 4" },
-      { area: "OBSERVACIÓN", cama: "🟢 Observacion 5" }, { area: "OBSERVACIÓN", cama: "🟢 Observacion 5-2" }, { area: "OBSERVACIÓN", cama: "🟢 Observacion Silla 5" },
-      
-      // TRAUMA MENOR
-      { area: "TRAUMA MENOR", cama: "🟡 Trauma 1" }, { area: "TRAUMA MENOR", cama: "🟡 Trauma 2" }, { area: "TRAUMA MENOR", cama: "🟡 Trauma 3" }, { area: "TRAUMA MENOR", cama: "🟡 Trauma 4" },
-      { area: "TRAUMA MENOR", cama: "🟡 Trauma Silla 1" }, { area: "TRAUMA MENOR", cama: "🟡 Trauma Silla 2" }, { area: "TRAUMA MENOR", cama: "🟡 Trauma Silla 3" },
-      
-      // PEDIATRÍA
-      { area: "PEDIATRÍA", cama: "🔵 Pediatria Cuna 1" }, { area: "PEDIATRÍA", cama: "🔵 Pediatria Cuna 2" }, { area: "PEDIATRÍA", cama: "🔵 Pediatria Cuna 3" }, 
-      { area: "PEDIATRÍA", cama: "🔵 Pediatria Silla 1" }, { area: "PEDIATRÍA", cama: "🔵 Pediatria Silla 2" },
-      
-      // EXTRAS
-      { area: "EXTRAS", cama: "🟠 Extra 1" }, { area: "EXTRAS", cama: "🟠 Extra 2" }, { area: "EXTRAS", cama: "🟠 Extra 3" }, { area: "EXTRAS", cama: "🟠 Extra 4" }, { area: "EXTRAS", cama: "🟠 Extra 5" }
+    // Nombres cortos y elegantes para las camas
+    const masterCamas = [
+      { area: "SALA DE CHOQUE", cama: "CHOQUE 1" }, { area: "SALA DE CHOQUE", cama: "CHOQUE 2" },
+      { area: "OBSERVACIÓN", cama: "CAMA 1" }, { area: "OBSERVACIÓN", cama: "CAMA 1-2" }, { area: "OBSERVACIÓN", cama: "SILLA 1" },
+      { area: "OBSERVACIÓN", cama: "CAMA 2" }, { area: "OBSERVACIÓN", cama: "CAMA 2-2" }, { area: "OBSERVACIÓN", cama: "SILLA 2" },
+      { area: "OBSERVACIÓN", cama: "CAMA 3" }, { area: "OBSERVACIÓN", cama: "CAMA 3-2" }, { area: "OBSERVACIÓN", cama: "SILLA 3" },
+      { area: "OBSERVACIÓN", cama: "CAMA 4" }, { area: "OBSERVACIÓN", cama: "CAMA 4-2" }, { area: "OBSERVACIÓN", cama: "SILLA 4" },
+      { area: "OBSERVACIÓN", cama: "CAMA 5" }, { area: "OBSERVACIÓN", cama: "CAMA 5-2" }, { area: "OBSERVACIÓN", cama: "SILLA 5" },
+      { area: "TRAUMA MENOR", cama: "CAMA 1" }, { area: "TRAUMA MENOR", cama: "CAMA 2" }, { area: "TRAUMA MENOR", cama: "CAMA 3" }, { area: "TRAUMA MENOR", cama: "CAMA 4" },
+      { area: "TRAUMA MENOR", cama: "SILLA 1" }, { area: "TRAUMA MENOR", cama: "SILLA 2" }, { area: "TRAUMA MENOR", cama: "SILLA 3" },
+      { area: "PEDIATRÍA", cama: "CUNA 1" }, { area: "PEDIATRÍA", cama: "CUNA 2" }, { area: "PEDIATRÍA", cama: "CUNA 3" }, 
+      { area: "PEDIATRÍA", cama: "SILLA 1" }, { area: "PEDIATRÍA", cama: "SILLA 2" },
+      { area: "EXTRAS", cama: "EXTRA 1" }, { area: "EXTRAS", cama: "EXTRA 2" }, { area: "EXTRAS", cama: "EXTRA 3" }, { area: "EXTRAS", cama: "EXTRA 4" }, { area: "EXTRAS", cama: "EXTRA 5" }
     ];
+
+    // Función "Limpiadora" para purgar retroactivamente pacientes viejos sin afectar Firebase
+    function limpiarNombreCama(camaStr) {
+      if (!camaStr) return '';
+      let c = String(camaStr).toUpperCase()
+                .replace('🔴', '').replace('🟢', '').replace('🟡', '')
+                .replace('🔵', '').replace('🟠', '').trim();
+                
+      if (c.startsWith('OBSERVACION SILLA')) return c.replace('OBSERVACION SILLA', 'SILLA').trim();
+      if (c.startsWith('OBSERVACION')) return c.replace('OBSERVACION', 'CAMA').trim();
+      if (c.startsWith('TRAUMA SILLA')) return c.replace('TRAUMA SILLA', 'SILLA').trim();
+      if (c.startsWith('TRAUMA') && !c.includes('MENOR')) return c.replace('TRAUMA', 'CAMA').trim();
+      if (c.startsWith('PEDIATRIA CUNA')) return c.replace('PEDIATRIA CUNA', 'CUNA').trim();
+      if (c.startsWith('PEDIATRIA SILLA')) return c.replace('PEDIATRIA SILLA', 'SILLA').trim();
+      return c;
+    }
 
     // ==========================================================
     // VARIABLES GLOBALES DEL CENSO
@@ -708,7 +715,7 @@ const masterCamas = [
       return `<div class="section animate-in" style="margin-top:0; border-top:none;"><div class="section-header"><div class="section-title">CARGANDO CENSO...</div></div><div class="skeleton-loader">${mobileCards}</div></div>`;
     }
 
-function render(lista) {
+    function render(lista) {
       const content = document.getElementById('content');
       const metaText = document.getElementById('meta-text');
       const mainAppContainer = document.getElementById('mainAppContainer');
@@ -730,12 +737,10 @@ function render(lista) {
       let areas = Object.keys(grupos);
       const isDesktop = window.innerWidth >= 768;
 
-      // =========================================================
-      // NUEVO: ORDEN ESTRICTO DE PRIORIDAD CLÍNICA
-      // =========================================================
+      // ORDEN ESTRICTO DE PRIORIDAD CLÍNICA
       const ordenEstricto = [
         "SALA DE CHOQUE",
-        "OBSERVACIÓN", "OBSERVACION", // Por si alguien lo escribe sin acento
+        "OBSERVACIÓN", "OBSERVACION", 
         "TRAUMA MENOR",
         "PEDIATRÍA", "PEDIATRIA",
         "EXTRAS",
@@ -745,14 +750,10 @@ function render(lista) {
       areas.sort((a, b) => {
         const indexA = ordenEstricto.indexOf(a.toUpperCase().trim());
         const indexB = ordenEstricto.indexOf(b.toUpperCase().trim());
-        
-        // Si hay un área nueva o rara que no esté en la lista, la manda al fondo (999)
         const posA = indexA === -1 ? 999 : indexA;
         const posB = indexB === -1 ? 999 : indexB;
-        
         return posA - posB;
       });
-      // =========================================================
 
       if (currentViewMode === 'table' && isDesktop) {
         content.classList.add('view-table-mode');
@@ -857,8 +858,13 @@ function render(lista) {
             data.fechaIngresoISO = '';
           }
 
+          // Pasamos el filtro para limpiar el nombre y asignarlo directamente a la UI
+          if(data.cama) {
+            data.cama = limpiarNombreCama(data.cama);
+            occupiedBeds.push(data.cama); // Lo manda ultra limpio para descartar la cama
+          }
+
           pacientesGlobal.push(data);
-          if(data.cama) occupiedBeds.push(data.cama.toUpperCase().trim());
         });
 
         // Ordenar globalmente por fecha de ingreso (los más recientes primero)
@@ -1015,7 +1021,6 @@ function render(lista) {
     function abrirModalAgregar() {
       vibrar(30); 
       
-      // Llenar el input de fecha con la hora local actual
       const now = new Date();
       now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
       document.getElementById('addFechaIngreso').value = now.toISOString().slice(0,16);
