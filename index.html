@@ -153,15 +153,13 @@
     }
 
 /* ENCABEZADO BASE LIMPIO */
-   /* ENCABEZADO BASE LIMPIO */
+/* 1. ENCABEZADO BASE (Para navegadores como Chrome y Safari) */
     .header { 
       position: relative; 
       flex-shrink: 0; 
       z-index: 50; 
       width: 100%; 
-      padding: 10px; 
-      /* Este calc() suma 10px al notch, si no hay notch (escritorio), suma 0 y se queda en 10px */
-      padding-top: calc(10px + env(safe-area-inset-top, 0px)); 
+      padding: 14px 10px; /* Padding sólido y predecible */
       margin: 0; 
       background: var(--panel-glass); 
       backdrop-filter: blur(12px); 
@@ -171,16 +169,24 @@
       overflow: hidden; 
     }
     
+    /* 2. EL TRUCO: Solo aplicar el padding del notch si es Web App instalada */
+    @media (display-mode: standalone) {
+      .header {
+        padding-top: max(14px, env(safe-area-inset-top));
+      }
+    }
+    
+    /* 3. CONTENEDOR FLEXIBLE SIN ALTURAS FIJAS (Evita que Chrome lo corte) */
     .header-top { 
       display: flex; 
       align-items: center; 
       justify-content: space-between; 
       position: relative; 
       width: 100%; 
-      min-height: 56px; /* Aumentamos un poquito para que respire en celular */
+      /* Eliminamos el min-height. El contenedor crecerá orgánicamente según el texto */
+      padding: 2px 0; 
       z-index: 2; 
     }
-
     #plexusCanvas {
       position: absolute;
       top: 0;
