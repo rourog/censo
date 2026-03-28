@@ -153,12 +153,15 @@
     }
 
 /* ENCABEZADO BASE LIMPIO */
+   /* ENCABEZADO BASE LIMPIO */
     .header { 
       position: relative; 
       flex-shrink: 0; 
       z-index: 50; 
       width: 100%; 
       padding: 10px; 
+      /* Este calc() suma 10px al notch, si no hay notch (escritorio), suma 0 y se queda en 10px */
+      padding-top: calc(10px + env(safe-area-inset-top, 0px)); 
       margin: 0; 
       background: var(--panel-glass); 
       backdrop-filter: blur(12px); 
@@ -174,7 +177,7 @@
       justify-content: space-between; 
       position: relative; 
       width: 100%; 
-      min-height: 48px; 
+      min-height: 56px; /* Aumentamos un poquito para que respire en celular */
       z-index: 2; 
     }
 
@@ -188,7 +191,6 @@
       pointer-events: none;
     }
 
-    /* Asignamos espacio equitativo a los lados */
     .header-top .header-left { 
       display: flex; align-items: center; gap: 8px; z-index: 2; 
       flex: 1; 
@@ -201,7 +203,6 @@
       justify-content: flex-end; 
     }
 
-    /* El título fluye natural sin position: absolute */
     .main-title { 
       text-align: center; 
       display: flex; 
@@ -212,14 +213,13 @@
       white-space: nowrap; 
     }
     
-    /* Tamaño ajustado para celular */
     .title-censo { 
       font-family: 'Space Mono', monospace; 
       font-size: 1.4rem; 
       font-weight: 700; 
       letter-spacing: 0.08em; 
-      line-height: 1; 
-      padding-bottom: 2px; 
+      line-height: 1.2; /* Pasamos de 1 a 1.2 para que no mutile la fuente */
+      padding: 2px 0; /* Padding en lugar de solo abajo para proteger el gradiente */
       background-image: linear-gradient(to right, #ef4444, #f97316, #eab308, #f97316, #ef4444); 
       background-size: 200% auto; 
       -webkit-background-clip: text; 
@@ -529,7 +529,7 @@
 
     <div class="footer">
       Hospital Regional de Delicias - <span style="color: var(--accent); font-weight: 600;">Rourog Innovations</span>
-      <span style="opacity: 0.4; font-size: 0.8em; margin-left: 8px;">v2.1</span>
+      <span style="opacity: 0.4; font-size: 0.8em; margin-left: 8px;">v2.2</span>
     </div>
 
     <div id="easterEggContainer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; pointer-events: none; overflow: hidden;"></div>
