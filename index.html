@@ -153,14 +153,14 @@
     }
 
     /* ENCABEZADO BASE LIMPIO */
-/* ENCABEZADO BASE LIMPIO Y ESTANDARIZADO */
+/* 1. Ajustamos el padding del header para darle respiro abajo */
 .header { 
   position: relative; 
   flex-shrink: 0; 
   z-index: 50; 
   width: 100%; 
-  /* Modifica solo esta línea: */
-  padding: max(10px, env(safe-area-inset-top)) 10px 10px 10px; 
+  padding: 10px 10px 16px 10px; /* Aumentamos a 16px el padding inferior */
+  padding-top: max(16px, env(safe-area-inset-top, 0px)); /* Garantizamos 16px arriba */
   margin: 0; 
   background: var(--panel-glass); 
   backdrop-filter: blur(12px); 
@@ -169,17 +169,17 @@
   box-shadow: 0 4px 166px rgba(0,0,0,0.08); 
   overflow: hidden; 
 }
-    
-    .header-top { 
-      display: flex; 
-      align-items: center; 
-      justify-content: space-between; 
-      position: relative; 
-      width: 100%; 
-      /* Forzamos una altura mínima para evitar colapsos */
-      min-height: 40px; 
-      z-index: 2; 
-    }
+
+/* 2. Le damos la altura necesaria al contenedor superior */
+.header-top { 
+  display: flex; 
+  align-items: center; 
+  justify-content: space-between; 
+  position: relative; 
+  width: 100%; 
+  min-height: 70px; /* Aumentamos de 40px a 70px para contener el título completo */
+  z-index: 2; 
+}
     .header-top .header-left, .header-top .header-right { display: flex; align-items: center; gap: 8px; z-index: 2; }
     .header-top .header-right { justify-content: flex-end; }
     #plexusCanvas {
