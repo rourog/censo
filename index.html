@@ -152,15 +152,13 @@
       }
     }
 
-    /* ENCABEZADO BASE LIMPIO */
-.header { 
+/* ENCABEZADO BASE LIMPIO */
+    .header { 
       position: relative; 
       flex-shrink: 0; 
       z-index: 50; 
       width: 100%; 
-      /* Padding inferior discreto de 12px, y el notch controlado arriba */
-      padding: 10px 10px 12px 10px; 
-      padding-top: max(12px, env(safe-area-inset-top, 0px)); 
+      padding: 10px 10px; /* Restaurado a su valor original */
       margin: 0; 
       background: var(--panel-glass); 
       backdrop-filter: blur(12px); 
@@ -176,11 +174,18 @@
       justify-content: space-between; 
       position: relative; 
       width: 100%; 
-      /* Reducimos de 70px a 50px porque ya no está el contador */
-      min-height: 50px; 
+      min-height: 48px; /* Restaurado a su valor original */
       z-index: 2; 
     }
-
+#plexusCanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: none;
+    }
     
     .main-title { position: absolute; left: 50%; transform: translateX(-50%); text-align: center; display: flex; flex-direction: column; align-items: center; z-index: 2; }
     
