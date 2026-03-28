@@ -154,21 +154,21 @@
 
     /* ENCABEZADO BASE LIMPIO */
 /* ENCABEZADO BASE LIMPIO Y ESTANDARIZADO */
-    .header { 
-      position: relative; 
-      flex-shrink: 0; 
-      z-index: 50; 
-      width: 100%; 
-      margin: 0; 
-      background: var(--panel-glass); 
-      backdrop-filter: blur(12px); 
-      -webkit-backdrop-filter: blur(12px); 
-      border-bottom: 1px solid var(--line); 
-      box-shadow: 0 4px 16px rgba(0,0,0,0.08); 
-      overflow: hidden; 
-      /* Controlamos el padding interno de forma estricta */
-      padding: 12px 16px; 
-    }
+.header { 
+  position: relative; 
+  flex-shrink: 0; 
+  z-index: 50; 
+  width: 100%; 
+  /* Modifica solo esta línea: */
+  padding: max(10px, env(safe-area-inset-top)) 10px 10px 10px; 
+  margin: 0; 
+  background: var(--panel-glass); 
+  backdrop-filter: blur(12px); 
+  -webkit-backdrop-filter: blur(12px); 
+  border-bottom: 1px solid var(--line); 
+  box-shadow: 0 4px 166px rgba(0,0,0,0.08); 
+  overflow: hidden; 
+}
     
     .header-top { 
       display: flex; 
@@ -182,6 +182,17 @@
     }
     .header-top .header-left, .header-top .header-right { display: flex; align-items: center; gap: 8px; z-index: 2; }
     .header-top .header-right { justify-content: flex-end; }
+    #plexusCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1; /* Se mantiene detrás de los botones y el título */
+  pointer-events: none; /* Evita que el canvas bloquee los clics en los botones */
+}
+
+    
     .main-title { position: absolute; left: 50%; transform: translateX(-50%); text-align: center; display: flex; flex-direction: column; align-items: center; z-index: 2; }
     
     .title-censo { font-family: 'Space Mono', monospace; font-size: 1.8rem; font-weight: 700; letter-spacing: 0.12em; line-height: 1.1; padding-bottom: 2px; background-image: linear-gradient(to right, #ef4444, #f97316, #eab308, #f97316, #ef4444); background-size: 200% auto; -webkit-background-clip: text; background-clip: text; color: transparent; animation: hypnoticGradient 8s linear infinite; }
