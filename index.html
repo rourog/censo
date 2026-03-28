@@ -158,7 +158,7 @@
       flex-shrink: 0; 
       z-index: 50; 
       width: 100%; 
-      padding: 10px 10px; /* Restaurado a su valor original */
+      padding: 10px; 
       margin: 0; 
       background: var(--panel-glass); 
       backdrop-filter: blur(12px); 
@@ -174,10 +174,11 @@
       justify-content: space-between; 
       position: relative; 
       width: 100%; 
-      min-height: 48px; /* Restaurado a su valor original */
+      min-height: 48px; 
       z-index: 2; 
     }
-#plexusCanvas {
+
+    #plexusCanvas {
       position: absolute;
       top: 0;
       left: 0;
@@ -186,18 +187,78 @@
       z-index: 1;
       pointer-events: none;
     }
-    
-    .main-title { position: absolute; left: 50%; transform: translateX(-50%); text-align: center; display: flex; flex-direction: column; align-items: center; z-index: 2; }
-    
-    .title-censo { font-family: 'Space Mono', monospace; font-size: 1.8rem; font-weight: 700; letter-spacing: 0.12em; line-height: 1.1; padding-bottom: 2px; background-image: linear-gradient(to right, #ef4444, #f97316, #eab308, #f97316, #ef4444); background-size: 200% auto; -webkit-background-clip: text; background-clip: text; color: transparent; animation: hypnoticGradient 8s linear infinite; }
-    .title-urgencias { font-size: 0.85rem; font-weight: 600; color: var(--muted); letter-spacing: 0.15em; text-transform: uppercase; margin-top: 0px; }
 
-    .icon-btn { width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--accent-border); background: var(--toggle-bg); color: var(--text); display: flex; align-items: center; justify-content: center; font-size: 1rem; cursor: pointer; transition: all var(--transition-fast); padding: 0; }
+    /* Asignamos espacio equitativo a los lados */
+    .header-top .header-left { 
+      display: flex; align-items: center; gap: 8px; z-index: 2; 
+      flex: 1; 
+      justify-content: flex-start; 
+    }
+    
+    .header-top .header-right { 
+      display: flex; align-items: center; gap: 8px; z-index: 2; 
+      flex: 1; 
+      justify-content: flex-end; 
+    }
+
+    /* El título fluye natural sin position: absolute */
+    .main-title { 
+      text-align: center; 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      z-index: 2; 
+      flex: 0 1 auto;
+      white-space: nowrap; 
+    }
+    
+    /* Tamaño ajustado para celular */
+    .title-censo { 
+      font-family: 'Space Mono', monospace; 
+      font-size: 1.4rem; 
+      font-weight: 700; 
+      letter-spacing: 0.08em; 
+      line-height: 1; 
+      padding-bottom: 2px; 
+      background-image: linear-gradient(to right, #ef4444, #f97316, #eab308, #f97316, #ef4444); 
+      background-size: 200% auto; 
+      -webkit-background-clip: text; 
+      background-clip: text; 
+      color: transparent; 
+      animation: hypnoticGradient 8s linear infinite; 
+    }
+    
+    .title-urgencias { 
+      font-size: 0.75rem; 
+      font-weight: 600; 
+      color: var(--muted); 
+      letter-spacing: 0.15em; 
+      text-transform: uppercase; 
+      margin-top: 0px; 
+    }
+
+    /* Agregamos flex-shrink: 0 para que no se apachurren */
+    .icon-btn { 
+      width: 30px; 
+      height: 30px; 
+      border-radius: 50%; 
+      border: 1px solid var(--accent-border); 
+      background: var(--toggle-bg); 
+      color: var(--text); 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      font-size: 1rem; 
+      cursor: pointer; 
+      transition: all var(--transition-fast); 
+      padding: 0; 
+      flex-shrink: 0; 
+    }
+    
     .icon-btn:active { transform: scale(0.9); background: var(--accent-soft); }
     @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     @keyframes hypnoticGradient { from { background-position: 0% center; } to { background-position: 200% center; } }
     .spin { animation: spin 1s linear infinite; display: inline-block; }
-
     .search-wrapper { position: relative; z-index: 2; max-height: 60px; opacity: 1; transform: translateY(0); overflow: hidden; transition: all var(--transition); margin-top: 12px; }
     .search-wrapper.collapsed { max-height: 0; opacity: 0; transform: translateY(-10px); margin-top: 0; pointer-events: none; }
     .search { width: 100%; max-width: 100%; padding: 12px 10px; font-size: 1rem; border-radius: var(--radius-md); border: 1px solid var(--line); background: var(--search-bg); color: var(--text); outline: none; font-family: 'Fira Code', monospace; transition: border-color var(--transition-fast), box-shadow var(--transition-fast); }
@@ -321,6 +382,10 @@
       .skeleton-loader { gap: 12px; padding: 0 16px 16px; }
       .skeleton-card { border-bottom: none !important; border-radius: var(--radius-md); border: 1px solid var(--line); margin-bottom: 12px; }
 
+      /* Recuperar el tamaño original del título en monitores de escritorio */
+      .title-censo { font-size: 1.8rem; letter-spacing: 0.12em; }
+      .title-urgencias { font-size: 0.85rem; }
+      
       ::-webkit-scrollbar { width: 8px; height: 8px; }
       ::-webkit-scrollbar-track { background: transparent; }
       ::-webkit-scrollbar-thumb { background: var(--muted); border-radius: 10px; opacity: 0.3; }
@@ -464,7 +529,7 @@
 
     <div class="footer">
       Hospital Regional de Delicias - <span style="color: var(--accent); font-weight: 600;">Rourog Innovations</span>
-      <span style="opacity: 0.4; font-size: 0.8em; margin-left: 8px;">v2.0</span>
+      <span style="opacity: 0.4; font-size: 0.8em; margin-left: 8px;">v2.1</span>
     </div>
 
     <div id="easterEggContainer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; pointer-events: none; overflow: hidden;"></div>
