@@ -177,14 +177,13 @@
     }
     
     /* 3. CONTENEDOR FLEXIBLE SIN ALTURAS FIJAS (Evita que Chrome lo corte) */
-    .header-top { 
+.header-top { 
       display: flex; 
       align-items: center; 
       justify-content: space-between; 
       position: relative; 
       width: 100%; 
-      /* Eliminamos el min-height. El contenedor crecerá orgánicamente según el texto */
-      padding: 2px 0; 
+      min-height: 54px; /* Le damos altura suficiente para abrazar el título completo */
       z-index: 2; 
     }
     #plexusCanvas {
@@ -209,14 +208,17 @@
       justify-content: flex-end; 
     }
 
-    .main-title { 
+.main-title { 
+      position: absolute; 
+      left: 50%; 
+      top: 50%; /* Lo anclamos exactamente a la mitad vertical */
+      transform: translate(-50%, -50%); /* Centrado absoluto perfecto */
       text-align: center; 
       display: flex; 
       flex-direction: column; 
       align-items: center; 
       z-index: 2; 
-      flex: 0 1 auto;
-      white-space: nowrap; 
+      width: max-content; /* Evita que el celular intente exprimir el texto */
     }
     
     .title-censo { 
@@ -224,8 +226,27 @@
       font-size: 1.4rem; 
       font-weight: 700; 
       letter-spacing: 0.08em; 
-      line-height: 1.2; /* Pasamos de 1 a 1.2 para que no mutile la fuente */
-      padding: 2px 0; /* Padding en lugar de solo abajo para proteger el gradiente */
+      line-height: 1.2; .main-title { 
+      position: absolute; 
+      left: 50%; 
+      top: 50%; /* Lo anclamos exactamente a la mitad vertical */
+      transform: translate(-50%, -50%); /* Centrado absoluto perfecto */
+      text-align: center; 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      z-index: 2; 
+      width: max-content; /* Evita que el celular intente exprimir el texto */
+    }
+    
+    .title-censo { 
+      font-family: 'Space Mono', monospace; 
+      font-size: 1.4rem; 
+      font-weight: 700; 
+      letter-spacing: 0.08em; 
+      line-height: 1.2; 
+      /* Le damos 4px de colchón arriba para que Chrome no le corte la cabeza a la C */
+      padding: 4px 4px 2px 4px; 
       background-image: linear-gradient(to right, #ef4444, #f97316, #eab308, #f97316, #ef4444); 
       background-size: 200% auto; 
       -webkit-background-clip: text; 
@@ -233,7 +254,15 @@
       color: transparent; 
       animation: hypnoticGradient 8s linear infinite; 
     }
-    
+      /* Le damos 4px de colchón arriba para que Chrome no le corte la cabeza a la C */
+      padding: 4px 4px 2px 4px; 
+      background-image: linear-gradient(to right, #ef4444, #f97316, #eab308, #f97316, #ef4444); 
+      background-size: 200% auto; 
+      -webkit-background-clip: text; 
+      background-clip: text; 
+      color: transparent; 
+      animation: hypnoticGradient 8s linear infinite; 
+    }
     .title-urgencias { 
       font-size: 0.75rem; 
       font-weight: 600; 
@@ -535,7 +564,7 @@
 
     <div class="footer">
       Hospital Regional de Delicias - <span style="color: var(--accent); font-weight: 600;">Rourog Innovations</span>
-      <span style="opacity: 0.4; font-size: 0.8em; margin-left: 8px;">v2.2</span>
+      <span style="opacity: 0.4; font-size: 0.8em; margin-left: 8px;">v2.3</span>
     </div>
 
     <div id="easterEggContainer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; pointer-events: none; overflow: hidden;"></div>
