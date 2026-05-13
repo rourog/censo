@@ -29,7 +29,7 @@
     body { font-family: 'Fira Code', monospace; transition: background 0.5s ease, color 0.5s ease; font-variant-ligatures: contextual; }
 
     /* ==========================================================
-       DEFINICIÓN DE TEMAS (Heredados del sistema principal)
+       DEFINICIÓN DE TEMAS
        ========================================================== */
     body.dark {
       --bg: #0f172a; --panel: #0b1220; --panel-glass: rgba(11, 18, 32, 0.85); --section-head: #0b1220;
@@ -133,9 +133,7 @@
     .icon-btn:active { transform: scale(0.9); background: var(--accent-soft); }
 
     /* FILTROS DE BÚSQUEDA */
-    .filters-container { 
-      display: flex; flex-direction: column; gap: 10px; margin-top: 14px; 
-    }
+    .filters-container { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; }
     @media (min-width: 768px) {
       .filters-container { flex-direction: row; }
       .search-box { flex: 2; }
@@ -158,7 +156,7 @@
     /* CONTENEDOR PRINCIPAL Y TABLA */
     #content { flex-grow: 1; overflow-y: auto; overflow-x: auto; padding: 0; position: relative; z-index: 10; }
     
-    .table-wrapper { width: 100%; min-width: 900px; border-collapse: collapse; }
+    .table-wrapper { width: 100%; min-width: 950px; border-collapse: collapse; }
     .censo-table { width: 100%; border-collapse: collapse; text-align: left; background: transparent; table-layout: fixed; }
     
     .censo-table th { 
@@ -171,28 +169,36 @@
     .truncate-text { width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
     .expanded-cell { white-space: normal !important; word-break: break-word; }
 
-    .chip { 
-      display: inline-block; font-size: 0.7rem; font-weight: 700; padding: 4px 8px; border-radius: 6px; 
-      border: 1px solid var(--accent-border); background: var(--chip-bg); color: var(--chip-text); 
-    }
-
+    .chip { display: inline-block; font-size: 0.7rem; font-weight: 700; padding: 4px 8px; border-radius: 6px; border: 1px solid var(--accent-border); background: var(--chip-bg); color: var(--chip-text); }
     .meta-time { font-size: 0.75rem; color: var(--muted); font-family: 'Fira Code', monospace; margin-top: 4px; display: block; }
     .badge-role { font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; background: var(--field); border: 1px solid var(--line); color: var(--muted); font-weight: 600; }
 
     .footer { flex-shrink: 0; text-align: center; padding: 10px; color: var(--muted); font-size: 0.75rem; border-top: 1px solid var(--line); background: var(--panel-glass); z-index: 20; }
 
-    /* SPINNER Y ESTADOS */
-    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-    .spin { animation: spin 1s linear infinite; display: inline-block; }
-    
-    .empty, .error { padding: 40px 20px; text-align: center; color: var(--muted); font-family: 'Space Mono', monospace; font-size: 1rem; width: 100%; position: absolute; left: 0; }
-    .error { color: var(--error-text); background: var(--error-bg); border-bottom: 1px solid var(--error-border); }
+    /* BOTONES DE LA TABLA */
+    .btn-table { background: transparent; border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 6px; cursor: pointer; font-size: 1rem; transition: all var(--transition-fast); }
+    .btn-table:hover { transform: scale(1.1); }
+    .btn-table.delete { color: #ef4444; }
+    .btn-table.delete:hover { background: rgba(239, 68, 68, 0.1); border-color: #ef4444; }
 
-    /* MODAL AUTENTICACIÓN */
-    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--modal-overlay); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); z-index: 100; display: none; align-items: center; justify-content: center; padding: 16px; }
-    .modal-overlay.active { display: flex; }
+    /* MODALES GENERALES */
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--modal-overlay); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); z-index: 100; display: none; align-items: center; justify-content: center; padding: 16px; opacity: 0; transition: opacity 0.3s; }
+    .modal-overlay.active { display: flex; opacity: 1; }
+    .modal-content { background: var(--panel); width: 100%; max-width: 400px; border-radius: var(--radius-xl); border: 1px solid var(--line); box-shadow: 0 10px 25px rgba(0,0,0,0.2); padding: 20px; display: flex; flex-direction: column; gap: 12px; transform: translateY(20px); transition: transform 0.3s; }
+    .modal-overlay.active .modal-content { transform: translateY(0); }
+    
     .input-control { width: 100%; padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--line); background: var(--bg); color: var(--text); font-family: 'Fira Code', monospace; font-size: 1rem; text-align: center; letter-spacing: 0.2em; }
     .input-control:focus { outline: none; border-color: var(--accent); }
+
+    .modal-actions { display: flex; gap: 10px; margin-top: 10px; width: 100%; }
+    .btn-cancelar { flex: 1; padding: 12px; border-radius: var(--radius-sm); background: var(--field); border: 1px solid var(--line); color: var(--text); font-weight: 600; cursor: pointer; text-transform: uppercase; font-family: 'Space Mono', monospace; }
+    .btn-borrar { flex: 1; padding: 12px; border-radius: var(--radius-sm); background: var(--error-bg); border: 1px solid var(--error-border); color: var(--error-text); font-weight: 600; cursor: pointer; text-transform: uppercase; font-family: 'Space Mono', monospace; transition: all var(--transition-fast); }
+    .btn-borrar:active { transform: scale(0.95); background: #ef4444; color: #fff; }
+
+    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    .spin { animation: spin 1s linear infinite; display: inline-block; }
+    .empty, .error { padding: 40px 20px; text-align: center; color: var(--muted); font-family: 'Space Mono', monospace; font-size: 1rem; width: 100%; position: absolute; left: 0; }
+    .error { color: var(--error-text); background: var(--error-bg); border-bottom: 1px solid var(--error-border); }
 
     /* SCROLLBARS */
     ::-webkit-scrollbar { width: 8px; height: 8px; }
@@ -253,12 +259,13 @@
         <table class="censo-table">
           <thead>
             <tr>
-              <th style="width: 18%;">PACIENTE</th>
-              <th style="width: 8%;">EDAD</th>
-              <th style="width: 10%;">ÚLTIMA CAMA</th>
-              <th style="width: 26%;">DIAGNÓSTICO REGISTRADO</th>
+              <th style="width: 17%;">PACIENTE</th>
+              <th style="width: 6%;">EDAD</th>
+              <th style="width: 9%;">ÚLTIMA CAMA</th>
+              <th style="width: 25%;">DIAGNÓSTICO REGISTRADO</th>
               <th style="width: 18%;">DESTINO DE EGRESO</th>
-              <th style="width: 20%;">DATOS DE SALIDA</th>
+              <th style="width: 18%;">DATOS DE SALIDA</th>
+              <th style="width: 7%; text-align: center;">ACCIÓN</th>
             </tr>
           </thead>
           <tbody id="tableBody">
@@ -269,6 +276,20 @@
 
     <div class="footer">
       Archivo Histórico Seguro - <span style="color: var(--accent); font-weight: 700;">Rourog Innovations</span>
+      <span style="opacity: 0.4; font-size: 0.8em; margin-left: 8px;">v1.2</span>
+    </div>
+  </div>
+
+  <div id="deleteSecureModal" class="modal-overlay">
+    <div class="modal-content" style="border: 2px solid var(--error-border);">
+      <div style="font-size: 2.5rem; text-align: center;">🛡️</div>
+      <div style="color: var(--error-text); font-weight: 700; text-align: center; font-family: 'Space Mono';">AUTORIZACIÓN DE PURGA</div>
+      <div style="text-align: center; color: var(--muted); font-size: 0.85rem;">Ingresa la clave de administrador para eliminar este registro permanentemente.</div>
+      <input type="password" id="adminPassInput" class="input-control" placeholder="CONTRASEÑA" style="letter-spacing: 0.1em; text-align: center;">
+      <div class="modal-actions">
+        <button class="btn-cancelar" onclick="cerrarSecureModal()">CANCELAR</button>
+        <button class="btn-borrar" id="btnConfirmSecureDelete" onclick="ejecutarPurga()">ELIMINAR</button>
+      </div>
     </div>
   </div>
 
@@ -277,7 +298,7 @@
     // 1. IMPORTACIONES DE FIREBASE
     // ==========================================================
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
-    import { initializeFirestore, collection, getDocs, query, orderBy } 
+    import { initializeFirestore, collection, getDocs, query, orderBy, doc, deleteDoc } 
         from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
     import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } 
         from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
@@ -303,6 +324,7 @@
     // ==========================================================
     let historialGlobal = [];
     let isFetching = false;
+    let targetDeleteId = null;
 
     const chipPalette = [
       { bg: '#ffe4e6', text: '#9f1239' }, { bg: '#dcfce7', text: '#166534' }, 
@@ -344,7 +366,7 @@
       tbody.innerHTML = '';
 
       if (lista.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6"><div class="empty">No se encontraron egresos que coincidan con la búsqueda.</div></td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7"><div class="empty">No se encontraron egresos que coincidan con la búsqueda.</div></td></tr>`;
         return;
       }
 
@@ -370,6 +392,9 @@
             <td>
               <span style="font-weight: 600; font-size: 0.85rem;">${escapeHtml(p.fechaEgresoStr)}</span>
               <span class="meta-time" title="Ingreso original">ING: ${escapeHtml(p.fechaIngresoStr)}</span>
+            </td>
+            <td style="text-align: center; vertical-align: middle;">
+              <button class="btn-table delete" onclick="abrirSecureDelete('${p.id}')" title="Purgar Registro">🗑️</button>
             </td>
           </tr>
         `;
@@ -413,7 +438,6 @@
       counterText.innerText = "DESCARGANDO ARCHIVO HISTÓRICO...";
 
       try {
-        // Traemos todo el archivo ordenado desde el backend por fecha de salida descendente
         const qReq = query(collection(db, "historial"), orderBy("fechaEgreso", "desc"));
         const snapshot = await getDocs(qReq);
         
@@ -421,7 +445,6 @@
         snapshot.forEach(docSnap => {
           const data = docSnap.data();
           
-          // Formateo seguro de Timestamp de salida
           let fEgreso = '-';
           if (data.fechaEgreso && typeof data.fechaEgreso.toDate === 'function') {
             fEgreso = data.fechaEgreso.toDate().toLocaleString('es-MX', { 
@@ -429,7 +452,6 @@
             }).toUpperCase();
           }
 
-          // Formateo seguro de Timestamp de ingreso original
           let fIngreso = '-';
           if (data.creado && typeof data.creado.toDate === 'function') {
             fIngreso = data.creado.toDate().toLocaleString('es-MX', { 
@@ -447,7 +469,7 @@
 
         aplicarFiltros();
       } catch (err) {
-        document.getElementById('tableBody').innerHTML = `<tr><td colspan="6"><div class="error">ERROR AL CARGAR DATOS:<br>${escapeHtml(err.message)}</div></td></tr>`;
+        document.getElementById('tableBody').innerHTML = `<tr><td colspan="7"><div class="error">ERROR AL CARGAR DATOS:<br>${escapeHtml(err.message)}</div></td></tr>`;
         counterText.innerText = "ERROR DE CONEXIÓN";
       } finally {
         isFetching = false;
@@ -456,7 +478,52 @@
     }
 
     // ==========================================================
-    // 5. AUTENTICACIÓN Y CONTROLADORES UI
+    // 5. PURGA CON CONTRASEÑA EN CRUDO
+    // ==========================================================
+    window.abrirSecureDelete = function(id) {
+      targetDeleteId = id;
+      document.getElementById('adminPassInput').value = '';
+      document.getElementById('deleteSecureModal').classList.add('active');
+      setTimeout(() => document.getElementById('adminPassInput').focus(), 200);
+    };
+
+    window.cerrarSecureModal = function() {
+      document.getElementById('deleteSecureModal').classList.remove('active');
+      targetDeleteId = null;
+    };
+
+    window.ejecutarPurga = async function() {
+      const pass = document.getElementById('adminPassInput').value;
+      if (pass !== "CensoAdmin") {
+        alert("Clave de administrador incorrecta.");
+        return;
+      }
+
+      if (!targetDeleteId) return;
+
+      const btn = document.getElementById('btnConfirmSecureDelete');
+      btn.disabled = true; btn.innerHTML = '<span class="spin">🔄</span>';
+
+      try {
+        await deleteDoc(doc(db, "historial", targetDeleteId));
+        cerrarSecureModal();
+        // Recargamos el archivo localmente para reflejar el borrado sin tirarle extra peticiones al servidor
+        historialGlobal = historialGlobal.filter(p => p.id !== targetDeleteId);
+        aplicarFiltros();
+      } catch (e) {
+        alert("Error al borrar el registro: " + e.message);
+      } finally {
+        btn.disabled = false; btn.innerHTML = 'ELIMINAR';
+      }
+    };
+
+    // Accionar purga con Enter
+    document.getElementById('adminPassInput').addEventListener('keypress', e => {
+      if (e.key === 'Enter') ejecutarPurga();
+    });
+
+    // ==========================================================
+    // 6. AUTENTICACIÓN Y CONTROLADORES UI
     // ==========================================================
     const loginScreen = document.getElementById('loginScreen');
     const mainAppContainer = document.getElementById('mainAppContainer');
@@ -507,7 +574,7 @@
       const iconEl = document.getElementById('themeIcon');
       if (iconEl) iconEl.textContent = themeIcons[theme];
       localStorage.setItem('censo-theme', theme);
-      aplicarFiltros(); // Refresca los chips por si entra a modo colorful
+      aplicarFiltros(); 
     }
 
     document.getElementById('themeToggle').addEventListener('click', () => { 
@@ -515,7 +582,6 @@
       applyTheme(themes[(themes.indexOf(curr) + 1) % themes.length]);
     });
 
-    // Arranque inicial de Tema
     applyTheme(localStorage.getItem('censo-theme') || 'dark');
 </script>
 </body>
