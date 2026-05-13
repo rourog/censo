@@ -152,14 +152,13 @@
       }
     }
 
-/* ENCABEZADO BASE LIMPIO */
-/* 1. ENCABEZADO BASE (Para navegadores como Chrome y Safari) */
+    /* ENCABEZADO BASE LIMPIO */
     .header { 
       position: relative; 
       flex-shrink: 0; 
       z-index: 50; 
       width: 100%; 
-      padding: 14px 10px; /* Padding sólido y predecible */
+      padding: 14px 10px; 
       margin: 0; 
       background: var(--panel-glass); 
       backdrop-filter: blur(12px); 
@@ -169,21 +168,19 @@
       overflow: hidden; 
     }
     
-    /* 2. EL TRUCO: Solo aplicar el padding del notch si es Web App instalada */
     @media (display-mode: standalone) {
       .header {
         padding-top: max(14px, env(safe-area-inset-top));
       }
     }
     
-    /* 3. CONTENEDOR FLEXIBLE SIN ALTURAS FIJAS (Evita que Chrome lo corte) */
-.header-top { 
+    .header-top { 
       display: flex; 
       align-items: center; 
       justify-content: space-between; 
       position: relative; 
       width: 100%; 
-      min-height: 54px; /* Le damos altura suficiente para abrazar el título completo */
+      min-height: 54px; 
       z-index: 2; 
     }
     #plexusCanvas {
@@ -208,35 +205,17 @@
       justify-content: flex-end; 
     }
 
-.main-title { 
+    .main-title { 
       position: absolute; 
       left: 50%; 
-      top: 50%; /* Lo anclamos exactamente a la mitad vertical */
-      transform: translate(-50%, -50%); /* Centrado absoluto perfecto */
+      top: 50%; 
+      transform: translate(-50%, -50%); 
       text-align: center; 
       display: flex; 
       flex-direction: column; 
       align-items: center; 
       z-index: 2; 
-      width: max-content; /* Evita que el celular intente exprimir el texto */
-    }
-    
-    .title-censo { 
-      font-family: 'Space Mono', monospace; 
-      font-size: 1.4rem; 
-      font-weight: 700; 
-      letter-spacing: 0.08em; 
-      line-height: 1.2; .main-title { 
-      position: absolute; 
-      left: 50%; 
-      top: 50%; /* Lo anclamos exactamente a la mitad vertical */
-      transform: translate(-50%, -50%); /* Centrado absoluto perfecto */
-      text-align: center; 
-      display: flex; 
-      flex-direction: column; 
-      align-items: center; 
-      z-index: 2; 
-      width: max-content; /* Evita que el celular intente exprimir el texto */
+      width: max-content; 
     }
     
     .title-censo { 
@@ -245,16 +224,6 @@
       font-weight: 700; 
       letter-spacing: 0.08em; 
       line-height: 1.2; 
-      /* Le damos 4px de colchón arriba para que Chrome no le corte la cabeza a la C */
-      padding: 4px 4px 2px 4px; 
-      background-image: linear-gradient(to right, #ef4444, #f97316, #eab308, #f97316, #ef4444); 
-      background-size: 200% auto; 
-      -webkit-background-clip: text; 
-      background-clip: text; 
-      color: transparent; 
-      animation: hypnoticGradient 8s linear infinite; 
-    }
-      /* Le damos 4px de colchón arriba para que Chrome no le corte la cabeza a la C */
       padding: 4px 4px 2px 4px; 
       background-image: linear-gradient(to right, #ef4444, #f97316, #eab308, #f97316, #ef4444); 
       background-size: 200% auto; 
@@ -272,7 +241,6 @@
       margin-top: 0px; 
     }
 
-    /* Agregamos flex-shrink: 0 para que no se apachurren */
     .icon-btn { 
       width: 30px; 
       height: 30px; 
@@ -518,7 +486,7 @@
 
     <div style="position: absolute; bottom: 30px; font-size: 0.7rem; font-family: 'Space Mono', monospace; font-weight: 700; letter-spacing: 0.1em;">
       <span style="color: var(--muted);">ROUROG</span> <span style="color: var(--text); opacity: 0.5;">Innovations</span>
-      <span style="opacity: 0.3; margin-left: 6px;">v1.5</span>
+      <span style="opacity: 0.3; margin-left: 6px;">v1.6</span>
     </div>
   </div>
   <div class="app" id="mainAppContainer" style="display: none;">
@@ -528,6 +496,7 @@
       <div class="header-top">
         <div class="header-left">
           <button id="searchToggleBtn" class="icon-btn" aria-label="Buscar"><span>🔍</span></button>
+          <button id="historyBtn" class="icon-btn" type="button" aria-label="Historial" title="Ver Historial"><span>🗄️</span></button>
         </div>
 
         <div class="main-title">
@@ -564,7 +533,7 @@
 
     <div class="footer">
       Hospital Regional de Delicias - <span style="color: var(--accent); font-weight: 600;">Rourog Innovations</span>
-      <span style="opacity: 0.4; font-size: 0.8em; margin-left: 8px;">v2.3</span>
+      <span style="opacity: 0.4; font-size: 0.8em; margin-left: 8px;">v2.4</span>
     </div>
 
     <div id="easterEggContainer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; pointer-events: none; overflow: hidden;"></div>
@@ -635,7 +604,7 @@
     // ==========================================================
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-analytics.js";
-    import { initializeFirestore, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, serverTimestamp } 
+    import { initializeFirestore, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, setDoc, serverTimestamp } 
         from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
     import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } 
         from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
@@ -1171,10 +1140,21 @@
       const btnBorrar = document.getElementById('btnConfirmDelete');
       if (!filaABorrar) return;
 
-      btnBorrar.disabled = true; btnBorrar.innerHTML = '<span class="spin">🔄</span>...';
+      btnBorrar.disabled = true; 
+      btnBorrar.innerHTML = '<span class="spin">🔄</span>...';
       vibrar(20);
       
       try {
+        const pacienteData = pacientesGlobal.find(p => p.fila === filaABorrar);
+        if (pacienteData) {
+          const { fila, fechaIngresoFormateada, fechaIngresoISO, ...datosParaArchivar } = pacienteData;
+          await setDoc(doc(db, "historial", filaABorrar), {
+            ...datosParaArchivar,
+            fechaEgreso: serverTimestamp(),
+            egresadoPor: rolUsuario
+          });
+        }
+
         await deleteDoc(doc(db, "pacientes", filaABorrar));
         vibrar([30, 50, 30]); 
         cerrarModalBorrado(); 
@@ -1391,6 +1371,12 @@
       vibrar(15); const wrapper = document.getElementById('searchWrapper'); const searchInput = document.getElementById('search');
       wrapper.classList.toggle('collapsed');
       if (!wrapper.classList.contains('collapsed')) { setTimeout(() => searchInput.focus(), 300); } else { searchInput.value = ''; render(pacientesGlobal); }
+    });
+
+    // Evento de Enlace Externo para el Botón del Historial
+    document.getElementById('historyBtn').addEventListener('click', () => {
+      vibrar(15);
+      window.open('https://rourog.github.io/censo/historial.html', '_blank');
     });
     
     document.getElementById('reloadBtn').addEventListener('click', () => { 
