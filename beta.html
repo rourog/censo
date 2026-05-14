@@ -275,7 +275,7 @@
     @media (min-width: 768px) { 
       .hide-on-mobile { display: flex !important; }
       
-      /* REESTRUCTURACIÓN DE CONTENT PARA KANBAN Y TABLA */
+      /* REESTRUCTURACIÓN DE CONTENT PARA KANBAN Y TABLA (v2.17) */
       #content { display: flex; flex-direction: row; gap: 24px; padding: 16px; align-items: flex-start; overflow-x: auto; overflow-y: hidden; }
       
       /* KANBAN EN COLUMNAS */
@@ -302,12 +302,23 @@
         border: 1px solid var(--accent-border); border-top: none; border-radius: var(--radius-md); 
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35); 
         overflow-y: auto; overflow-x: auto; max-height: calc(100vh - 145px); margin-bottom: 0; 
+        /* === ACELERACIÓN POR HARDWARE === */
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
+        will-change: scroll-position, transform;
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
       }
       
       body.light .table-wrapper, body.pink .table-wrapper { background: rgba(255, 255, 255, 0.40) !important; }
       body.colorful .table-wrapper { background: rgba(255, 255, 255, 0.20) !important; }
       
-      .censo-table { width: 100%; border-collapse: collapse; text-align: left; background: transparent; table-layout: fixed; }
+      .censo-table { 
+        width: 100%; border-collapse: collapse; text-align: left; background: transparent; table-layout: fixed; 
+        /* Forzar renderizado de fuente por hardware */
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
+      }
       
       /* ENCABEZADOS TEMÁTICOS */
       .censo-table th { background: var(--section-head) !important; opacity: 0.95; backdrop-filter: blur(4px); color: var(--accent); padding: 10px 10px; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid var(--line); position: sticky; top: 0; z-index: 5; }
@@ -357,11 +368,11 @@
       .inline-destino-option:hover { background: var(--field); color: var(--accent); }
       .inline-destino-option.selected { background: var(--accent-soft); color: var(--accent); font-weight: 700; }
 
-      /* ESTILOS DE NAVEGACIÓN POR TECLADO (FLECHAS) */
       .patient-row.selected-nav { border-left: 4px solid var(--accent) !important; background: var(--accent-soft) !important; }
-      .btn-add-table.selected-nav { background: var(--accent-soft) !important; color: var(--text); border-left: 4px solid var(--accent); }
 
-      /* GUÍA VISUAL CENTRADA SOBRE LAS OLAS */
+      /* ========================================================= 
+         GUÍA VISUAL CENTRADA SOBRE LAS OLAS CON VIVÉN
+         ========================================================= */
       @keyframes subtleBounce {
         0%, 100% { transform: translate(-50%, 0); }
         50% { transform: translate(-50%, -4px); }
@@ -400,9 +411,16 @@
       body.light .btn-add-table, body.pink .btn-add-table { background: rgba(255, 255, 255, 0.6) !important; }
       body.colorful .btn-add-table { background: rgba(255, 255, 255, 0.3) !important; }
       .btn-add-table:hover { background: var(--accent-soft) !important; color: var(--text); }
+      .btn-add-table.selected-nav { background: var(--accent-soft) !important; color: var(--text); border-left: 4px solid var(--accent); }
 
       /* FONDO DE OLAS: Altura a 30vh por detrás del cristal */
-      .desktop-waves-bg { position: fixed; bottom: 0; left: 0; width: 100%; height: 30vh; z-index: 0; pointer-events: none; }
+      .desktop-waves-bg { 
+        position: fixed; bottom: 0; left: 0; width: 100%; height: 30vh; z-index: 0; pointer-events: none; 
+        /* Acelerar la capa de olas */
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
+        will-change: transform;
+      }
       .waves { position: absolute; width: 100%; height: 100%; bottom: 0; }
       .wave-layer-1 { fill: var(--accent); opacity: 0.05; animation: move-forever 60s cubic-bezier(.55,.5,.45,.5) infinite; }
       .wave-layer-2 { fill: var(--accent); opacity: 0.10; animation: move-forever 45s cubic-bezier(.55,.5,.45,.5) infinite; }
@@ -411,6 +429,8 @@
       @keyframes move-forever { 0% { transform: translate3d(-90px, 0, 0); } 100% { transform: translate3d(85px, 0, 0); } }
 
       #content { position: relative; z-index: 10; } 
+      .section { background: var(--panel-glass) !important; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--accent-border); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); }
+      .section-header { background: transparent !important; border-bottom: 1px solid var(--line); }
       
       .modal-content { max-width: 650px; padding: 32px; gap: 16px; }
       .modal-title { font-size: 1.4rem; }
@@ -442,7 +462,7 @@
 
     <div style="position: absolute; bottom: 30px; font-size: 0.7rem; font-family: 'Space Mono', monospace; font-weight: 700; letter-spacing: 0.1em;">
       <span style="color: var(--muted);">ROUROG</span> <span style="color: var(--text); opacity: 0.5;">Innovations</span>
-      <span style="opacity: 0.3; margin-left: 6px;">v1.16</span>
+      <span style="opacity: 0.3; margin-left: 6px;">v1.17</span>
     </div>
   </div>
   <div class="app" id="mainAppContainer" style="display: none;">
@@ -489,7 +509,7 @@
 
     <div class="footer">
       Hospital Regional de Delicias - <span style="color: var(--accent); font-weight: 600;">Rourog Innovations</span>
-      <span style="opacity: 0.4; font-size: 0.8em; margin-left: 8px;">v2.16</span>
+      <span style="opacity: 0.4; font-size: 0.8em; margin-left: 8px;">v2.17</span>
     </div>
 
     <div id="easterEggContainer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; pointer-events: none; overflow: hidden;"></div>
@@ -1020,8 +1040,7 @@
     }
 
     // ==========================================================
-    // CÁLCULO INTELIGENTE Y ACTIVACIÓN DEL GUÍA DE SCROLL (v2.16)
-    // Se extrajo la variable fuera para limpiar oyentes y evitar memory leaks
+    // CÁLCULO INTELIGENTE Y ACTIVACIÓN DEL GUÍA DE SCROLL (v2.17)
     // ==========================================================
     let scrollGuiderHandler = null;
 
@@ -1675,7 +1694,7 @@
     // ARRANQUE FINAL
     initTheme(); 
 
-    // SISTEMA DE PARTÍCULAS NEURAL Y SINAPSIS (OPTIMIZADO v2.16)
+    // SISTEMA DE PARTÍCULAS NEURAL Y SINAPSIS (OPTIMIZADO v2.17)
     let plexusRunning = false;
     let isTabActive = true;
     
