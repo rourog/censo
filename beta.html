@@ -317,12 +317,12 @@
       
       .censo-table { width: 100%; border-collapse: collapse; text-align: left; background: transparent; table-layout: fixed; transform: translateZ(0); -webkit-transform: translateZ(0); }
       
-      /* ENCABEZADOS TEMÁTICOS Y DENSIDAD V2.20: PADDING DE 6PX PARA MAXIMIZAR ANCHO HORIZONTAL */
+      /* ENCABEZADOS TEMÁTICOS Y DENSIDAD */
       .censo-table th { background: var(--section-head) !important; opacity: 0.95; backdrop-filter: blur(4px); color: var(--accent); padding: 10px 6px; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid var(--line); position: sticky; top: 0; z-index: 5; }
       .censo-table td { padding: 8px 6px; border-bottom: 1px solid var(--line); color: var(--text); font-size: 0.95rem; vertical-align: middle; background: transparent; }
       .censo-table tr:last-child td { border-bottom: none; }
       
-      /* TRUNCAMIENTO MULTILÍNEA PARA ESCRITORIO (V2.20) */
+      /* TRUNCAMIENTO MULTILÍNEA PARA ESCRITORIO */
       .truncate-text { 
         width: 100%; max-width: 100%; 
         display: -webkit-box; 
@@ -369,11 +369,12 @@
         line-height: inherit !important; 
       }
       
-      /* CONTENEDOR DE DESTINOS EN LÍNEA CON SCROLL INTERNO (Se inyecta al body directo) */
+      /* CONTENEDOR DE DESTINOS EN LÍNEA CON SCROLL INTERNO Y BUSCADOR (v2.21) */
       .inline-destino-container {
         background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius-sm);
-        box-shadow: 0 10px 25px rgba(0,0,0,0.3); z-index: 99999; max-height: 250px; overflow-y: auto; 
+        box-shadow: 0 10px 25px rgba(0,0,0,0.3); z-index: 99999; display: flex; flex-direction: column; overflow: hidden;
       }
+      .inline-options-wrapper { max-height: 250px; overflow-y: auto; width: 100%; }
       .inline-destino-option {
         padding: 10px 12px; font-size: 0.8rem; color: var(--text); cursor: pointer;
         transition: background var(--transition-fast); text-transform: uppercase; border-bottom: 1px solid var(--line);
@@ -476,7 +477,7 @@
 
     <div style="position: absolute; bottom: 30px; font-size: 0.7rem; font-family: 'Space Mono', monospace; font-weight: 700; letter-spacing: 0.1em;">
       <span style="color: var(--muted);">ROUROG</span> <span style="color: var(--text); opacity: 0.5;">Innovations</span>
-      <span style="opacity: 0.3; margin-left: 6px;">v1.20</span>
+      <span style="opacity: 0.3; margin-left: 6px;">v1.21</span>
     </div>
   </div>
   <div class="app" id="mainAppContainer" style="display: none;">
@@ -523,7 +524,7 @@
 
     <div class="footer">
       Hospital Regional de Delicias - <span style="color: var(--accent); font-weight: 600;">Rourog Innovations</span>
-      <span style="opacity: 0.4; font-size: 0.8em; margin-left: 8px;">v2.20</span>
+      <span style="opacity: 0.4; font-size: 0.8em; margin-left: 8px;">v2.21</span>
     </div>
 
     <div id="easterEggContainer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; pointer-events: none; overflow: hidden;"></div>
@@ -540,7 +541,11 @@
       <input type="hidden" id="modalFila" value="">
       <div class="modal-body-grid">
         <div class="input-group span-6"><label>Fecha y Hora de Ingreso</label><input id="modalFechaIngreso" class="input-control" type="datetime-local" /></div>
-        <div class="input-group span-6"><label>Destino</label><select id="modalDestino" class="input-control"></select></div>
+        <div class="input-group span-6">
+          <label>Destino</label>
+          <input type="text" id="searchEditDestino" class="input-control" placeholder="🔍 Buscar destino..." autocomplete="off" style="padding: 8px 12px; margin-bottom: -1px; border-bottom-left-radius: 0; border-bottom-right-radius: 0; font-size: 0.8rem;">
+          <select id="modalDestino" class="input-control" style="border-top-left-radius: 0; border-top-right-radius: 0;"></select>
+        </div>
         
         <div class="input-group span-9"><label>Nombre del Paciente</label><input id="modalNombre" class="input-control" type="text" /></div>
         <div class="input-group span-3"><label>Edad</label><input id="modalEdad" class="input-control" type="text" /></div>
@@ -548,7 +553,11 @@
         <div class="input-group span-6"><label>Diagnóstico</label><textarea id="modalDiagnostico" class="input-control" rows="3"></textarea></div>
         <div class="input-group span-6"><label>Pendientes</label><textarea id="modalPendientes" class="input-control" rows="3"></textarea></div>
         
-        <div class="input-group span-12"><label class="optional-label">Mover a otra cama (Opcional)</label><select id="moverA_Select" class="input-control"></select></div>
+        <div class="input-group span-12">
+          <label class="optional-label">Mover a otra cama (Opcional)</label>
+          <input type="text" id="searchEditMover" class="input-control" placeholder="🔍 Buscar cama..." autocomplete="off" style="padding: 8px 12px; margin-bottom: -1px; border-bottom-left-radius: 0; border-bottom-right-radius: 0; font-size: 0.8rem;">
+          <select id="moverA_Select" class="input-control" style="border-top-left-radius: 0; border-top-right-radius: 0;"></select>
+        </div>
       </div>
       <div class="modal-actions">
         <button class="btn-cancelar" onclick="cerrarModal('editModal')">CANCELAR</button>
@@ -568,7 +577,11 @@
       </div>
       <div class="modal-body-grid">
         <div class="input-group span-6"><label>Fecha y Hora de Ingreso</label><input id="addFechaIngreso" class="input-control" type="datetime-local" /></div>
-        <div class="input-group span-6"><label>Cama Disponible</label><select id="addCamaSelect" class="input-control"></select></div>
+        <div class="input-group span-6">
+          <label>Cama Disponible</label>
+          <input type="text" id="searchAddCama" class="input-control" placeholder="🔍 Buscar cama..." autocomplete="off" style="padding: 8px 12px; margin-bottom: -1px; border-bottom-left-radius: 0; border-bottom-right-radius: 0; font-size: 0.8rem;">
+          <select id="addCamaSelect" class="input-control" style="border-top-left-radius: 0; border-top-right-radius: 0;"></select>
+        </div>
         
         <div class="input-group span-9"><label>Nombre del Paciente</label><input id="addNombre" class="input-control" type="text" /></div>
         <div class="input-group span-3"><label>Edad</label><input id="addEdad" class="input-control" type="text" placeholder="EJ: 45 AÑOS" /></div>
@@ -576,7 +589,11 @@
         <div class="input-group span-6"><label>Diagnóstico</label><textarea id="addDiagnostico" class="input-control" rows="3"></textarea></div>
         <div class="input-group span-6"><label>Pendientes</label><textarea id="addPendientes" class="input-control" rows="3"></textarea></div>
         
-        <div class="input-group span-12"><label>Destino</label><select id="addDestino" class="input-control"></select></div>
+        <div class="input-group span-12">
+          <label>Destino</label>
+          <input type="text" id="searchAddDestino" class="input-control" placeholder="🔍 Buscar destino..." autocomplete="off" style="padding: 8px 12px; margin-bottom: -1px; border-bottom-left-radius: 0; border-bottom-right-radius: 0; font-size: 0.8rem;">
+          <select id="addDestino" class="input-control" style="border-top-left-radius: 0; border-top-right-radius: 0;"></select>
+        </div>
       </div>
       <div class="modal-actions">
         <button class="btn-cancelar" onclick="cerrarModal('addModal')">CANCELAR</button>
@@ -967,7 +984,6 @@
                 const camaHtml = p.cama ? `<div class="patient-bed">${escapeHtml(p.cama)}</div>` : '';
                 const destinoChip = getColorfulChipHtml(p.destino);
                 
-                // Limpiar etiquetas HTML <br> o span de la fecha de ingreso para vista movil
                 const fechaLimpia = p.fechaIngresoFormateada ? p.fechaIngresoFormateada.replace(/<[^>]*>?/gm, ' ') : '-';
 
                 const detailsHtml = [ 
@@ -1186,6 +1202,34 @@
     }
 
     // ==========================================================
+    // FUNCIONES DE FILTRADO PARA MODALES
+    // ==========================================================
+    function bindFiltroSelect(inputId, selectId) {
+      const input = document.getElementById(inputId);
+      const select = document.getElementById(selectId);
+      if (!input || !select) return;
+      
+      input.value = ''; 
+      
+      const eventHandler = (e) => {
+          const q = normalizar(e.target.value);
+          Array.from(select.options).forEach(opt => {
+              if (opt.value === "" && !q) { opt.style.display = ''; return; }
+              if (opt.value === "" && q && opt.disabled) { opt.style.display = 'none'; return; }
+              if (opt.value === "" && q && !opt.disabled) { opt.style.display = ''; return; }
+              const text = normalizar(opt.innerText);
+              opt.style.display = text.includes(q) ? '' : 'none';
+          });
+          Array.from(select.querySelectorAll('optgroup')).forEach(group => {
+              const hasVisible = Array.from(group.querySelectorAll('option')).some(o => o.style.display !== 'none');
+              group.style.display = hasVisible ? '' : 'none';
+          });
+      };
+      input.oninput = eventHandler;
+      input.dispatchEvent(new Event('input')); 
+    }
+
+    // ==========================================================
     // EDICIÓN ULTRA SUTIL EN LÍNEA
     // ==========================================================
     window.iniciarEdicionSubtle = function(el) {
@@ -1263,7 +1307,7 @@
     };
 
     // ==========================================================
-    // DESTINO SUPERPUESTO MINIMALISTA EN EL BODY (V2.20)
+    // DESTINO SUPERPUESTO MINIMALISTA EN EL BODY (V2.21)
     // ==========================================================
     window.abrirDestinoFlotante = function(tdEl, filaId, destinoActual, event) {
       event.stopPropagation();
@@ -1276,12 +1320,19 @@
       const container = document.createElement('div');
       container.className = 'inline-destino-container animate-in';
       
-      let opcionesHtml = `<div class="inline-destino-option ${!destinoActual ? 'selected' : ''}" data-value="">(SIN DESTINO)</div>`;
+      let opcionesHtml = `
+        <div style="padding: 6px; background: var(--panel); border-bottom: 1px solid var(--line);">
+          <input type="text" class="inline-search-input input-control" placeholder="🔍 Buscar destino..." autocomplete="off" style="width: 100%; padding: 6px 10px; font-size: 0.8rem; margin: 0; outline: none;">
+        </div>
+        <div class="inline-options-wrapper">
+          <div class="inline-destino-option ${!destinoActual ? 'selected' : ''}" data-value="">(SIN DESTINO)</div>
+      `;
       destinosGlobal.forEach(d => {
         const dStr = d.toUpperCase().trim();
         const sel = dStr === destinoActual.toUpperCase().trim() ? 'selected' : '';
         opcionesHtml += `<div class="inline-destino-option ${sel}" data-value="${escapeHtml(dStr)}">${escapeHtml(dStr)}</div>`;
       });
+      opcionesHtml += `</div>`;
       
       container.innerHTML = opcionesHtml;
       
@@ -1304,7 +1355,20 @@
         container.style.bottom = 'auto';
       }
 
-      const cerrarDirecto = () => {
+      const inputBuscador = container.querySelector('.inline-search-input');
+      const wrapperOptions = container.querySelector('.inline-options-wrapper');
+
+      inputBuscador.addEventListener('input', (e) => {
+          const q = normalizar(e.target.value);
+          wrapperOptions.querySelectorAll('.inline-destino-option').forEach(opt => {
+              const text = normalizar(opt.innerText);
+              opt.style.display = text.includes(q) ? 'block' : 'none';
+          });
+      });
+
+      const cerrarDirecto = (e) => {
+        if (e && e.type === 'scroll' && container.contains(e.target)) return;
+        
         window.isInlineEditing = false;
         if (container.parentNode) container.remove();
         if (window.pendingSnapshotList) { pacientesGlobal = window.pendingSnapshotList; window.pendingSnapshotList = null; filtrar(); }
@@ -1313,6 +1377,8 @@
 
       container.addEventListener('click', async (e) => {
         e.stopPropagation();
+        if (e.target.classList.contains('inline-search-input')) return;
+
         const opcionEl = e.target.closest('.inline-destino-option');
         if (!opcionEl) return;
         
@@ -1340,6 +1406,7 @@
       setTimeout(() => {
           document.addEventListener('click', closeHandler);
           document.addEventListener('scroll', cerrarDirecto, true);
+          inputBuscador.focus();
       }, 10);
     };
 
@@ -1387,7 +1454,12 @@
         camas.forEach(c => { optgroup += `<option value="${c.fila}">${escapeHtml(c.cama.toUpperCase())}</option>`; });
         optgroup += `</optgroup>`; selectMoverA.innerHTML += optgroup;
       }
+      
       document.getElementById('editModal').classList.add('active');
+      
+      // Vinculamos los buscadores
+      bindFiltroSelect('searchEditDestino', 'modalDestino');
+      bindFiltroSelect('searchEditMover', 'moverA_Select');
     }
 
     async function guardarEdicion() {
@@ -1518,6 +1590,10 @@
       document.getElementById('addDestino').value = '';
       
       document.getElementById('addModal').classList.add('active');
+      
+      // Vinculamos los buscadores
+      bindFiltroSelect('searchAddCama', 'addCamaSelect');
+      bindFiltroSelect('searchAddDestino', 'addDestino');
     }
 
     async function guardarNuevo() {
@@ -1654,8 +1730,8 @@
           activeCard.style.transform = 'translateX(0)';
           activeCard.closest('.card').classList.remove('swipe-ready-delete', 'swipe-ready-edit');
           
-          if(xDiff > 110) { setTimeout(() => borrarPacienteDirecto(fila, nombre), 100); }
-          else if(xDiff < -110) { setTimeout(() => abrirModal(fila), 100); }
+          if(xDiff > ACTION_THRESHOLD) { setTimeout(() => borrarPacienteDirecto(fila, nombre), 100); }
+          else if(xDiff < -ACTION_THRESHOLD) { setTimeout(() => abrirModal(fila), 100); }
           
           xDown = null; activeCard = null;
         });
