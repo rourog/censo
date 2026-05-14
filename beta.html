@@ -281,7 +281,7 @@
     @media (min-width: 768px) { 
       .hide-on-mobile { display: flex !important; }
       
-      /* REESTRUCTURACIÓN DE CONTENT PARA KANBAN Y TABLA */
+      /* REESTRUCTURACIÓN DE CONTENT PARA KANBAN Y TABLA (v2.19) */
       #content { display: flex; flex-direction: row; gap: 24px; padding: 16px; align-items: flex-start; overflow-x: auto; overflow-y: hidden; }
       
       /* KANBAN EN COLUMNAS */
@@ -316,12 +316,12 @@
       
       .censo-table { width: 100%; border-collapse: collapse; text-align: left; background: transparent; table-layout: fixed; transform: translateZ(0); -webkit-transform: translateZ(0); }
       
-      /* ENCABEZADOS TEMÁTICOS */
-      .censo-table th { background: var(--section-head) !important; opacity: 0.95; backdrop-filter: blur(4px); color: var(--accent); padding: 10px 10px; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid var(--line); position: sticky; top: 0; z-index: 5; }
-      .censo-table td { padding: 8px 10px; border-bottom: 1px solid var(--line); color: var(--text); font-size: 0.95rem; vertical-align: middle; background: transparent; }
+      /* ENCABEZADOS TEMÁTICOS Y DENSIDAD (PADDING REDUCIDO Y BALANCEO DE ANCHOS V2.19) */
+      .censo-table th { background: var(--section-head) !important; opacity: 0.95; backdrop-filter: blur(4px); color: var(--accent); padding: 10px 6px; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid var(--line); position: sticky; top: 0; z-index: 5; }
+      .censo-table td { padding: 8px 6px; border-bottom: 1px solid var(--line); color: var(--text); font-size: 0.95rem; vertical-align: middle; background: transparent; }
       .censo-table tr:last-child td { border-bottom: none; }
       
-      /* TRUNCAMIENTO MULTILÍNEA PARA ESCRITORIO (V2.18) */
+      /* TRUNCAMIENTO MULTILÍNEA PARA ESCRITORIO (V2.19) */
       .truncate-text { 
         width: 100%; max-width: 100%; 
         display: -webkit-box; 
@@ -366,11 +366,10 @@
         line-height: inherit !important; 
       }
       
-      /* CONTENEDOR DE DESTINOS EN LÍNEA CON SCROLL INTERNO */
+      /* CONTENEDOR DE DESTINOS SE UBICA CON POSITION FIXED EN JS, AQUI SOLO ESTILOS */
       .inline-destino-container {
-        position: absolute; top: 0; left: 0; width: 100%; min-width: 220px;
         background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius-sm);
-        box-shadow: 0 10px 25px rgba(0,0,0,0.3); z-index: 100; max-height: 250px; overflow-y: auto; 
+        box-shadow: 0 10px 25px rgba(0,0,0,0.3); z-index: 99999; max-height: 250px; overflow-y: auto; 
       }
       .inline-destino-option {
         padding: 10px 12px; font-size: 0.8rem; color: var(--text); cursor: pointer;
@@ -423,7 +422,7 @@
       .btn-add-table:hover { background: var(--accent-soft) !important; color: var(--text); }
       .btn-add-table.selected-nav { background: var(--accent-soft) !important; color: var(--text); border-left: 4px solid var(--accent); }
 
-      /* FONDO DE OLAS */
+      /* FONDO DE OLAS: Altura a 30vh por detrás del cristal */
       .desktop-waves-bg { position: fixed; bottom: 0; left: 0; width: 100%; height: 30vh; z-index: 0; pointer-events: none; transform: translateZ(0); -webkit-transform: translateZ(0); will-change: transform; }
       .waves { position: absolute; width: 100%; height: 100%; bottom: 0; }
       .wave-layer-1 { fill: var(--accent); opacity: 0.05; animation: move-forever 60s cubic-bezier(.55,.5,.45,.5) infinite; }
@@ -433,8 +432,10 @@
       @keyframes move-forever { 0% { transform: translate3d(-90px, 0, 0); } 100% { transform: translate3d(85px, 0, 0); } }
 
       #content { position: relative; z-index: 10; } 
+      .section { background: var(--panel-glass) !important; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--accent-border); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); }
+      .section-header { background: transparent !important; border-bottom: 1px solid var(--line); }
       
-      /* MODALES MEJORADOS PARA ESCRITORIO (CSS GRID) v2.18 */
+      /* MODALES MEJORADOS PARA ESCRITORIO (CSS GRID) */
       .modal-content { max-width: 850px; padding: 32px; gap: 20px; }
       .modal-title { font-size: 1.4rem; }
       .input-group label { font-size: 0.85rem; }
@@ -472,7 +473,7 @@
 
     <div style="position: absolute; bottom: 30px; font-size: 0.7rem; font-family: 'Space Mono', monospace; font-weight: 700; letter-spacing: 0.1em;">
       <span style="color: var(--muted);">ROUROG</span> <span style="color: var(--text); opacity: 0.5;">Innovations</span>
-      <span style="opacity: 0.3; margin-left: 6px;">v1.18</span>
+      <span style="opacity: 0.3; margin-left: 6px;">v1.19</span>
     </div>
   </div>
   <div class="app" id="mainAppContainer" style="display: none;">
@@ -519,7 +520,7 @@
 
     <div class="footer">
       Hospital Regional de Delicias - <span style="color: var(--accent); font-weight: 600;">Rourog Innovations</span>
-      <span style="opacity: 0.4; font-size: 0.8em; margin-left: 8px;">v2.18</span>
+      <span style="opacity: 0.4; font-size: 0.8em; margin-left: 8px;">v2.19</span>
     </div>
 
     <div id="easterEggContainer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; pointer-events: none; overflow: hidden;"></div>
@@ -887,7 +888,7 @@
         let htmlArr = [];
         htmlArr.push(`<div class="table-wrapper animate-in" id="scrollTableWrapper">
           <div id="scrollGuiderObj" class="scroll-guider" title="Ir al extremo">↓</div>
-          <table class="censo-table"><thead><tr><th style="width: 6%">CAMA</th><th style="width: 9%">INGRESO</th><th style="width: 18%">PACIENTE</th><th style="width: 4%">EDAD</th><th style="width: 25%">DIAGNÓSTICO</th><th style="width: 25%">PENDIENTES</th><th style="width: 8%">DESTINO</th><th style="width: 5%; text-align: center;">⚙️</th></tr></thead><tbody>`);
+          <table class="censo-table"><thead><tr><th style="width: 5%">CAMA</th><th style="width: 8%">INGRESO</th><th style="width: 17%">PACIENTE</th><th style="width: 4%">EDAD</th><th style="width: 24%">DIAGNÓSTICO</th><th style="width: 24%">PENDIENTES</th><th style="width: 13%">DESTINO</th><th style="width: 5%; text-align: center;">⚙️</th></tr></thead><tbody>`);
         
         areas.forEach((area) => {
           const areaNormalizada = String(area).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().trim();
@@ -1058,7 +1059,7 @@
     }
 
     // ==========================================================
-    // CÁLCULO INTELIGENTE Y ACTIVACIÓN DEL GUÍA DE SCROLL (v2.18)
+    // CÁLCULO INTELIGENTE Y ACTIVACIÓN DEL GUÍA DE SCROLL (v2.19)
     // ==========================================================
     let scrollGuiderHandler = null;
 
@@ -1246,15 +1247,14 @@
     };
 
     // ==========================================================
-    // DESTINO SUPERPUESTO MINIMALISTA CON SCROLL
+    // DESTINO SUPERPUESTO MINIMALISTA (FIX CORTE INFERIOR V2.19)
     // ==========================================================
     window.abrirDestinoFlotante = function(tdEl, filaId, destinoActual, event) {
       event.stopPropagation();
       const tr = tdEl.closest('tr');
       if (!tr.classList.contains('expanded-row')) { toggleTableRow(tr); return; }
-      if (tdEl.querySelector('.inline-destino-container')) return; 
+      if (document.querySelector('.inline-destino-container')) return; 
 
-      document.querySelectorAll('.inline-destino-container').forEach(c => c.remove());
       window.isInlineEditing = true; 
 
       const container = document.createElement('div');
@@ -1268,12 +1268,32 @@
       });
       
       container.innerHTML = opcionesHtml;
-      tdEl.appendChild(container);
+      
+      // En lugar de meterlo en el TD donde se corta, lo colgamos del body por encima de todo
+      document.body.appendChild(container);
+      
+      const rect = tdEl.getBoundingClientRect();
+      container.style.position = 'fixed';
+      container.style.width = Math.max(220, rect.width) + 'px';
+      container.style.left = rect.left + 'px';
+      container.style.zIndex = '99999';
+
+      // Prevención inteligente de choques en el borde inferior
+      const dropdownHeight = 250; 
+      if (rect.bottom + dropdownHeight > window.innerHeight) {
+        container.style.top = 'auto';
+        container.style.bottom = (window.innerHeight - rect.top) + 'px';
+        container.style.boxShadow = '0 -10px 25px rgba(0,0,0,0.3)';
+      } else {
+        container.style.top = rect.bottom + 'px';
+        container.style.bottom = 'auto';
+      }
 
       const cerrarDirecto = () => {
         window.isInlineEditing = false;
-        container.remove();
+        if (container.parentNode) container.remove();
         if (window.pendingSnapshotList) { pacientesGlobal = window.pendingSnapshotList; window.pendingSnapshotList = null; filtrar(); }
+        document.removeEventListener('scroll', cerrarDirecto, true);
       };
 
       container.addEventListener('click', async (e) => {
@@ -1296,14 +1316,17 @@
         }
       });
 
-      // Nombrado especificamente para removerlo y evitar fugas
+      // Cerramos si hace click fuera O hace scroll
       const closeHandler = (e) => {
         if (container && !container.contains(e.target)) { 
             cerrarDirecto(); 
             document.removeEventListener('click', closeHandler); 
         }
       };
-      setTimeout(() => document.addEventListener('click', closeHandler), 10);
+      setTimeout(() => {
+          document.addEventListener('click', closeHandler);
+          document.addEventListener('scroll', cerrarDirecto, true);
+      }, 10);
     };
 
     function toggleCard(headerEl) {
@@ -1601,8 +1624,8 @@
           if (Math.abs(xDiff) > Math.abs(yDiff)) {
             if(Math.abs(xDiff) > 30) {
               activeCard.style.transform = `translateX(${-xDiff * 0.4}px)`;
-              if(xDiff > ACTION_THRESHOLD) { activeCard.closest('.card').classList.add('swipe-ready-delete'); }
-              else if(xDiff < -ACTION_THRESHOLD) { activeCard.closest('.card').classList.add('swipe-ready-edit'); }
+              if(xDiff > 110) { activeCard.closest('.card').classList.add('swipe-ready-delete'); }
+              else if(xDiff < -110) { activeCard.closest('.card').classList.add('swipe-ready-edit'); }
               else { activeCard.closest('.card').classList.remove('swipe-ready-delete', 'swipe-ready-edit'); }
             }
           }
@@ -1617,8 +1640,8 @@
           activeCard.style.transform = 'translateX(0)';
           activeCard.closest('.card').classList.remove('swipe-ready-delete', 'swipe-ready-edit');
           
-          if(xDiff > ACTION_THRESHOLD) { setTimeout(() => borrarPacienteDirecto(fila, nombre), 100); }
-          else if(xDiff < -ACTION_THRESHOLD) { setTimeout(() => abrirModal(fila), 100); }
+          if(xDiff > 110) { setTimeout(() => borrarPacienteDirecto(fila, nombre), 100); }
+          else if(xDiff < -110) { setTimeout(() => abrirModal(fila), 100); }
           
           xDown = null; activeCard = null;
         });
