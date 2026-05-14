@@ -278,7 +278,8 @@
       /* REESTRUCTURACIÓN DE CONTENT PARA PERMITIR GLASSMORPHISM COMPLETO */
       #content { display: block; padding: 0; overflow-y: hidden; }
       
-      .section { min-width: 450px; flex: 1 0 450px; max-width: 800px; margin: 0; border-radius: var(--radius-lg); border: 1px solid var(--line); background: var(--bg); max-height: calc(100vh - 85px); display: flex; flex-direction: column; } 
+      /* AJUSTE GENERAL DE ALTURA PARA DESPEJAR PIE DE PÁGINA */
+      .section { min-width: 450px; flex: 1 0 450px; max-width: 800px; margin: 0; border-radius: var(--radius-lg); border: 1px solid var(--line); background: var(--bg); max-height: calc(100vh - 145px); display: flex; flex-direction: column; } 
       .section-header { border-radius: var(--radius-lg) var(--radius-lg) 0 0; position: sticky; top: 0; z-index: 10; font-size: 1.1rem; padding: 16px; background: var(--bg); }
       .patient-list { overflow-y: auto; flex-grow: 1; padding: 0 16px 16px; gap: 12px; }
       .card { border-bottom: none !important; border-radius: var(--radius-md); box-shadow: 0 3px 8px rgba(0,0,0,0.06); width: auto; border: none !important; margin-bottom: 12px; }
@@ -292,14 +293,14 @@
 
       #content.view-table-mode { display: block; }
       
-      /* CONTENEDOR DE TABLA PRINCIPAL CON EFECTO CRISTAL (GLASSMORPHISM) */
+      /* CONTENEDOR DE TABLA PRINCIPAL CON ALTURA CALIBRADA PARA NO CORTARSE CON EL BANNER */
       .table-wrapper { 
         position: relative; width: 100%; 
         background: rgba(0, 0, 0, 0.30) !important; 
         backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); 
         border: none; border-top: 1px solid var(--line);
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35); 
-        overflow-y: auto; overflow-x: auto; max-height: calc(100vh - 85px); margin-bottom: 0; 
+        overflow-y: auto; overflow-x: auto; max-height: calc(100vh - 145px); margin-bottom: 0; 
       }
       
       body.light .table-wrapper, body.pink .table-wrapper { background: rgba(255, 255, 255, 0.40) !important; }
@@ -307,7 +308,6 @@
       
       .censo-table { width: 100%; border-collapse: collapse; text-align: left; background: transparent; table-layout: fixed; }
       
-      /* DENSIDAD AUMENTADA: Reducción de padding en TH y TD para maximizar filas visibles */
       .censo-table th { background: rgba(0, 0, 0, 0.25) !important; backdrop-filter: blur(4px); color: var(--accent); padding: 10px 10px; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid var(--line); position: sticky; top: 0; z-index: 5; }
       .censo-table td { padding: 8px 10px; border-bottom: 1px solid var(--line); color: var(--text); font-size: 0.95rem; vertical-align: middle; background: transparent; }
       .censo-table tr:last-child td { border-bottom: none; }
@@ -321,7 +321,7 @@
       .patient-row.expanded-row .truncate-text { white-space: normal; overflow: visible; max-width: none; }
       .patient-row.expanded-row .chip { max-width: none; white-space: normal; overflow: visible; display: inline-block; line-height: 1.2; }
       
-      /* SUTILEZA EXTREMA: EDICIÓN EN LÍNEA SIN BRINCO DE TAMAÑO */
+      /* EDICIÓN SUTIL EN LÍNEA */
       .patient-row.expanded-row td.editable-cell { cursor: text; position: relative; }
       .patient-row.expanded-row td.editable-cell:hover::after { content: '✎'; position: absolute; top: 2px; right: 2px; font-size: 0.7rem; color: var(--muted); opacity: 0.5; pointer-events: none; }
       
@@ -341,7 +341,6 @@
         line-height: inherit !important; 
       }
       
-      /* CONTENEDOR DE DESTINOS EN LÍNEA CON SCROLL INTERNO */
       .inline-destino-container {
         position: absolute; top: 0; left: 0; width: 100%; min-width: 220px;
         background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius-sm);
@@ -357,9 +356,7 @@
 
       .patient-row.selected-nav { border-left: 4px solid var(--accent) !important; background: var(--accent-soft) !important; }
 
-      /* ========================================================= 
-         GUÍA VISUAL CENTRADA SOBRE LAS OLAS CON VIVÉN (v2.13)
-         ========================================================= */
+      /* GUÍA VISUAL CENTRADA SOBRE LAS OLAS */
       @keyframes subtleBounce {
         0%, 100% { transform: translate(-50%, 0); }
         50% { transform: translate(-50%, -4px); }
@@ -372,7 +369,7 @@
         opacity: 0; pointer-events: none; transition: opacity var(--transition-fast), top var(--transition), bottom var(--transition);
         animation: subtleBounce 2s infinite ease-in-out;
       }
-      /* Ajustamos para que flote impecable por encima del botón de nuevo ingreso fijo */
+      /* Anclamos dinámicamente arriba o abajo manteniendo flotabilidad limpia por encima del botón fijo */
       .scroll-guider.active-down { bottom: 65px; top: auto; opacity: 0.85; pointer-events: auto; }
       .scroll-guider.active-up { top: 60px; bottom: auto; opacity: 0.85; pointer-events: auto; }
       .scroll-guider:hover { opacity: 1; background: var(--accent-soft); }
@@ -385,7 +382,7 @@
       .btn-table.delete:hover { background: rgba(239, 68, 68, 0.1); border-color: #ef4444; }
       .app.table-is-active ~ .fab-btn { display: none !important; }
       
-      /* PARCHE v2.13: BOTÓN DE NUEVO INGRESO FIJO CON COMPORTAMIENTO INTELIGENTE */
+      /* BOTÓN FIJO AL FINAL DE LA TABLA (COMPORTAMIENTO STICKY NATIVO) */
       .btn-add-table { 
         position: sticky; bottom: 0; z-index: 25;
         display: block; width: 100%; padding: 14px; 
@@ -398,7 +395,7 @@
       }
       .btn-add-table:hover { background: var(--accent-soft) !important; color: var(--text); }
 
-      /* FONDO DE OLAS: Altura a 30vh por detrás del cristal */
+      /* FONDO DE OLAS */
       .desktop-waves-bg { position: fixed; bottom: 0; left: 0; width: 100%; height: 30vh; z-index: 0; pointer-events: none; }
       .waves { position: absolute; width: 100%; height: 100%; bottom: 0; }
       .wave-layer-1 { fill: var(--accent); opacity: 0.05; animation: move-forever 60s cubic-bezier(.55,.5,.45,.5) infinite; }
@@ -441,7 +438,7 @@
 
     <div style="position: absolute; bottom: 30px; font-size: 0.7rem; font-family: 'Space Mono', monospace; font-weight: 700; letter-spacing: 0.1em;">
       <span style="color: var(--muted);">ROUROG</span> <span style="color: var(--text); opacity: 0.5;">Innovations</span>
-      <span style="opacity: 0.3; margin-left: 6px;">v1.13</span>
+      <span style="opacity: 0.3; margin-left: 6px;">v1.14</span>
     </div>
   </div>
   <div class="app" id="mainAppContainer" style="display: none;">
@@ -488,7 +485,7 @@
 
     <div class="footer">
       Hospital Regional de Delicias - <span style="color: var(--accent); font-weight: 600;">Rourog Innovations</span>
-      <span style="opacity: 0.4; font-size: 0.8em; margin-left: 8px;">v2.13</span>
+      <span style="opacity: 0.4; font-size: 0.8em; margin-left: 8px;">v2.14</span>
     </div>
 
     <div id="easterEggContainer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; pointer-events: none; overflow: hidden;"></div>
@@ -887,7 +884,6 @@
         tableHtml += `</tbody></table><button class="btn-add-table" onclick="abrirModalAgregar()">➕ NUEVO INGRESO</button></div>`;
         content.innerHTML = tableHtml;
         
-        // Habilitamos los sensores visuales del Scroll de forma dinámica
         setTimeout(initScrollGuider, 100);
 
         if (typeof syncPlexusPatients === 'function') syncPlexusPatients(lista);
@@ -1528,8 +1524,8 @@
           if (Math.abs(xDiff) > Math.abs(yDiff)) {
             if(Math.abs(xDiff) > 30) {
               activeCard.style.transform = `translateX(${-xDiff * 0.4}px)`;
-              if(xDiff > 110) { activeCard.closest('.card').classList.add('swipe-ready-delete'); }
-              else if(xDiff < -110) { activeCard.closest('.card').classList.add('swipe-ready-edit'); }
+              if(xDiff > ACTION_THRESHOLD) { activeCard.closest('.card').classList.add('swipe-ready-delete'); }
+              else if(xDiff < -ACTION_THRESHOLD) { activeCard.closest('.card').classList.add('swipe-ready-edit'); }
               else { activeCard.closest('.card').classList.remove('swipe-ready-delete', 'swipe-ready-edit'); }
             }
           }
@@ -1544,8 +1540,8 @@
           activeCard.style.transform = 'translateX(0)';
           activeCard.closest('.card').classList.remove('swipe-ready-delete', 'swipe-ready-edit');
           
-          if(xDiff > 110) { setTimeout(() => borrarPacienteDirecto(fila, nombre), 100); }
-          else if(xDiff < -110) { setTimeout(() => abrirModal(fila), 100); }
+          if(xDiff > ACTION_THRESHOLD) { setTimeout(() => borrarPacienteDirecto(fila, nombre), 100); }
+          else if(xDiff < -ACTION_THRESHOLD) { setTimeout(() => abrirModal(fila), 100); }
           
           xDown = null; activeCard = null;
         });
