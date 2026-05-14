@@ -243,8 +243,11 @@
     .modal-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
     .modal-title { font-family: 'Space Mono', monospace; font-size: 1.1rem; font-weight: 700; color: var(--text); text-transform: uppercase; }
     .modal-close { background: transparent; border: none; color: var(--muted); font-size: 1.5rem; cursor: pointer; padding: 0; line-height: 1; }
+    
+    .modal-body-grid { display: flex; flex-direction: column; gap: 12px; width: 100%; }
     .input-group { display: flex; flex-direction: column; gap: 6px; }
     .input-group label { font-size: 0.75rem; color: var(--accent); font-weight: 600; text-transform: uppercase; }
+    .modal-body-grid .input-control { margin-bottom: 0; }
     .input-control { width: 100%; padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--line); background: var(--bg); color: var(--text); font-family: 'Fira Code', monospace; font-size: 0.9rem; resize: vertical; transition: border-color var(--transition-fast); }
     .input-control:focus { outline: none; border-color: var(--accent); }
     .input-control:disabled { opacity: 0.5; cursor: not-allowed; }
@@ -266,6 +269,9 @@
     .warning-icon { font-size: 3.5rem; margin: 10px auto; height: 80px; width: 80px; display: flex; align-items: center; justify-content: center; animation: pulseWarning 1s infinite ease-in-out; }
     .delete-text-highlight { color: var(--error-text); font-weight: 700; font-size: 1.1rem; text-align: center; font-family: 'Space Mono', monospace; line-height: 1.4; }
 
+    /* TRUNCATE BASE (MÓVIL) */
+    .truncate-text { width: 100%; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
+
     /* PERSONALIZACIÓN DE SCROLLBARS GLOBALES */
     ::-webkit-scrollbar { width: 8px; height: 8px; }
     ::-webkit-scrollbar-track { background: transparent; }
@@ -275,7 +281,7 @@
     @media (min-width: 768px) { 
       .hide-on-mobile { display: flex !important; }
       
-      /* REESTRUCTURACIÓN DE CONTENT PARA KANBAN Y TABLA (v2.17) */
+      /* REESTRUCTURACIÓN DE CONTENT PARA KANBAN Y TABLA */
       #content { display: flex; flex-direction: row; gap: 24px; padding: 16px; align-items: flex-start; overflow-x: auto; overflow-y: hidden; }
       
       /* KANBAN EN COLUMNAS */
@@ -302,36 +308,42 @@
         border: 1px solid var(--accent-border); border-top: none; border-radius: var(--radius-md); 
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35); 
         overflow-y: auto; overflow-x: auto; max-height: calc(100vh - 145px); margin-bottom: 0; 
-        /* === ACELERACIÓN POR HARDWARE === */
-        transform: translateZ(0);
-        -webkit-transform: translateZ(0);
-        will-change: scroll-position, transform;
-        backface-visibility: hidden;
-        -webkit-backface-visibility: hidden;
+        transform: translateZ(0); -webkit-transform: translateZ(0); will-change: scroll-position, transform; backface-visibility: hidden; -webkit-backface-visibility: hidden;
       }
       
       body.light .table-wrapper, body.pink .table-wrapper { background: rgba(255, 255, 255, 0.40) !important; }
       body.colorful .table-wrapper { background: rgba(255, 255, 255, 0.20) !important; }
       
-      .censo-table { 
-        width: 100%; border-collapse: collapse; text-align: left; background: transparent; table-layout: fixed; 
-        /* Forzar renderizado de fuente por hardware */
-        transform: translateZ(0);
-        -webkit-transform: translateZ(0);
-      }
+      .censo-table { width: 100%; border-collapse: collapse; text-align: left; background: transparent; table-layout: fixed; transform: translateZ(0); -webkit-transform: translateZ(0); }
       
       /* ENCABEZADOS TEMÁTICOS */
       .censo-table th { background: var(--section-head) !important; opacity: 0.95; backdrop-filter: blur(4px); color: var(--accent); padding: 10px 10px; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid var(--line); position: sticky; top: 0; z-index: 5; }
       .censo-table td { padding: 8px 10px; border-bottom: 1px solid var(--line); color: var(--text); font-size: 0.95rem; vertical-align: middle; background: transparent; }
       .censo-table tr:last-child td { border-bottom: none; }
       
-      .truncate-text { width: 100%; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
-      
+      /* TRUNCAMIENTO MULTILÍNEA PARA ESCRITORIO (V2.18) */
+      .truncate-text { 
+        width: 100%; max-width: 100%; 
+        display: -webkit-box; 
+        -webkit-line-clamp: 2; 
+        -webkit-box-orient: vertical; 
+        overflow: hidden; 
+        white-space: normal; 
+        word-break: break-word; 
+      }
       .patient-row { cursor: pointer; transition: background 0.2s ease; background: transparent; }
       .patient-row:hover { background: rgba(255, 255, 255, 0.05) !important; }
       .patient-row.expanded-row { background: var(--card-open) !important; }
       .patient-row.expanded-row td { border-bottom: 1px solid var(--line); }
-      .patient-row.expanded-row .truncate-text { white-space: normal; overflow: visible; max-width: none; }
+      
+      /* Al expandir, anulamos el truncamiento para mostrar todo el texto */
+      .patient-row.expanded-row .truncate-text { 
+        white-space: normal; 
+        overflow: visible; 
+        max-width: none; 
+        -webkit-line-clamp: unset;
+        display: block;
+      }
       .patient-row.expanded-row .chip { max-width: none; white-space: normal; overflow: visible; display: inline-block; line-height: 1.2; }
       
       /* SUTILEZA EXTREMA: EDICIÓN EN LÍNEA SIN BRINCO DE TAMAÑO */
@@ -370,9 +382,7 @@
 
       .patient-row.selected-nav { border-left: 4px solid var(--accent) !important; background: var(--accent-soft) !important; }
 
-      /* ========================================================= 
-         GUÍA VISUAL CENTRADA SOBRE LAS OLAS CON VIVÉN
-         ========================================================= */
+      /* GUÍA VISUAL CENTRADA SOBRE LAS OLAS */
       @keyframes subtleBounce {
         0%, 100% { transform: translate(-50%, 0); }
         50% { transform: translate(-50%, -4px); }
@@ -413,14 +423,8 @@
       .btn-add-table:hover { background: var(--accent-soft) !important; color: var(--text); }
       .btn-add-table.selected-nav { background: var(--accent-soft) !important; color: var(--text); border-left: 4px solid var(--accent); }
 
-      /* FONDO DE OLAS: Altura a 30vh por detrás del cristal */
-      .desktop-waves-bg { 
-        position: fixed; bottom: 0; left: 0; width: 100%; height: 30vh; z-index: 0; pointer-events: none; 
-        /* Acelerar la capa de olas */
-        transform: translateZ(0);
-        -webkit-transform: translateZ(0);
-        will-change: transform;
-      }
+      /* FONDO DE OLAS */
+      .desktop-waves-bg { position: fixed; bottom: 0; left: 0; width: 100%; height: 30vh; z-index: 0; pointer-events: none; transform: translateZ(0); -webkit-transform: translateZ(0); will-change: transform; }
       .waves { position: absolute; width: 100%; height: 100%; bottom: 0; }
       .wave-layer-1 { fill: var(--accent); opacity: 0.05; animation: move-forever 60s cubic-bezier(.55,.5,.45,.5) infinite; }
       .wave-layer-2 { fill: var(--accent); opacity: 0.10; animation: move-forever 45s cubic-bezier(.55,.5,.45,.5) infinite; }
@@ -429,15 +433,21 @@
       @keyframes move-forever { 0% { transform: translate3d(-90px, 0, 0); } 100% { transform: translate3d(85px, 0, 0); } }
 
       #content { position: relative; z-index: 10; } 
-      .section { background: var(--panel-glass) !important; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--accent-border); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); }
-      .section-header { background: transparent !important; border-bottom: 1px solid var(--line); }
       
-      .modal-content { max-width: 650px; padding: 32px; gap: 16px; }
+      /* MODALES MEJORADOS PARA ESCRITORIO (CSS GRID) v2.18 */
+      .modal-content { max-width: 850px; padding: 32px; gap: 20px; }
       .modal-title { font-size: 1.4rem; }
       .input-group label { font-size: 0.85rem; }
       .input-control { font-size: 1rem; padding: 14px; }
-      textarea.input-control { min-height: 100px; }
+      textarea.input-control { min-height: 80px; }
       .btn-guardar, .btn-cancelar, .btn-borrar { font-size: 1rem; padding: 14px; }
+      
+      .modal-body-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px 20px; width: 100%; }
+      .span-12 { grid-column: span 12; }
+      .span-9 { grid-column: span 9; }
+      .span-6 { grid-column: span 6; }
+      .span-3 { grid-column: span 3; }
+      .modal-body-grid .input-group { margin-bottom: 0; }
     }
   </style>
 </head>
@@ -462,7 +472,7 @@
 
     <div style="position: absolute; bottom: 30px; font-size: 0.7rem; font-family: 'Space Mono', monospace; font-weight: 700; letter-spacing: 0.1em;">
       <span style="color: var(--muted);">ROUROG</span> <span style="color: var(--text); opacity: 0.5;">Innovations</span>
-      <span style="opacity: 0.3; margin-left: 6px;">v1.17</span>
+      <span style="opacity: 0.3; margin-left: 6px;">v1.18</span>
     </div>
   </div>
   <div class="app" id="mainAppContainer" style="display: none;">
@@ -509,7 +519,7 @@
 
     <div class="footer">
       Hospital Regional de Delicias - <span style="color: var(--accent); font-weight: 600;">Rourog Innovations</span>
-      <span style="opacity: 0.4; font-size: 0.8em; margin-left: 8px;">v2.17</span>
+      <span style="opacity: 0.4; font-size: 0.8em; margin-left: 8px;">v2.18</span>
     </div>
 
     <div id="easterEggContainer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; pointer-events: none; overflow: hidden;"></div>
@@ -524,13 +534,18 @@
         <button class="modal-close" onclick="cerrarModal('editModal')">&times;</button>
       </div>
       <input type="hidden" id="modalFila" value="">
-      <div class="input-group"><label>Fecha y Hora de Ingreso</label><input id="modalFechaIngreso" class="input-control" type="datetime-local" /></div>
-      <div class="input-group"><label>Nombre del Paciente</label><input id="modalNombre" class="input-control" type="text" /></div>
-      <div class="input-group"><label>Edad</label><input id="modalEdad" class="input-control" type="text" /></div>
-      <div class="input-group"><label>Diagnóstico</label><textarea id="modalDiagnostico" class="input-control" rows="2"></textarea></div>
-      <div class="input-group"><label>Pendientes</label><textarea id="modalPendientes" class="input-control" rows="3"></textarea></div>
-      <div class="input-group"><label>Destino</label><select id="modalDestino" class="input-control"></select></div>
-      <div class="input-group"><label class="optional-label">Mover a otra cama (Opcional)</label><select id="moverA_Select" class="input-control"></select></div>
+      <div class="modal-body-grid">
+        <div class="input-group span-6"><label>Fecha y Hora de Ingreso</label><input id="modalFechaIngreso" class="input-control" type="datetime-local" /></div>
+        <div class="input-group span-6"><label>Destino</label><select id="modalDestino" class="input-control"></select></div>
+        
+        <div class="input-group span-9"><label>Nombre del Paciente</label><input id="modalNombre" class="input-control" type="text" /></div>
+        <div class="input-group span-3"><label>Edad</label><input id="modalEdad" class="input-control" type="text" /></div>
+        
+        <div class="input-group span-6"><label>Diagnóstico</label><textarea id="modalDiagnostico" class="input-control" rows="3"></textarea></div>
+        <div class="input-group span-6"><label>Pendientes</label><textarea id="modalPendientes" class="input-control" rows="3"></textarea></div>
+        
+        <div class="input-group span-12"><label class="optional-label">Mover a otra cama (Opcional)</label><select id="moverA_Select" class="input-control"></select></div>
+      </div>
       <div class="modal-actions">
         <button class="btn-cancelar" onclick="cerrarModal('editModal')">CANCELAR</button>
         <button class="btn-guardar" id="btnGuardarEdit" onclick="guardarEdicion()">💾 GUARDAR</button>
@@ -547,13 +562,18 @@
         <div class="modal-title" style="font-weight:700; font-family:'Space Mono';">NUEVO INGRESO</div>
         <button class="modal-close" onclick="cerrarModal('addModal')">&times;</button>
       </div>
-      <div class="input-group"><label>Fecha y Hora de Ingreso</label><input id="addFechaIngreso" class="input-control" type="datetime-local" /></div>
-      <div class="input-group"><label>Cama Disponible</label><select id="addCamaSelect" class="input-control"></select></div>
-      <div class="input-group"><label>Nombre del Paciente</label><input id="addNombre" class="input-control" type="text" /></div>
-      <div class="input-group"><label>Edad</label><input id="addEdad" class="input-control" type="text" placeholder="EJ: 45 AÑOS" /></div>
-      <div class="input-group"><label>Diagnóstico</label><textarea id="addDiagnostico" class="input-control" rows="2"></textarea></div>
-      <div class="input-group"><label>Pendientes</label><textarea id="addPendientes" class="input-control" rows="2"></textarea></div>
-      <div class="input-group"><label>Destino</label><select id="addDestino" class="input-control"></select></div>
+      <div class="modal-body-grid">
+        <div class="input-group span-6"><label>Fecha y Hora de Ingreso</label><input id="addFechaIngreso" class="input-control" type="datetime-local" /></div>
+        <div class="input-group span-6"><label>Cama Disponible</label><select id="addCamaSelect" class="input-control"></select></div>
+        
+        <div class="input-group span-9"><label>Nombre del Paciente</label><input id="addNombre" class="input-control" type="text" /></div>
+        <div class="input-group span-3"><label>Edad</label><input id="addEdad" class="input-control" type="text" placeholder="EJ: 45 AÑOS" /></div>
+        
+        <div class="input-group span-6"><label>Diagnóstico</label><textarea id="addDiagnostico" class="input-control" rows="3"></textarea></div>
+        <div class="input-group span-6"><label>Pendientes</label><textarea id="addPendientes" class="input-control" rows="3"></textarea></div>
+        
+        <div class="input-group span-12"><label>Destino</label><select id="addDestino" class="input-control"></select></div>
+      </div>
       <div class="modal-actions">
         <button class="btn-cancelar" onclick="cerrarModal('addModal')">CANCELAR</button>
         <button class="btn-guardar" id="btnGuardarAdd" onclick="guardarNuevo()">➕ INGRESAR</button>
@@ -864,7 +884,6 @@
         mainAppContainer.classList.add('table-is-active'); 
         if(fabBtn) fabBtn.style.display = 'none';
 
-        // OPTIMIZACIÓN v2.16: Usamos push a un array en lugar de concatenación masiva de strings
         let htmlArr = [];
         htmlArr.push(`<div class="table-wrapper animate-in" id="scrollTableWrapper">
           <div id="scrollGuiderObj" class="scroll-guider" title="Ir al extremo">↓</div>
@@ -882,7 +901,7 @@
                 <td style="padding: 6px 10px;"><span style="color: var(--accent); font-weight: 700; font-size: 0.85rem;">${escapeHtml(p.cama || '-')}</span></td>
                 <td style="padding: 6px 10px; font-size: 0.75rem; color: var(--muted); font-family: 'Fira Code', monospace; line-height: 1.2;">${escapeHtml(p.fechaIngresoFormateada || '-')}</td>
                 
-                <td style="padding: 6px 10px; font-family: 'Space Mono', monospace; font-weight: 700; font-size: 0.9rem; line-height: 1.1;" class="patient-name editable-cell" data-campo="nombre" data-original="${escapeHtml(p.nombre)}" contenteditable="true" onfocus="iniciarEdicionSubtle(this)" onblur="finalizarEdicionSubtle(this)" onkeydown="manejarTeclasSubtle(this, event)" onclick="event.stopPropagation()">
+                <td style="padding: 6px 10px; font-family: 'Space Mono', monospace; font-weight: 700; font-size: 0.9rem; line-height: 1.3;" class="patient-name editable-cell" data-campo="nombre" data-original="${escapeHtml(p.nombre)}" contenteditable="true" onfocus="iniciarEdicionSubtle(this)" onblur="finalizarEdicionSubtle(this)" onkeydown="manejarTeclasSubtle(this, event)" onclick="event.stopPropagation()">
                   <div class="truncate-text" title="${escapeHtml(p.nombre)}">${escapeHtml(p.nombre)}</div>
                 </td>
                 
@@ -891,11 +910,11 @@
                 </td>
                 
                 <td style="padding: 6px 10px;" class="editable-cell" data-campo="diagnostico" data-original="${escapeHtml(p.diagnostico)}" contenteditable="true" onfocus="iniciarEdicionSubtle(this)" onblur="finalizarEdicionSubtle(this)" onkeydown="manejarTeclasSubtle(this, event)" onclick="event.stopPropagation()">
-                  <div class="truncate-text" style="font-size: 0.8rem; line-height: 1.2;" title="${escapeHtml(p.diagnostico)}">${escapeHtml(p.diagnostico || '-')}</div>
+                  <div class="truncate-text" style="font-size: 0.8rem; line-height: 1.3;" title="${escapeHtml(p.diagnostico)}">${escapeHtml(p.diagnostico || '-')}</div>
                 </td>
                 
                 <td style="padding: 6px 10px;" class="editable-cell" data-campo="pendientes" data-original="${escapeHtml(p.pendientes)}" contenteditable="true" onfocus="iniciarEdicionSubtle(this)" onblur="finalizarEdicionSubtle(this)" onkeydown="manejarTeclasSubtle(this, event)" onclick="event.stopPropagation()">
-                  <div class="truncate-text" style="font-size: 0.8rem; line-height: 1.2;" title="${escapeHtml(p.pendientes)}">${escapeHtml(p.pendientes || '-')}</div>
+                  <div class="truncate-text" style="font-size: 0.8rem; line-height: 1.3;" title="${escapeHtml(p.pendientes)}">${escapeHtml(p.pendientes || '-')}</div>
                 </td>
                 
                 <td style="padding: 6px 10px; position: relative;" onclick="abrirDestinoFlotante(this, '${p.fila}', '${escapeHtml(p.destino)}', event)">
@@ -910,7 +929,6 @@
         htmlArr.push(`</tbody></table><button class="btn-add-table" onclick="abrirModalAgregar()">➕ NUEVO INGRESO</button></div>`);
         content.innerHTML = htmlArr.join('');
         
-        // Habilitamos los sensores visuales del Scroll de forma dinámica
         setTimeout(initScrollGuider, 100);
 
         if (typeof syncPlexusPatients === 'function') syncPlexusPatients(lista);
@@ -1040,7 +1058,7 @@
     }
 
     // ==========================================================
-    // CÁLCULO INTELIGENTE Y ACTIVACIÓN DEL GUÍA DE SCROLL (v2.17)
+    // CÁLCULO INTELIGENTE Y ACTIVACIÓN DEL GUÍA DE SCROLL (v2.18)
     // ==========================================================
     let scrollGuiderHandler = null;
 
@@ -1181,7 +1199,7 @@
       const nuevoValorFinal = nuevoValorRaw === '' ? '-' : nuevoValorRaw;
       
       const campoEstilizado = (campo === 'diagnostico' || campo === 'pendientes') ? 
-        `<div class="truncate-text" style="font-size: 0.8rem; line-height: 1.2;" title="${escapeHtml(nuevoValorFinal)}">${escapeHtml(nuevoValorFinal)}</div>` : 
+        `<div class="truncate-text" style="font-size: 0.8rem; line-height: 1.3;" title="${escapeHtml(nuevoValorFinal)}">${escapeHtml(nuevoValorFinal)}</div>` : 
         (campo === 'nombre') ? `<div class="truncate-text" title="${escapeHtml(nuevoValorFinal)}">${escapeHtml(nuevoValorFinal)}</div>` : escapeHtml(nuevoValorFinal);
       
       el.innerHTML = campoEstilizado;
@@ -1694,7 +1712,7 @@
     // ARRANQUE FINAL
     initTheme(); 
 
-    // SISTEMA DE PARTÍCULAS NEURAL Y SINAPSIS (OPTIMIZADO v2.17)
+    // SISTEMA DE PARTÍCULAS NEURAL Y SINAPSIS (OPTIMIZADO v2.16)
     let plexusRunning = false;
     let isTabActive = true;
     
