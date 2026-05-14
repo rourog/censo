@@ -33,53 +33,53 @@
     body { font-family: 'Fira Code', monospace; transition: background 0.5s ease, color 0.5s ease; font-variant-ligatures: contextual; }
 
     /* ==========================================================
-       DEFINICIÓN DE TEMAS
+       DEFINICIÓN DE TEMAS (SIN GLASSMORPHISM)
        ========================================================== */
     body.dark {
-      --bg: #0f172a; --panel: #0b1220; --panel-glass: rgba(11, 18, 32, 0.85); --section-head: #0b1220;
+      --bg: #0f172a; --panel: #1e293b; --section-head: #0f172a;
       --card: #1e293b; --card-open: #2d3e5a; --field: rgba(255,255,255,0.03);
       --text: #e5e7eb; --muted: #94a3b8; --line: rgba(255,255,255,0.08);
       --accent: #60a5fa; --accent-soft: rgba(96,165,250,0.12); --accent-border: rgba(96,165,250,0.24);
       --chip-bg: rgba(96,165,250,0.12); --chip-text: #dbeafe; 
       --search-bg: rgba(255,255,255,0.05); --error-bg: rgba(239,68,68,.10); --error-border: rgba(239,68,68,.22);
       --error-text: #fecaca; --toggle-bg: rgba(255,255,255,0.06); --toggle-icon: #dbeafe;
-      --modal-overlay: rgba(0,0,0,0.6); --success: #34d399; 
+      --modal-overlay: rgba(0,0,0,0.8); --success: #34d399; 
       --skeleton: #2d3e5a; --skeleton-shimmer: rgba(255, 255, 255, 0.05);
     }
 
     body.light {
-      --bg: #eef4fb; --panel: #ffffff; --panel-glass: rgba(255, 255, 255, 0.90); --section-head: #f8fbff;
+      --bg: #eef4fb; --panel: #ffffff; --section-head: #f8fbff;
       --card: #ffffff; --card-open: #dbeafe; --field: rgba(37,99,235,0.03);
       --text: #0f172a; --muted: #475569; --line: rgba(15,23,42,0.08);
       --accent: #2563eb; --accent-soft: rgba(37,99,235,0.10); --accent-border: rgba(37,99,235,0.16);
       --chip-bg: rgba(37,99,235,0.10); --chip-text: #1d4ed8; 
       --search-bg: rgba(37,99,235,0.05); --error-bg: rgba(254,242,242,0.92); --error-border: rgba(239,68,68,.18);
       --error-text: #b91c1c; --toggle-bg: rgba(37,99,235,0.08); --toggle-icon: #1d4ed8;
-      --modal-overlay: rgba(15,23,42,0.4); --success: #10b981; 
+      --modal-overlay: rgba(15,23,42,0.6); --success: #10b981; 
       --skeleton: #e2e8f0; --skeleton-shimmer: rgba(255, 255, 255, 0.4);
     }
 
     body.pink {
-      --bg: #fdf2f8; --panel: #ffffff; --panel-glass: rgba(255, 255, 255, 0.90); --section-head: #fdf2f8;
+      --bg: #fdf2f8; --panel: #ffffff; --section-head: #fdf2f8;
       --card: #ffffff; --card-open: #fce7f3; --field: rgba(219, 39, 119, 0.03);
       --text: #831843; --muted: #be185d; --line: rgba(219, 39, 119, 0.15);
       --accent: #db2777; --accent-soft: rgba(219, 39, 119, 0.12); --accent-border: rgba(219, 39, 119, 0.25);
       --chip-bg: rgba(219, 39, 119, 0.15); --chip-text: #9d174d; 
       --search-bg: rgba(219, 39, 119, 0.05); --error-bg: rgba(225, 29, 72, 0.1); --error-border: rgba(225, 29, 72, 0.2);
       --error-text: #e11d48; --toggle-bg: rgba(219, 39, 119, 0.1); --toggle-icon: #db2777;
-      --modal-overlay: rgba(131, 24, 67, 0.5); --success: #10b981; 
+      --modal-overlay: rgba(131, 24, 67, 0.7); --success: #10b981; 
       --skeleton: #fce7f3; --skeleton-shimmer: rgba(255, 255, 255, 0.4);
     }
 
     body.colorful {
-      --bg: #f8fafc; --panel: #fde68a; --panel-glass: rgba(253, 230, 138, 0.90); --section-head: #eab308; 
+      --bg: #f8fafc; --panel: #ffffff; --section-head: #eab308; 
       --card: #1d4ed8; --card-open: #d946ef; --field: rgba(0, 0, 0, 0.2); 
       --text: #001f3f; --muted: #475569; --line: rgba(0, 0, 0, 0.1);
       --accent: #16a34a; --accent-soft: rgba(22, 163, 74, 0.1); --accent-border: #15803d;
       --chip-bg: #bef264; --chip-text: #001f3f; 
       --search-bg: #ffffff; --error-bg: #fee2e2; --error-border: #ef4444; --error-text: #b91c1c; 
       --toggle-bg: #f43f5e; --toggle-icon: #ffffff;
-      --modal-overlay: rgba(23, 23, 23, 0.5); --success: #16a34a; 
+      --modal-overlay: rgba(23, 23, 23, 0.7); --success: #16a34a; 
       --skeleton: #bef264; --skeleton-shimmer: rgba(255, 255, 255, 0.5);
     }
 
@@ -94,14 +94,14 @@
     body.colorful .fab-btn { background: linear-gradient(135deg, #bef264, #06b6d4) !important; color: #001f3f; }
 
     body.midnight {
-      --bg: #000000; --panel: #0a0000; --panel-glass: rgba(0, 0, 0, 0.9); --section-head: #1a0000; 
+      --bg: #000000; --panel: #111111; --section-head: #1a0000; 
       --card: #120000; --card-open: #250000; --field: rgba(255, 0, 0, 0.05);
       --text: #ff4d4d; --muted: #800000; --line: rgba(255, 0, 0, 0.15);
       --accent: #ff0000; --accent-soft: rgba(255, 0, 0, 0.1); --accent-border: rgba(255, 0, 0, 0.3);
       --chip-bg: #330000; --chip-text: #ff4d4d; 
       --search-bg: #0a0000; --error-bg: #220000; --error-border: #aa0000; --error-text: #ff4d4d; 
       --toggle-bg: #1a0000; --toggle-icon: #ff0000;
-      --modal-overlay: rgba(0,0,0,0.8); --success: #880000; 
+      --modal-overlay: rgba(0,0,0,0.9); --success: #880000; 
       --skeleton: #1a0000; --skeleton-shimmer: rgba(255, 0, 0, 0.1);
     }
 
@@ -126,8 +126,8 @@
     /* ENCABEZADO BASE LIMPIO */
     .header { 
       position: relative; flex-shrink: 0; z-index: 50; width: 100%; padding: 14px 10px; margin: 0; 
-      background: var(--panel-glass); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); 
-      border-bottom: 1px solid var(--line); box-shadow: 0 4px 166px rgba(0,0,0,0.08); overflow: hidden; 
+      background: var(--panel); 
+      border-bottom: 1px solid var(--line); box-shadow: 0 4px 25px rgba(0,0,0,0.05); overflow: hidden; 
     }
     @media (display-mode: standalone) { .header { padding-top: max(14px, env(safe-area-inset-top)); } }
     
@@ -164,7 +164,7 @@
     @keyframes fadeInUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
     .animate-in { animation: fadeInUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards; opacity: 0; }
     
-    .section { width: 100%; max-width: 100%; margin: 0 0 16px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); border-radius: 0; background: var(--bg); overflow: hidden; }
+    .section { width: 100%; max-width: 100%; margin: 0 0 16px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); border-radius: 0; background: var(--panel); overflow: hidden; }
     .section-header { width: 100%; padding: 12px 10px; background: var(--section-head); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 10; }
     .section-title { font-size: 0.9rem; font-weight: 700; line-height: 1.12; color: var(--accent); text-transform: uppercase; letter-spacing: 0.08em; display: flex; align-items: center; gap: 6px; }
     
@@ -230,23 +230,23 @@
     .skeleton-right { display: flex; align-items: center; gap: 8px; } .skeleton-chip { height: 1.3rem; width: 55px; border-radius: 6px; } .skeleton-caret { height: 24px; width: 24px; border-radius: 50%; }
     .skeleton-row { display: flex; align-items: center; padding: 14px 16px; border-bottom: 1px solid var(--line); gap: 16px; background: var(--bg); } .skeleton-cell { height: 0.8rem; opacity: 0.6; }
 
-    .footer { flex-shrink: 0; display: block; text-align: center; padding: 8px 10px; color: var(--muted); font-size: 0.7rem; border-top: 1px solid var(--line); margin: 0; background: var(--panel-glass); }
+    .footer { flex-shrink: 0; display: block; text-align: center; padding: 8px 10px; color: var(--muted); font-size: 0.7rem; border-top: 1px solid var(--line); margin: 0; background: var(--panel); z-index: 50; position: relative;}
 
     .btn-editar-tarjeta { width: 100%; margin-top: 12px; padding: 12px; border-radius: var(--radius-sm); background: var(--accent-soft); border: 1px solid var(--accent-border); color: var(--accent); font-family: 'Space Mono', monospace; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; cursor: pointer; transition: all var(--transition-fast); }
     .btn-editar-tarjeta:active { transform: scale(0.98); background: var(--accent); color: #fff; }
     .fab-btn { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #ef4444, #f97316); color: white; border: none; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4); font-size: 2rem; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 40; transition: transform var(--transition-fast), box-shadow var(--transition-fast); line-height: 1; display: flex; }
     .fab-btn:active { transform: scale(0.9); box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4); }
 
-    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--modal-overlay); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); z-index: 100; display: none; align-items: center; justify-content: center; padding: 16px; opacity: 0; transition: opacity 0.3s; }
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--modal-overlay); z-index: 100; display: none; align-items: center; justify-content: center; padding: 16px; opacity: 0; transition: opacity 0.3s; }
     .modal-overlay.active { display: flex; opacity: 1; }
-    .modal-content { background: var(--panel); width: 100%; max-width: 400px; border-radius: var(--radius-xl); border: 1px solid var(--line); box-shadow: 0 10px 25px rgba(0,0,0,0.2); padding: 20px; display: flex; flex-direction: column; gap: 12px; transform: translateY(20px); transition: transform 0.3s; max-height: 90vh; overflow-y: auto; }
+    .modal-content { background: var(--panel); width: 100%; max-width: 400px; border-radius: var(--radius-xl); border: 1px solid var(--line); box-shadow: 0 10px 25px rgba(0,0,0,0.5); padding: 20px; display: flex; flex-direction: column; gap: 12px; transform: translateY(20px); transition: transform 0.3s; max-height: 90vh; overflow-y: auto; }
     .modal-overlay.active .modal-content { transform: translateY(0); }
     .modal-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
     .modal-title { font-family: 'Space Mono', monospace; font-size: 1.1rem; font-weight: 700; color: var(--text); text-transform: uppercase; }
     .modal-close { background: transparent; border: none; color: var(--muted); font-size: 1.5rem; cursor: pointer; padding: 0; line-height: 1; }
     
     .modal-body-grid { display: flex; flex-direction: column; gap: 12px; width: 100%; }
-    .input-group { display: flex; flex-direction: column; gap: 6px; }
+    .input-group { display: flex; flex-direction: column; gap: 6px; position: relative; }
     .input-group label { font-size: 0.75rem; color: var(--accent); font-weight: 600; text-transform: uppercase; }
     .modal-body-grid .input-control { margin-bottom: 0; }
     .input-control { width: 100%; padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--line); background: var(--bg); color: var(--text); font-family: 'Fira Code', monospace; font-size: 0.9rem; resize: vertical; transition: border-color var(--transition-fast); }
@@ -255,8 +255,6 @@
 
     /* ESTILO PARA CALENDARIO NATIVO */
     input[type="datetime-local"].input-control::-webkit-calendar-picker-indicator { filter: invert(0.5); cursor: pointer; }
-
-    select.input-control { appearance: none; background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2394a3b8%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E"); background-repeat: no-repeat; background-position: right 12px top 50%; background-size: 12px auto; padding-right: 32px; }
 
     .modal-actions { display: flex; gap: 10px; margin-top: 10px; width: 100%; }
     .btn-cancelar { flex: 1; padding: 12px; border-radius: var(--radius-sm); background: var(--field); border: 1px solid var(--line); color: var(--text); font-weight: 600; cursor: pointer; text-transform: uppercase; font-family: 'Space Mono', monospace; }
@@ -279,6 +277,28 @@
     ::-webkit-scrollbar-thumb { background: var(--muted); border-radius: 10px; opacity: 0.3; }
     ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
 
+    /* ========================================================= 
+       COMPONENTES DEL SELECTOR PERSONALIZADO (MODALES) 
+       ========================================================= */
+    .custom-select-wrapper { position: relative; width: 100%; }
+    .custom-select-display { cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; }
+    .custom-select-display::after { content: '▼'; font-size: 0.8rem; margin-left: 8px; color: var(--muted); }
+    .custom-select-popover {
+      display: none; position: absolute; top: 100%; left: 0; width: 100%; z-index: 99999;
+      background: var(--panel); border: 1px solid var(--accent); border-radius: var(--radius-sm);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5); flex-direction: column; overflow: hidden; margin-top: 4px;
+    }
+    .custom-select-popover.active { display: flex; }
+    .custom-select-search { padding: 6px; border-bottom: 1px solid var(--line); background: var(--bg); }
+    .custom-select-search input { width: 100%; padding: 8px; border-radius: 4px; border: 1px solid var(--line); background: var(--panel); color: var(--text); outline: none; font-family: 'Fira Code', monospace; font-size: 0.85rem;}
+    .custom-select-search input:focus { border-color: var(--accent); }
+    .custom-select-options { max-height: 180px; overflow-y: auto; }
+    .custom-select-option { padding: 10px 12px; font-size: 0.85rem; cursor: pointer; text-transform: uppercase; color: var(--text); border-bottom: 1px solid var(--line); }
+    .custom-select-option:last-child { border-bottom: none; }
+    .custom-select-option:hover { background: var(--field); color: var(--accent); }
+    .custom-select-optgroup { padding: 6px 12px; font-weight: bold; font-size: 0.75rem; color: var(--muted); background: var(--section-head); text-transform: uppercase; border-bottom: 1px solid var(--line); border-top: 1px solid var(--line);}
+    .custom-select-optgroup:first-child { border-top: none; }
+
     @media (min-width: 768px) { 
       .hide-on-mobile { display: flex !important; }
       
@@ -286,7 +306,7 @@
       #content { display: flex; flex-direction: row; gap: 24px; padding: 16px; align-items: flex-start; overflow-x: auto; overflow-y: hidden; }
       
       /* KANBAN EN COLUMNAS */
-      .section { min-width: 400px; flex: 0 0 400px; max-width: 400px; margin: 0; border-radius: var(--radius-lg); border: 1px solid var(--accent-border); background: var(--panel-glass) !important; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); max-height: calc(100vh - 145px); display: flex; flex-direction: column; } 
+      .section { min-width: 400px; flex: 0 0 400px; max-width: 400px; margin: 0; border-radius: var(--radius-lg); border: 1px solid var(--line); background: var(--panel) !important; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); max-height: calc(100vh - 145px); display: flex; flex-direction: column; } 
       .section-header { border-radius: var(--radius-lg) var(--radius-lg) 0 0; position: sticky; top: 0; z-index: 10; font-size: 1.1rem; padding: 16px; background: transparent !important; border-bottom: 1px solid var(--line); }
       .patient-list { overflow-y: auto; flex-grow: 1; padding: 0 16px 16px; gap: 12px; }
       .card { border-bottom: none !important; border-radius: var(--radius-md); box-shadow: 0 3px 8px rgba(0,0,0,0.06); width: auto; border: none !important; margin-bottom: 12px; }
@@ -301,28 +321,23 @@
       /* MODO TABLA COMPLETO */
       #content.view-table-mode { display: block; padding: 0 16px; overflow-x: hidden; }
       
-      /* CONTENEDOR DE TABLA PRINCIPAL CON EFECTO CRISTAL (GLASSMORPHISM) */
+      /* CONTENEDOR DE TABLA PRINCIPAL SÓLIDO (RENDIMIENTO MÁXIMO) */
       .table-wrapper { 
         position: relative; width: 100%; 
-        background: rgba(0, 0, 0, 0.30) !important; 
-        backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); 
-        border: 1px solid var(--accent-border); border-top: none; border-radius: var(--radius-md); 
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35); 
+        background: var(--panel) !important; 
+        border: 1px solid var(--line); border-radius: var(--radius-md); 
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15); 
         overflow-y: auto; overflow-x: auto; max-height: calc(100vh - 145px); margin-bottom: 0; 
-        transform: translateZ(0); -webkit-transform: translateZ(0); will-change: scroll-position, transform; backface-visibility: hidden; -webkit-backface-visibility: hidden;
       }
       
-      body.light .table-wrapper, body.pink .table-wrapper { background: rgba(255, 255, 255, 0.40) !important; }
-      body.colorful .table-wrapper { background: rgba(255, 255, 255, 0.20) !important; }
+      .censo-table { width: 100%; border-collapse: collapse; text-align: left; background: transparent; table-layout: fixed; }
       
-      .censo-table { width: 100%; border-collapse: collapse; text-align: left; background: transparent; table-layout: fixed; transform: translateZ(0); -webkit-transform: translateZ(0); }
-      
-      /* ENCABEZADOS TEMÁTICOS Y DENSIDAD */
-      .censo-table th { background: var(--section-head) !important; opacity: 0.95; backdrop-filter: blur(4px); color: var(--accent); padding: 10px 6px; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid var(--line); position: sticky; top: 0; z-index: 5; }
+      /* ENCABEZADOS TEMÁTICOS Y DENSIDAD V2.22: PADDING DE 6PX PARA MAXIMIZAR ANCHO HORIZONTAL */
+      .censo-table th { background: var(--section-head) !important; color: var(--accent); padding: 10px 6px; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid var(--line); position: sticky; top: 0; z-index: 5; }
       .censo-table td { padding: 8px 6px; border-bottom: 1px solid var(--line); color: var(--text); font-size: 0.95rem; vertical-align: middle; background: transparent; }
       .censo-table tr:last-child td { border-bottom: none; }
       
-      /* TRUNCAMIENTO MULTILÍNEA PARA ESCRITORIO */
+      /* TRUNCAMIENTO MULTILÍNEA PARA ESCRITORIO (V2.22) */
       .truncate-text { 
         width: 100%; max-width: 100%; 
         display: -webkit-box; 
@@ -333,7 +348,7 @@
         word-break: break-word; 
       }
       .patient-row { cursor: pointer; transition: background 0.2s ease; background: transparent; }
-      .patient-row:hover { background: rgba(255, 255, 255, 0.05) !important; }
+      .patient-row:hover { background: var(--field) !important; }
       .patient-row.expanded-row { background: var(--card-open) !important; }
       .patient-row.expanded-row td { border-bottom: 1px solid var(--line); }
       
@@ -369,10 +384,10 @@
         line-height: inherit !important; 
       }
       
-      /* CONTENEDOR DE DESTINOS EN LÍNEA CON SCROLL INTERNO Y BUSCADOR (v2.21) */
+      /* CONTENEDOR DE DESTINOS EN LÍNEA CON SCROLL INTERNO Y BUSCADOR (v2.22) */
       .inline-destino-container {
         background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius-sm);
-        box-shadow: 0 10px 25px rgba(0,0,0,0.3); z-index: 99999; display: flex; flex-direction: column; overflow: hidden;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.5); z-index: 99999; display: flex; flex-direction: column; overflow: hidden;
       }
       .inline-options-wrapper { max-height: 250px; overflow-y: auto; width: 100%; }
       .inline-destino-option {
@@ -410,24 +425,21 @@
       .btn-table.delete:hover { background: rgba(239, 68, 68, 0.1); border-color: #ef4444; }
       .app.table-is-active ~ .fab-btn { display: none !important; }
       
-      /* BOTÓN DE NUEVO INGRESO CON TRANSPARENCIA */
+      /* BOTÓN DE NUEVO INGRESO SÓLIDO (SIN GLASSMORPHISM) */
       .btn-add-table { 
         position: sticky; bottom: 0; z-index: 25;
         display: block; width: 100%; padding: 14px; 
-        background: rgba(0, 0, 0, 0.5) !important; 
-        backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+        background: var(--panel) !important; 
         color: var(--accent); border: none; border-top: 1px solid var(--accent-border); 
         font-family: 'Space Mono', monospace; font-size: 0.95rem; font-weight: 700; text-transform: uppercase; 
         cursor: pointer; transition: all 0.2s ease; text-align: center; 
         box-shadow: 0 -4px 15px rgba(0,0,0,0.1);
       }
-      body.light .btn-add-table, body.pink .btn-add-table { background: rgba(255, 255, 255, 0.6) !important; }
-      body.colorful .btn-add-table { background: rgba(255, 255, 255, 0.3) !important; }
       .btn-add-table:hover { background: var(--accent-soft) !important; color: var(--text); }
       .btn-add-table.selected-nav { background: var(--accent-soft) !important; color: var(--text); border-left: 4px solid var(--accent); }
 
-      /* FONDO DE OLAS: Altura a 30vh por detrás del cristal */
-      .desktop-waves-bg { position: fixed; bottom: 0; left: 0; width: 100%; height: 30vh; z-index: 0; pointer-events: none; transform: translateZ(0); -webkit-transform: translateZ(0); will-change: transform; }
+      /* FONDO DE OLAS: Solo visible en los espacios en blanco de la pantalla general */
+      .desktop-waves-bg { position: fixed; bottom: 0; left: 0; width: 100%; height: 30vh; z-index: 0; pointer-events: none; }
       .waves { position: absolute; width: 100%; height: 100%; bottom: 0; }
       .wave-layer-1 { fill: var(--accent); opacity: 0.05; animation: move-forever 60s cubic-bezier(.55,.5,.45,.5) infinite; }
       .wave-layer-2 { fill: var(--accent); opacity: 0.10; animation: move-forever 45s cubic-bezier(.55,.5,.45,.5) infinite; }
@@ -436,8 +448,6 @@
       @keyframes move-forever { 0% { transform: translate3d(-90px, 0, 0); } 100% { transform: translate3d(85px, 0, 0); } }
 
       #content { position: relative; z-index: 10; } 
-      .section { background: var(--panel-glass) !important; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--accent-border); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); }
-      .section-header { background: transparent !important; border-bottom: 1px solid var(--line); }
       
       /* MODALES MEJORADOS PARA ESCRITORIO (CSS GRID) */
       .modal-content { max-width: 850px; padding: 32px; gap: 20px; }
@@ -477,7 +487,7 @@
 
     <div style="position: absolute; bottom: 30px; font-size: 0.7rem; font-family: 'Space Mono', monospace; font-weight: 700; letter-spacing: 0.1em;">
       <span style="color: var(--muted);">ROUROG</span> <span style="color: var(--text); opacity: 0.5;">Innovations</span>
-      <span style="opacity: 0.3; margin-left: 6px;">v1.21</span>
+      <span style="opacity: 0.3; margin-left: 6px;">v1.22</span>
     </div>
   </div>
   <div class="app" id="mainAppContainer" style="display: none;">
@@ -524,7 +534,7 @@
 
     <div class="footer">
       Hospital Regional de Delicias - <span style="color: var(--accent); font-weight: 600;">Rourog Innovations</span>
-      <span style="opacity: 0.4; font-size: 0.8em; margin-left: 8px;">v2.21</span>
+      <span style="opacity: 0.4; font-size: 0.8em; margin-left: 8px;">v2.22</span>
     </div>
 
     <div id="easterEggContainer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; pointer-events: none; overflow: hidden;"></div>
@@ -543,8 +553,13 @@
         <div class="input-group span-6"><label>Fecha y Hora de Ingreso</label><input id="modalFechaIngreso" class="input-control" type="datetime-local" /></div>
         <div class="input-group span-6">
           <label>Destino</label>
-          <input type="text" id="searchEditDestino" class="input-control" placeholder="🔍 Buscar destino..." autocomplete="off" style="padding: 8px 12px; margin-bottom: -1px; border-bottom-left-radius: 0; border-bottom-right-radius: 0; font-size: 0.8rem;">
-          <select id="modalDestino" class="input-control" style="border-top-left-radius: 0; border-top-right-radius: 0;"></select>
+          <div class="custom-select-wrapper" id="editDestinoWrapper">
+            <div class="input-control custom-select-display" data-value="">(SIN DESTINO)</div>
+            <div class="custom-select-popover">
+              <div class="custom-select-search"><input type="text" placeholder="🔍 Buscar destino..." autocomplete="off"></div>
+              <div class="custom-select-options"></div>
+            </div>
+          </div>
         </div>
         
         <div class="input-group span-9"><label>Nombre del Paciente</label><input id="modalNombre" class="input-control" type="text" /></div>
@@ -555,8 +570,13 @@
         
         <div class="input-group span-12">
           <label class="optional-label">Mover a otra cama (Opcional)</label>
-          <input type="text" id="searchEditMover" class="input-control" placeholder="🔍 Buscar cama..." autocomplete="off" style="padding: 8px 12px; margin-bottom: -1px; border-bottom-left-radius: 0; border-bottom-right-radius: 0; font-size: 0.8rem;">
-          <select id="moverA_Select" class="input-control" style="border-top-left-radius: 0; border-top-right-radius: 0;"></select>
+          <div class="custom-select-wrapper" id="editMoverWrapper">
+            <div class="input-control custom-select-display" data-value="">NO MOVER (MANTENER EN CAMA ACTUAL)</div>
+            <div class="custom-select-popover">
+              <div class="custom-select-search"><input type="text" placeholder="🔍 Buscar cama..." autocomplete="off"></div>
+              <div class="custom-select-options"></div>
+            </div>
+          </div>
         </div>
       </div>
       <div class="modal-actions">
@@ -579,8 +599,13 @@
         <div class="input-group span-6"><label>Fecha y Hora de Ingreso</label><input id="addFechaIngreso" class="input-control" type="datetime-local" /></div>
         <div class="input-group span-6">
           <label>Cama Disponible</label>
-          <input type="text" id="searchAddCama" class="input-control" placeholder="🔍 Buscar cama..." autocomplete="off" style="padding: 8px 12px; margin-bottom: -1px; border-bottom-left-radius: 0; border-bottom-right-radius: 0; font-size: 0.8rem;">
-          <select id="addCamaSelect" class="input-control" style="border-top-left-radius: 0; border-top-right-radius: 0;"></select>
+          <div class="custom-select-wrapper" id="addCamaWrapper">
+            <div class="input-control custom-select-display" data-value="">SELECCIONA UNA CAMA LIBRE...</div>
+            <div class="custom-select-popover">
+              <div class="custom-select-search"><input type="text" placeholder="🔍 Buscar cama..." autocomplete="off"></div>
+              <div class="custom-select-options"></div>
+            </div>
+          </div>
         </div>
         
         <div class="input-group span-9"><label>Nombre del Paciente</label><input id="addNombre" class="input-control" type="text" /></div>
@@ -591,8 +616,13 @@
         
         <div class="input-group span-12">
           <label>Destino</label>
-          <input type="text" id="searchAddDestino" class="input-control" placeholder="🔍 Buscar destino..." autocomplete="off" style="padding: 8px 12px; margin-bottom: -1px; border-bottom-left-radius: 0; border-bottom-right-radius: 0; font-size: 0.8rem;">
-          <select id="addDestino" class="input-control" style="border-top-left-radius: 0; border-top-right-radius: 0;"></select>
+          <div class="custom-select-wrapper" id="addDestinoWrapper">
+            <div class="input-control custom-select-display" data-value="">(SIN DESTINO)</div>
+            <div class="custom-select-popover">
+              <div class="custom-select-search"><input type="text" placeholder="🔍 Buscar destino..." autocomplete="off"></div>
+              <div class="custom-select-options"></div>
+            </div>
+          </div>
         </div>
       </div>
       <div class="modal-actions">
@@ -1091,7 +1121,7 @@
     }
 
     // ==========================================================
-    // CÁLCULO INTELIGENTE Y ACTIVACIÓN DEL GUÍA DE SCROLL (v2.20)
+    // CÁLCULO INTELIGENTE Y ACTIVACIÓN DEL GUÍA DE SCROLL
     // ==========================================================
     let scrollGuiderHandler = null;
 
@@ -1159,7 +1189,6 @@
     document.addEventListener('keydown', (e) => {
       if (currentViewMode !== 'table' || window.innerWidth < 768 || window.isInlineEditing) return;
       
-      // Capturamos tanto las filas de pacientes como el botón inferior
       const elements = Array.from(document.querySelectorAll('.patient-row, .btn-add-table'));
       if (!elements.length) return;
 
@@ -1190,7 +1219,6 @@
         const el = elements[selectedNavIndex];
         el.classList.add('selected-nav');
         
-        // Solo expandimos si es una fila de paciente
         if (el.classList.contains('patient-row')) {
           const yaEstaAbierta = el.classList.contains('expanded-row');
           document.querySelectorAll('.patient-row').forEach(tr => tr.classList.remove('expanded-row'));
@@ -1202,32 +1230,54 @@
     }
 
     // ==========================================================
-    // FUNCIONES DE FILTRADO PARA MODALES
+    // SELECTOR PERSONALIZADO TIPO COMBOBOX (MODALES V2.22)
     // ==========================================================
-    function bindFiltroSelect(inputId, selectId) {
-      const input = document.getElementById(inputId);
-      const select = document.getElementById(selectId);
-      if (!input || !select) return;
+    window.initCustomSelect = function(wrapperId, optionsHtml) {
+      const wrapper = document.getElementById(wrapperId);
+      if(!wrapper) return;
+      const display = wrapper.querySelector('.custom-select-display');
+      const popover = wrapper.querySelector('.custom-select-popover');
+      const search = wrapper.querySelector('.custom-select-search input');
+      const list = wrapper.querySelector('.custom-select-options');
+
+      list.innerHTML = optionsHtml;
       
-      input.value = ''; 
-      
-      const eventHandler = (e) => {
-          const q = normalizar(e.target.value);
-          Array.from(select.options).forEach(opt => {
-              if (opt.value === "" && !q) { opt.style.display = ''; return; }
-              if (opt.value === "" && q && opt.disabled) { opt.style.display = 'none'; return; }
-              if (opt.value === "" && q && !opt.disabled) { opt.style.display = ''; return; }
-              const text = normalizar(opt.innerText);
-              opt.style.display = text.includes(q) ? '' : 'none';
-          });
-          Array.from(select.querySelectorAll('optgroup')).forEach(group => {
-              const hasVisible = Array.from(group.querySelectorAll('option')).some(o => o.style.display !== 'none');
-              group.style.display = hasVisible ? '' : 'none';
-          });
+      display.onclick = (e) => {
+        e.stopPropagation();
+        const isActive = popover.classList.contains('active');
+        document.querySelectorAll('.custom-select-popover.active').forEach(p => p.classList.remove('active'));
+        if (!isActive) {
+          popover.classList.add('active');
+          search.value = '';
+          Array.from(list.children).forEach(c => c.style.display = '');
+          setTimeout(() => search.focus(), 50);
+        }
       };
-      input.oninput = eventHandler;
-      input.dispatchEvent(new Event('input')); 
-    }
+
+      search.oninput = (e) => {
+        const q = normalizar(e.target.value);
+        Array.from(list.children).forEach(opt => {
+          if (opt.classList.contains('custom-select-optgroup')) return;
+          const text = normalizar(opt.innerText);
+          opt.style.display = text.includes(q) ? 'block' : 'none';
+        });
+      };
+
+      list.querySelectorAll('.custom-select-option').forEach(opt => {
+        opt.onclick = (e) => {
+          e.stopPropagation();
+          display.innerText = opt.innerText;
+          display.dataset.value = opt.getAttribute('data-value');
+          popover.classList.remove('active');
+        };
+      });
+    };
+
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.custom-select-wrapper')) {
+        document.querySelectorAll('.custom-select-popover.active').forEach(p => p.classList.remove('active'));
+      }
+    });
 
     // ==========================================================
     // EDICIÓN ULTRA SUTIL EN LÍNEA
@@ -1307,7 +1357,7 @@
     };
 
     // ==========================================================
-    // DESTINO SUPERPUESTO MINIMALISTA EN EL BODY (V2.21)
+    // DESTINO SUPERPUESTO MINIMALISTA EN EL BODY (V2.22)
     // ==========================================================
     window.abrirDestinoFlotante = function(tdEl, filaId, destinoActual, event) {
       event.stopPropagation();
@@ -1336,7 +1386,6 @@
       
       container.innerHTML = opcionesHtml;
       
-      // Añadir al body para evitar cualquier corte por overflow
       document.body.appendChild(container);
       
       const rect = tdEl.getBoundingClientRect();
@@ -1349,7 +1398,7 @@
       if (rect.bottom + dropdownHeight > window.innerHeight) {
         container.style.top = 'auto';
         container.style.bottom = (window.innerHeight - rect.top) + 'px';
-        container.style.boxShadow = '0 -10px 25px rgba(0,0,0,0.3)';
+        container.style.boxShadow = '0 -10px 25px rgba(0,0,0,0.5)';
       } else {
         container.style.top = rect.bottom + 'px';
         container.style.bottom = 'auto';
@@ -1436,36 +1485,38 @@
       document.getElementById('modalDiagnostico').value = (paciente.diagnostico || '').toUpperCase();
       document.getElementById('modalPendientes').value = (paciente.pendientes || '').toUpperCase();
 
-      const selectDestino = document.getElementById('modalDestino');
-      selectDestino.innerHTML = '<option value="">(SIN DESTINO)</option>';
+      // Destino Custom Dropdown
+      let htmlDestino = `<div class="custom-select-option" data-value="">(SIN DESTINO)</div>`;
+      destinosGlobal.forEach(d => { htmlDestino += `<div class="custom-select-option" data-value="${escapeHtml(d.toUpperCase())}">${escapeHtml(d.toUpperCase())}</div>`; });
+      initCustomSelect('editDestinoWrapper', htmlDestino);
+      const destinoDisplay = document.querySelector('#editDestinoWrapper .custom-select-display');
       const pDestinoStr = String(paciente.destino || '').toUpperCase().trim();
-      
-      destinosGlobal.forEach(d => {
-        const dStr = String(d).toUpperCase().trim();
-        const isSelected = (pDestinoStr === dStr) ? 'selected' : '';
-        selectDestino.innerHTML += `<option value="${escapeHtml(dStr)}" ${isSelected}>${escapeHtml(dStr)}</option>`;
-      });
+      destinoDisplay.innerText = pDestinoStr || '(SIN DESTINO)';
+      destinoDisplay.dataset.value = pDestinoStr;
 
-      const selectMoverA = document.getElementById('moverA_Select');
-      selectMoverA.innerHTML = '<option value="" selected>NO MOVER (MANTENER EN CAMA ACTUAL)</option>';
+      // Cama Custom Dropdown
+      let htmlMover = `<div class="custom-select-option" data-value="">NO MOVER (MANTENER EN CAMA ACTUAL)</div>`;
       const gruposLibres = agruparPorArea(camasLibresGlobal);
       for (const [area, camas] of Object.entries(gruposLibres)) {
-        let optgroup = `<optgroup label="${escapeHtml(area.toUpperCase())}">`;
-        camas.forEach(c => { optgroup += `<option value="${c.fila}">${escapeHtml(c.cama.toUpperCase())}</option>`; });
-        optgroup += `</optgroup>`; selectMoverA.innerHTML += optgroup;
+        htmlMover += `<div class="custom-select-optgroup">${escapeHtml(area.toUpperCase())}</div>`;
+        camas.forEach(c => { htmlMover += `<div class="custom-select-option" data-value="${c.fila}">${escapeHtml(c.cama.toUpperCase())}</div>`; });
       }
+      initCustomSelect('editMoverWrapper', htmlMover);
+      const moverDisplay = document.querySelector('#editMoverWrapper .custom-select-display');
+      moverDisplay.innerText = 'NO MOVER (MANTENER EN CAMA ACTUAL)';
+      moverDisplay.dataset.value = '';
       
       document.getElementById('editModal').classList.add('active');
-      
-      // Vinculamos los buscadores
-      bindFiltroSelect('searchEditDestino', 'modalDestino');
-      bindFiltroSelect('searchEditMover', 'moverA_Select');
     }
 
     async function guardarEdicion() {
       const btnGuardar = document.getElementById('btnGuardarEdit');
       const filaId = document.getElementById('modalFila').value;
-      const moverAFila = document.getElementById('moverA_Select').value;
+      
+      // Leer valores de los Custom Dropdowns en lugar del select
+      const destinoVal = document.querySelector('#editDestinoWrapper .custom-select-display').dataset.value || '';
+      const moverAFila = document.querySelector('#editMoverWrapper .custom-select-display').dataset.value || '';
+      
       const fechaInput = document.getElementById('modalFechaIngreso').value;
 
       btnGuardar.disabled = true; btnGuardar.innerHTML = '<span class="spin">🔄</span> GUARDANDO...';
@@ -1476,7 +1527,7 @@
             edad: document.getElementById('modalEdad').value.toUpperCase(),
             diagnostico: document.getElementById('modalDiagnostico').value.toUpperCase(),
             pendientes: document.getElementById('modalPendientes').value.toUpperCase(),
-            destino: document.getElementById('modalDestino').value.toUpperCase()
+            destino: destinoVal
         };
 
         if (fechaInput) {
@@ -1564,49 +1615,51 @@
       now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
       document.getElementById('addFechaIngreso').value = now.toISOString().slice(0,16);
 
-      const selectCama = document.getElementById('addCamaSelect');
-      selectCama.innerHTML = '<option value="" disabled selected>SELECCIONA UNA CAMA LIBRE...</option>';
+      // Cama Custom Dropdown
+      let htmlCamas = '';
       if (camasLibresGlobal.length === 0) { 
-        selectCama.innerHTML += '<option value="" disabled>NO HAY CAMAS DISPONIBLES 🛑</option>'; 
+        htmlCamas = `<div class="custom-select-option" data-value="">NO HAY CAMAS DISPONIBLES 🛑</div>`; 
       } else {
         const gruposLibres = agruparPorArea(camasLibresGlobal);
         for (const [area, camas] of Object.entries(gruposLibres)) {
-          let optgroup = `<optgroup label="${escapeHtml(area.toUpperCase())}">`;
-          camas.forEach(c => { optgroup += `<option value="${escapeHtml(c.cama.toUpperCase())}|${escapeHtml(c.area.toUpperCase())}">${escapeHtml(c.cama.toUpperCase())}</option>`; });
-          optgroup += `</optgroup>`; selectCama.innerHTML += optgroup;
+          htmlCamas += `<div class="custom-select-optgroup">${escapeHtml(area.toUpperCase())}</div>`;
+          camas.forEach(c => { htmlCamas += `<div class="custom-select-option" data-value="${escapeHtml(c.cama.toUpperCase())}|${escapeHtml(c.area.toUpperCase())}">${escapeHtml(c.cama.toUpperCase())}</div>`; });
         }
       }
+      initCustomSelect('addCamaWrapper', htmlCamas);
+      const camaDisplay = document.querySelector('#addCamaWrapper .custom-select-display');
+      camaDisplay.innerText = 'SELECCIONA UNA CAMA LIBRE...';
+      camaDisplay.dataset.value = '';
 
-      const selectDestino = document.getElementById('addDestino');
-      selectDestino.innerHTML = '<option value="">(SIN DESTINO)</option>';
-      destinosGlobal.forEach(d => {
-        selectDestino.innerHTML += `<option value="${escapeHtml(d.toUpperCase())}">${escapeHtml(d.toUpperCase())}</option>`;
-      });
+      // Destino Custom Dropdown
+      let htmlDestino = `<div class="custom-select-option" data-value="">(SIN DESTINO)</div>`;
+      destinosGlobal.forEach(d => { htmlDestino += `<div class="custom-select-option" data-value="${escapeHtml(d.toUpperCase())}">${escapeHtml(d.toUpperCase())}</div>`; });
+      initCustomSelect('addDestinoWrapper', htmlDestino);
+      const destinoDisplay = document.querySelector('#addDestinoWrapper .custom-select-display');
+      destinoDisplay.innerText = '(SIN DESTINO)';
+      destinoDisplay.dataset.value = '';
 
       document.getElementById('addNombre').value = ''; 
       document.getElementById('addEdad').value = ''; 
       document.getElementById('addDiagnostico').value = ''; 
       document.getElementById('addPendientes').value = '';
-      document.getElementById('addDestino').value = '';
       
       document.getElementById('addModal').classList.add('active');
-      
-      // Vinculamos los buscadores
-      bindFiltroSelect('searchAddCama', 'addCamaSelect');
-      bindFiltroSelect('searchAddDestino', 'addDestino');
     }
 
     async function guardarNuevo() {
       const btnGuardar = document.getElementById('btnGuardarAdd');
-      const selectCama = document.getElementById('addCamaSelect');
-      const fechaInput = document.getElementById('addFechaIngreso').value;
       
-      if(!selectCama.value) { alert("POR FAVOR SELECCIONA UNA CAMA DISPONIBLE."); return; }
-      
-      const [nombreCamaReal, areaReal] = selectCama.value.split('|');
+      // Leer valores desde Custom Dropdowns
+      const selectCamaVal = document.querySelector('#addCamaWrapper .custom-select-display').dataset.value;
+      if(!selectCamaVal) { alert("POR FAVOR SELECCIONA UNA CAMA DISPONIBLE."); return; }
+      const [nombreCamaReal, areaReal] = selectCamaVal.split('|');
       
       const nom = document.getElementById('addNombre').value.toUpperCase(); 
       if(!nom) { alert("EL NOMBRE ES OBLIGATORIO."); return; }
+
+      const destinoVal = document.querySelector('#addDestinoWrapper .custom-select-display').dataset.value || '';
+      const fechaInput = document.getElementById('addFechaIngreso').value;
 
       btnGuardar.disabled = true; 
       btnGuardar.innerHTML = '<span class="spin">🔄</span> PROCESANDO...';
@@ -1619,7 +1672,7 @@
             edad: document.getElementById('addEdad').value.toUpperCase(),
             diagnostico: document.getElementById('addDiagnostico').value.toUpperCase(),
             pendientes: document.getElementById('addPendientes').value.toUpperCase(),
-            destino: document.getElementById('addDestino').value.toUpperCase(),
+            destino: destinoVal,
             cama: nombreCamaReal,
             area: areaReal,
             creado: fechaCreacion
@@ -1730,8 +1783,8 @@
           activeCard.style.transform = 'translateX(0)';
           activeCard.closest('.card').classList.remove('swipe-ready-delete', 'swipe-ready-edit');
           
-          if(xDiff > ACTION_THRESHOLD) { setTimeout(() => borrarPacienteDirecto(fila, nombre), 100); }
-          else if(xDiff < -ACTION_THRESHOLD) { setTimeout(() => abrirModal(fila), 100); }
+          if(xDiff > 110) { setTimeout(() => borrarPacienteDirecto(fila, nombre), 100); }
+          else if(xDiff < -110) { setTimeout(() => abrirModal(fila), 100); }
           
           xDown = null; activeCard = null;
         });
