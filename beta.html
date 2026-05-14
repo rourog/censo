@@ -20,7 +20,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <style>
- :root {
+    :root {
       --radius-xl: 16px;
       --radius-lg: 12px;
       --radius-md: 10px;
@@ -274,7 +274,10 @@
 
     @media (min-width: 768px) { 
       .hide-on-mobile { display: flex !important; }
-      #content { display: flex; flex-direction: row; gap: 24px; padding: 0; padding-bottom: 60px; align-items: flex-start; }
+      
+      /* REESTRUCTURACIÓN DE CONTENT PARA PERMITIR GLASSMORPHISM COMPLETO (v2.12) */
+      #content { display: block; padding: 0; overflow-y: hidden; }
+      
       .section { min-width: 450px; flex: 1 0 450px; max-width: 800px; margin: 0; border-radius: var(--radius-lg); border: 1px solid var(--line); background: var(--bg); max-height: calc(100vh - 85px); display: flex; flex-direction: column; } 
       .section-header { border-radius: var(--radius-lg) var(--radius-lg) 0 0; position: sticky; top: 0; z-index: 10; font-size: 1.1rem; padding: 16px; background: var(--bg); }
       .patient-list { overflow-y: auto; flex-grow: 1; padding: 0 16px 16px; gap: 12px; }
@@ -287,29 +290,29 @@
       .title-censo { font-size: 1.8rem; letter-spacing: 0.12em; }
       .title-urgencias { font-size: 0.85rem; }
 
-      #content.view-table-mode { flex-direction: column !important; align-items: stretch !important; overflow-y: auto; padding: 0 !important; }
+      #content.view-table-mode { display: block; }
       
       /* CONTENEDOR DE TABLA PRINCIPAL CON EFECTO CRISTAL (GLASSMORPHISM) */
       .table-wrapper { 
         position: relative; width: 100%; 
         background: var(--panel-glass) !important; 
         backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); 
-        border: 1px solid var(--accent-border); border-radius: var(--radius-md); 
+        border: none; border-top: 1px solid var(--line);
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15); 
-        overflow-y: auto; overflow-x: auto; max-height: calc(100vh - 180px); margin-bottom: 0; 
+        overflow-y: auto; overflow-x: auto; max-height: calc(100vh - 85px); margin-bottom: 0; 
       }
       
-      /* Fondo transparente para interactuar con la transparencia de Glassmorphism */
+      /* El fondo transparente unificado deja ver las olas de fondo suavizadas por el wrapper */
       .censo-table { width: 100%; border-collapse: collapse; text-align: left; background: transparent; table-layout: fixed; }
       
-      /* DENSIDAD AUMENTADA v2.11: Reducción de padding en TH y TD para maximizar espacio */
-      .censo-table th { background: rgba(0, 0, 0, 0.15) !important; backdrop-filter: blur(4px); color: var(--accent); padding: 10px 10px; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid var(--line); position: sticky; top: 0; z-index: 5; }
-      .censo-table td { padding: 8px 10px; border-bottom: 1px solid var(--line); color: var(--text); font-size: 0.95rem; vertical-align: middle; }
+      /* DENSIDAD AUMENTADA: Reducción de padding en TH y TD para maximizar espacio */
+      .censo-table th { background: rgba(0, 0, 0, 0.25) !important; backdrop-filter: blur(4px); color: var(--accent); padding: 10px 10px; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid var(--line); position: sticky; top: 0; z-index: 5; }
+      .censo-table td { padding: 8px 10px; border-bottom: 1px solid var(--line); color: var(--text); font-size: 0.95rem; vertical-align: middle; background: transparent; }
       .censo-table tr:last-child td { border-bottom: none; }
       
       .truncate-text { width: 100%; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
       
-      .patient-row { cursor: pointer; transition: background 0.2s ease; }
+      .patient-row { cursor: pointer; transition: background 0.2s ease; background: transparent; }
       .patient-row:hover { background: var(--field) !important; }
       .patient-row.expanded-row { background: var(--card-open) !important; }
       .patient-row.expanded-row td { border-bottom: 1px solid var(--line); }
@@ -329,7 +332,6 @@
         color: #ef4444 !important; 
         font-weight: 700; 
       }
-      /* Anular variaciones en hijos nativos para que la fuente se vea exactamente igual en modo editable */
       .patient-row.expanded-row td.editable-cell.is-editing * { 
         color: inherit !important; 
         font-size: inherit !important; 
@@ -354,7 +356,7 @@
       .patient-row.selected-nav { border-left: 4px solid var(--accent) !important; background: var(--accent-soft) !important; }
 
       /* ========================================================= 
-         GUÍA VISUAL CENTRADA SOBRE LAS OLAS CON VIVÉN (v2.11)
+         GUÍA VISUAL CENTRADA SOBRE LAS OLAS CON VIVÉN (v2.12)
          ========================================================= */
       @keyframes subtleBounce {
         0%, 100% { transform: translate(-50%, 0); }
@@ -382,7 +384,7 @@
       .btn-add-table { display: block; width: 100%; padding: 16px; background: transparent; color: var(--muted); border: none; border-top: 1px dashed var(--line); font-family: 'Space Mono', monospace; font-size: 0.95rem; font-weight: 700; text-transform: uppercase; cursor: pointer; transition: all 0.2s ease; text-align: center; }
       .btn-add-table:hover { background: var(--accent-soft); color: var(--accent); letter-spacing: 0.05em; }
 
-      /* FONDO DE OLAS (Glassmorphism: Z-index 0 para quedar por detrás del contenedor translúcido) */
+      /* FONDO DE OLAS (Glassmorphism: Z-index 0 anclado de forma fija a la base del viewport global) */
       .desktop-waves-bg { position: fixed; bottom: 0; left: 0; width: 100%; height: 15vh; z-index: 0; pointer-events: none; }
       .waves { position: absolute; width: 100%; height: 100%; bottom: 0; }
       .wave-layer-1 { fill: var(--accent); opacity: 0.05; animation: move-forever 60s cubic-bezier(.55,.5,.45,.5) infinite; }
@@ -425,7 +427,7 @@
 
     <div style="position: absolute; bottom: 30px; font-size: 0.7rem; font-family: 'Space Mono', monospace; font-weight: 700; letter-spacing: 0.1em;">
       <span style="color: var(--muted);">ROUROG</span> <span style="color: var(--text); opacity: 0.5;">Innovations</span>
-      <span style="opacity: 0.3; margin-left: 6px;">v1.11</span>
+      <span style="opacity: 0.3; margin-left: 6px;">v1.12</span>
     </div>
   </div>
   <div class="app" id="mainAppContainer" style="display: none;">
@@ -472,7 +474,7 @@
 
     <div class="footer">
       Hospital Regional de Delicias - <span style="color: var(--accent); font-weight: 600;">Rourog Innovations</span>
-      <span style="opacity: 0.4; font-size: 0.8em; margin-left: 8px;">v2.11</span>
+      <span style="opacity: 0.4; font-size: 0.8em; margin-left: 8px;">v2.12</span>
     </div>
 
     <div id="easterEggContainer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; pointer-events: none; overflow: hidden;"></div>
@@ -1002,7 +1004,7 @@
     }
 
     // ==========================================================
-    // CÁLCULO INTELIGENTE Y ACTIVACIÓN DEL GUÍA DE SCROLL (v2.11)
+    // CÁLCULO INTELIGENTE Y ACTIVACIÓN DEL GUÍA DE SCROLL (v2.12)
     // ==========================================================
     function initScrollGuider() {
       const wrapper = document.getElementById('scrollTableWrapper');
