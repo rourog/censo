@@ -309,13 +309,27 @@
       .patient-row.expanded-row .truncate-text { white-space: normal; overflow: visible; max-width: none; }
       .patient-row.expanded-row .chip { max-width: none; white-space: normal; overflow: visible; display: inline-block; line-height: 1.2; }
       
-      /* EDICIÓN SUTIL EN LÍNEA */
+/* EDICIÓN SUTIL EN LÍNEA */
       .patient-row.expanded-row td.editable-cell { cursor: text; position: relative; }
       .patient-row.expanded-row td.editable-cell:hover::after { content: '✎'; position: absolute; top: 2px; right: 2px; font-size: 0.7rem; color: var(--muted); opacity: 0.5; pointer-events: none; }
-      .patient-row.expanded-row td.editable-cell.is-editing { color: #ef4444 !important; outline: none; background-color: rgba(239, 68, 68, 0.05); }
-      .patient-row.expanded-row td.editable-cell.is-editing.patient-name { color: #ef4444 !important; font-weight: 700; }
-      .patient-row.expanded-row td.editable-cell.is-editing * { color: inherit !important; }
       
+      /* Mantener tipografía y forzar color rojo sin alterar tamaños de fuente */
+      .patient-row.expanded-row td.editable-cell.is-editing { 
+        color: #ef4444 !important; 
+        outline: none; 
+        background-color: rgba(239, 68, 68, 0.05); 
+      }
+      .patient-row.expanded-row td.editable-cell.is-editing.patient-name { 
+        color: #ef4444 !important; 
+        font-weight: 700; 
+      }
+      /* Forzar a que los elementos internos hereden el tamaño y tipografía de la celda padre exacta */
+      .patient-row.expanded-row td.editable-cell.is-editing * { 
+        color: inherit !important; 
+        font-size: inherit !important; 
+        font-family: inherit !important; 
+        line-height: inherit !important; 
+      }
       .inline-destino-container {
         position: absolute; top: 0; left: 0; width: 100%; min-width: 220px;
         background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius-sm);
