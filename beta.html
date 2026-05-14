@@ -295,8 +295,9 @@
       }
       .censo-table { width: 100%; border-collapse: collapse; text-align: left; background: var(--bg); table-layout: fixed; }
       
-      .censo-table th { background: var(--section-head); color: var(--accent); padding: 14px 10px; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid var(--line); position: sticky; top: 0; z-index: 5; }
-      .censo-table td { padding: 12px 10px; border-bottom: 1px solid var(--line); color: var(--text); font-size: 0.95rem; vertical-align: middle; }
+      /* DENSIDAD AUMENTADA v2.11: Robar pixeles reduciendo padding de 14px a 10px en TH y de 12px a 8px en TD */
+      .censo-table th { background: var(--section-head); color: var(--accent); padding: 10px 10px; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid var(--line); position: sticky; top: 0; z-index: 5; }
+      .censo-table td { padding: 8px 10px; border-bottom: 1px solid var(--line); color: var(--text); font-size: 0.95rem; vertical-align: middle; }
       .censo-table tr:last-child td { border-bottom: none; }
       
       .truncate-text { width: 100%; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
@@ -331,21 +332,22 @@
       .patient-row.selected-nav { border-left: 4px solid var(--accent) !important; background: var(--accent-soft) !important; }
 
       /* ========================================================= 
-         INDICADOR DE SCROLL INTELIGENTE (GUÍA VISUAL CON VIVÉN)
+         GUÍA VISUAL CENTRADA SOBRE LAS OLAS CON VIVÉN (v2.11)
          ========================================================= */
       @keyframes subtleBounce {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-4px); }
+        0%, 100% { transform: translate(-50%, 0); }
+        50% { transform: translate(-50%, -4px); }
       }
       .scroll-guider {
-        position: absolute; right: 20px; width: 38px; height: 38px; border-radius: 50%;
+        position: absolute; left: 50%; width: 38px; height: 38px; border-radius: 50%;
         background: var(--panel); border: 1px solid var(--accent-border); color: var(--accent);
         display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 700;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.25); cursor: pointer; z-index: 30;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3); cursor: pointer; z-index: 30;
         opacity: 0; pointer-events: none; transition: opacity var(--transition-fast), top var(--transition), bottom var(--transition);
         animation: subtleBounce 2s infinite ease-in-out;
       }
-      .scroll-guider.active-down { bottom: 20px; top: auto; opacity: 0.85; pointer-events: auto; }
+      /* Anclamos dinámicamente arriba o abajo manteniendo el centrado horizontal */
+      .scroll-guider.active-down { bottom: 25px; top: auto; opacity: 0.85; pointer-events: auto; }
       .scroll-guider.active-up { top: 60px; bottom: auto; opacity: 0.85; pointer-events: auto; }
       .scroll-guider:hover { opacity: 1; background: var(--accent-soft); }
 
@@ -402,7 +404,7 @@
 
     <div style="position: absolute; bottom: 30px; font-size: 0.7rem; font-family: 'Space Mono', monospace; font-weight: 700; letter-spacing: 0.1em;">
       <span style="color: var(--muted);">ROUROG</span> <span style="color: var(--text); opacity: 0.5;">Innovations</span>
-      <span style="opacity: 0.3; margin-left: 6px;">v1.10</span>
+      <span style="opacity: 0.3; margin-left: 6px;">v1.11</span>
     </div>
   </div>
   <div class="app" id="mainAppContainer" style="display: none;">
@@ -449,7 +451,7 @@
 
     <div class="footer">
       Hospital Regional de Delicias - <span style="color: var(--accent); font-weight: 600;">Rourog Innovations</span>
-      <span style="opacity: 0.4; font-size: 0.8em; margin-left: 8px;">v2.10</span>
+      <span style="opacity: 0.4; font-size: 0.8em; margin-left: 8px;">v2.11</span>
     </div>
 
     <div id="easterEggContainer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; pointer-events: none; overflow: hidden;"></div>
@@ -979,7 +981,7 @@
     }
 
     // ==========================================================
-    // CÁLCULO INTELIGENTE Y ACTIVACIÓN DEL GUÍA DE SCROLL (v2.10)
+    // CÁLCULO INTELIGENTE Y ACTIVACIÓN DEL GUÍA DE SCROLL (v2.11)
     // ==========================================================
     function initScrollGuider() {
       const wrapper = document.getElementById('scrollTableWrapper');
