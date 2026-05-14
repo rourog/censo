@@ -266,6 +266,12 @@
     .warning-icon { font-size: 3.5rem; margin: 10px auto; height: 80px; width: 80px; display: flex; align-items: center; justify-content: center; animation: pulseWarning 1s infinite ease-in-out; }
     .delete-text-highlight { color: var(--error-text); font-weight: 700; font-size: 1.1rem; text-align: center; font-family: 'Space Mono', monospace; line-height: 1.4; }
 
+    /* PERSONALIZACIÓN DE SCROLLBARS GLOBALES */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--muted); border-radius: 10px; opacity: 0.3; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
     @media (min-width: 768px) { 
       .hide-on-mobile { display: flex !important; }
       #content { display: flex; flex-direction: row; gap: 24px; padding: 0; padding-bottom: 60px; align-items: flex-start; }
@@ -278,17 +284,16 @@
       .skeleton-loader { gap: 12px; padding: 0 16px 16px; }
       .skeleton-card { border-bottom: none !important; border-radius: var(--radius-md); border: 1px solid var(--line); margin-bottom: 12px; }
 
-      /* Recuperar el tamaño original del título en monitores de escritorio */
       .title-censo { font-size: 1.8rem; letter-spacing: 0.12em; }
       .title-urgencias { font-size: 0.85rem; }
-      
-      ::-webkit-scrollbar { width: 8px; height: 8px; }
-      ::-webkit-scrollbar-track { background: transparent; }
-      ::-webkit-scrollbar-thumb { background: var(--muted); border-radius: 10px; opacity: 0.3; }
-      ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
 
       #content.view-table-mode { flex-direction: column !important; align-items: stretch !important; overflow-y: auto; padding: 0 !important; }
-      .table-wrapper { width: 100%; background: transparent; border-radius: 0; border: none; box-shadow: none; overflow: hidden; margin-bottom: 0; }
+      
+      /* CONTENEDOR DE TABLA CON SCROLL NATIVO Y TOPE DE ALTURA */
+      .table-wrapper { 
+        width: 100%; background: transparent; border-radius: 0; border: none; box-shadow: none; 
+        overflow-y: auto; overflow-x: auto; max-height: calc(100vh - 180px); margin-bottom: 0; 
+      }
       .censo-table { width: 100%; border-collapse: collapse; text-align: left; background: var(--bg); table-layout: fixed; }
       
       .censo-table th { background: var(--section-head); color: var(--accent); padding: 14px 10px; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid var(--line); position: sticky; top: 0; z-index: 5; }
@@ -304,47 +309,35 @@
       .patient-row.expanded-row .truncate-text { white-space: normal; overflow: visible; max-width: none; }
       .patient-row.expanded-row .chip { max-width: none; white-space: normal; overflow: visible; display: inline-block; line-height: 1.2; }
       
-      /* ========================================================= 
-         SUTILEZA EXTREMA: EDICIÓN EN LÍNEA SIN RECUADROS (v2.8)
-         ========================================================= */
+      /* SUTILEZA EXTREMA: EDICIÓN EN LÍNEA */
       .patient-row.expanded-row td.editable-cell { cursor: text; position: relative; }
-      
-      /* Indicador visual en texto superior derecho al pasar mouse */
       .patient-row.expanded-row td.editable-cell:hover::after {
         content: '✎'; position: absolute; top: 2px; right: 2px; font-size: 0.7rem; color: var(--muted); opacity: 0.5; pointer-events: none;
       }
-
-      /* Estilo cuando la celda está ACTIVA en edición nativa */
       .patient-row.expanded-row td.editable-cell.is-editing {
-        color: #ef4444 !important; /* Texto Rojo Vivo */
-        outline: none; /* Quitar borde azul por defecto de contenteditable */
-        background-color: rgba(239, 68, 68, 0.05); /* Fondo rojizo ultra tenue de indicación */
+        color: #ef4444 !important; outline: none; background-color: rgba(239, 68, 68, 0.05);
       }
-      
-      /* Asegurar que el nombre mantenga la jerarquía visual */
       .patient-row.expanded-row td.editable-cell.is-editing.patient-name {
         color: #ef4444 !important; font-weight: 700;
       }
+      .patient-row.expanded-row td.editable-cell.is-editing * { color: inherit !important; }
       
-      /* Forzar a elementos internos a heredar el color rojo de edición */
-      .patient-row.expanded-row td.editable-cell.is-editing * {
-        color: inherit !important;
-      }
-      
-      /* Estilo para el contenedor del select flotante minimalista */
+      /* CONTENEDOR DE DESTINOS EN LÍNEA CON SCROLL */
       .inline-destino-container {
-        position: absolute; top: 0; left: 0; width: 100%; min-width: 200px;
+        position: absolute; top: 0; left: 0; width: 100%; min-width: 220px;
         background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius-sm);
-        box-shadow: 0 10px 25px rgba(0,0,0,0.2); z-index: 100; overflow: hidden;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.3); z-index: 100; 
+        max-height: 250px; overflow-y: auto; /* Activamos scroll interno */
       }
       .inline-destino-option {
         padding: 10px 12px; font-size: 0.8rem; color: var(--text); cursor: pointer;
         transition: background var(--transition-fast); text-transform: uppercase;
+        border-bottom: 1px solid var(--line);
       }
+      .inline-destino-option:last-child { border-bottom: none; }
       .inline-destino-option:hover { background: var(--field); color: var(--accent); }
       .inline-destino-option.selected { background: var(--accent-soft); color: var(--accent); font-weight: 700; }
 
-      /* Resaltado para navegación oculta con flechas */
       .patient-row.selected-nav { border-left: 4px solid var(--accent) !important; background: var(--accent-soft) !important; }
 
       .btn-table { background: transparent; border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 6px; cursor: pointer; font-size: 1.1rem; transition: all var(--transition-fast); margin-right: 4px; }
@@ -368,7 +361,6 @@
       #content { position: relative; z-index: 10; } 
       .section { background: var(--panel-glass) !important; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--accent-border); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); }
       .section-header { background: transparent !important; border-bottom: 1px solid var(--line); }
-      .table-wrapper { background: var(--panel-glass) !important; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
       .censo-table th { background: rgba(0,0,0,0.05) !important; backdrop-filter: blur(5px); }
 
       .modal-content { max-width: 650px; padding: 32px; gap: 16px; }
@@ -401,7 +393,7 @@
 
     <div style="position: absolute; bottom: 30px; font-size: 0.7rem; font-family: 'Space Mono', monospace; font-weight: 700; letter-spacing: 0.1em;">
       <span style="color: var(--muted);">ROUROG</span> <span style="color: var(--text); opacity: 0.5;">Innovations</span>
-      <span style="opacity: 0.3; margin-left: 6px;">v1.9</span>
+      <span style="opacity: 0.3; margin-left: 6px;">v1.10</span>
     </div>
   </div>
   <div class="app" id="mainAppContainer" style="display: none;">
@@ -448,7 +440,7 @@
 
     <div class="footer">
       Hospital Regional de Delicias - <span style="color: var(--accent); font-weight: 600;">Rourog Innovations</span>
-      <span style="opacity: 0.4; font-size: 0.8em; margin-left: 8px;">v2.8</span>
+      <span style="opacity: 0.4; font-size: 0.8em; margin-left: 8px;">v2.9</span>
     </div>
 
     <div id="easterEggContainer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; pointer-events: none; overflow: hidden;"></div>
@@ -551,7 +543,7 @@
     let unsubscribe = null; 
     let rolUsuario = "INTERNO"; 
 
-    // Banderas globales para edición sutil en línea y navegación oculta
+    // Banderas globales para pausar sincronización visual durante edición en línea
     window.isInlineEditing = false;
     window.pendingSnapshotList = null;
     let selectedNavIndex = -1;
@@ -764,7 +756,7 @@
       const metaText = document.getElementById('meta-text');
       const mainAppContainer = document.getElementById('mainAppContainer');
       const fabBtn = document.getElementById('mainFabBtn');
-      selectedNavIndex = -1; // Resetear la navegación al renderizar
+      selectedNavIndex = -1; 
 
       if(metaText) metaText.innerHTML = `${lista.length} PACIENTES`;
       content.classList.remove('view-table-mode'); 
@@ -814,7 +806,6 @@
 
           grupos[area].forEach((p) => {
             const destinoChip = getColorfulChipHtml(p.destino);
-            // Celdas listas para modo sutil e integrada identificación por fila
             tableHtml += `<tr class="patient-row" data-fila="${p.fila}" onclick="toggleTableRow(this)">
                 <td style="padding: 6px 10px;"><span style="color: var(--accent); font-weight: 700; font-size: 0.85rem;">${escapeHtml(p.cama || '-')}</span></td>
                 <td style="padding: 6px 10px; font-size: 0.75rem; color: var(--muted); font-family: 'Fira Code', monospace; line-height: 1.2;">${escapeHtml(p.fechaIngresoFormateada || '-')}</td>
@@ -885,7 +876,6 @@
         content.innerHTML += sectionHtml;
       });
       
-      // Armar lógicas interactivas para móvil post render
       setTimeout(initSwipe, 50);
       if (typeof syncPlexusPatients === 'function') syncPlexusPatients(lista);
     }
@@ -958,7 +948,6 @@
 
         isFetchingData = false;
         
-        // INTERCEPCIÓN EN VIVO: Si el médico tiene un cursor editando en línea, acumulamos y no redibujamos para evitar el parpadeo
         if (window.isInlineEditing) {
           window.pendingSnapshotList = [...pacientesGlobal];
           document.getElementById('reloadIcon').classList.remove('spin');
@@ -975,10 +964,9 @@
     }
 
     // ==========================================================
-    // LÓGICA OCULTA DE NAVEGACIÓN POR TECLADO (v2.8)
+    // NAVEGACIÓN POR TECLADO OCULTA
     // ==========================================================
     document.addEventListener('keydown', (e) => {
-      // Ignorar si estamos en móvil, si no es la vista de tabla o si el médico está escribiendo en el editor sutil
       if (currentViewMode !== 'table' || window.innerWidth < 768 || window.isInlineEditing) return;
       const rows = document.querySelectorAll('.patient-row');
       if (!rows.length) return;
@@ -1002,7 +990,6 @@
       rows.forEach(r => r.classList.remove('selected-nav'));
       if (rows[selectedNavIndex]) {
         rows[selectedNavIndex].classList.add('selected-nav');
-        // Expande automáticamente y mantiene la visibilidad en pantalla
         const yaEstaAbierta = rows[selectedNavIndex].classList.contains('expanded-row');
         document.querySelectorAll('.patient-row').forEach(tr => tr.classList.remove('expanded-row'));
         rows[selectedNavIndex].classList.add('expanded-row');
@@ -1011,23 +998,20 @@
     }
 
     // ==========================================================
-    // LÓGICA DE EDICIÓN ULTRA SUTIL EN LÍNEA (v2.8)
+    // EDICIÓN ULTRA SUTIL EN LÍNEA
     // ==========================================================
     window.iniciarEdicionSubtle = function(el) {
-      // Aseguramos primero la fila expandida si llegó vía clic
       const tr = el.closest('tr');
       if (!tr.classList.contains('expanded-row')) { toggleTableRow(tr); }
       
       window.isInlineEditing = true;
       el.classList.add('is-editing');
       
-      // Remover colapso visual truncado y quitar el elemento de truncamiento localmente para editar todo el texto
       const trunc = el.querySelector('.truncate-text');
       if (trunc) { el.innerText = trunc.innerText; }
       
       if (el.innerText.trim() === '-') { el.innerText = ''; }
       
-      // Colocar cursor de escritura al final
       const range = document.createRange(); const sel = window.getSelection();
       range.selectNodeContents(el); range.collapse(false); sel.removeAllRanges(); sel.addRange(range);
     };
@@ -1043,14 +1027,12 @@
       
       const nuevoValorFinal = nuevoValorRaw === '' ? '-' : nuevoValorRaw;
       
-      // Restaurar el elemento truncate visual para mantener la estética si pierde el foco
       const campoEstilizado = (campo === 'diagnostico' || campo === 'pendientes') ? 
         `<div class="truncate-text" style="font-size: 0.8rem; line-height: 1.2;" title="${escapeHtml(nuevoValorFinal)}">${escapeHtml(nuevoValorFinal)}</div>` : 
         (campo === 'nombre') ? `<div class="truncate-text" title="${escapeHtml(nuevoValorFinal)}">${escapeHtml(nuevoValorFinal)}</div>` : escapeHtml(nuevoValorFinal);
       
       el.innerHTML = campoEstilizado;
 
-      // Despachar actualizaciones que estuvieran en cola en Firebase
       if (window.pendingSnapshotList) {
         pacientesGlobal = window.pendingSnapshotList;
         window.pendingSnapshotList = null;
@@ -1073,7 +1055,6 @@
         } finally { el.style.opacity = '1'; }
       }
       
-      // Mantener la celda visible abierta tras el repintado
       setTimeout(() => {
         const trRestaurado = document.querySelector(`tr[data-fila="${filaId}"]`);
         if (trRestaurado && !trRestaurado.classList.contains('expanded-row')) { trRestaurado.classList.add('expanded-row'); }
@@ -1083,7 +1064,6 @@
     window.manejarTeclasSubtle = function(el, event) {
       const campo = el.getAttribute('data-campo');
       if (event.key === 'Enter') {
-        // En Nombre o Edad, Enter finaliza edición de inmediato. En DX o Pendientes hace salto de línea nativo
         if (campo === 'nombre' || campo === 'edad') {
           event.preventDefault(); el.blur();
         }
@@ -1095,7 +1075,7 @@
     };
 
     // ==========================================================
-    // LÓGICA DE DESTINO SUPERPUESTO MINIMALISTA (v2.8)
+    // DESTINO SUPERPUESTO MINIMALISTA CON SCROLL
     // ==========================================================
     window.abrirDestinoFlotante = function(tdEl, filaId, destinoActual, event) {
       event.stopPropagation();
@@ -1103,7 +1083,6 @@
       if (!tr.classList.contains('expanded-row')) { toggleTableRow(tr); return; }
       if (tdEl.querySelector('.inline-destino-container')) return; 
 
-      // Cerrar otros selectores que queden colgados
       document.querySelectorAll('.inline-destino-container').forEach(c => c.remove());
       window.isInlineEditing = true; 
 
@@ -1433,9 +1412,6 @@
       wrapper.appendChild(inner); container.appendChild(wrapper);
     }
 
-    // ==========================================================
-    // SISTEMA NATIVO DE DESLIZAMIENTO PARA MÓVIL (SWIPE RESTAURADO)
-    // ==========================================================
     function initSwipe() {
       let xDown = null, yDown = null, activeCard = null;
       document.querySelectorAll('.card-content-wrapper').forEach(el => {
