@@ -114,154 +114,47 @@
 
     /* BOTON DE LOGIN SOBRIO Y ELEGANTE */
     .btn-login-sober {
-      padding: 12px 36px;
-      font-size: 0.9rem;
-      font-family: 'Space Mono', monospace;
-      font-weight: 700;
-      letter-spacing: 0.15em;
-      color: var(--text);
-      background: transparent;
-      border: 1px solid var(--muted);
-      border-radius: var(--radius-sm);
-      cursor: pointer;
-      transition: all var(--transition);
-      text-transform: uppercase;
-      min-width: 160px;
+      padding: 12px 36px; font-size: 0.9rem; font-family: 'Space Mono', monospace; font-weight: 700; letter-spacing: 0.15em;
+      color: var(--text); background: transparent; border: 1px solid var(--muted); border-radius: var(--radius-sm);
+      cursor: pointer; transition: all var(--transition); text-transform: uppercase; min-width: 160px;
     }
-    .btn-login-sober:hover:not(:disabled) {
-      border-color: var(--accent);
-      color: var(--accent);
-      background: var(--accent-soft);
-      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-    }
-    .btn-login-sober:active:not(:disabled) {
-      transform: scale(0.95);
-      background: var(--accent);
-      color: #fff;
-    }
-    .btn-login-sober:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      border-color: var(--line);
-    }
-    @media (min-width: 768px) {
-      .btn-login-sober {
-        padding: 14px 48px;
-        font-size: 1rem;
-        border-width: 2px;
-      }
-    }
+    .btn-login-sober:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    .btn-login-sober:active:not(:disabled) { transform: scale(0.95); background: var(--accent); color: #fff; }
+    .btn-login-sober:disabled { opacity: 0.5; cursor: not-allowed; border-color: var(--line); }
+    @media (min-width: 768px) { .btn-login-sober { padding: 14px 48px; font-size: 1rem; border-width: 2px; } }
 
     /* ENCABEZADO BASE LIMPIO */
     .header { 
-      position: relative; 
-      flex-shrink: 0; 
-      z-index: 50; 
-      width: 100%; 
-      padding: 14px 10px; 
-      margin: 0; 
-      background: var(--panel-glass); 
-      backdrop-filter: blur(12px); 
-      -webkit-backdrop-filter: blur(12px); 
-      border-bottom: 1px solid var(--line); 
-      box-shadow: 0 4px 166px rgba(0,0,0,0.08); 
-      overflow: hidden; 
+      position: relative; flex-shrink: 0; z-index: 50; width: 100%; padding: 14px 10px; margin: 0; 
+      background: var(--panel-glass); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); 
+      border-bottom: 1px solid var(--line); box-shadow: 0 4px 166px rgba(0,0,0,0.08); overflow: hidden; 
     }
+    @media (display-mode: standalone) { .header { padding-top: max(14px, env(safe-area-inset-top)); } }
     
-    @media (display-mode: standalone) {
-      .header {
-        padding-top: max(14px, env(safe-area-inset-top));
-      }
-    }
-    
-    .header-top { 
-      display: flex; 
-      align-items: center; 
-      justify-content: space-between; 
-      position: relative; 
-      width: 100%; 
-      min-height: 54px; 
-      z-index: 2; 
-    }
-    #plexusCanvas {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 1;
-      pointer-events: none;
-    }
+    .header-top { display: flex; align-items: center; justify-content: space-between; position: relative; width: 100%; min-height: 54px; z-index: 2; }
+    #plexusCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
 
-    .header-top .header-left { 
-      display: flex; align-items: center; gap: 8px; z-index: 2; 
-      flex: 1; 
-      justify-content: flex-start; 
-    }
-    
-    .header-top .header-right { 
-      display: flex; align-items: center; gap: 8px; z-index: 2; 
-      flex: 1; 
-      justify-content: flex-end; 
-    }
+    .header-top .header-left { display: flex; align-items: center; gap: 8px; z-index: 2; flex: 1; justify-content: flex-start; }
+    .header-top .header-right { display: flex; align-items: center; gap: 8px; z-index: 2; flex: 1; justify-content: flex-end; }
 
-    .main-title { 
-      position: absolute; 
-      left: 50%; 
-      top: 50%; 
-      transform: translate(-50%, -50%); 
-      text-align: center; 
-      display: flex; 
-      flex-direction: column; 
-      align-items: center; 
-      z-index: 2; 
-      width: max-content; 
-    }
-    
+    .main-title { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); text-align: center; display: flex; flex-direction: column; align-items: center; z-index: 2; width: max-content; }
     .title-censo { 
-      font-family: 'Space Mono', monospace; 
-      font-size: 1.4rem; 
-      font-weight: 700; 
-      letter-spacing: 0.08em; 
-      line-height: 1.2; 
-      padding: 4px 4px 2px 4px; 
-      background-image: linear-gradient(to right, #ef4444, #f97316, #eab308, #f97316, #ef4444); 
-      background-size: 200% auto; 
-      -webkit-background-clip: text; 
-      background-clip: text; 
-      color: transparent; 
-      animation: hypnoticGradient 8s linear infinite; 
+      font-family: 'Space Mono', monospace; font-size: 1.4rem; font-weight: 700; letter-spacing: 0.08em; line-height: 1.2; 
+      padding: 4px 4px 2px 4px; background-image: linear-gradient(to right, #ef4444, #f97316, #eab308, #f97316, #ef4444); 
+      background-size: 200% auto; -webkit-background-clip: text; background-clip: text; color: transparent; animation: hypnoticGradient 8s linear infinite; 
     }
-    .title-urgencias { 
-      font-size: 0.75rem; 
-      font-weight: 600; 
-      color: var(--muted); 
-      letter-spacing: 0.15em; 
-      text-transform: uppercase; 
-      margin-top: 0px; 
-    }
+    .title-urgencias { font-size: 0.75rem; font-weight: 600; color: var(--muted); letter-spacing: 0.15em; text-transform: uppercase; margin-top: 0px; }
 
     .icon-btn { 
-      width: 30px; 
-      height: 30px; 
-      border-radius: 50%; 
-      border: 1px solid var(--accent-border); 
-      background: var(--toggle-bg); 
-      color: var(--text); 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      font-size: 1rem; 
-      cursor: pointer; 
-      transition: all var(--transition-fast); 
-      padding: 0; 
-      flex-shrink: 0; 
+      width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--accent-border); background: var(--toggle-bg); 
+      color: var(--text); display: flex; align-items: center; justify-content: center; font-size: 1rem; cursor: pointer; transition: all var(--transition-fast); padding: 0; flex-shrink: 0; 
     }
-    
     .icon-btn:active { transform: scale(0.9); background: var(--accent-soft); }
+    
     @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     @keyframes hypnoticGradient { from { background-position: 0% center; } to { background-position: 200% center; } }
     .spin { animation: spin 1s linear infinite; display: inline-block; }
+    
     .search-wrapper { position: relative; z-index: 2; max-height: 60px; opacity: 1; transform: translateY(0); overflow: hidden; transition: all var(--transition); margin-top: 12px; }
     .search-wrapper.collapsed { max-height: 0; opacity: 0; transform: translateY(-10px); margin-top: 0; pointer-events: none; }
     .search { width: 100%; max-width: 100%; padding: 12px 10px; font-size: 1rem; border-radius: var(--radius-md); border: 1px solid var(--line); background: var(--search-bg); color: var(--text); outline: none; font-family: 'Fira Code', monospace; transition: border-color var(--transition-fast), box-shadow var(--transition-fast); }
@@ -413,6 +306,14 @@
       .patient-row.expanded-row .truncate-text { white-space: normal; overflow: visible; max-width: none; }
       .patient-row.expanded-row .chip { max-width: none; white-space: normal; overflow: visible; display: inline-block; line-height: 1.2; }
       
+      /* ESTILOS INTERACTIVOS PARA EDICIÓN EN LÍNEA */
+      .patient-row.expanded-row td.editable-cell { position: relative; cursor: pointer; }
+      .patient-row.expanded-row td.editable-cell:hover { background-color: var(--field) !important; }
+      .patient-row.expanded-row td.editable-cell::after {
+        content: '✏️'; position: absolute; bottom: 2px; right: 2px; font-size: 0.6rem; opacity: 0; transition: opacity var(--transition-fast); pointer-events: none;
+      }
+      .patient-row.expanded-row td.editable-cell:hover::after { opacity: 0.6; }
+      
       .btn-table { background: transparent; border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 6px; cursor: pointer; font-size: 1.1rem; transition: all var(--transition-fast); margin-right: 4px; }
       .btn-table:hover { transform: scale(1.1); }
       .btn-table.edit { color: #10b981; }
@@ -445,23 +346,11 @@
         padding: 32px; 
         gap: 16px;
       }
-      .modal-title {
-        font-size: 1.4rem;
-      }
-      .input-group label { 
-        font-size: 0.85rem; 
-      }
-      .input-control { 
-        font-size: 1rem; 
-        padding: 14px; 
-      }
-      textarea.input-control { 
-        min-height: 100px; 
-      }
-      .btn-guardar, .btn-cancelar, .btn-borrar {
-        font-size: 1rem;
-        padding: 14px;
-      }
+      .modal-title { font-size: 1.4rem; }
+      .input-group label { font-size: 0.85rem; }
+      .input-control { font-size: 1rem; padding: 14px; }
+      textarea.input-control { min-height: 100px; }
+      .btn-guardar, .btn-cancelar, .btn-borrar { font-size: 1rem; padding: 14px; }
     }
   </style>
 </head>
@@ -486,7 +375,7 @@
 
     <div style="position: absolute; bottom: 30px; font-size: 0.7rem; font-family: 'Space Mono', monospace; font-weight: 700; letter-spacing: 0.1em;">
       <span style="color: var(--muted);">ROUROG</span> <span style="color: var(--text); opacity: 0.5;">Innovations</span>
-      <span style="opacity: 0.3; margin-left: 6px;">v1.6</span>
+      <span style="opacity: 0.3; margin-left: 6px;">v1.7</span>
     </div>
   </div>
   <div class="app" id="mainAppContainer" style="display: none;">
@@ -533,7 +422,7 @@
 
     <div class="footer">
       Hospital Regional de Delicias - <span style="color: var(--accent); font-weight: 600;">Rourog Innovations</span>
-      <span style="opacity: 0.4; font-size: 0.8em; margin-left: 8px;">v2.4</span>
+      <span style="opacity: 0.4; font-size: 0.8em; margin-left: 8px;">v2.5</span>
     </div>
 
     <div id="easterEggContainer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; pointer-events: none; overflow: hidden;"></div>
@@ -635,6 +524,10 @@
     const mainFabBtn = document.getElementById('mainFabBtn');
     let unsubscribe = null; 
     let rolUsuario = "INTERNO"; 
+
+    // Banderas globales para pausar sincronización visual durante edición en línea
+    window.isInlineEditing = false;
+    window.pendingSnapshotList = null;
 
     function showMainApp() {
       loginScreen.classList.remove('active');
@@ -893,14 +786,15 @@
 
           grupos[area].forEach((p) => {
             const destinoChip = getColorfulChipHtml(p.destino);
-            tableHtml += `<tr class="patient-row" onclick="toggleTableRow(this)">
+            // Agregamos data-fila a la TR para identificarla fácilmente e integramos las celdas editables en línea
+            tableHtml += `<tr class="patient-row" data-fila="${p.fila}" onclick="toggleTableRow(this)">
                 <td style="padding: 6px 10px;"><span style="color: var(--accent); font-weight: 700; font-size: 0.85rem;">${escapeHtml(p.cama || '-')}</span></td>
                 <td style="padding: 6px 10px; font-size: 0.75rem; color: var(--muted); font-family: 'Fira Code', monospace; line-height: 1.2;">${escapeHtml(p.fechaIngresoFormateada || '-')}</td>
-                <td style="padding: 6px 10px; font-family: 'Space Mono', monospace; font-weight: 700; font-size: 0.9rem; line-height: 1.1;" class="patient-name"><div class="truncate-text" title="${escapeHtml(p.nombre)}">${escapeHtml(p.nombre)}</div></td>
-                <td style="padding: 6px 10px;"><span style="color: var(--muted); font-size: 0.85rem;" class="value">${escapeHtml(p.edad || '-')}</span></td>
-                <td style="padding: 6px 10px;"><div class="truncate-text" style="font-size: 0.8rem; line-height: 1.2;" title="${escapeHtml(p.diagnostico)}">${escapeHtml(p.diagnostico || '-')}</div></td>
-                <td style="padding: 6px 10px;"><div class="truncate-text" style="font-size: 0.8rem; line-height: 1.2;" title="${escapeHtml(p.pendientes)}">${escapeHtml(p.pendientes || '-')}</div></td>
-                <td style="padding: 6px 10px;">${destinoChip}</td>
+                <td style="padding: 6px 10px; font-family: 'Space Mono', monospace; font-weight: 700; font-size: 0.9rem; line-height: 1.1;" class="patient-name editable-cell" onclick="iniciarEdicionCelda(this, '${p.fila}', 'nombre', 'text', event)"><div class="truncate-text" title="${escapeHtml(p.nombre)}">${escapeHtml(p.nombre)}</div></td>
+                <td style="padding: 6px 10px;" class="editable-cell" onclick="iniciarEdicionCelda(this, '${p.fila}', 'edad', 'text', event)"><span style="color: var(--muted); font-size: 0.85rem;" class="value">${escapeHtml(p.edad || '-')}</span></td>
+                <td style="padding: 6px 10px;" class="editable-cell" onclick="iniciarEdicionCelda(this, '${p.fila}', 'diagnostico', 'textarea', event)"><div class="truncate-text" style="font-size: 0.8rem; line-height: 1.2;" title="${escapeHtml(p.diagnostico)}">${escapeHtml(p.diagnostico || '-')}</div></td>
+                <td style="padding: 6px 10px;" class="editable-cell" onclick="iniciarEdicionCelda(this, '${p.fila}', 'pendientes', 'textarea', event)"><div class="truncate-text" style="font-size: 0.8rem; line-height: 1.2;" title="${escapeHtml(p.pendientes)}">${escapeHtml(p.pendientes || '-')}</div></td>
+                <td style="padding: 6px 10px;" class="editable-cell" onclick="iniciarEdicionCelda(this, '${p.fila}', 'destino', 'select', event)">${destinoChip}</td>
                 <td style="padding: 4px 10px; text-align: center; white-space: nowrap;"><button class="btn-table edit" style="padding: 4px; font-size: 0.9rem; margin-right: 2px;" onclick="abrirModal('${p.fila}'); event.stopPropagation();" title="Editar">✏️</button><button class="btn-table delete" style="padding: 4px; font-size: 0.9rem;" onclick="borrarPacienteDirecto('${p.fila}', '${escapeHtml(p.nombre)}'); event.stopPropagation();" title="Borrar">🗑️</button></td>
             </tr>`;
           });
@@ -1017,6 +911,14 @@
         camasLibresGlobal = camasLibresGlobal.map((c, i) => ({ ...c, fila: 'cama_libre_'+i }));
 
         isFetchingData = false;
+        
+        // INTERCEPCIÓN EN VIVO: Si el médico tiene un cursor editando en línea, acumulamos y no redibujamos para evitar el parpadeo
+        if (window.isInlineEditing) {
+          window.pendingSnapshotList = [...pacientesGlobal];
+          document.getElementById('reloadIcon').classList.remove('spin');
+          return;
+        }
+
         filtrar(); 
         document.getElementById('reloadIcon').classList.remove('spin');
       }, (error) => {
@@ -1025,6 +927,100 @@
         document.getElementById('reloadIcon').classList.remove('spin');
       });
     }
+
+    // ==========================================================
+    // LÓGICA CLÍNICA DE EDICIÓN EN LÍNEA (INLINE EDITING)
+    // ==========================================================
+    window.iniciarEdicionCelda = function(tdEl, filaId, campo, tipo, event) {
+      event.stopPropagation(); // Evitamos que la tabla cierre la fila
+      const tr = tdEl.closest('tr');
+      
+      // Si la fila no ha sido expandida aún, la expandimos primero (1er clic para lectura)
+      if (!tr.classList.contains('expanded-row')) {
+        toggleTableRow(tr);
+        return;
+      }
+      
+      // Si ya hay una celda activa editándose aquí, ignoramos el clic
+      if (tdEl.querySelector('.inline-edit-input')) return;
+
+      // Pausar renderizados de Firestore temporalmente
+      window.isInlineEditing = true;
+
+      const paciente = pacientesGlobal.find(p => p.fila === filaId);
+      const valorActual = paciente ? (paciente[campo] || '') : '';
+      const contenidoOriginal = tdEl.innerHTML;
+      
+      tdEl.setAttribute('data-original', contenidoOriginal);
+      tdEl.style.padding = '4px 6px'; // Ajustamos densidad para el editor
+
+      let inputHtml = '';
+      if (tipo === 'text') {
+        inputHtml = `<input type="text" class="input-control inline-edit-input" value="${escapeHtml(valorActual)}" style="padding: 6px; font-size: 0.85rem; margin: 0; width: 100%; box-sizing: border-box;" />`;
+      } else if (tipo === 'textarea') {
+        inputHtml = `<textarea class="input-control inline-edit-input" rows="3" style="padding: 6px; font-size: 0.8rem; margin: 0; width: 100%; box-sizing: border-box; line-height: 1.2;">${escapeHtml(valorActual)}</textarea>`;
+      } else if (tipo === 'select') {
+        let opciones = `<option value="">(SIN DESTINO)</option>`;
+        destinosGlobal.forEach(d => {
+          const sel = (d.toUpperCase().trim() === valorActual.toUpperCase().trim()) ? 'selected' : '';
+          opciones += `<option value="${escapeHtml(d.toUpperCase())}" ${sel}>${escapeHtml(d.toUpperCase())}</option>`;
+        });
+        inputHtml = `<select class="input-control inline-edit-input" style="padding: 6px; font-size: 0.8rem; margin: 0; width: 100%; box-sizing: border-box;">${opciones}</select>`;
+      }
+
+      tdEl.innerHTML = inputHtml;
+      const inputEl = tdEl.querySelector('.inline-edit-input');
+      inputEl.focus();
+      
+      if (tipo === 'text' || tipo === 'textarea') {
+        inputEl.setSelectionRange(inputEl.value.length, inputEl.value.length);
+      }
+
+      let guardadoEnProceso = false;
+      const finalizar = async (guardar) => {
+        if (guardadoEnProceso) return;
+        guardadoEnProceso = true;
+
+        const nuevoValor = inputEl.value.toUpperCase().trim();
+        const cambioReal = guardar && (nuevoValor !== valorActual.toUpperCase().trim());
+
+        window.isInlineEditing = false;
+        tdEl.style.padding = ''; 
+
+        if (cambioReal) {
+          tdEl.innerHTML = `<span class="spin">🔄</span>`;
+          try {
+            await updateDoc(doc(db, "pacientes", filaId), { [campo]: nuevoValor });
+            vibrar(15);
+            if (paciente) paciente[campo] = nuevoValor;
+          } catch (e) {
+            alert("Error al guardar en línea: " + e.message);
+          }
+        }
+
+        // Si llegó un snapshot durante tu escritura, lo pintamos; de lo contrario repintamos limpio
+        if (window.pendingSnapshotList) {
+          pacientesGlobal = window.pendingSnapshotList;
+          window.pendingSnapshotList = null;
+        }
+        filtrar();
+
+        // Garantizar que la fila sobre la que trabajábamos se mantenga expandida sin parpadeo
+        setTimeout(() => {
+          const trRestaurado = document.querySelector(`tr[data-fila="${filaId}"]`);
+          if (trRestaurado && !trRestaurado.classList.contains('expanded-row')) {
+            trRestaurado.classList.add('expanded-row');
+          }
+        }, 30);
+      };
+
+      inputEl.addEventListener('blur', () => finalizar(true));
+      inputEl.addEventListener('keydown', e => {
+        if (e.key === 'Escape') finalizar(false);
+        else if (e.key === 'Enter' && tipo !== 'textarea') inputEl.blur();
+      });
+      inputEl.addEventListener('click', e => e.stopPropagation());
+    };
 
     function toggleCard(headerEl) {
       vibrar(15); 
@@ -1373,7 +1369,6 @@
       if (!wrapper.classList.contains('collapsed')) { setTimeout(() => searchInput.focus(), 300); } else { searchInput.value = ''; render(pacientesGlobal); }
     });
 
-    // Evento de Enlace Externo para el Botón del Historial
     document.getElementById('historyBtn').addEventListener('click', () => {
       vibrar(15);
       window.open('https://rourog.github.io/censo/historial.html', '_blank');
