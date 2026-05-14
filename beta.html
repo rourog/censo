@@ -275,7 +275,7 @@
     @media (min-width: 768px) { 
       .hide-on-mobile { display: flex !important; }
       
-      /* REESTRUCTURACIÓN DE CONTENT PARA KANBAN Y TABLA (v2.15) */
+      /* REESTRUCTURACIÓN DE CONTENT PARA KANBAN Y TABLA */
       #content { display: flex; flex-direction: row; gap: 24px; padding: 16px; align-items: flex-start; overflow-x: auto; overflow-y: hidden; }
       
       /* KANBAN EN COLUMNAS */
@@ -357,11 +357,11 @@
       .inline-destino-option:hover { background: var(--field); color: var(--accent); }
       .inline-destino-option.selected { background: var(--accent-soft); color: var(--accent); font-weight: 700; }
 
+      /* ESTILOS DE NAVEGACIÓN POR TECLADO (FLECHAS) */
       .patient-row.selected-nav { border-left: 4px solid var(--accent) !important; background: var(--accent-soft) !important; }
+      .btn-add-table.selected-nav { background: var(--accent-soft) !important; color: var(--text); border-left: 4px solid var(--accent); }
 
-      /* ========================================================= 
-         GUÍA VISUAL CENTRADA SOBRE LAS OLAS CON VIVÉN
-         ========================================================= */
+      /* GUÍA VISUAL CENTRADA SOBRE LAS OLAS */
       @keyframes subtleBounce {
         0%, 100% { transform: translate(-50%, 0); }
         50% { transform: translate(-50%, -4px); }
@@ -442,7 +442,7 @@
 
     <div style="position: absolute; bottom: 30px; font-size: 0.7rem; font-family: 'Space Mono', monospace; font-weight: 700; letter-spacing: 0.1em;">
       <span style="color: var(--muted);">ROUROG</span> <span style="color: var(--text); opacity: 0.5;">Innovations</span>
-      <span style="opacity: 0.3; margin-left: 6px;">v1.15</span>
+      <span style="opacity: 0.3; margin-left: 6px;">v1.16</span>
     </div>
   </div>
   <div class="app" id="mainAppContainer" style="display: none;">
@@ -489,7 +489,7 @@
 
     <div class="footer">
       Hospital Regional de Delicias - <span style="color: var(--accent); font-weight: 600;">Rourog Innovations</span>
-      <span style="opacity: 0.4; font-size: 0.8em; margin-left: 8px;">v2.15</span>
+      <span style="opacity: 0.4; font-size: 0.8em; margin-left: 8px;">v2.16</span>
     </div>
 
     <div id="easterEggContainer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; pointer-events: none; overflow: hidden;"></div>
@@ -844,19 +844,21 @@
         mainAppContainer.classList.add('table-is-active'); 
         if(fabBtn) fabBtn.style.display = 'none';
 
-        let tableHtml = `<div class="table-wrapper animate-in" id="scrollTableWrapper">
+        // OPTIMIZACIÓN v2.16: Usamos push a un array en lugar de concatenación masiva de strings
+        let htmlArr = [];
+        htmlArr.push(`<div class="table-wrapper animate-in" id="scrollTableWrapper">
           <div id="scrollGuiderObj" class="scroll-guider" title="Ir al extremo">↓</div>
-          <table class="censo-table"><thead><tr><th style="width: 6%">CAMA</th><th style="width: 9%">INGRESO</th><th style="width: 18%">PACIENTE</th><th style="width: 4%">EDAD</th><th style="width: 25%">DIAGNÓSTICO</th><th style="width: 25%">PENDIENTES</th><th style="width: 8%">DESTINO</th><th style="width: 5%; text-align: center;">⚙️</th></tr></thead><tbody>`;
+          <table class="censo-table"><thead><tr><th style="width: 6%">CAMA</th><th style="width: 9%">INGRESO</th><th style="width: 18%">PACIENTE</th><th style="width: 4%">EDAD</th><th style="width: 25%">DIAGNÓSTICO</th><th style="width: 25%">PENDIENTES</th><th style="width: 8%">DESTINO</th><th style="width: 5%; text-align: center;">⚙️</th></tr></thead><tbody>`);
         
         areas.forEach((area) => {
           const areaNormalizada = String(area).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().trim();
           const visual = areaVisuals[areaNormalizada] || areaVisuals[area.toUpperCase()] || { emoji: '🏥', class: '' };
 
-          tableHtml += `<tr style="background: rgba(128, 128, 128, 0.15);"><td colspan="8" style="padding: 6px 10px; font-weight: 800; font-size: 0.85rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--line);"><span class="area-icon ${visual.class}">${visual.emoji}</span> ${escapeHtml(area)}</td></tr>`;
+          htmlArr.push(`<tr style="background: rgba(128, 128, 128, 0.15);"><td colspan="8" style="padding: 6px 10px; font-weight: 800; font-size: 0.85rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--line);"><span class="area-icon ${visual.class}">${visual.emoji}</span> ${escapeHtml(area)}</td></tr>`);
 
           grupos[area].forEach((p) => {
             const destinoChip = getColorfulChipHtml(p.destino);
-            tableHtml += `<tr class="patient-row" data-fila="${p.fila}" onclick="toggleTableRow(this)">
+            htmlArr.push(`<tr class="patient-row" data-fila="${p.fila}" onclick="toggleTableRow(this)">
                 <td style="padding: 6px 10px;"><span style="color: var(--accent); font-weight: 700; font-size: 0.85rem;">${escapeHtml(p.cama || '-')}</span></td>
                 <td style="padding: 6px 10px; font-size: 0.75rem; color: var(--muted); font-family: 'Fira Code', monospace; line-height: 1.2;">${escapeHtml(p.fechaIngresoFormateada || '-')}</td>
                 
@@ -881,13 +883,14 @@
                 </td>
                 
                 <td style="padding: 4px 10px; text-align: center; white-space: nowrap;"><button class="btn-table edit" style="padding: 4px; font-size: 0.9rem; margin-right: 2px;" onclick="abrirModal('${p.fila}'); event.stopPropagation();" title="Editar">✏️</button><button class="btn-table delete" style="padding: 4px; font-size: 0.9rem;" onclick="borrarPacienteDirecto('${p.fila}', '${escapeHtml(p.nombre)}'); event.stopPropagation();" title="Borrar">🗑️</button></td>
-            </tr>`;
+            </tr>`);
           });
         });
 
-        tableHtml += `</tbody></table><button class="btn-add-table" onclick="abrirModalAgregar()">➕ NUEVO INGRESO</button></div>`;
-        content.innerHTML = tableHtml;
+        htmlArr.push(`</tbody></table><button class="btn-add-table" onclick="abrirModalAgregar()">➕ NUEVO INGRESO</button></div>`);
+        content.innerHTML = htmlArr.join('');
         
+        // Habilitamos los sensores visuales del Scroll de forma dinámica
         setTimeout(initScrollGuider, 100);
 
         if (typeof syncPlexusPatients === 'function') syncPlexusPatients(lista);
@@ -1017,13 +1020,21 @@
     }
 
     // ==========================================================
-    // CÁLCULO INTELIGENTE Y ACTIVACIÓN DEL GUÍA DE SCROLL (v2.15)
+    // CÁLCULO INTELIGENTE Y ACTIVACIÓN DEL GUÍA DE SCROLL (v2.16)
+    // Se extrajo la variable fuera para limpiar oyentes y evitar memory leaks
     // ==========================================================
+    let scrollGuiderHandler = null;
+
     function initScrollGuider() {
       const wrapper = document.getElementById('scrollTableWrapper');
       const guider = document.getElementById('scrollGuiderObj');
       if (!wrapper || !guider) return;
 
+      if (scrollGuiderHandler) {
+        wrapper.removeEventListener('scroll', scrollGuiderHandler);
+      }
+
+      let isScrolling = false;
       const checkScrollPosition = () => {
         const atBottom = wrapper.scrollHeight - wrapper.scrollTop <= wrapper.clientHeight + 20;
         const atTop = wrapper.scrollTop <= 20;
@@ -1047,8 +1058,17 @@
         }
       };
 
-      wrapper.removeEventListener('scroll', checkScrollPosition);
-      wrapper.addEventListener('scroll', checkScrollPosition, { passive: true });
+      scrollGuiderHandler = () => {
+        if (!isScrolling) {
+          window.requestAnimationFrame(() => {
+            checkScrollPosition();
+            isScrolling = false;
+          });
+          isScrolling = true;
+        }
+      };
+
+      wrapper.addEventListener('scroll', scrollGuiderHandler, { passive: true });
       
       guider.onclick = (e) => {
         e.stopPropagation();
@@ -1064,36 +1084,50 @@
     }
 
     // ==========================================================
-    // NAVEGACIÓN POR TECLADO OCULTA
+    // NAVEGACIÓN POR TECLADO OCULTA Y AGREGADA A "NUEVO INGRESO"
     // ==========================================================
     document.addEventListener('keydown', (e) => {
       if (currentViewMode !== 'table' || window.innerWidth < 768 || window.isInlineEditing) return;
-      const rows = document.querySelectorAll('.patient-row');
-      if (!rows.length) return;
+      
+      // Capturamos tanto las filas de pacientes como el botón inferior
+      const elements = Array.from(document.querySelectorAll('.patient-row, .btn-add-table'));
+      if (!elements.length) return;
 
       if (e.key === 'ArrowDown') {
         e.preventDefault();
-        selectedNavIndex = Math.min(selectedNavIndex + 1, rows.length - 1);
-        updateNavHighlight(rows);
+        selectedNavIndex = Math.min(selectedNavIndex + 1, elements.length - 1);
+        updateNavHighlight(elements);
       } else if (e.key === 'ArrowUp') {
         e.preventDefault();
         selectedNavIndex = Math.max(selectedNavIndex - 1, 0);
-        updateNavHighlight(rows);
+        updateNavHighlight(elements);
       } else if (e.key === 'Enter' && selectedNavIndex !== -1) {
         e.preventDefault();
-        const filaId = rows[selectedNavIndex].getAttribute('data-fila');
-        abrirModal(filaId);
+        const el = elements[selectedNavIndex];
+        
+        if (el.classList.contains('btn-add-table')) {
+          abrirModalAgregar();
+        } else {
+          const filaId = el.getAttribute('data-fila');
+          abrirModal(filaId);
+        }
       }
     });
 
-    function updateNavHighlight(rows) {
-      rows.forEach(r => r.classList.remove('selected-nav'));
-      if (rows[selectedNavIndex]) {
-        rows[selectedNavIndex].classList.add('selected-nav');
-        const yaEstaAbierta = rows[selectedNavIndex].classList.contains('expanded-row');
-        document.querySelectorAll('.patient-row').forEach(tr => tr.classList.remove('expanded-row'));
-        rows[selectedNavIndex].classList.add('expanded-row');
-        rows[selectedNavIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    function updateNavHighlight(elements) {
+      elements.forEach(r => r.classList.remove('selected-nav'));
+      if (elements[selectedNavIndex]) {
+        const el = elements[selectedNavIndex];
+        el.classList.add('selected-nav');
+        
+        // Solo expandimos si es una fila de paciente
+        if (el.classList.contains('patient-row')) {
+          const yaEstaAbierta = el.classList.contains('expanded-row');
+          document.querySelectorAll('.patient-row').forEach(tr => tr.classList.remove('expanded-row'));
+          el.classList.add('expanded-row');
+        }
+        
+        el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
     }
 
@@ -1225,12 +1259,14 @@
         }
       });
 
-      setTimeout(() => {
-        const closeHandler = (e) => {
-          if (container && !container.contains(e.target)) { cerrarDirecto(); document.removeEventListener('click', closeHandler); }
-        };
-        document.addEventListener('click', closeHandler);
-      }, 10);
+      // Nombrado especificamente para removerlo y evitar fugas
+      const closeHandler = (e) => {
+        if (container && !container.contains(e.target)) { 
+            cerrarDirecto(); 
+            document.removeEventListener('click', closeHandler); 
+        }
+      };
+      setTimeout(() => document.addEventListener('click', closeHandler), 10);
     };
 
     function toggleCard(headerEl) {
@@ -1639,8 +1675,16 @@
     // ARRANQUE FINAL
     initTheme(); 
 
-    // SISTEMA DE PARTÍCULAS NEURAL Y SINAPSIS
+    // SISTEMA DE PARTÍCULAS NEURAL Y SINAPSIS (OPTIMIZADO v2.16)
+    let plexusRunning = false;
+    let isTabActive = true;
+    
+    document.addEventListener("visibilitychange", () => { isTabActive = !document.hidden; });
+
     function initPlexus() {
+      if (plexusRunning) return;
+      plexusRunning = true;
+
       const canvas = document.getElementById('plexusCanvas');
       const ctx = canvas.getContext('2d');
       let width, height, standardParticles = [], patientParticles = [];
@@ -1704,6 +1748,11 @@
       }
 
       function animate() {
+        if (!isTabActive) {
+          requestAnimationFrame(animate);
+          return;
+        }
+
         ctx.clearRect(0, 0, width, height);
         let defaultFill = 'rgba(255, 255, 255, 0.4)', defaultStroke = 'rgba(255, 255, 255, 0.2)';
         
