@@ -33,7 +33,7 @@
     body { font-family: 'Fira Code', monospace; transition: background 0.5s ease, color 0.5s ease; font-variant-ligatures: contextual; }
 
     /* ==========================================================
-       DEFINICIÓN DE TEMAS (ALTO RENDIMIENTO - SIN GLASSMORPHISM)
+       DEFINICIÓN DE TEMAS (SÓLIDOS PARA RENDIMIENTO)
        ========================================================== */
     body.dark {
       --bg: #0f172a; --panel: #1e293b; --section-head: #0f172a;
@@ -112,7 +112,7 @@
     .patient-name, .value, .truncate-text, .patient-bed, .chip, .section-title, .censo-table td, .input-control { text-transform: uppercase !important; }
     body.midnight .section-title { color: #ff0000; }
 
-    /* BOTON DE LOGIN */
+    /* BOTON DE LOGIN SOBRIO Y ELEGANTE */
     .btn-login-sober {
       padding: 12px 36px; font-size: 0.9rem; font-family: 'Space Mono', monospace; font-weight: 700; letter-spacing: 0.15em;
       color: var(--text); background: transparent; border: 1px solid var(--muted); border-radius: var(--radius-sm);
@@ -205,6 +205,9 @@
     
     .chip { display: inline-block; font-size: 0.65rem; font-weight: 600; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--accent-border); background: var(--chip-bg); color: var(--chip-text); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: center; }
     .card .chip { max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.65rem; }
+    
+    /* EMOJI CHIP PARA MODO KANBAN (v2.25) */
+    .chip-emoji { font-size: 1.5rem; line-height: 1; text-align: center; display: inline-block; cursor: help; background: transparent; border: none; padding: 0; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15)); }
 
     .caret { width: 24px; height: 24px; display: grid; place-items: center; border-radius: 999px; color: var(--muted); font-size: 1rem; transition: transform var(--transition), color var(--transition); flex-shrink: 0; }
     .card.open .caret { transform: rotate(180deg) scale(1.1); color: var(--accent); }
@@ -308,8 +311,8 @@
       #content { display: flex; flex-direction: row; gap: 24px; padding: 16px; align-items: flex-start; overflow-x: auto; overflow-y: hidden; }
       
       /* KANBAN EN COLUMNAS */
-      .section { min-width: 380px; flex: 0 0 380px; max-width: 380px; margin: 0; border-radius: var(--radius-lg); border: 1px solid var(--accent-border); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); max-height: calc(100vh - 145px); display: flex; flex-direction: column; background: var(--panel); } 
-      .section-header { background: var(--section-head) !important; border-bottom: 1px solid var(--line); border-radius: var(--radius-lg) var(--radius-lg) 0 0; position: sticky; top: 0; z-index: 10; font-size: 1.1rem; padding: 16px; }
+      .section { min-width: 400px; flex: 0 0 400px; max-width: 400px; margin: 0; border-radius: var(--radius-lg); border: 1px solid var(--line); background: var(--panel) !important; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); max-height: calc(100vh - 145px); display: flex; flex-direction: column; } 
+      .section-header { border-radius: var(--radius-lg) var(--radius-lg) 0 0; position: sticky; top: 0; z-index: 10; font-size: 1.1rem; padding: 16px; background: transparent !important; border-bottom: 1px solid var(--line); }
       .patient-list { overflow-y: auto; flex-grow: 1; padding: 0 16px 16px; gap: 12px; }
       .card { border-bottom: none !important; border-radius: var(--radius-md); box-shadow: 0 3px 8px rgba(0,0,0,0.06); width: auto; border: none !important; margin-bottom: 12px; }
       .swipe-bg { border-radius: var(--radius-md); top: 1px; left: 1px; width: calc(100% - 2px); height: calc(100% - 2px); }
@@ -327,7 +330,7 @@
       .table-wrapper { 
         position: relative; width: 100%; 
         background: var(--panel) !important; 
-        border: 1px solid var(--accent-border); border-radius: var(--radius-md); 
+        border: 1px solid var(--line); border-radius: var(--radius-md); 
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15); 
         overflow-y: auto; overflow-x: auto; max-height: calc(100vh - 145px); margin-bottom: 0; 
         transform: translateZ(0); -webkit-transform: translateZ(0); will-change: scroll-position, transform; backface-visibility: hidden; -webkit-backface-visibility: hidden;
@@ -444,15 +447,15 @@
       /* FONDO DE OLAS: Solo visible en los espacios en blanco de la pantalla general */
       .desktop-waves-bg { position: fixed; bottom: 0; left: 0; width: 100%; height: 30vh; z-index: 0; pointer-events: none; transform: translateZ(0); -webkit-transform: translateZ(0); will-change: transform; }
       .waves { position: absolute; width: 100%; height: 100%; bottom: 0; }
-      .wave-layer-1 { fill: var(--accent); opacity: 0.05; animation: move-forever 60s cubic-bezier(.55,.5,.45,.5) infinite; }
-      .wave-layer-2 { fill: var(--accent); opacity: 0.10; animation: move-forever 45s cubic-bezier(.55,.5,.45,.5) infinite; }
-      .wave-layer-3 { fill: var(--accent); opacity: 0.15; animation: move-forever 30s cubic-bezier(.55,.5,.45,.5) infinite; }
-      .wave-layer-4 { fill: var(--accent); opacity: 0.25; animation: move-forever 20s cubic-bezier(.55,.5,.45,.5) infinite; }
+      .wave-layer-1 { fill: var(--accent); opacity: 0.05; animation: move-forever 60s linear infinite; }
+      .wave-layer-2 { fill: var(--accent); opacity: 0.10; animation: move-forever 45s linear infinite; }
+      .wave-layer-3 { fill: var(--accent); opacity: 0.15; animation: move-forever 30s linear infinite; }
+      .wave-layer-4 { fill: var(--accent); opacity: 0.25; animation: move-forever 20s linear infinite; }
       @keyframes move-forever { 0% { transform: translate3d(-90px, 0, 0); } 100% { transform: translate3d(85px, 0, 0); } }
 
       #content { position: relative; z-index: 10; } 
       
-      /* MODALES MEJORADOS Y EXPANDIDOS PARA ESCRITORIO (v2.24) */
+      /* MODALES MEJORADOS Y EXPANDIDOS PARA ESCRITORIO (CSS GRID) */
       .modal-content { max-width: 950px; padding: 36px; gap: 24px; }
       .modal-title { font-size: 1.4rem; }
       .input-group label { font-size: 0.85rem; }
@@ -490,7 +493,7 @@
 
     <div style="position: absolute; bottom: 30px; font-size: 0.7rem; font-family: 'Space Mono', monospace; font-weight: 700; letter-spacing: 0.1em;">
       <span style="color: var(--muted);">ROUROG</span> <span style="color: var(--text); opacity: 0.5;">Innovations</span>
-      <span style="opacity: 0.3; margin-left: 6px;">v1.24</span>
+      <span style="opacity: 0.3; margin-left: 6px;">v1.25</span>
     </div>
   </div>
   <div class="app" id="mainAppContainer" style="display: none;">
@@ -537,7 +540,7 @@
 
     <div class="footer">
       Hospital Regional de Delicias - <span style="color: var(--accent); font-weight: 600;">Rourog Innovations</span>
-      <span style="opacity: 0.4; font-size: 0.8em; margin-left: 8px;">v2.24</span>
+      <span style="opacity: 0.4; font-size: 0.8em; margin-left: 8px;">v2.25</span>
     </div>
 
     <div id="easterEggContainer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; pointer-events: none; overflow: hidden;"></div>
@@ -805,6 +808,14 @@
       return c;
     }
 
+    // EXTRAER SOLO EMOJI PARA MODO TARJETA
+    function getEmojiOnly(texto) {
+      if (!texto) return '';
+      const t = String(texto).trim();
+      const firstSpace = t.indexOf(' ');
+      return firstSpace > -1 ? t.substring(0, firstSpace) : t.substring(0, 2);
+    }
+
     // ==========================================================
     // VARIABLES GLOBALES DEL CENSO
     // ==========================================================
@@ -831,7 +842,10 @@
     const themeColors = { 'dark': '#0f172a', 'light': '#eef4fb', 'pink': '#fdf2f8', 'colorful': '#f8fafc', 'midnight': '#000000' };
 
     function escapeHtml(texto) { return String(texto || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;'); }
-    function cerrarModal(id) { document.getElementById(id).classList.remove('active'); }
+    function cerrarModal(id) { 
+        document.getElementById(id).classList.remove('active'); 
+        closeAllPopovers(null); 
+    }
     function cerrarModalBorrado() { document.getElementById('deleteConfirmModal').classList.remove('active'); }
 
     const chipPalette = [
@@ -998,6 +1012,7 @@
         return;
       }
 
+      // KANBAN MODE
       content.innerHTML = '';
       areas.forEach((area, indexArea) => {
         const pacientes = grupos[area];
@@ -1015,7 +1030,10 @@
             <div class="patient-list">
               ${pacientes.map((p, indexPatient) => {
                 const camaHtml = p.cama ? `<div class="patient-bed">${escapeHtml(p.cama)}</div>` : '';
-                const destinoChip = getColorfulChipHtml(p.destino);
+                
+                // MODO TARJETA: Solo Emoji para Destino (v2.25)
+                const emojiSolo = p.destino ? getEmojiOnly(p.destino) : '';
+                const destinoEmojiHtml = emojiSolo ? `<div class="chip-emoji" title="${escapeHtml(p.destino)}">${emojiSolo}</div>` : '';
                 
                 const fechaLimpia = p.fechaIngresoFormateada ? p.fechaIngresoFormateada.replace(/<[^>]*>?/gm, ' ') : '-';
 
@@ -1028,7 +1046,7 @@
                 ].filter(Boolean).join('');
                 const delayPatient = delayBase + (indexPatient * 50);
                 
-                return `<div class="card animate-in" data-fila="${p.fila}" data-nombre="${escapeHtml(p.nombre)}" style="animation-delay: ${delayPatient}ms;"><div class="swipe-bg"><div class="swipe-action swipe-delete">🗑️</div><div class="swipe-action swipe-edit">✏️</div></div><div class="card-content-wrapper"><div class="card-header" onclick="toggleCard(this)"><div class="patient-main"><div class="patient-name">${escapeHtml(p.nombre)}</div>${camaHtml}</div><div class="header-right">${destinoChip}<div class="caret">⌄</div></div></div><div class="details"><div class="details-content">${detailsHtml}<button class="btn-editar-tarjeta" onclick="abrirModal('${p.fila}'); event.stopPropagation();">✏️ EDITAR PACIENTE</button></div></div></div></div>`;
+                return `<div class="card animate-in" data-fila="${p.fila}" data-nombre="${escapeHtml(p.nombre)}" style="animation-delay: ${delayPatient}ms;"><div class="swipe-bg"><div class="swipe-action swipe-delete">🗑️</div><div class="swipe-action swipe-edit">✏️</div></div><div class="card-content-wrapper"><div class="card-header" onclick="toggleCard(this)"><div class="patient-main"><div class="patient-name">${escapeHtml(p.nombre)}</div>${camaHtml}</div><div class="header-right">${destinoEmojiHtml}<div class="caret">⌄</div></div></div><div class="details"><div class="details-content">${detailsHtml}<button class="btn-editar-tarjeta" onclick="abrirModal('${p.fila}'); event.stopPropagation();">✏️ EDITAR PACIENTE</button></div></div></div></div>`;
               }).join('')}
             </div>
           </section>
@@ -1249,7 +1267,7 @@
     document.addEventListener('scroll', closeAllPopovers, true);
 
     // ==========================================================
-    // SELECTOR PERSONALIZADO TIPO COMBOBOX (MODALES V2.24)
+    // SELECTOR PERSONALIZADO TIPO COMBOBOX (MODALES)
     // ==========================================================
     window.initCustomSelect = function(wrapperId, optionsHtml) {
       const wrapper = document.getElementById(wrapperId);
@@ -1502,6 +1520,7 @@
       vibrar(15); 
       const card = headerEl.closest('.card'); 
       card.classList.toggle('open');
+      resetAllSwipes();
       if (card.classList.contains('open')) { setTimeout(() => { card.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }, 350); }
     }
 
@@ -1776,11 +1795,16 @@
       wrapper.appendChild(inner); container.appendChild(wrapper);
     }
 
+    function resetAllSwipes() {
+      document.querySelectorAll('.card').forEach(c => c.classList.remove('swipe-ready-delete', 'swipe-ready-edit'));
+      document.querySelectorAll('.card-content-wrapper').forEach(cw => cw.style.transform = 'translateX(0)');
+    }
+
     function initSwipe() {
       let xDown = null, yDown = null, activeCard = null;
       document.querySelectorAll('.card-content-wrapper').forEach(el => {
         el.addEventListener('touchstart', e => { 
-          if (e.target.closest('.btn-editar-tarjeta')) return;
+          if (e.target.closest('.btn-editar-tarjeta') || e.target.closest('.header-right')) return;
           xDown = e.touches[0].clientX; yDown = e.touches[0].clientY; activeCard = el; 
         }, {passive: true});
         
@@ -1860,6 +1884,7 @@
       applyTheme(prefersLight ? 'light' : 'dark');
     }
 
+    // EVENTOS UI
     document.getElementById('search').addEventListener('input', filtrar);
     document.getElementById('search').addEventListener('search', (e) => { if (e.target.value === '') render(pacientesGlobal); });
     
@@ -1899,7 +1924,85 @@
       resizeTimer = setTimeout(() => { if (!isFetchingData) render(pacientesGlobal); }, 200);
     });
 
+    // ARRANQUE FINAL
     initTheme(); 
+
+    // SISTEMA DE PARTÍCULAS NEURAL Y SINAPSIS (OPTIMIZADO V2.25)
+    let plexusRunning = false;
+    let isTabActive = true;
+    
+    document.addEventListener("visibilitychange", () => { isTabActive = !document.hidden; });
+
+    function initPlexus() {
+      if (plexusRunning) return;
+      plexusRunning = true;
+
+      const canvas = document.getElementById('plexusCanvas');
+      const ctx = canvas.getContext('2d');
+      let width, height, particles = [];
+
+      function resize() { 
+        width = canvas.width = canvas.offsetWidth; 
+        height = canvas.height = canvas.offsetHeight; 
+        initParticles();
+      }
+      
+      function initParticles() {
+        particles = [];
+        let num = Math.floor(width / 35); 
+        for (let i = 0; i < num; i++) {
+          particles.push({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            vx: (Math.random() - 0.5) * 0.4,
+            vy: (Math.random() - 0.5) * 0.4,
+            radius: Math.random() * 1.5 + 0.5
+          });
+        }
+      }
+
+      window.addEventListener('resize', resize);
+      resize();
+
+      function animate() {
+        if (!isTabActive) {
+          requestAnimationFrame(animate);
+          return;
+        }
+
+        ctx.clearRect(0, 0, width, height);
+        
+        let isLight = document.body.classList.contains('light') || document.body.classList.contains('pink') || document.body.classList.contains('colorful');
+        ctx.fillStyle = isLight ? 'rgba(15, 23, 42, 0.3)' : 'rgba(255, 255, 255, 0.3)';
+        ctx.strokeStyle = isLight ? 'rgba(15, 23, 42, 0.1)' : 'rgba(255, 255, 255, 0.1)';
+        ctx.lineWidth = 0.8; 
+
+        for (let i = 0; i < particles.length; i++) {
+          let p = particles[i];
+          p.x += p.vx; p.y += p.vy;
+          
+          if (p.x < 0 || p.x > width) p.vx *= -1; 
+          if (p.y < 0 || p.y > height) p.vy *= -1;
+          
+          ctx.beginPath(); 
+          ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2); 
+          ctx.fill();
+
+          for (let j = i + 1; j < particles.length; j++) {
+            let p2 = particles[j];
+            let dx = p.x - p2.x, dy = p.y - p2.y;
+            if (dx*dx + dy*dy < 6400) { // 80*80
+              ctx.beginPath(); 
+              ctx.moveTo(p.x, p.y); 
+              ctx.lineTo(p2.x, p2.y); 
+              ctx.stroke();
+            }
+          }
+        }
+        requestAnimationFrame(animate);
+      }
+      animate();
+    }
 </script>
 </body>
 </html>
