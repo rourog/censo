@@ -33,76 +33,89 @@
     body { font-family: 'Fira Code', monospace; transition: background 0.5s ease, color 0.5s ease; font-variant-ligatures: contextual; }
 
     /* ==========================================================
-       DEFINICIÓN DE TEMAS (SÓLIDOS PARA RENDIMIENTO)
+       1. COLORES BASE (FONDOS Y PANELES)
        ========================================================== */
-    body.dark {
+    body.base-dark {
       --bg: #0f172a; --panel: #1e293b; --section-head: #0f172a;
       --card: #1e293b; --card-open: #2d3e5a; --field: rgba(255,255,255,0.03);
       --text: #e5e7eb; --muted: #94a3b8; --line: rgba(255,255,255,0.08);
-      --accent: #60a5fa; --accent-soft: rgba(96,165,250,0.12); --accent-border: rgba(96,165,250,0.24);
-      --chip-bg: rgba(96,165,250,0.12); --chip-text: #dbeafe; 
-      --search-bg: rgba(255,255,255,0.05); --error-bg: rgba(239,68,68,.10); --error-border: rgba(239,68,68,.22);
-      --error-text: #fecaca; --toggle-bg: rgba(255,255,255,0.06); --toggle-icon: #dbeafe;
-      --modal-overlay: rgba(0,0,0,0.85); --success: #34d399; 
-      --skeleton: #2d3e5a; --skeleton-shimmer: rgba(255, 255, 255, 0.05);
+      --search-bg: rgba(255,255,255,0.05); --error-bg: rgba(239,68,68,0.1); --error-border: rgba(239,68,68,0.22); --error-text: #fecaca;
+      --modal-overlay: rgba(0,0,0,0.85); --skeleton: #2d3e5a; --skeleton-shimmer: rgba(255,255,255,0.05);
+      --theme-meta: #0f172a;
+    }
+    body.base-light {
+      --bg: #f8fafc; --panel: #ffffff; --section-head: #f1f5f9;
+      --card: #ffffff; --card-open: #f1f5f9; --field: rgba(0,0,0,0.02);
+      --text: #0f172a; --muted: #475569; --line: rgba(0,0,0,0.08);
+      --search-bg: rgba(0,0,0,0.03); --error-bg: rgba(254,242,242,0.92); --error-border: rgba(239,68,68,0.18); --error-text: #b91c1c;
+      --modal-overlay: rgba(15,23,42,0.6); --skeleton: #e2e8f0; --skeleton-shimmer: rgba(255,255,255,0.4);
+      --theme-meta: #f8fafc;
+    }
+    body.base-midnight {
+      --bg: #000000; --panel: #0a0a0a; --section-head: #000000;
+      --card: #0a0a0a; --card-open: #1a1a1a; --field: rgba(255,255,255,0.04);
+      --text: #ffffff; --muted: #737373; --line: rgba(255,255,255,0.12);
+      --search-bg: rgba(255,255,255,0.05); --error-bg: rgba(220,38,38,0.1); --error-border: rgba(220,38,38,0.2); --error-text: #fca5a5;
+      --modal-overlay: rgba(0,0,0,0.92); --skeleton: #1a1a1a; --skeleton-shimmer: rgba(255,255,255,0.05);
+      --theme-meta: #000000;
+    }
+    body.base-navy {
+      --bg: #001529; --panel: #001f3f; --section-head: #001529;
+      --card: #001f3f; --card-open: #003366; --field: rgba(255,255,255,0.03);
+      --text: #e0f2fe; --muted: #7dd3fc; --line: rgba(255,255,255,0.1);
+      --search-bg: rgba(255,255,255,0.05); --error-bg: rgba(225,29,72,0.15); --error-border: rgba(225,29,72,0.3); --error-text: #fda4af;
+      --modal-overlay: rgba(0,21,41,0.85); --skeleton: #003366; --skeleton-shimmer: rgba(255,255,255,0.05);
+      --theme-meta: #001529;
+    }
+    body.base-sand {
+      --bg: #fefce8; --panel: #ffffff; --section-head: #fef9c3;
+      --card: #ffffff; --card-open: #fef08a; --field: rgba(0,0,0,0.02);
+      --text: #422006; --muted: #854d0e; --line: rgba(0,0,0,0.08);
+      --search-bg: rgba(0,0,0,0.03); --error-bg: #fee2e2; --error-border: #ef4444; --error-text: #991b1b;
+      --modal-overlay: rgba(66,32,6,0.6); --skeleton: #fef08a; --skeleton-shimmer: rgba(255,255,255,0.4);
+      --theme-meta: #fefce8;
+    }
+    body.base-rose {
+      --bg: #fff1f2; --panel: #ffffff; --section-head: #ffe4e6;
+      --card: #ffffff; --card-open: #fecdd3; --field: rgba(0,0,0,0.02);
+      --text: #881337; --muted: #e11d48; --line: rgba(225,29,72,0.15);
+      --search-bg: rgba(225,29,72,0.05); --error-bg: #ffe4e6; --error-border: #f43f5e; --error-text: #9f1239;
+      --modal-overlay: rgba(136,19,55,0.6); --skeleton: #fecdd3; --skeleton-shimmer: rgba(255,255,255,0.4);
+      --theme-meta: #fff1f2;
     }
 
-    body.light {
-      --bg: #eef4fb; --panel: #ffffff; --section-head: #f8fbff;
-      --card: #ffffff; --card-open: #dbeafe; --field: rgba(37,99,235,0.03);
-      --text: #0f172a; --muted: #475569; --line: rgba(15,23,42,0.08);
-      --accent: #2563eb; --accent-soft: rgba(37,99,235,0.10); --accent-border: rgba(37,99,235,0.16);
-      --chip-bg: rgba(37,99,235,0.10); --chip-text: #1d4ed8; 
-      --search-bg: rgba(37,99,235,0.05); --error-bg: rgba(254,242,242,0.92); --error-border: rgba(239,68,68,.18);
-      --error-text: #b91c1c; --toggle-bg: rgba(37,99,235,0.08); --toggle-icon: #1d4ed8;
-      --modal-overlay: rgba(15,23,42,0.6); --success: #10b981; 
-      --skeleton: #e2e8f0; --skeleton-shimmer: rgba(255, 255, 255, 0.4);
+    /* ==========================================================
+       2. COLORES DE ACENTO
+       ========================================================== */
+    body.accent-blue {
+      --accent: #3b82f6; --accent-soft: rgba(59,130,246,0.12); --accent-border: rgba(59,130,246,0.25);
+      --chip-bg: rgba(59,130,246,0.15); --chip-text: var(--accent);
+      --toggle-bg: rgba(59,130,246,0.1); --toggle-icon: #3b82f6;
     }
-
-    body.pink {
-      --bg: #fdf2f8; --panel: #ffffff; --section-head: #fdf2f8;
-      --card: #ffffff; --card-open: #fce7f3; --field: rgba(219, 39, 119, 0.03);
-      --text: #831843; --muted: #be185d; --line: rgba(219, 39, 119, 0.15);
-      --accent: #db2777; --accent-soft: rgba(219, 39, 119, 0.12); --accent-border: rgba(219, 39, 119, 0.25);
-      --chip-bg: rgba(219, 39, 119, 0.15); --chip-text: #9d174d; 
-      --search-bg: rgba(219, 39, 119, 0.05); --error-bg: rgba(225, 29, 72, 0.1); --error-border: rgba(225, 29, 72, 0.2);
-      --error-text: #e11d48; --toggle-bg: rgba(219, 39, 119, 0.1); --toggle-icon: #db2777;
-      --modal-overlay: rgba(131, 24, 67, 0.7); --success: #10b981; 
-      --skeleton: #fce7f3; --skeleton-shimmer: rgba(255, 255, 255, 0.4);
+    body.accent-green {
+      --accent: #10b981; --accent-soft: rgba(16,185,129,0.12); --accent-border: rgba(16,185,129,0.25);
+      --chip-bg: rgba(16,185,129,0.15); --chip-text: var(--accent);
+      --toggle-bg: rgba(16,185,129,0.1); --toggle-icon: #10b981;
     }
-
-    body.colorful {
-      --bg: #f8fafc; --panel: #fde68a; --section-head: #eab308; 
-      --card: #1d4ed8; --card-open: #d946ef; --field: rgba(0, 0, 0, 0.2); 
-      --text: #001f3f; --muted: #475569; --line: rgba(0, 0, 0, 0.1);
-      --accent: #16a34a; --accent-soft: rgba(22, 163, 74, 0.1); --accent-border: #15803d;
-      --chip-bg: #bef264; --chip-text: #001f3f; 
-      --search-bg: #ffffff; --error-bg: #fee2e2; --error-border: #ef4444; --error-text: #b91c1c; 
-      --toggle-bg: #f43f5e; --toggle-icon: #ffffff;
-      --modal-overlay: rgba(23, 23, 23, 0.7); --success: #16a34a; 
-      --skeleton: #bef264; --skeleton-shimmer: rgba(255, 255, 255, 0.5);
+    body.accent-pink {
+      --accent: #ec4899; --accent-soft: rgba(236,72,153,0.12); --accent-border: rgba(236,72,153,0.25);
+      --chip-bg: rgba(236,72,153,0.15); --chip-text: var(--accent);
+      --toggle-bg: rgba(236,72,153,0.1); --toggle-icon: #ec4899;
     }
-
-    body.colorful { background-image: linear-gradient(135deg, #e0f2fe 0%, #d1fae5 50%, #ede9fe 100%) !important; background-attachment: fixed; }
-    body.colorful .header { background-image: linear-gradient(135deg, #f0abfc 0%, #bfdbfe 100%) !important; }
-    body.colorful .title-urgencias, body.colorful #meta-text, body.colorful .section-title { color: #001f3f !important; text-shadow: none; font-weight: 800; }
-    body.colorful .card .patient-name, body.colorful .card .value, body.colorful .card .caret { color: #ffffff !important; }
-    body.colorful .card .patient-bed, body.colorful .card .label { color: rgba(255, 255, 255, 0.8) !important; }
-    body.colorful .card .field { border: 1px solid rgba(255,255,255,0.2) !important; background: rgba(0,0,0,0.15) !important; }
-    body.colorful .card .btn-editar-tarjeta { background: #ffffff !important; color: #d946ef !important; border: none; font-weight: 800; box-shadow: 0 4px 6px rgba(0,0,0,0.15); }
-    body.colorful .card .btn-editar-tarjeta:active { background: #e0f2fe !important; color: #a21caf !important; }
-    body.colorful .fab-btn { background: linear-gradient(135deg, #bef264, #06b6d4) !important; color: #001f3f; }
-
-    body.midnight {
-      --bg: #000000; --panel: #111111; --section-head: #1a0000; 
-      --card: #120000; --card-open: #250000; --field: rgba(255, 0, 0, 0.05);
-      --text: #ff4d4d; --muted: #800000; --line: rgba(255, 0, 0, 0.15);
-      --accent: #ff0000; --accent-soft: rgba(255, 0, 0, 0.1); --accent-border: rgba(255, 0, 0, 0.3);
-      --chip-bg: #330000; --chip-text: #ff4d4d; 
-      --search-bg: #0a0000; --error-bg: #220000; --error-border: #aa0000; --error-text: #ff4d4d; 
-      --toggle-bg: #1a0000; --toggle-icon: #ff0000;
-      --modal-overlay: rgba(0,0,0,0.9); --success: #880000; 
-      --skeleton: #1a0000; --skeleton-shimmer: rgba(255, 0, 0, 0.1);
+    body.accent-purple {
+      --accent: #a855f7; --accent-soft: rgba(168,85,247,0.12); --accent-border: rgba(168,85,247,0.25);
+      --chip-bg: rgba(168,85,247,0.15); --chip-text: var(--accent);
+      --toggle-bg: rgba(168,85,247,0.1); --toggle-icon: #a855f7;
+    }
+    body.accent-orange {
+      --accent: #f97316; --accent-soft: rgba(249,115,22,0.12); --accent-border: rgba(249,115,22,0.25);
+      --chip-bg: rgba(249,115,22,0.15); --chip-text: var(--accent);
+      --toggle-bg: rgba(249,115,22,0.1); --toggle-icon: #f97316;
+    }
+    body.accent-red {
+      --accent: #ef4444; --accent-soft: rgba(239,68,68,0.12); --accent-border: rgba(239,68,68,0.25);
+      --chip-bg: rgba(239,68,68,0.15); --chip-text: var(--accent);
+      --toggle-bg: rgba(239,68,68,0.1); --toggle-icon: #ef4444;
     }
 
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -110,9 +123,8 @@
     .hide-on-mobile { display: none !important; }
 
     .patient-name, .value, .truncate-text, .patient-bed, .chip, .section-title, .censo-table td, .input-control { text-transform: uppercase !important; }
-    body.midnight .section-title { color: #ff0000; }
 
-    /* BOTON DE LOGIN SOBRIO Y ELEGANTE */
+    /* BOTON DE LOGIN */
     .btn-login-sober {
       padding: 12px 36px; font-size: 0.9rem; font-family: 'Space Mono', monospace; font-weight: 700; letter-spacing: 0.15em;
       color: var(--text); background: transparent; border: 1px solid var(--muted); border-radius: var(--radius-sm);
@@ -206,7 +218,6 @@
     .chip { display: inline-block; font-size: 0.65rem; font-weight: 600; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--accent-border); background: var(--chip-bg); color: var(--chip-text); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: center; }
     .card .chip { max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.65rem; }
     
-    /* EMOJI CHIP PARA MODO KANBAN (v2.25) */
     .chip-emoji { font-size: 1.5rem; line-height: 1; text-align: center; display: inline-block; cursor: help; background: transparent; border: none; padding: 0; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15)); }
 
     .caret { width: 24px; height: 24px; display: grid; place-items: center; border-radius: 999px; color: var(--muted); font-size: 1rem; transition: transform var(--transition), color var(--transition); flex-shrink: 0; }
@@ -239,8 +250,8 @@
 
     .btn-editar-tarjeta { width: 100%; margin-top: 12px; padding: 12px; border-radius: var(--radius-sm); background: var(--accent-soft); border: 1px solid var(--accent-border); color: var(--accent); font-family: 'Space Mono', monospace; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; cursor: pointer; transition: all var(--transition-fast); }
     .btn-editar-tarjeta:active { transform: scale(0.98); background: var(--accent); color: #fff; }
-    .fab-btn { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #ef4444, #f97316); color: white; border: none; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4); font-size: 2rem; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 40; transition: transform var(--transition-fast), box-shadow var(--transition-fast); line-height: 1; display: flex; }
-    .fab-btn:active { transform: scale(0.9); box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4); }
+    .fab-btn { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; border-radius: 50%; background: var(--accent); color: white; border: none; box-shadow: 0 4px 15px var(--accent-border); font-size: 2rem; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 40; transition: transform var(--transition-fast), box-shadow var(--transition-fast); line-height: 1; }
+    .fab-btn:active { transform: scale(0.9); box-shadow: 0 2px 8px var(--accent-border); }
 
     .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--modal-overlay); z-index: 100; display: none; align-items: center; justify-content: center; padding: 16px; opacity: 0; transition: opacity 0.3s; }
     .modal-overlay.active { display: flex; opacity: 1; }
@@ -266,7 +277,7 @@
     .btn-guardar { flex: 2; padding: 12px; border-radius: var(--radius-sm); background: var(--accent); border: none; color: #fff; font-weight: 600; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; text-transform: uppercase; font-family: 'Space Mono', monospace; }
     .btn-guardar:disabled { opacity: 0.7; cursor: not-allowed; }
     .btn-borrar { flex: 1; padding: 12px; border-radius: var(--radius-sm); background: var(--error-bg); border: 1px solid var(--error-border); color: var(--error-text); font-weight: 600; cursor: pointer; text-transform: uppercase; font-family: 'Space Mono', monospace; transition: all var(--transition-fast); width: 100%;}
-    .btn-borrar:active { transform: scale(0.95); background: #ef4444; color: #fff; }
+    .btn-borrar:active { transform: scale(0.95); background: var(--accent); color: #fff; }
     .optional-label { color: var(--muted) !important; font-weight: 500 !important; }
 
     @keyframes pulseWarning { 0% { transform: scale(1); } 50% { transform: scale(1.15); } 100% { transform: scale(1); } }
@@ -303,6 +314,14 @@
     .custom-select-option:hover { background: var(--field); color: var(--accent); }
     .custom-select-optgroup { padding: 6px 12px; font-weight: bold; font-size: 0.75rem; color: var(--muted); background: var(--section-head); text-transform: uppercase; border-bottom: 1px solid var(--line); border-top: 1px solid var(--line);}
     .custom-select-optgroup:first-child { border-top: none; }
+
+    /* ========================================================= 
+       TEMA: SELECTORES DE COLOR 
+       ========================================================= */
+    .color-picker-grid { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px; }
+    .color-swatch { width: 36px; height: 36px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: transform 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+    .color-swatch:hover { transform: scale(1.1); }
+    .color-swatch.active { border-color: var(--text); transform: scale(1.1); outline: 2px solid var(--accent); outline-offset: 2px; }
 
     @media (min-width: 768px) { 
       .hide-on-mobile { display: flex !important; }
@@ -375,12 +394,12 @@
       .patient-row.expanded-row td.editable-cell:hover::after { content: '✎'; position: absolute; top: 2px; right: 2px; font-size: 0.7rem; color: var(--muted); opacity: 0.5; pointer-events: none; }
       
       .patient-row.expanded-row td.editable-cell.is-editing { 
-        color: #ef4444 !important; 
+        color: var(--accent) !important; 
         outline: none; 
-        background-color: rgba(239, 68, 68, 0.05); 
+        background-color: var(--accent-soft); 
       }
       .patient-row.expanded-row td.editable-cell.is-editing.patient-name { 
-        color: #ef4444 !important; 
+        color: var(--accent) !important; 
         font-weight: 700; 
       }
       .patient-row.expanded-row td.editable-cell.is-editing * { 
@@ -472,7 +491,7 @@
     }
   </style>
 </head>
-<body class="dark">
+<body class="base-dark accent-blue">
 
   <div id="loginScreen" class="modal-overlay active" style="z-index: 10000; background: var(--bg); flex-direction: column; justify-content: center; align-items: center; gap: 15px;">
     
@@ -493,7 +512,7 @@
 
     <div style="position: absolute; bottom: 30px; font-size: 0.7rem; font-family: 'Space Mono', monospace; font-weight: 700; letter-spacing: 0.1em;">
       <span style="color: var(--muted);">ROUROG</span> <span style="color: var(--text); opacity: 0.5;">Innovations</span>
-      <span style="opacity: 0.3; margin-left: 6px;">v1.26</span>
+      <span style="opacity: 0.3; margin-left: 6px;">v1.27</span>
     </div>
   </div>
   <div class="app" id="mainAppContainer" style="display: none;">
@@ -514,7 +533,7 @@
         <div class="header-right">
           <button id="viewToggleBtn" class="icon-btn hide-on-mobile" type="button" aria-label="Vista"><span id="viewIcon">📋</span></button>
           <button id="reloadBtn" class="icon-btn" type="button" aria-label="Recargar"><span id="reloadIcon">🔄</span></button>
-          <button id="themeToggle" class="icon-btn" type="button" aria-label="Tema"><span id="themeIcon">☀️</span></button>
+          <button id="themeToggleBtn" class="icon-btn" type="button" aria-label="Tema"><span>🎨</span></button>
           <button id="btnLogoutBtn" class="icon-btn" type="button" aria-label="Cerrar Sesión" title="Cerrar Sesión"><span>🚪</span></button>
         </div>
       </div>
@@ -540,7 +559,7 @@
 
     <div class="footer">
       Hospital Regional de Delicias - <span style="color: var(--accent); font-weight: 600;">Rourog Innovations</span>
-      <span style="opacity: 0.4; font-size: 0.8em; margin-left: 8px;">v2.26</span>
+      <span style="opacity: 0.4; font-size: 0.8em; margin-left: 8px;">v2.27</span>
     </div>
 
     <div id="easterEggContainer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; pointer-events: none; overflow: hidden;"></div>
@@ -548,6 +567,31 @@
 
   <button class="fab-btn" id="mainFabBtn" onclick="abrirModalAgregar()" style="display: none;">+</button>
 
+  <!-- THEME MODAL (v2.27) -->
+  <div id="themeModal" class="modal-overlay">
+    <div class="modal-content" style="max-width: 380px;">
+      <div class="modal-header">
+        <div class="modal-title" style="font-weight:700; font-family:'Space Mono';">APARIENCIA</div>
+        <button class="modal-close" onclick="cerrarModal('themeModal')">&times;</button>
+      </div>
+      
+      <div style="margin-bottom: 16px;">
+        <label class="label" style="margin-bottom: 8px;">COLOR BASE (FONDO)</label>
+        <div class="color-picker-grid" id="baseColorPicker">
+           <!-- Inyectado por JS -->
+        </div>
+      </div>
+
+      <div>
+        <label class="label" style="margin-bottom: 8px;">COLOR DE ACENTO</label>
+        <div class="color-picker-grid" id="accentColorPicker">
+           <!-- Inyectado por JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EDIT MODAL -->
   <div id="editModal" class="modal-overlay">
     <div class="modal-content">
       <div class="modal-header">
@@ -595,6 +639,7 @@
     </div>
   </div>
 
+  <!-- ADD MODAL -->
   <div id="addModal" class="modal-overlay">
     <div class="modal-content">
       <div class="modal-header">
@@ -691,7 +736,6 @@
 
     window.isInlineEditing = false;
     window.pendingSnapshotList = null;
-    window.syncPlexusPatients = () => {}; 
     let selectedNavIndex = -1;
 
     function showMainApp() {
@@ -809,7 +853,6 @@
       return c;
     }
 
-    // EXTRAER SOLO EMOJI PARA MODO TARJETA
     function getEmojiOnly(texto) {
       if (!texto) return '';
       const t = String(texto).trim();
@@ -837,9 +880,6 @@
     };
 
     function vibrar(patron) { if (navigator.vibrate) { navigator.vibrate(patron); } }
-    const themes = ['dark', 'light', 'pink', 'colorful', 'midnight'];
-    const themeIcons = { 'dark': '🌙', 'light': '☀️', 'pink': '🌸', 'colorful': '🎨', 'midnight': '🌑' };
-    const themeColors = { 'dark': '#0f172a', 'light': '#eef4fb', 'pink': '#fdf2f8', 'colorful': '#f8fafc', 'midnight': '#000000' };
 
     function escapeHtml(texto) { return String(texto || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;'); }
     function cerrarModal(id) { 
@@ -847,28 +887,6 @@
         closeAllPopovers(null); 
     }
     function cerrarModalBorrado() { document.getElementById('deleteConfirmModal').classList.remove('active'); }
-
-    const chipPalette = [
-      { bg: '#ffe4e6', text: '#9f1239' }, { bg: '#dcfce7', text: '#166534' }, 
-      { bg: '#fef9c3', text: '#854d0e' }, { bg: '#dbeafe', text: '#1e40af' }, 
-      { bg: '#ffedd5', text: '#9a3412' }, { bg: '#f3e8ff', text: '#6b21a8' }, { bg: '#e0f7fa', text: '#006064' }  
-    ];
-
-    function getChipColor(text) {
-      if (!text) return { bg: 'var(--chip-bg)', text: 'var(--chip-text)' };
-      let hash = 0;
-      for (let i = 0; i < text.length; i++) hash = text.charCodeAt(i) + ((hash << 5) - hash);
-      return chipPalette[Math.abs(hash) % chipPalette.length];
-    }
-
-    function getColorfulChipHtml(destino) {
-      if (!destino) return '';
-      const isColorful = document.body.classList.contains('colorful');
-      if (isColorful) {
-        const colors = getChipColor(destino);
-        return `<div class="chip" style="background-color: ${colors.bg}; color: ${colors.text}; border-color: rgba(0,0,0,0.1); font-weight: 700;">${escapeHtml(destino)}</div>`;
-      } else { return `<div class="chip">${escapeHtml(destino)}</div>`; }
-    }
 
     function agruparPorArea(lista) {
       const grupos = {};
@@ -973,7 +991,7 @@
           htmlArr.push(`<tr style="background: rgba(128, 128, 128, 0.15);"><td colspan="8" style="padding: 6px 10px; font-weight: 800; font-size: 0.85rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--line);"><span class="area-icon ${visual.class}">${visual.emoji}</span> ${escapeHtml(area)}</td></tr>`);
 
           grupos[area].forEach((p) => {
-            const destinoChip = getColorfulChipHtml(p.destino);
+            const destinoChip = p.destino ? `<div class="chip">${escapeHtml(p.destino)}</div>` : '';
             htmlArr.push(`<tr class="patient-row" data-fila="${p.fila}" onclick="toggleTableRow(this)">
                 <td style="padding: 6px 10px; text-align: center;"><span style="color: var(--accent); font-weight: 700; font-size: 0.85rem;">${escapeHtml(p.cama || '-')}</span></td>
                 <td style="padding: 6px 10px; font-size: 0.7rem; color: var(--muted); font-family: 'Fira Code', monospace; line-height: 1.3; text-align: center;">${p.fechaIngresoFormateada || '-'}</td>
@@ -1030,7 +1048,6 @@
               ${pacientes.map((p, indexPatient) => {
                 const camaHtml = p.cama ? `<div class="patient-bed">${escapeHtml(p.cama)}</div>` : '';
                 
-                // MODO TARJETA: Solo Emoji para Destino (v2.25)
                 const emojiSolo = p.destino ? getEmojiOnly(p.destino) : '';
                 const destinoEmojiHtml = emojiSolo ? `<div class="chip-emoji" title="${escapeHtml(p.destino)}">${emojiSolo}</div>` : '';
                 
@@ -1865,31 +1882,74 @@
       if(document.getElementById('meta-text')) document.getElementById('meta-text').innerHTML = `ERROR DE CONEXIÓN`; 
     }
 
-    function applyTheme(theme) {
-      if (!themes.includes(theme)) theme = 'dark';
-      const body = document.body; const themeIcon = document.getElementById('themeIcon');
-      body.classList.remove(...themes); body.classList.add(theme);
-      const metaThemeColor = document.querySelector('meta[name="theme-color"]');
-      if(metaThemeColor) metaThemeColor.setAttribute('content', themeColors[theme]);
-      if(themeIcon) themeIcon.textContent = themeIcons[theme];
-      localStorage.setItem('censo-theme', theme);
+    // ==========================================================
+    // SISTEMA DE TEMAS (NUEVO V2.27)
+    // ==========================================================
+    const bases = [
+      { id: 'base-dark', color: '#0f172a' }, { id: 'base-light', color: '#f8fafc' },
+      { id: 'base-midnight', color: '#000000' }, { id: 'base-navy', color: '#001529' },
+      { id: 'base-sand', color: '#fefce8' }, { id: 'base-rose', color: '#fff1f2' }
+    ];
+    const accents = [
+      { id: 'accent-blue', color: '#3b82f6' }, { id: 'accent-green', color: '#10b981' },
+      { id: 'accent-pink', color: '#ec4899' }, { id: 'accent-purple', color: '#a855f7' },
+      { id: 'accent-orange', color: '#f97316' }, { id: 'accent-red', color: '#ef4444' }
+    ];
+
+    function renderThemePickers() {
+      const baseGrid = document.getElementById('baseColorPicker');
+      const accentGrid = document.getElementById('accentColorPicker');
+      if(!baseGrid || !accentGrid) return;
+      
+      baseGrid.innerHTML = bases.map(b => `<div class="color-swatch base-swatch" style="background-color: ${b.color};" data-val="${b.id}"></div>`).join('');
+      accentGrid.innerHTML = accents.map(a => `<div class="color-swatch accent-swatch" style="background-color: ${a.color};" data-val="${a.id}"></div>`).join('');
+
+      baseGrid.querySelectorAll('.base-swatch').forEach(sw => {
+        sw.onclick = () => { applyTheme(sw.dataset.val, null); };
+      });
+      accentGrid.querySelectorAll('.accent-swatch').forEach(sw => {
+        sw.onclick = () => { applyTheme(null, sw.dataset.val); };
+      });
+    }
+
+    function applyTheme(newBase, newAccent) {
+      let currentBase = localStorage.getItem('censo-base') || 'base-dark';
+      let currentAccent = localStorage.getItem('censo-accent') || 'accent-blue';
+      
+      if(newBase) currentBase = newBase;
+      if(newAccent) currentAccent = newAccent;
+
+      document.body.className = `${currentBase} ${currentAccent}`;
+      localStorage.setItem('censo-base', currentBase);
+      localStorage.setItem('censo-accent', currentAccent);
+
+      // Update active states
+      document.querySelectorAll('.base-swatch').forEach(sw => sw.classList.toggle('active', sw.dataset.val === currentBase));
+      document.querySelectorAll('.accent-swatch').forEach(sw => sw.classList.toggle('active', sw.dataset.val === currentAccent));
+
+      // Update meta color
+      setTimeout(() => {
+        const metaColor = getComputedStyle(document.body).getPropertyValue('--theme-meta').trim();
+        if(metaColor) document.querySelector('meta[name="theme-color"]').setAttribute('content', metaColor);
+      }, 50);
     }
 
     function initTheme() {
-      const saved = localStorage.getItem('censo-theme');
+      const savedView = localStorage.getItem('censo-view') || 'kanban';
+      currentViewMode = savedView;
       document.getElementById('viewIcon').textContent = currentViewMode === 'kanban' ? '📋' : '🗂️'; 
-      if (themes.includes(saved)) { applyTheme(saved); return; }
-      const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches; 
-      applyTheme(prefersLight ? 'light' : 'dark');
+      
+      renderThemePickers();
+      applyTheme(localStorage.getItem('censo-base'), localStorage.getItem('censo-accent'));
     }
 
+    // EVENTOS UI
     document.getElementById('search').addEventListener('input', filtrar);
     document.getElementById('search').addEventListener('search', (e) => { if (e.target.value === '') render(pacientesGlobal); });
     
-    document.getElementById('themeToggle').addEventListener('click', () => { 
-      vibrar(15); let currentTheme = 'dark';
-      themes.forEach(t => { if(document.body.classList.contains(t)) currentTheme = t; });
-      let nextIndex = (themes.indexOf(currentTheme) + 1) % themes.length; applyTheme(themes[nextIndex]);
+    document.getElementById('themeToggleBtn').addEventListener('click', () => { 
+      vibrar(15); 
+      document.getElementById('themeModal').classList.add('active');
     });
 
     document.getElementById('viewToggleBtn').addEventListener('click', () => {
@@ -1925,14 +1985,13 @@
     initTheme(); 
 
     // ==========================================================
-    // SISTEMA DE PARTÍCULAS NEURAL Y SINAPSIS (OPTIMIZADO V2.26)
+    // SISTEMA DE PARTÍCULAS NEURAL Y SINAPSIS (RESTAURADO v2.27)
     // ==========================================================
     let plexusRunning = false;
     let isTabActive = true;
     
     document.addEventListener("visibilitychange", () => { isTabActive = !document.hidden; });
 
-    // Declaramos la función global para que "render" pueda alimentarle los pacientes
     window.syncPlexusPatients = () => {};
 
     function initPlexus() {
@@ -1979,7 +2038,6 @@
         }
       }
 
-      // La enlazamos con la recolección de datos de Firebase
       window.syncPlexusPatients = (listaPacientes) => {
         patientParticles = [];
         (listaPacientes || []).forEach(p => {
@@ -2000,7 +2058,7 @@
 
         ctx.clearRect(0, 0, width, height);
         
-        let isLight = document.body.classList.contains('light') || document.body.classList.contains('pink') || document.body.classList.contains('colorful');
+        let isLight = document.body.classList.contains('base-light') || document.body.classList.contains('base-sand') || document.body.classList.contains('base-rose');
         let defaultFill = isLight ? 'rgba(15, 23, 42, 0.3)' : 'rgba(255, 255, 255, 0.3)';
         let defaultStroke = isLight ? 'rgba(15, 23, 42, 0.1)' : 'rgba(255, 255, 255, 0.1)';
         
