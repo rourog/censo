@@ -61,6 +61,30 @@
       --modal-overlay: rgba(15,23,42,0.6); --skeleton: #e2e8f0; --skeleton-shimmer: rgba(255,255,255,0.4);
       --theme-meta: #f8fafc;
     }
+    body.base-pure-white {
+      --bg: #ffffff; --panel: #ffffff; --section-head: #f8fafc;
+      --card: #ffffff; --card-open: #f1f5f9; --field: rgba(0,0,0,0.03);
+      --text: #0f172a; --muted: #64748b; --line: rgba(0,0,0,0.1);
+      --search-bg: rgba(0,0,0,0.04); --error-bg: #fef2f2; --error-border: #f87171; --error-text: #991b1b;
+      --modal-overlay: rgba(15,23,42,0.6); --skeleton: #e2e8f0; --skeleton-shimmer: rgba(255,255,255,0.6);
+      --theme-meta: #ffffff;
+    }
+    body.base-gray-light {
+      --bg: #e2e8f0; --panel: #f8fafc; --section-head: #e2e8f0;
+      --card: #f8fafc; --card-open: #e2e8f0; --field: rgba(0,0,0,0.03);
+      --text: #1e293b; --muted: #64748b; --line: rgba(0,0,0,0.08);
+      --search-bg: rgba(0,0,0,0.04); --error-bg: #fef2f2; --error-border: #f87171; --error-text: #991b1b;
+      --modal-overlay: rgba(15,23,42,0.6); --skeleton: #cbd5e1; --skeleton-shimmer: rgba(255,255,255,0.5);
+      --theme-meta: #e2e8f0;
+    }
+    body.base-gray-dark {
+      --bg: #27272a; --panel: #18181b; --section-head: #27272a;
+      --card: #18181b; --card-open: #3f3f46; --field: rgba(255,255,255,0.03);
+      --text: #e4e4e7; --muted: #a1a1aa; --line: rgba(255,255,255,0.08);
+      --search-bg: rgba(255,255,255,0.05); --error-bg: rgba(239,68,68,0.1); --error-border: rgba(239,68,68,0.22); --error-text: #fecaca;
+      --modal-overlay: rgba(0,0,0,0.85); --skeleton: #3f3f46; --skeleton-shimmer: rgba(255,255,255,0.05);
+      --theme-meta: #27272a;
+    }
     body.base-midnight {
       --bg: #000000; --panel: #0a0a0a; --section-head: #000000;
       --card: #0a0a0a; --card-open: #1a1a1a; --field: rgba(255,255,255,0.04);
@@ -138,11 +162,16 @@
        2. COLORES DE ACENTO
        ========================================================== */
     body.accent-blue { --accent: #3b82f6; --accent-soft: rgba(59,130,246,0.12); --accent-border: rgba(59,130,246,0.25); --chip-bg: rgba(59,130,246,0.15); --chip-text: var(--accent); --toggle-bg: rgba(59,130,246,0.1); --toggle-icon: #3b82f6; }
+    body.accent-pure-blue { --accent: #1d4ed8; --accent-soft: rgba(29,78,216,0.12); --accent-border: rgba(29,78,216,0.25); --chip-bg: rgba(29,78,216,0.15); --chip-text: var(--accent); --toggle-bg: rgba(29,78,216,0.1); --toggle-icon: #1d4ed8; }
     body.accent-green { --accent: #10b981; --accent-soft: rgba(16,185,129,0.12); --accent-border: rgba(16,185,129,0.25); --chip-bg: rgba(16,185,129,0.15); --chip-text: var(--accent); --toggle-bg: rgba(16,185,129,0.1); --toggle-icon: #10b981; }
+    body.accent-emerald { --accent: #059669; --accent-soft: rgba(5,150,105,0.12); --accent-border: rgba(5,150,105,0.25); --chip-bg: rgba(5,150,105,0.15); --chip-text: var(--accent); --toggle-bg: rgba(5,150,105,0.1); --toggle-icon: #059669; }
     body.accent-pink { --accent: #ec4899; --accent-soft: rgba(236,72,153,0.12); --accent-border: rgba(236,72,153,0.25); --chip-bg: rgba(236,72,153,0.15); --chip-text: var(--accent); --toggle-bg: rgba(236,72,153,0.1); --toggle-icon: #ec4899; }
     body.accent-purple { --accent: #a855f7; --accent-soft: rgba(168,85,247,0.12); --accent-border: rgba(168,85,247,0.25); --chip-bg: rgba(168,85,247,0.15); --chip-text: var(--accent); --toggle-bg: rgba(168,85,247,0.1); --toggle-icon: #a855f7; }
     body.accent-orange { --accent: #f97316; --accent-soft: rgba(249,115,22,0.12); --accent-border: rgba(249,115,22,0.25); --chip-bg: rgba(249,115,22,0.15); --chip-text: var(--accent); --toggle-bg: rgba(249,115,22,0.1); --toggle-icon: #f97316; }
+    body.accent-amber { --accent: #d97706; --accent-soft: rgba(217,119,6,0.12); --accent-border: rgba(217,119,6,0.25); --chip-bg: rgba(217,119,6,0.15); --chip-text: var(--accent); --toggle-bg: rgba(217,119,6,0.1); --toggle-icon: #d97706; }
     body.accent-red { --accent: #ef4444; --accent-soft: rgba(239,68,68,0.12); --accent-border: rgba(239,68,68,0.25); --chip-bg: rgba(239,68,68,0.15); --chip-text: var(--accent); --toggle-bg: rgba(239,68,68,0.1); --toggle-icon: #ef4444; }
+    body.accent-pure-red { --accent: #dc2626; --accent-soft: rgba(220,38,38,0.12); --accent-border: rgba(220,38,38,0.25); --chip-bg: rgba(220,38,38,0.15); --chip-text: var(--accent); --toggle-bg: rgba(220,38,38,0.1); --toggle-icon: #dc2626; }
+    body.accent-crimson { --accent: #be123c; --accent-soft: rgba(190,18,60,0.12); --accent-border: rgba(190,18,60,0.25); --chip-bg: rgba(190,18,60,0.15); --chip-text: var(--accent); --toggle-bg: rgba(190,18,60,0.1); --toggle-icon: #be123c; }
     body.accent-gold { --accent: #eab308; --accent-soft: rgba(234,179,8,0.12); --accent-border: rgba(234,179,8,0.25); --chip-bg: rgba(234,179,8,0.15); --chip-text: var(--accent); --toggle-bg: rgba(234,179,8,0.1); --toggle-icon: #eab308; }
     body.accent-teal { --accent: #14b8a6; --accent-soft: rgba(20,184,166,0.12); --accent-border: rgba(20,184,166,0.25); --chip-bg: rgba(20,184,166,0.15); --chip-text: var(--accent); --toggle-bg: rgba(20,184,166,0.1); --toggle-icon: #14b8a6; }
     body.accent-lime { --accent: #84cc16; --accent-soft: rgba(132,204,22,0.12); --accent-border: rgba(132,204,22,0.25); --chip-bg: rgba(132,204,22,0.15); --chip-text: var(--accent); --toggle-bg: rgba(132,204,22,0.1); --toggle-icon: #84cc16; }
@@ -354,8 +383,8 @@
     /* ========================================================= 
        TEMA: SELECTORES DE COLOR 
        ========================================================= */
-    .color-picker-grid { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px; }
-    .color-swatch { width: 36px; height: 36px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: transform 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+    .color-picker-grid { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+    .color-swatch { width: 28px; height: 28px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: transform 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
     .color-swatch:hover { transform: scale(1.1); }
     .color-swatch.active { border-color: var(--text); transform: scale(1.1); outline: 2px solid var(--accent); outline-offset: 2px; }
 
@@ -549,7 +578,7 @@
 
     <div style="position: absolute; bottom: 30px; font-size: 0.7rem; font-family: 'Space Mono', monospace; font-weight: 700; letter-spacing: 0.1em;">
       <span style="color: var(--muted);">ROUROG</span> <span style="color: var(--text); opacity: 0.5;">Innovations</span>
-      <span style="opacity: 0.3; margin-left: 6px;">v1.29</span>
+      <span style="opacity: 0.3; margin-left: 6px;">v1.30</span>
     </div>
   </div>
   <div class="app" id="mainAppContainer" style="display: none;">
@@ -596,7 +625,7 @@
 
     <div class="footer">
       Hospital Regional de Delicias - <span style="color: var(--accent); font-weight: 600;">Rourog Innovations</span>
-      <span style="opacity: 0.4; font-size: 0.8em; margin-left: 8px;">v2.29</span>
+      <span style="opacity: 0.4; font-size: 0.8em; margin-left: 8px;">v2.30</span>
     </div>
 
     <div id="easterEggContainer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; pointer-events: none; overflow: hidden;"></div>
@@ -886,7 +915,6 @@
       return c;
     }
 
-    // EXTRAER SOLO EMOJI PARA MODO TARJETA
     function getEmojiOnly(texto) {
       if (!texto) return '';
       const t = String(texto).trim();
@@ -937,7 +965,13 @@
 
     function getColorfulChipHtml(destino) {
       if (!destino) return '';
-      const isColorful = document.body.className.includes('base-light') || document.body.className.includes('base-sand') || document.body.className.includes('base-rose') || document.body.className.includes('base-mint') || document.body.className.includes('base-lavender');
+      const isColorful = document.body.className.includes('base-light') || 
+                         document.body.className.includes('base-pure-white') || 
+                         document.body.className.includes('base-gray-light') || 
+                         document.body.className.includes('base-sand') || 
+                         document.body.className.includes('base-rose') || 
+                         document.body.className.includes('base-mint') || 
+                         document.body.className.includes('base-lavender');
       if (isColorful) {
         const colors = getChipColor(destino);
         return `<div class="chip" style="background-color: ${colors.bg}; color: ${colors.text}; border-color: rgba(0,0,0,0.1); font-weight: 700;">${escapeHtml(destino)}</div>`;
@@ -1943,22 +1977,40 @@
     }
 
     // ==========================================================
-    // SISTEMA DE TEMAS (NUEVO V2.27 / v2.28)
+    // SISTEMA DE TEMAS (NUEVO V2.30)
     // ==========================================================
     const bases = [
-      { id: 'base-dark', color: '#0f172a' }, { id: 'base-light', color: '#f8fafc' },
-      { id: 'base-midnight', color: '#000000' }, { id: 'base-navy', color: '#001529' },
-      { id: 'base-sand', color: '#fefce8' }, { id: 'base-rose', color: '#fff1f2' },
-      { id: 'base-forest', color: '#064e3b' }, { id: 'base-plum', color: '#3b0764' },
-      { id: 'base-coffee', color: '#451a03' }, { id: 'base-mint', color: '#f0fdf4' },
+      { id: 'base-dark', color: '#0f172a' }, 
+      { id: 'base-midnight', color: '#000000' }, 
+      { id: 'base-gray-dark', color: '#27272a' },
+      { id: 'base-navy', color: '#001529' },
+      { id: 'base-plum', color: '#3b0764' }, 
+      { id: 'base-forest', color: '#064e3b' }, 
+      { id: 'base-coffee', color: '#451a03' }, 
+      { id: 'base-light', color: '#f8fafc' },
+      { id: 'base-pure-white', color: '#ffffff' }, 
+      { id: 'base-gray-light', color: '#e2e8f0' },
+      { id: 'base-sand', color: '#fefce8' }, 
+      { id: 'base-rose', color: '#fff1f2' },
+      { id: 'base-mint', color: '#f0fdf4' }, 
       { id: 'base-lavender', color: '#faf5ff' }
     ];
     const accents = [
-      { id: 'accent-blue', color: '#3b82f6' }, { id: 'accent-green', color: '#10b981' },
-      { id: 'accent-pink', color: '#ec4899' }, { id: 'accent-purple', color: '#a855f7' },
-      { id: 'accent-orange', color: '#f97316' }, { id: 'accent-red', color: '#ef4444' },
-      { id: 'accent-gold', color: '#eab308' }, { id: 'accent-teal', color: '#14b8a6' },
-      { id: 'accent-lime', color: '#84cc16' }, { id: 'accent-indigo', color: '#6366f1' },
+      { id: 'accent-blue', color: '#3b82f6' }, 
+      { id: 'accent-pure-blue', color: '#1d4ed8' },
+      { id: 'accent-green', color: '#10b981' }, 
+      { id: 'accent-emerald', color: '#059669' },
+      { id: 'accent-pink', color: '#ec4899' }, 
+      { id: 'accent-purple', color: '#a855f7' },
+      { id: 'accent-orange', color: '#f97316' }, 
+      { id: 'accent-amber', color: '#d97706' },
+      { id: 'accent-red', color: '#ef4444' }, 
+      { id: 'accent-pure-red', color: '#dc2626' },
+      { id: 'accent-crimson', color: '#be123c' },
+      { id: 'accent-gold', color: '#eab308' }, 
+      { id: 'accent-teal', color: '#14b8a6' },
+      { id: 'accent-lime', color: '#84cc16' }, 
+      { id: 'accent-indigo', color: '#6366f1' },
       { id: 'accent-cyan', color: '#06b6d4' }
     ];
 
@@ -2122,7 +2174,14 @@
 
         ctx.clearRect(0, 0, width, height);
         
-        let isLight = document.body.className.includes('base-light') || document.body.className.includes('base-sand') || document.body.className.includes('base-rose') || document.body.className.includes('base-mint') || document.body.className.includes('base-lavender');
+        let isLight = document.body.className.includes('base-light') || 
+                      document.body.className.includes('base-pure-white') || 
+                      document.body.className.includes('base-gray-light') || 
+                      document.body.className.includes('base-sand') || 
+                      document.body.className.includes('base-rose') || 
+                      document.body.className.includes('base-mint') || 
+                      document.body.className.includes('base-lavender');
+                      
         let defaultFill = isLight ? 'rgba(15, 23, 42, 0.3)' : 'rgba(255, 255, 255, 0.3)';
         let defaultStroke = isLight ? 'rgba(15, 23, 42, 0.1)' : 'rgba(255, 255, 255, 0.1)';
         
