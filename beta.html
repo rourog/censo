@@ -72,7 +72,7 @@
     }
 
     body.colorful {
-      --bg: #f8fafc; --panel: #ffffff; --section-head: #eab308; 
+      --bg: #f8fafc; --panel: #fde68a; --section-head: #eab308; 
       --card: #1d4ed8; --card-open: #d946ef; --field: rgba(0, 0, 0, 0.2); 
       --text: #001f3f; --muted: #475569; --line: rgba(0, 0, 0, 0.1);
       --accent: #16a34a; --accent-soft: rgba(22, 163, 74, 0.1); --accent-border: #15803d;
@@ -311,8 +311,8 @@
       #content { display: flex; flex-direction: row; gap: 24px; padding: 16px; align-items: flex-start; overflow-x: auto; overflow-y: hidden; }
       
       /* KANBAN EN COLUMNAS */
-      .section { min-width: 400px; flex: 0 0 400px; max-width: 400px; margin: 0; border-radius: var(--radius-lg); border: 1px solid var(--line); background: var(--panel) !important; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); max-height: calc(100vh - 145px); display: flex; flex-direction: column; } 
-      .section-header { border-radius: var(--radius-lg) var(--radius-lg) 0 0; position: sticky; top: 0; z-index: 10; font-size: 1.1rem; padding: 16px; background: transparent !important; border-bottom: 1px solid var(--line); }
+      .section { min-width: 380px; flex: 0 0 380px; max-width: 380px; margin: 0; border-radius: var(--radius-lg); border: 1px solid var(--accent-border); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); max-height: calc(100vh - 145px); display: flex; flex-direction: column; background: var(--panel); } 
+      .section-header { background: var(--section-head) !important; border-bottom: 1px solid var(--line); border-radius: var(--radius-lg) var(--radius-lg) 0 0; position: sticky; top: 0; z-index: 10; font-size: 1.1rem; padding: 16px; }
       .patient-list { overflow-y: auto; flex-grow: 1; padding: 0 16px 16px; gap: 12px; }
       .card { border-bottom: none !important; border-radius: var(--radius-md); box-shadow: 0 3px 8px rgba(0,0,0,0.06); width: auto; border: none !important; margin-bottom: 12px; }
       .swipe-bg { border-radius: var(--radius-md); top: 1px; left: 1px; width: calc(100% - 2px); height: calc(100% - 2px); }
@@ -330,7 +330,7 @@
       .table-wrapper { 
         position: relative; width: 100%; 
         background: var(--panel) !important; 
-        border: 1px solid var(--line); border-radius: var(--radius-md); 
+        border: 1px solid var(--accent-border); border-radius: var(--radius-md); 
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15); 
         overflow-y: auto; overflow-x: auto; max-height: calc(100vh - 145px); margin-bottom: 0; 
         transform: translateZ(0); -webkit-transform: translateZ(0); will-change: scroll-position, transform; backface-visibility: hidden; -webkit-backface-visibility: hidden;
@@ -447,10 +447,10 @@
       /* FONDO DE OLAS: Solo visible en los espacios en blanco de la pantalla general */
       .desktop-waves-bg { position: fixed; bottom: 0; left: 0; width: 100%; height: 30vh; z-index: 0; pointer-events: none; transform: translateZ(0); -webkit-transform: translateZ(0); will-change: transform; }
       .waves { position: absolute; width: 100%; height: 100%; bottom: 0; }
-      .wave-layer-1 { fill: var(--accent); opacity: 0.05; animation: move-forever 60s linear infinite; }
-      .wave-layer-2 { fill: var(--accent); opacity: 0.10; animation: move-forever 45s linear infinite; }
-      .wave-layer-3 { fill: var(--accent); opacity: 0.15; animation: move-forever 30s linear infinite; }
-      .wave-layer-4 { fill: var(--accent); opacity: 0.25; animation: move-forever 20s linear infinite; }
+      .wave-layer-1 { fill: var(--accent); opacity: 0.05; animation: move-forever 60s cubic-bezier(.55,.5,.45,.5) infinite; }
+      .wave-layer-2 { fill: var(--accent); opacity: 0.10; animation: move-forever 45s cubic-bezier(.55,.5,.45,.5) infinite; }
+      .wave-layer-3 { fill: var(--accent); opacity: 0.15; animation: move-forever 30s cubic-bezier(.55,.5,.45,.5) infinite; }
+      .wave-layer-4 { fill: var(--accent); opacity: 0.25; animation: move-forever 20s cubic-bezier(.55,.5,.45,.5) infinite; }
       @keyframes move-forever { 0% { transform: translate3d(-90px, 0, 0); } 100% { transform: translate3d(85px, 0, 0); } }
 
       #content { position: relative; z-index: 10; } 
@@ -493,7 +493,7 @@
 
     <div style="position: absolute; bottom: 30px; font-size: 0.7rem; font-family: 'Space Mono', monospace; font-weight: 700; letter-spacing: 0.1em;">
       <span style="color: var(--muted);">ROUROG</span> <span style="color: var(--text); opacity: 0.5;">Innovations</span>
-      <span style="opacity: 0.3; margin-left: 6px;">v1.25</span>
+      <span style="opacity: 0.3; margin-left: 6px;">v1.26</span>
     </div>
   </div>
   <div class="app" id="mainAppContainer" style="display: none;">
@@ -540,7 +540,7 @@
 
     <div class="footer">
       Hospital Regional de Delicias - <span style="color: var(--accent); font-weight: 600;">Rourog Innovations</span>
-      <span style="opacity: 0.4; font-size: 0.8em; margin-left: 8px;">v2.25</span>
+      <span style="opacity: 0.4; font-size: 0.8em; margin-left: 8px;">v2.26</span>
     </div>
 
     <div id="easterEggContainer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; pointer-events: none; overflow: hidden;"></div>
@@ -691,6 +691,7 @@
 
     window.isInlineEditing = false;
     window.pendingSnapshotList = null;
+    window.syncPlexusPatients = () => {}; 
     let selectedNavIndex = -1;
 
     function showMainApp() {
@@ -823,7 +824,6 @@
     let camasLibresGlobal = []; 
     let currentViewMode = localStorage.getItem('censo-view') || 'kanban'; 
     let isFetchingData = true;
-    let syncPlexusPatients = () => {}; 
 
     const areaVisuals = {
       'SALA DE CHOQUE': { emoji: '❤️', class: 'icon-heartbeat' },
@@ -922,7 +922,7 @@
       if (!lista.length) { 
         if (isFetchingData) { content.innerHTML = generarSkeletonHtml(); } 
         else { content.innerHTML = `<div class="empty animate-in">NO HAY PACIENTES EN EL CENSO.</div>`; }
-        if (typeof syncPlexusPatients === 'function') syncPlexusPatients(lista);
+        if (typeof window.syncPlexusPatients === 'function') window.syncPlexusPatients(lista);
         return; 
       }
 
@@ -1008,11 +1008,10 @@
         
         setTimeout(initScrollGuider, 100);
 
-        if (typeof syncPlexusPatients === 'function') syncPlexusPatients(lista);
+        if (typeof window.syncPlexusPatients === 'function') window.syncPlexusPatients(lista);
         return;
       }
 
-      // KANBAN MODE
       content.innerHTML = '';
       areas.forEach((area, indexArea) => {
         const pacientes = grupos[area];
@@ -1055,7 +1054,7 @@
       });
       
       setTimeout(initSwipe, 50);
-      if (typeof syncPlexusPatients === 'function') syncPlexusPatients(lista);
+      if (typeof window.syncPlexusPatients === 'function') window.syncPlexusPatients(lista);
     }
 
     function initFirebaseListener() {
@@ -1292,7 +1291,7 @@
         closeAllPopovers(null);
 
         if (!isActive) {
-          document.body.appendChild(popover); // Desvincular overflow del modal
+          document.body.appendChild(popover); 
           
           const rect = display.getBoundingClientRect();
           popover.style.position = 'fixed';
@@ -1884,7 +1883,6 @@
       applyTheme(prefersLight ? 'light' : 'dark');
     }
 
-    // EVENTOS UI
     document.getElementById('search').addEventListener('input', filtrar);
     document.getElementById('search').addEventListener('search', (e) => { if (e.target.value === '') render(pacientesGlobal); });
     
@@ -1924,14 +1922,18 @@
       resizeTimer = setTimeout(() => { if (!isFetchingData) render(pacientesGlobal); }, 200);
     });
 
-    // ARRANQUE FINAL
     initTheme(); 
 
-    // SISTEMA DE PARTÍCULAS NEURAL Y SINAPSIS (OPTIMIZADO V2.25)
+    // ==========================================================
+    // SISTEMA DE PARTÍCULAS NEURAL Y SINAPSIS (OPTIMIZADO V2.26)
+    // ==========================================================
     let plexusRunning = false;
     let isTabActive = true;
     
     document.addEventListener("visibilitychange", () => { isTabActive = !document.hidden; });
+
+    // Declaramos la función global para que "render" pueda alimentarle los pacientes
+    window.syncPlexusPatients = () => {};
 
     function initPlexus() {
       if (plexusRunning) return;
@@ -1939,27 +1941,53 @@
 
       const canvas = document.getElementById('plexusCanvas');
       const ctx = canvas.getContext('2d');
-      let width, height, particles = [];
+      let width, height, standardParticles = [], patientParticles = [];
 
       function resize() { 
         width = canvas.width = canvas.offsetWidth; 
         height = canvas.height = canvas.offsetHeight; 
-        initParticles();
+        initStandardParticles();
+      }
+
+      const plexusAreaColors = {
+        'SALA DE CHOQUE': { solid: '#ef4444', glow: 'rgba(239, 68, 68, 0.4)' },
+        'OBSERVACION': { solid: '#10b981', glow: 'rgba(16, 185, 129, 0.4)' },
+        'OBSERVACIÓN': { solid: '#10b981', glow: 'rgba(16, 185, 129, 0.4)' },
+        'TRAUMA MENOR': { solid: '#eab308', glow: 'rgba(234, 179, 8, 0.4)' },
+        'PEDIATRIA': { solid: '#3b82f6', glow: 'rgba(59, 130, 246, 0.4)' },
+        'PEDIATRÍA': { solid: '#3b82f6', glow: 'rgba(59, 130, 246, 0.4)' },
+        'EXTRAS': { solid: '#d946ef', glow: 'rgba(217, 70, 239, 0.4)' }
+      };
+
+      function createParticle(isPatient, colorSet) {
+        return {
+          isPatient: isPatient,
+          x: Math.random() * width,
+          y: Math.random() * height,
+          vx: (Math.random() - 0.5) * 0.5,
+          vy: (Math.random() - 0.5) * 0.5,
+          radius: isPatient ? (Math.random() * 2 + 3) : (Math.random() * 1.5 + 0.5),
+          color: colorSet
+        };
       }
       
-      function initParticles() {
-        particles = [];
+      function initStandardParticles() {
+        standardParticles = [];
         let num = Math.floor(width / 35); 
         for (let i = 0; i < num; i++) {
-          particles.push({
-            x: Math.random() * width,
-            y: Math.random() * height,
-            vx: (Math.random() - 0.5) * 0.4,
-            vy: (Math.random() - 0.5) * 0.4,
-            radius: Math.random() * 1.5 + 0.5
-          });
+          standardParticles.push(createParticle(false, null));
         }
       }
+
+      // La enlazamos con la recolección de datos de Firebase
+      window.syncPlexusPatients = (listaPacientes) => {
+        patientParticles = [];
+        (listaPacientes || []).forEach(p => {
+          let areaNormalizada = String(p.area || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().trim();
+          let colorSet = plexusAreaColors[areaNormalizada] || { solid: '#ffffff', glow: 'rgba(255,255,255,0.3)' };
+          patientParticles.push(createParticle(true, colorSet));
+        });
+      };
 
       window.addEventListener('resize', resize);
       resize();
@@ -1973,26 +2001,42 @@
         ctx.clearRect(0, 0, width, height);
         
         let isLight = document.body.classList.contains('light') || document.body.classList.contains('pink') || document.body.classList.contains('colorful');
-        ctx.fillStyle = isLight ? 'rgba(15, 23, 42, 0.3)' : 'rgba(255, 255, 255, 0.3)';
-        ctx.strokeStyle = isLight ? 'rgba(15, 23, 42, 0.1)' : 'rgba(255, 255, 255, 0.1)';
+        let defaultFill = isLight ? 'rgba(15, 23, 42, 0.3)' : 'rgba(255, 255, 255, 0.3)';
+        let defaultStroke = isLight ? 'rgba(15, 23, 42, 0.1)' : 'rgba(255, 255, 255, 0.1)';
+        
+        let allParticles = standardParticles.concat(patientParticles);
         ctx.lineWidth = 0.8; 
 
-        for (let i = 0; i < particles.length; i++) {
-          let p = particles[i];
+        for (let i = 0; i < allParticles.length; i++) {
+          let p = allParticles[i];
           p.x += p.vx; p.y += p.vy;
           
           if (p.x < 0 || p.x > width) p.vx *= -1; 
           if (p.y < 0 || p.y > height) p.vy *= -1;
           
-          ctx.beginPath(); 
-          ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2); 
-          ctx.fill();
+          if (p.isPatient) {
+            ctx.beginPath(); 
+            ctx.arc(p.x, p.y, p.radius + 3, 0, Math.PI * 2); 
+            ctx.fillStyle = p.color.glow; 
+            ctx.fill();
+            
+            ctx.beginPath(); 
+            ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2); 
+            ctx.fillStyle = p.color.solid; 
+            ctx.fill();
+          } else {
+            ctx.beginPath(); 
+            ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2); 
+            ctx.fillStyle = defaultFill; 
+            ctx.fill();
+          }
 
-          for (let j = i + 1; j < particles.length; j++) {
-            let p2 = particles[j];
+          for (let j = i + 1; j < allParticles.length; j++) {
+            let p2 = allParticles[j];
             let dx = p.x - p2.x, dy = p.y - p2.y;
-            if (dx*dx + dy*dy < 6400) { // 80*80
+            if (dx*dx + dy*dy < 8000) { 
               ctx.beginPath(); 
+              ctx.strokeStyle = defaultStroke; 
               ctx.moveTo(p.x, p.y); 
               ctx.lineTo(p2.x, p2.y); 
               ctx.stroke();
