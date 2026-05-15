@@ -33,53 +33,53 @@
     body { font-family: 'Fira Code', monospace; transition: background 0.5s ease, color 0.5s ease; font-variant-ligatures: contextual; }
 
     /* ==========================================================
-       DEFINICIÓN DE TEMAS
+       DEFINICIÓN DE TEMAS (SÓLIDOS PARA RENDIMIENTO)
        ========================================================== */
     body.dark {
-      --bg: #0f172a; --panel: #0b1220; --panel-glass: rgba(11, 18, 32, 0.85); --section-head: #0b1220;
+      --bg: #0f172a; --panel: #1e293b; --section-head: #0f172a;
       --card: #1e293b; --card-open: #2d3e5a; --field: rgba(255,255,255,0.03);
       --text: #e5e7eb; --muted: #94a3b8; --line: rgba(255,255,255,0.08);
       --accent: #60a5fa; --accent-soft: rgba(96,165,250,0.12); --accent-border: rgba(96,165,250,0.24);
       --chip-bg: rgba(96,165,250,0.12); --chip-text: #dbeafe; 
       --search-bg: rgba(255,255,255,0.05); --error-bg: rgba(239,68,68,.10); --error-border: rgba(239,68,68,.22);
       --error-text: #fecaca; --toggle-bg: rgba(255,255,255,0.06); --toggle-icon: #dbeafe;
-      --modal-overlay: rgba(0,0,0,0.6); --success: #34d399; 
+      --modal-overlay: rgba(0,0,0,0.85); --success: #34d399; 
       --skeleton: #2d3e5a; --skeleton-shimmer: rgba(255, 255, 255, 0.05);
     }
 
     body.light {
-      --bg: #eef4fb; --panel: #ffffff; --panel-glass: rgba(255, 255, 255, 0.90); --section-head: #f8fbff;
+      --bg: #eef4fb; --panel: #ffffff; --section-head: #f8fbff;
       --card: #ffffff; --card-open: #dbeafe; --field: rgba(37,99,235,0.03);
       --text: #0f172a; --muted: #475569; --line: rgba(15,23,42,0.08);
       --accent: #2563eb; --accent-soft: rgba(37,99,235,0.10); --accent-border: rgba(37,99,235,0.16);
       --chip-bg: rgba(37,99,235,0.10); --chip-text: #1d4ed8; 
       --search-bg: rgba(37,99,235,0.05); --error-bg: rgba(254,242,242,0.92); --error-border: rgba(239,68,68,.18);
       --error-text: #b91c1c; --toggle-bg: rgba(37,99,235,0.08); --toggle-icon: #1d4ed8;
-      --modal-overlay: rgba(15,23,42,0.4); --success: #10b981; 
+      --modal-overlay: rgba(15,23,42,0.6); --success: #10b981; 
       --skeleton: #e2e8f0; --skeleton-shimmer: rgba(255, 255, 255, 0.4);
     }
 
     body.pink {
-      --bg: #fdf2f8; --panel: #ffffff; --panel-glass: rgba(255, 255, 255, 0.90); --section-head: #fdf2f8;
+      --bg: #fdf2f8; --panel: #ffffff; --section-head: #fdf2f8;
       --card: #ffffff; --card-open: #fce7f3; --field: rgba(219, 39, 119, 0.03);
       --text: #831843; --muted: #be185d; --line: rgba(219, 39, 119, 0.15);
       --accent: #db2777; --accent-soft: rgba(219, 39, 119, 0.12); --accent-border: rgba(219, 39, 119, 0.25);
       --chip-bg: rgba(219, 39, 119, 0.15); --chip-text: #9d174d; 
       --search-bg: rgba(219, 39, 119, 0.05); --error-bg: rgba(225, 29, 72, 0.1); --error-border: rgba(225, 29, 72, 0.2);
       --error-text: #e11d48; --toggle-bg: rgba(219, 39, 119, 0.1); --toggle-icon: #db2777;
-      --modal-overlay: rgba(131, 24, 67, 0.5); --success: #10b981; 
+      --modal-overlay: rgba(131, 24, 67, 0.7); --success: #10b981; 
       --skeleton: #fce7f3; --skeleton-shimmer: rgba(255, 255, 255, 0.4);
     }
 
     body.colorful {
-      --bg: #f8fafc; --panel: #fde68a; --panel-glass: rgba(253, 230, 138, 0.90); --section-head: #eab308; 
+      --bg: #f8fafc; --panel: #fde68a; --section-head: #eab308; 
       --card: #1d4ed8; --card-open: #d946ef; --field: rgba(0, 0, 0, 0.2); 
       --text: #001f3f; --muted: #475569; --line: rgba(0, 0, 0, 0.1);
       --accent: #16a34a; --accent-soft: rgba(22, 163, 74, 0.1); --accent-border: #15803d;
       --chip-bg: #bef264; --chip-text: #001f3f; 
       --search-bg: #ffffff; --error-bg: #fee2e2; --error-border: #ef4444; --error-text: #b91c1c; 
       --toggle-bg: #f43f5e; --toggle-icon: #ffffff;
-      --modal-overlay: rgba(23, 23, 23, 0.5); --success: #16a34a; 
+      --modal-overlay: rgba(23, 23, 23, 0.7); --success: #16a34a; 
       --skeleton: #bef264; --skeleton-shimmer: rgba(255, 255, 255, 0.5);
     }
 
@@ -94,19 +94,19 @@
     body.colorful .fab-btn { background: linear-gradient(135deg, #bef264, #06b6d4) !important; color: #001f3f; }
 
     body.midnight {
-      --bg: #000000; --panel: #0a0000; --panel-glass: rgba(0, 0, 0, 0.9); --section-head: #1a0000; 
+      --bg: #000000; --panel: #111111; --section-head: #1a0000; 
       --card: #120000; --card-open: #250000; --field: rgba(255, 0, 0, 0.05);
       --text: #ff4d4d; --muted: #800000; --line: rgba(255, 0, 0, 0.15);
       --accent: #ff0000; --accent-soft: rgba(255, 0, 0, 0.1); --accent-border: rgba(255, 0, 0, 0.3);
       --chip-bg: #330000; --chip-text: #ff4d4d; 
       --search-bg: #0a0000; --error-bg: #220000; --error-border: #aa0000; --error-text: #ff4d4d; 
       --toggle-bg: #1a0000; --toggle-icon: #ff0000;
-      --modal-overlay: rgba(0,0,0,0.8); --success: #880000; 
+      --modal-overlay: rgba(0,0,0,0.9); --success: #880000; 
       --skeleton: #1a0000; --skeleton-shimmer: rgba(255, 0, 0, 0.1);
     }
 
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    .app { display: flex; flex-direction: column; width: 100%; height: 100vh; background: var(--bg); }
+    .app { display: flex; flex-direction: column; width: 100%; height: 100vh; background: var(--bg); overflow: hidden; }
     .hide-on-mobile { display: none !important; }
 
     .patient-name, .value, .truncate-text, .patient-bed, .chip, .section-title, .censo-table td, .input-control { text-transform: uppercase !important; }
@@ -114,154 +114,47 @@
 
     /* BOTON DE LOGIN SOBRIO Y ELEGANTE */
     .btn-login-sober {
-      padding: 12px 36px;
-      font-size: 0.9rem;
-      font-family: 'Space Mono', monospace;
-      font-weight: 700;
-      letter-spacing: 0.15em;
-      color: var(--text);
-      background: transparent;
-      border: 1px solid var(--muted);
-      border-radius: var(--radius-sm);
-      cursor: pointer;
-      transition: all var(--transition);
-      text-transform: uppercase;
-      min-width: 160px;
+      padding: 12px 36px; font-size: 0.9rem; font-family: 'Space Mono', monospace; font-weight: 700; letter-spacing: 0.15em;
+      color: var(--text); background: transparent; border: 1px solid var(--muted); border-radius: var(--radius-sm);
+      cursor: pointer; transition: all var(--transition); text-transform: uppercase; min-width: 160px;
     }
-    .btn-login-sober:hover:not(:disabled) {
-      border-color: var(--accent);
-      color: var(--accent);
-      background: var(--accent-soft);
-      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-    }
-    .btn-login-sober:active:not(:disabled) {
-      transform: scale(0.95);
-      background: var(--accent);
-      color: #fff;
-    }
-    .btn-login-sober:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      border-color: var(--line);
-    }
-    @media (min-width: 768px) {
-      .btn-login-sober {
-        padding: 14px 48px;
-        font-size: 1rem;
-        border-width: 2px;
-      }
-    }
+    .btn-login-sober:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    .btn-login-sober:active:not(:disabled) { transform: scale(0.95); background: var(--accent); color: #fff; }
+    .btn-login-sober:disabled { opacity: 0.5; cursor: not-allowed; border-color: var(--line); }
+    @media (min-width: 768px) { .btn-login-sober { padding: 14px 48px; font-size: 1rem; border-width: 2px; } }
 
     /* ENCABEZADO BASE LIMPIO */
     .header { 
-      position: relative; 
-      flex-shrink: 0; 
-      z-index: 50; 
-      width: 100%; 
-      padding: 14px 10px; 
-      margin: 0; 
-      background: var(--panel-glass); 
-      backdrop-filter: blur(12px); 
-      -webkit-backdrop-filter: blur(12px); 
-      border-bottom: 1px solid var(--line); 
-      box-shadow: 0 4px 166px rgba(0,0,0,0.08); 
-      overflow: hidden; 
+      position: relative; flex-shrink: 0; z-index: 50; width: 100%; padding: 14px 10px; margin: 0; 
+      background: var(--panel); 
+      border-bottom: 1px solid var(--line); box-shadow: 0 4px 25px rgba(0,0,0,0.05); overflow: hidden; 
     }
+    @media (display-mode: standalone) { .header { padding-top: max(14px, env(safe-area-inset-top)); } }
     
-    @media (display-mode: standalone) {
-      .header {
-        padding-top: max(14px, env(safe-area-inset-top));
-      }
-    }
-    
-    .header-top { 
-      display: flex; 
-      align-items: center; 
-      justify-content: space-between; 
-      position: relative; 
-      width: 100%; 
-      min-height: 54px; 
-      z-index: 2; 
-    }
-    #plexusCanvas {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 1;
-      pointer-events: none;
-    }
+    .header-top { display: flex; align-items: center; justify-content: space-between; position: relative; width: 100%; min-height: 54px; z-index: 2; }
+    #plexusCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
 
-    .header-top .header-left { 
-      display: flex; align-items: center; gap: 8px; z-index: 2; 
-      flex: 1; 
-      justify-content: flex-start; 
-    }
-    
-    .header-top .header-right { 
-      display: flex; align-items: center; gap: 8px; z-index: 2; 
-      flex: 1; 
-      justify-content: flex-end; 
-    }
+    .header-top .header-left { display: flex; align-items: center; gap: 8px; z-index: 2; flex: 1; justify-content: flex-start; }
+    .header-top .header-right { display: flex; align-items: center; gap: 8px; z-index: 2; flex: 1; justify-content: flex-end; }
 
-    .main-title { 
-      position: absolute; 
-      left: 50%; 
-      top: 50%; 
-      transform: translate(-50%, -50%); 
-      text-align: center; 
-      display: flex; 
-      flex-direction: column; 
-      align-items: center; 
-      z-index: 2; 
-      width: max-content; 
-    }
-    
+    .main-title { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); text-align: center; display: flex; flex-direction: column; align-items: center; z-index: 2; width: max-content; }
     .title-censo { 
-      font-family: 'Space Mono', monospace; 
-      font-size: 1.4rem; 
-      font-weight: 700; 
-      letter-spacing: 0.08em; 
-      line-height: 1.2; 
-      padding: 4px 4px 2px 4px; 
-      background-image: linear-gradient(to right, #ef4444, #f97316, #eab308, #f97316, #ef4444); 
-      background-size: 200% auto; 
-      -webkit-background-clip: text; 
-      background-clip: text; 
-      color: transparent; 
-      animation: hypnoticGradient 8s linear infinite; 
+      font-family: 'Space Mono', monospace; font-size: 1.4rem; font-weight: 700; letter-spacing: 0.08em; line-height: 1.2; 
+      padding: 4px 4px 2px 4px; background-image: linear-gradient(to right, #ef4444, #f97316, #eab308, #f97316, #ef4444); 
+      background-size: 200% auto; -webkit-background-clip: text; background-clip: text; color: transparent; animation: hypnoticGradient 8s linear infinite; 
     }
-    .title-urgencias { 
-      font-size: 0.75rem; 
-      font-weight: 600; 
-      color: var(--muted); 
-      letter-spacing: 0.15em; 
-      text-transform: uppercase; 
-      margin-top: 0px; 
-    }
+    .title-urgencias { font-size: 0.75rem; font-weight: 600; color: var(--muted); letter-spacing: 0.15em; text-transform: uppercase; margin-top: 0px; }
 
     .icon-btn { 
-      width: 30px; 
-      height: 30px; 
-      border-radius: 50%; 
-      border: 1px solid var(--accent-border); 
-      background: var(--toggle-bg); 
-      color: var(--text); 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      font-size: 1rem; 
-      cursor: pointer; 
-      transition: all var(--transition-fast); 
-      padding: 0; 
-      flex-shrink: 0; 
+      width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--accent-border); background: var(--toggle-bg); 
+      color: var(--text); display: flex; align-items: center; justify-content: center; font-size: 1rem; cursor: pointer; transition: all var(--transition-fast); padding: 0; flex-shrink: 0; 
     }
-    
     .icon-btn:active { transform: scale(0.9); background: var(--accent-soft); }
+    
     @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     @keyframes hypnoticGradient { from { background-position: 0% center; } to { background-position: 200% center; } }
     .spin { animation: spin 1s linear infinite; display: inline-block; }
+    
     .search-wrapper { position: relative; z-index: 2; max-height: 60px; opacity: 1; transform: translateY(0); overflow: hidden; transition: all var(--transition); margin-top: 12px; }
     .search-wrapper.collapsed { max-height: 0; opacity: 0; transform: translateY(-10px); margin-top: 0; pointer-events: none; }
     .search { width: 100%; max-width: 100%; padding: 12px 10px; font-size: 1rem; border-radius: var(--radius-md); border: 1px solid var(--line); background: var(--search-bg); color: var(--text); outline: none; font-family: 'Fira Code', monospace; transition: border-color var(--transition-fast), box-shadow var(--transition-fast); }
@@ -271,7 +164,7 @@
     @keyframes fadeInUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
     .animate-in { animation: fadeInUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards; opacity: 0; }
     
-    .section { width: 100%; max-width: 100%; margin: 0 0 16px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); border-radius: 0; background: var(--bg); overflow: hidden; }
+    .section { width: 100%; max-width: 100%; margin: 0 0 16px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); border-radius: 0; background: var(--panel); overflow: hidden; }
     .section-header { width: 100%; padding: 12px 10px; background: var(--section-head); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 10; }
     .section-title { font-size: 0.9rem; font-weight: 700; line-height: 1.12; color: var(--accent); text-transform: uppercase; letter-spacing: 0.08em; display: flex; align-items: center; gap: 6px; }
     
@@ -309,7 +202,13 @@
     .patient-name { font-family: 'Space Mono', monospace; font-size: 1.15rem; font-weight: 700; line-height: 1.2; color: var(--text); white-space: normal; word-break: break-word; transition: all var(--transition-fast); }
     .patient-bed { margin-top: 6px; font-size: 0.8rem; color: var(--muted); font-weight: 500; }
     .card-header .header-right { display: flex; align-items: center; gap: 6px; flex: 0 0 auto; min-width: 0; }
-    .chip { display: inline-block; font-size: 0.65rem; font-weight: 600; padding: 4px 6px; border-radius: 6px; border: 1px solid var(--accent-border); background: var(--chip-bg); color: var(--chip-text); max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    
+    .chip { display: inline-block; font-size: 0.65rem; font-weight: 600; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--accent-border); background: var(--chip-bg); color: var(--chip-text); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: center; }
+    .card .chip { max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.65rem; }
+    
+    /* EMOJI CHIP PARA MODO KANBAN (v2.25) */
+    .chip-emoji { font-size: 1.5rem; line-height: 1; text-align: center; display: inline-block; cursor: help; background: transparent; border: none; padding: 0; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15)); }
+
     .caret { width: 24px; height: 24px; display: grid; place-items: center; border-radius: 999px; color: var(--muted); font-size: 1rem; transition: transform var(--transition), color var(--transition); flex-shrink: 0; }
     .card.open .caret { transform: rotate(180deg) scale(1.1); color: var(--accent); }
     
@@ -336,30 +235,31 @@
     .skeleton-right { display: flex; align-items: center; gap: 8px; } .skeleton-chip { height: 1.3rem; width: 55px; border-radius: 6px; } .skeleton-caret { height: 24px; width: 24px; border-radius: 50%; }
     .skeleton-row { display: flex; align-items: center; padding: 14px 16px; border-bottom: 1px solid var(--line); gap: 16px; background: var(--bg); } .skeleton-cell { height: 0.8rem; opacity: 0.6; }
 
-    .footer { flex-shrink: 0; display: block; text-align: center; padding: 8px 10px; color: var(--muted); font-size: 0.7rem; border-top: 1px solid var(--line); margin: 0; background: var(--panel-glass); }
+    .footer { flex-shrink: 0; display: block; text-align: center; padding: 8px 10px; color: var(--muted); font-size: 0.7rem; border-top: 1px solid var(--line); margin: 0; background: var(--panel); z-index: 50; position: relative;}
 
     .btn-editar-tarjeta { width: 100%; margin-top: 12px; padding: 12px; border-radius: var(--radius-sm); background: var(--accent-soft); border: 1px solid var(--accent-border); color: var(--accent); font-family: 'Space Mono', monospace; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; cursor: pointer; transition: all var(--transition-fast); }
     .btn-editar-tarjeta:active { transform: scale(0.98); background: var(--accent); color: #fff; }
     .fab-btn { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #ef4444, #f97316); color: white; border: none; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4); font-size: 2rem; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 40; transition: transform var(--transition-fast), box-shadow var(--transition-fast); line-height: 1; display: flex; }
     .fab-btn:active { transform: scale(0.9); box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4); }
 
-    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--modal-overlay); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); z-index: 100; display: none; align-items: center; justify-content: center; padding: 16px; opacity: 0; transition: opacity 0.3s; }
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--modal-overlay); z-index: 100; display: none; align-items: center; justify-content: center; padding: 16px; opacity: 0; transition: opacity 0.3s; }
     .modal-overlay.active { display: flex; opacity: 1; }
-    .modal-content { background: var(--panel); width: 100%; max-width: 400px; border-radius: var(--radius-xl); border: 1px solid var(--line); box-shadow: 0 10px 25px rgba(0,0,0,0.2); padding: 20px; display: flex; flex-direction: column; gap: 12px; transform: translateY(20px); transition: transform 0.3s; max-height: 90vh; overflow-y: auto; }
+    .modal-content { background: var(--panel); width: 100%; max-width: 400px; border-radius: var(--radius-xl); border: 1px solid var(--line); box-shadow: 0 10px 25px rgba(0,0,0,0.5); padding: 20px; display: flex; flex-direction: column; gap: 12px; transform: translateY(20px); transition: transform 0.3s; max-height: 90vh; overflow-y: auto; }
     .modal-overlay.active .modal-content { transform: translateY(0); }
     .modal-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
     .modal-title { font-family: 'Space Mono', monospace; font-size: 1.1rem; font-weight: 700; color: var(--text); text-transform: uppercase; }
     .modal-close { background: transparent; border: none; color: var(--muted); font-size: 1.5rem; cursor: pointer; padding: 0; line-height: 1; }
-    .input-group { display: flex; flex-direction: column; gap: 6px; }
+    
+    .modal-body-grid { display: flex; flex-direction: column; gap: 12px; width: 100%; }
+    .input-group { display: flex; flex-direction: column; gap: 6px; position: relative; }
     .input-group label { font-size: 0.75rem; color: var(--accent); font-weight: 600; text-transform: uppercase; }
+    .modal-body-grid .input-control { margin-bottom: 0; }
     .input-control { width: 100%; padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--line); background: var(--bg); color: var(--text); font-family: 'Fira Code', monospace; font-size: 0.9rem; resize: vertical; transition: border-color var(--transition-fast); }
     .input-control:focus { outline: none; border-color: var(--accent); }
     .input-control:disabled { opacity: 0.5; cursor: not-allowed; }
 
     /* ESTILO PARA CALENDARIO NATIVO */
     input[type="datetime-local"].input-control::-webkit-calendar-picker-indicator { filter: invert(0.5); cursor: pointer; }
-
-    select.input-control { appearance: none; background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2394a3b8%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E"); background-repeat: no-repeat; background-position: right 12px top 50%; background-size: 12px auto; padding-right: 32px; }
 
     .modal-actions { display: flex; gap: 10px; margin-top: 10px; width: 100%; }
     .btn-cancelar { flex: 1; padding: 12px; border-radius: var(--radius-sm); background: var(--field); border: 1px solid var(--line); color: var(--text); font-weight: 600; cursor: pointer; text-transform: uppercase; font-family: 'Space Mono', monospace; }
@@ -373,11 +273,46 @@
     .warning-icon { font-size: 3.5rem; margin: 10px auto; height: 80px; width: 80px; display: flex; align-items: center; justify-content: center; animation: pulseWarning 1s infinite ease-in-out; }
     .delete-text-highlight { color: var(--error-text); font-weight: 700; font-size: 1.1rem; text-align: center; font-family: 'Space Mono', monospace; line-height: 1.4; }
 
+    /* TRUNCATE BASE (MÓVIL) */
+    .truncate-text { width: 100%; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
+
+    /* PERSONALIZACIÓN DE SCROLLBARS GLOBALES */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--muted); border-radius: 10px; opacity: 0.3; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+    /* ========================================================= 
+       COMPONENTES DEL SELECTOR PERSONALIZADO (MODALES) 
+       ========================================================= */
+    .custom-select-wrapper { position: relative; width: 100%; }
+    .custom-select-display { cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; }
+    .custom-select-display::after { content: '▼'; font-size: 0.8rem; margin-left: 8px; color: var(--muted); }
+    .custom-select-popover {
+      display: none; position: absolute; top: 100%; left: 0; width: 100%; z-index: 99999;
+      background: var(--panel); border: 1px solid var(--accent); border-radius: var(--radius-sm);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5); flex-direction: column; overflow: hidden; margin-top: 4px;
+    }
+    .custom-select-popover.active { display: flex; }
+    .custom-select-search { padding: 6px; border-bottom: 1px solid var(--line); background: var(--bg); }
+    .custom-select-search input { width: 100%; padding: 8px; border-radius: 4px; border: 1px solid var(--line); background: var(--panel); color: var(--text); outline: none; font-family: 'Fira Code', monospace; font-size: 0.85rem;}
+    .custom-select-search input:focus { border-color: var(--accent); }
+    .custom-select-options { max-height: 180px; overflow-y: auto; }
+    .custom-select-option { padding: 10px 12px; font-size: 0.85rem; cursor: pointer; text-transform: uppercase; color: var(--text); border-bottom: 1px solid var(--line); }
+    .custom-select-option:last-child { border-bottom: none; }
+    .custom-select-option:hover { background: var(--field); color: var(--accent); }
+    .custom-select-optgroup { padding: 6px 12px; font-weight: bold; font-size: 0.75rem; color: var(--muted); background: var(--section-head); text-transform: uppercase; border-bottom: 1px solid var(--line); border-top: 1px solid var(--line);}
+    .custom-select-optgroup:first-child { border-top: none; }
+
     @media (min-width: 768px) { 
       .hide-on-mobile { display: flex !important; }
-      #content { display: flex; flex-direction: row; gap: 24px; padding: 0; padding-bottom: 60px; align-items: flex-start; }
-      .section { min-width: 450px; flex: 1 0 450px; max-width: 800px; margin: 0; border-radius: var(--radius-lg); border: 1px solid var(--line); background: var(--bg); max-height: calc(100vh - 85px); display: flex; flex-direction: column; } 
-      .section-header { border-radius: var(--radius-lg) var(--radius-lg) 0 0; position: sticky; top: 0; z-index: 10; font-size: 1.1rem; padding: 16px; background: var(--bg); }
+      
+      /* REESTRUCTURACIÓN DE CONTENT PARA KANBAN Y TABLA */
+      #content { display: flex; flex-direction: row; gap: 24px; padding: 16px; align-items: flex-start; overflow-x: auto; overflow-y: hidden; }
+      
+      /* KANBAN EN COLUMNAS */
+      .section { min-width: 380px; flex: 0 0 380px; max-width: 380px; margin: 0; border-radius: var(--radius-lg); border: 1px solid var(--accent-border); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); max-height: calc(100vh - 145px); display: flex; flex-direction: column; background: var(--panel); } 
+      .section-header { background: var(--section-head) !important; border-bottom: 1px solid var(--line); border-radius: var(--radius-lg) var(--radius-lg) 0 0; position: sticky; top: 0; z-index: 10; font-size: 1.1rem; padding: 16px; }
       .patient-list { overflow-y: auto; flex-grow: 1; padding: 0 16px 16px; gap: 12px; }
       .card { border-bottom: none !important; border-radius: var(--radius-md); box-shadow: 0 3px 8px rgba(0,0,0,0.06); width: auto; border: none !important; margin-bottom: 12px; }
       .swipe-bg { border-radius: var(--radius-md); top: 1px; left: 1px; width: calc(100% - 2px); height: calc(100% - 2px); }
@@ -385,34 +320,109 @@
       .skeleton-loader { gap: 12px; padding: 0 16px 16px; }
       .skeleton-card { border-bottom: none !important; border-radius: var(--radius-md); border: 1px solid var(--line); margin-bottom: 12px; }
 
-      /* Recuperar el tamaño original del título en monitores de escritorio */
       .title-censo { font-size: 1.8rem; letter-spacing: 0.12em; }
       .title-urgencias { font-size: 0.85rem; }
-      
-      ::-webkit-scrollbar { width: 8px; height: 8px; }
-      ::-webkit-scrollbar-track { background: transparent; }
-      ::-webkit-scrollbar-thumb { background: var(--muted); border-radius: 10px; opacity: 0.3; }
-      ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
 
-      #content.view-table-mode { flex-direction: column !important; align-items: stretch !important; overflow-y: auto; padding: 0 !important; }
-      .table-wrapper { width: 100%; background: transparent; border-radius: 0; border: none; box-shadow: none; overflow: hidden; margin-bottom: 0; }
-      .censo-table { width: 100%; border-collapse: collapse; text-align: left; background: var(--bg); table-layout: fixed; }
-      /* ========================================================= 
-         REDISEÑO DE COLUMNAS DE LA TABLA (MAXIMIZANDO ESPACIO)
-         ========================================================= */
-      .censo-table th { background: var(--section-head); color: var(--accent); padding: 14px 10px; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid var(--line); position: sticky; top: 0; z-index: 5; }
-      .censo-table td { padding: 12px 10px; border-bottom: 1px solid var(--line); color: var(--text); font-size: 0.95rem; vertical-align: middle; }
+      /* MODO TABLA COMPLETO */
+      #content.view-table-mode { display: block; padding: 0 16px; overflow-x: hidden; }
+      
+      /* CONTENEDOR DE TABLA PRINCIPAL SÓLIDO (RENDIMIENTO MÁXIMO) */
+      .table-wrapper { 
+        position: relative; width: 100%; 
+        background: var(--panel) !important; 
+        border: 1px solid var(--accent-border); border-radius: var(--radius-md); 
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15); 
+        overflow-y: auto; overflow-x: auto; max-height: calc(100vh - 145px); margin-bottom: 0; 
+        transform: translateZ(0); -webkit-transform: translateZ(0); will-change: scroll-position, transform; backface-visibility: hidden; -webkit-backface-visibility: hidden;
+      }
+      
+      .censo-table { width: 100%; border-collapse: collapse; text-align: left; background: transparent; table-layout: fixed; transform: translateZ(0); -webkit-transform: translateZ(0); }
+      
+      /* ENCABEZADOS TEMÁTICOS Y DENSIDAD */
+      .censo-table th { background: var(--section-head) !important; color: var(--accent); padding: 10px 6px; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid var(--line); position: sticky; top: 0; z-index: 5; }
+      .censo-table td { padding: 8px 6px; border-bottom: 1px solid var(--line); color: var(--text); font-size: 0.95rem; vertical-align: middle; background: transparent; }
       .censo-table tr:last-child td { border-bottom: none; }
       
-      .truncate-text { width: 100%; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
-      
-      .patient-row { cursor: pointer; transition: background 0.2s ease; }
+      .censo-table .chip { width: 100%; padding: 8px 4px; font-size: 0.7rem; }
+
+      /* TRUNCAMIENTO MULTILÍNEA PARA ESCRITORIO */
+      .truncate-text { 
+        width: 100%; max-width: 100%; 
+        display: -webkit-box; 
+        -webkit-line-clamp: 2; 
+        -webkit-box-orient: vertical; 
+        overflow: hidden; 
+        white-space: normal; 
+        word-break: break-word; 
+      }
+      .patient-row { cursor: pointer; transition: background 0.2s ease; background: transparent; }
       .patient-row:hover { background: var(--field) !important; }
       .patient-row.expanded-row { background: var(--card-open) !important; }
       .patient-row.expanded-row td { border-bottom: 1px solid var(--line); }
-      .patient-row.expanded-row .truncate-text { white-space: normal; overflow: visible; max-width: none; }
-      .patient-row.expanded-row .chip { max-width: none; white-space: normal; overflow: visible; display: inline-block; line-height: 1.2; }
       
+      /* Al expandir, anulamos el truncamiento para mostrar todo el texto */
+      .patient-row.expanded-row .truncate-text { 
+        white-space: normal; 
+        overflow: visible; 
+        max-width: none; 
+        -webkit-line-clamp: unset;
+        display: block;
+      }
+      .patient-row.expanded-row .chip { white-space: normal; overflow: visible; display: inline-block; line-height: 1.2; }
+      
+      /* SUTILEZA EXTREMA: EDICIÓN EN LÍNEA SIN BRINCO DE TAMAÑO */
+      .patient-row.expanded-row td.editable-cell { cursor: text; position: relative; }
+      .patient-row.expanded-row td.editable-cell:hover::after { content: '✎'; position: absolute; top: 2px; right: 2px; font-size: 0.7rem; color: var(--muted); opacity: 0.5; pointer-events: none; }
+      
+      .patient-row.expanded-row td.editable-cell.is-editing { 
+        color: #ef4444 !important; 
+        outline: none; 
+        background-color: rgba(239, 68, 68, 0.05); 
+      }
+      .patient-row.expanded-row td.editable-cell.is-editing.patient-name { 
+        color: #ef4444 !important; 
+        font-weight: 700; 
+      }
+      .patient-row.expanded-row td.editable-cell.is-editing * { 
+        color: inherit !important; 
+        font-size: inherit !important; 
+        font-family: inherit !important; 
+        line-height: inherit !important; 
+      }
+      
+      /* CONTENEDOR DE DESTINOS EN LÍNEA CON SCROLL INTERNO Y BUSCADOR */
+      .inline-destino-container {
+        background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius-sm);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.5); z-index: 99999; display: flex; flex-direction: column; overflow: hidden;
+      }
+      .inline-options-wrapper { max-height: 250px; overflow-y: auto; width: 100%; }
+      .inline-destino-option {
+        padding: 10px 12px; font-size: 0.8rem; color: var(--text); cursor: pointer;
+        transition: background var(--transition-fast); text-transform: uppercase; border-bottom: 1px solid var(--line);
+      }
+      .inline-destino-option:last-child { border-bottom: none; }
+      .inline-destino-option:hover { background: var(--field); color: var(--accent); }
+      .inline-destino-option.selected { background: var(--accent-soft); color: var(--accent); font-weight: 700; }
+
+      .patient-row.selected-nav { border-left: 4px solid var(--accent) !important; background: var(--accent-soft) !important; }
+
+      /* GUÍA VISUAL CENTRADA SOBRE LAS OLAS */
+      @keyframes subtleBounce {
+        0%, 100% { transform: translate(-50%, 0); }
+        50% { transform: translate(-50%, -4px); }
+      }
+      .scroll-guider {
+        position: absolute; left: 50%; width: 38px; height: 38px; border-radius: 50%;
+        background: var(--panel); border: 1px solid var(--accent-border); color: var(--accent);
+        display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 700;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3); cursor: pointer; z-index: 30;
+        opacity: 0; pointer-events: none; transition: opacity var(--transition-fast), top var(--transition), bottom var(--transition);
+        animation: subtleBounce 2s infinite ease-in-out;
+      }
+      .scroll-guider.active-down { bottom: 65px; top: auto; opacity: 0.85; pointer-events: auto; }
+      .scroll-guider.active-up { top: 60px; bottom: auto; opacity: 0.85; pointer-events: auto; }
+      .scroll-guider:hover { opacity: 1; background: var(--accent-soft); }
+
       .btn-table { background: transparent; border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 6px; cursor: pointer; font-size: 1.1rem; transition: all var(--transition-fast); margin-right: 4px; }
       .btn-table:hover { transform: scale(1.1); }
       .btn-table.edit { color: #10b981; }
@@ -420,10 +430,22 @@
       .btn-table.delete { color: #ef4444; }
       .btn-table.delete:hover { background: rgba(239, 68, 68, 0.1); border-color: #ef4444; }
       .app.table-is-active ~ .fab-btn { display: none !important; }
-      .btn-add-table { display: block; width: 100%; padding: 16px; background: transparent; color: var(--muted); border: none; border-top: 1px dashed var(--line); font-family: 'Space Mono', monospace; font-size: 0.95rem; font-weight: 700; text-transform: uppercase; cursor: pointer; transition: all 0.2s ease; text-align: center; }
-      .btn-add-table:hover { background: var(--accent-soft); color: var(--accent); letter-spacing: 0.05em; }
+      
+      /* BOTÓN DE NUEVO INGRESO FIJO SÓLIDO */
+      .btn-add-table { 
+        position: sticky; bottom: 0; z-index: 25;
+        display: block; width: 100%; padding: 14px; 
+        background: var(--panel) !important; 
+        color: var(--accent); border: none; border-top: 1px solid var(--accent-border); 
+        font-family: 'Space Mono', monospace; font-size: 0.95rem; font-weight: 700; text-transform: uppercase; 
+        cursor: pointer; transition: all 0.2s ease; text-align: center; 
+        box-shadow: 0 -4px 15px rgba(0,0,0,0.1);
+      }
+      .btn-add-table:hover { background: var(--accent-soft) !important; color: var(--text); }
+      .btn-add-table.selected-nav { background: var(--accent-soft) !important; color: var(--text); border-left: 4px solid var(--accent); }
 
-      .desktop-waves-bg { position: fixed; bottom: 0; left: 0; width: 100%; height: 15vh; z-index: 0; pointer-events: none; }
+      /* FONDO DE OLAS: Solo visible en los espacios en blanco de la pantalla general */
+      .desktop-waves-bg { position: fixed; bottom: 0; left: 0; width: 100%; height: 30vh; z-index: 0; pointer-events: none; transform: translateZ(0); -webkit-transform: translateZ(0); will-change: transform; }
       .waves { position: absolute; width: 100%; height: 100%; bottom: 0; }
       .wave-layer-1 { fill: var(--accent); opacity: 0.05; animation: move-forever 60s cubic-bezier(.55,.5,.45,.5) infinite; }
       .wave-layer-2 { fill: var(--accent); opacity: 0.10; animation: move-forever 45s cubic-bezier(.55,.5,.45,.5) infinite; }
@@ -432,36 +454,21 @@
       @keyframes move-forever { 0% { transform: translate3d(-90px, 0, 0); } 100% { transform: translate3d(85px, 0, 0); } }
 
       #content { position: relative; z-index: 10; } 
-      .section { background: var(--panel-glass) !important; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--accent-border); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); }
-      .section-header { background: transparent !important; border-bottom: 1px solid var(--line); }
-      .table-wrapper { background: var(--panel-glass) !important; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
-      .censo-table th { background: rgba(0,0,0,0.05) !important; backdrop-filter: blur(5px); }
-
-      /* ========================================================= 
-         MODALES MÁS AMPLIOS PARA ESCRITORIO
-         ========================================================= */
-      .modal-content { 
-        max-width: 650px; 
-        padding: 32px; 
-        gap: 16px;
-      }
-      .modal-title {
-        font-size: 1.4rem;
-      }
-      .input-group label { 
-        font-size: 0.85rem; 
-      }
-      .input-control { 
-        font-size: 1rem; 
-        padding: 14px; 
-      }
-      textarea.input-control { 
-        min-height: 100px; 
-      }
-      .btn-guardar, .btn-cancelar, .btn-borrar {
-        font-size: 1rem;
-        padding: 14px;
-      }
+      
+      /* MODALES MEJORADOS Y EXPANDIDOS PARA ESCRITORIO (CSS GRID) */
+      .modal-content { max-width: 950px; padding: 36px; gap: 24px; }
+      .modal-title { font-size: 1.4rem; }
+      .input-group label { font-size: 0.85rem; }
+      .input-control { font-size: 1rem; padding: 14px; }
+      textarea.input-control { min-height: 80px; }
+      .btn-guardar, .btn-cancelar, .btn-borrar { font-size: 1rem; padding: 14px; }
+      
+      .modal-body-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px 20px; width: 100%; }
+      .span-12 { grid-column: span 12; }
+      .span-9 { grid-column: span 9; }
+      .span-6 { grid-column: span 6; }
+      .span-3 { grid-column: span 3; }
+      .modal-body-grid .input-group { margin-bottom: 0; }
     }
   </style>
 </head>
@@ -486,7 +493,7 @@
 
     <div style="position: absolute; bottom: 30px; font-size: 0.7rem; font-family: 'Space Mono', monospace; font-weight: 700; letter-spacing: 0.1em;">
       <span style="color: var(--muted);">ROUROG</span> <span style="color: var(--text); opacity: 0.5;">Innovations</span>
-      <span style="opacity: 0.3; margin-left: 6px;">v1.6</span>
+      <span style="opacity: 0.3; margin-left: 6px;">v1.26</span>
     </div>
   </div>
   <div class="app" id="mainAppContainer" style="display: none;">
@@ -533,7 +540,7 @@
 
     <div class="footer">
       Hospital Regional de Delicias - <span style="color: var(--accent); font-weight: 600;">Rourog Innovations</span>
-      <span style="opacity: 0.4; font-size: 0.8em; margin-left: 8px;">v2.4</span>
+      <span style="opacity: 0.4; font-size: 0.8em; margin-left: 8px;">v2.26</span>
     </div>
 
     <div id="easterEggContainer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; pointer-events: none; overflow: hidden;"></div>
@@ -548,13 +555,36 @@
         <button class="modal-close" onclick="cerrarModal('editModal')">&times;</button>
       </div>
       <input type="hidden" id="modalFila" value="">
-      <div class="input-group"><label>Fecha y Hora de Ingreso</label><input id="modalFechaIngreso" class="input-control" type="datetime-local" /></div>
-      <div class="input-group"><label>Nombre del Paciente</label><input id="modalNombre" class="input-control" type="text" /></div>
-      <div class="input-group"><label>Edad</label><input id="modalEdad" class="input-control" type="text" /></div>
-      <div class="input-group"><label>Diagnóstico</label><textarea id="modalDiagnostico" class="input-control" rows="2"></textarea></div>
-      <div class="input-group"><label>Pendientes</label><textarea id="modalPendientes" class="input-control" rows="3"></textarea></div>
-      <div class="input-group"><label>Destino</label><select id="modalDestino" class="input-control"></select></div>
-      <div class="input-group"><label class="optional-label">Mover a otra cama (Opcional)</label><select id="moverA_Select" class="input-control"></select></div>
+      <div class="modal-body-grid">
+        <div class="input-group span-6"><label>Fecha y Hora de Ingreso</label><input id="modalFechaIngreso" class="input-control" type="datetime-local" /></div>
+        <div class="input-group span-6">
+          <label>Destino</label>
+          <div class="custom-select-wrapper" id="editDestinoWrapper">
+            <div class="input-control custom-select-display" data-value="">(SIN DESTINO)</div>
+            <div class="custom-select-popover">
+              <div class="custom-select-search"><input type="text" placeholder="🔍 Buscar destino..." autocomplete="off"></div>
+              <div class="custom-select-options"></div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="input-group span-9"><label>Nombre del Paciente</label><input id="modalNombre" class="input-control" type="text" /></div>
+        <div class="input-group span-3"><label>Edad</label><input id="modalEdad" class="input-control" type="text" /></div>
+        
+        <div class="input-group span-6"><label>Diagnóstico</label><textarea id="modalDiagnostico" class="input-control" rows="3"></textarea></div>
+        <div class="input-group span-6"><label>Pendientes</label><textarea id="modalPendientes" class="input-control" rows="3"></textarea></div>
+        
+        <div class="input-group span-12">
+          <label class="optional-label">Mover a otra cama (Opcional)</label>
+          <div class="custom-select-wrapper" id="editMoverWrapper">
+            <div class="input-control custom-select-display" data-value="">NO MOVER (MANTENER EN CAMA ACTUAL)</div>
+            <div class="custom-select-popover">
+              <div class="custom-select-search"><input type="text" placeholder="🔍 Buscar cama..." autocomplete="off"></div>
+              <div class="custom-select-options"></div>
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="modal-actions">
         <button class="btn-cancelar" onclick="cerrarModal('editModal')">CANCELAR</button>
         <button class="btn-guardar" id="btnGuardarEdit" onclick="guardarEdicion()">💾 GUARDAR</button>
@@ -571,13 +601,36 @@
         <div class="modal-title" style="font-weight:700; font-family:'Space Mono';">NUEVO INGRESO</div>
         <button class="modal-close" onclick="cerrarModal('addModal')">&times;</button>
       </div>
-      <div class="input-group"><label>Fecha y Hora de Ingreso</label><input id="addFechaIngreso" class="input-control" type="datetime-local" /></div>
-      <div class="input-group"><label>Cama Disponible</label><select id="addCamaSelect" class="input-control"></select></div>
-      <div class="input-group"><label>Nombre del Paciente</label><input id="addNombre" class="input-control" type="text" /></div>
-      <div class="input-group"><label>Edad</label><input id="addEdad" class="input-control" type="text" placeholder="EJ: 45 AÑOS" /></div>
-      <div class="input-group"><label>Diagnóstico</label><textarea id="addDiagnostico" class="input-control" rows="2"></textarea></div>
-      <div class="input-group"><label>Pendientes</label><textarea id="addPendientes" class="input-control" rows="2"></textarea></div>
-      <div class="input-group"><label>Destino</label><select id="addDestino" class="input-control"></select></div>
+      <div class="modal-body-grid">
+        <div class="input-group span-6"><label>Fecha y Hora de Ingreso</label><input id="addFechaIngreso" class="input-control" type="datetime-local" /></div>
+        <div class="input-group span-6">
+          <label>Cama Disponible</label>
+          <div class="custom-select-wrapper" id="addCamaWrapper">
+            <div class="input-control custom-select-display" data-value="">SELECCIONA UNA CAMA LIBRE...</div>
+            <div class="custom-select-popover">
+              <div class="custom-select-search"><input type="text" placeholder="🔍 Buscar cama..." autocomplete="off"></div>
+              <div class="custom-select-options"></div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="input-group span-9"><label>Nombre del Paciente</label><input id="addNombre" class="input-control" type="text" /></div>
+        <div class="input-group span-3"><label>Edad</label><input id="addEdad" class="input-control" type="text" placeholder="EJ: 45 AÑOS" /></div>
+        
+        <div class="input-group span-6"><label>Diagnóstico</label><textarea id="addDiagnostico" class="input-control" rows="3"></textarea></div>
+        <div class="input-group span-6"><label>Pendientes</label><textarea id="addPendientes" class="input-control" rows="3"></textarea></div>
+        
+        <div class="input-group span-12">
+          <label>Destino</label>
+          <div class="custom-select-wrapper" id="addDestinoWrapper">
+            <div class="input-control custom-select-display" data-value="">(SIN DESTINO)</div>
+            <div class="custom-select-popover">
+              <div class="custom-select-search"><input type="text" placeholder="🔍 Buscar destino..." autocomplete="off"></div>
+              <div class="custom-select-options"></div>
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="modal-actions">
         <button class="btn-cancelar" onclick="cerrarModal('addModal')">CANCELAR</button>
         <button class="btn-guardar" id="btnGuardarAdd" onclick="guardarNuevo()">➕ INGRESAR</button>
@@ -635,6 +688,11 @@
     const mainFabBtn = document.getElementById('mainFabBtn');
     let unsubscribe = null; 
     let rolUsuario = "INTERNO"; 
+
+    window.isInlineEditing = false;
+    window.pendingSnapshotList = null;
+    window.syncPlexusPatients = () => {}; 
+    let selectedNavIndex = -1;
 
     function showMainApp() {
       loginScreen.classList.remove('active');
@@ -751,6 +809,14 @@
       return c;
     }
 
+    // EXTRAER SOLO EMOJI PARA MODO TARJETA
+    function getEmojiOnly(texto) {
+      if (!texto) return '';
+      const t = String(texto).trim();
+      const firstSpace = t.indexOf(' ');
+      return firstSpace > -1 ? t.substring(0, firstSpace) : t.substring(0, 2);
+    }
+
     // ==========================================================
     // VARIABLES GLOBALES DEL CENSO
     // ==========================================================
@@ -758,7 +824,6 @@
     let camasLibresGlobal = []; 
     let currentViewMode = localStorage.getItem('censo-view') || 'kanban'; 
     let isFetchingData = true;
-    let syncPlexusPatients = () => {}; 
 
     const areaVisuals = {
       'SALA DE CHOQUE': { emoji: '❤️', class: 'icon-heartbeat' },
@@ -777,7 +842,10 @@
     const themeColors = { 'dark': '#0f172a', 'light': '#eef4fb', 'pink': '#fdf2f8', 'colorful': '#f8fafc', 'midnight': '#000000' };
 
     function escapeHtml(texto) { return String(texto || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;'); }
-    function cerrarModal(id) { document.getElementById(id).classList.remove('active'); }
+    function cerrarModal(id) { 
+        document.getElementById(id).classList.remove('active'); 
+        closeAllPopovers(null); 
+    }
     function cerrarModalBorrado() { document.getElementById('deleteConfirmModal').classList.remove('active'); }
 
     const chipPalette = [
@@ -844,6 +912,7 @@
       const metaText = document.getElementById('meta-text');
       const mainAppContainer = document.getElementById('mainAppContainer');
       const fabBtn = document.getElementById('mainFabBtn');
+      selectedNavIndex = -1; 
 
       if(metaText) metaText.innerHTML = `${lista.length} PACIENTES`;
       content.classList.remove('view-table-mode'); 
@@ -853,7 +922,7 @@
       if (!lista.length) { 
         if (isFetchingData) { content.innerHTML = generarSkeletonHtml(); } 
         else { content.innerHTML = `<div class="empty animate-in">NO HAY PACIENTES EN EL CENSO.</div>`; }
-        if (typeof syncPlexusPatients === 'function') syncPlexusPatients(lista);
+        if (typeof window.syncPlexusPatients === 'function') window.syncPlexusPatients(lista);
         return; 
       }
 
@@ -883,32 +952,63 @@
         mainAppContainer.classList.add('table-is-active'); 
         if(fabBtn) fabBtn.style.display = 'none';
 
-        let tableHtml = `<div class="table-wrapper animate-in"><table class="censo-table"><thead><tr><th style="width: 6%">CAMA</th><th style="width: 9%">INGRESO</th><th style="width: 18%">PACIENTE</th><th style="width: 4%">EDAD</th><th style="width: 25%">DIAGNÓSTICO</th><th style="width: 25%">PENDIENTES</th><th style="width: 8%">DESTINO</th><th style="width: 5%; text-align: center;">⚙️</th></tr></thead><tbody>`;
+        let htmlArr = [];
+        htmlArr.push(`<div class="table-wrapper animate-in" id="scrollTableWrapper">
+          <div id="scrollGuiderObj" class="scroll-guider" title="Ir al extremo">↓</div>
+          <table class="censo-table"><thead><tr>
+            <th style="width: 5%; text-align: center;">CAMA</th>
+            <th style="width: 6%; text-align: center;">INGRESO</th>
+            <th style="width: 20%;">PACIENTE</th>
+            <th style="width: 3.5%;">EDAD</th>
+            <th style="width: 26%;">DIAGNÓSTICO</th>
+            <th style="width: 26%;">PENDIENTES</th>
+            <th style="width: 9%; text-align: center;">DESTINO</th>
+            <th style="width: 4.5%; text-align: center;">⚙️</th>
+          </tr></thead><tbody>`);
         
         areas.forEach((area) => {
           const areaNormalizada = String(area).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().trim();
           const visual = areaVisuals[areaNormalizada] || areaVisuals[area.toUpperCase()] || { emoji: '🏥', class: '' };
 
-          tableHtml += `<tr style="background: var(--card-open);"><td colspan="8" style="padding: 6px 10px; font-weight: 800; font-size: 0.85rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--line);"><span class="area-icon ${visual.class}">${visual.emoji}</span> ${escapeHtml(area)}</td></tr>`;
+          htmlArr.push(`<tr style="background: rgba(128, 128, 128, 0.15);"><td colspan="8" style="padding: 6px 10px; font-weight: 800; font-size: 0.85rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--line);"><span class="area-icon ${visual.class}">${visual.emoji}</span> ${escapeHtml(area)}</td></tr>`);
 
           grupos[area].forEach((p) => {
             const destinoChip = getColorfulChipHtml(p.destino);
-            tableHtml += `<tr class="patient-row" onclick="toggleTableRow(this)">
-                <td style="padding: 6px 10px;"><span style="color: var(--accent); font-weight: 700; font-size: 0.85rem;">${escapeHtml(p.cama || '-')}</span></td>
-                <td style="padding: 6px 10px; font-size: 0.75rem; color: var(--muted); font-family: 'Fira Code', monospace; line-height: 1.2;">${escapeHtml(p.fechaIngresoFormateada || '-')}</td>
-                <td style="padding: 6px 10px; font-family: 'Space Mono', monospace; font-weight: 700; font-size: 0.9rem; line-height: 1.1;" class="patient-name"><div class="truncate-text" title="${escapeHtml(p.nombre)}">${escapeHtml(p.nombre)}</div></td>
-                <td style="padding: 6px 10px;"><span style="color: var(--muted); font-size: 0.85rem;" class="value">${escapeHtml(p.edad || '-')}</span></td>
-                <td style="padding: 6px 10px;"><div class="truncate-text" style="font-size: 0.8rem; line-height: 1.2;" title="${escapeHtml(p.diagnostico)}">${escapeHtml(p.diagnostico || '-')}</div></td>
-                <td style="padding: 6px 10px;"><div class="truncate-text" style="font-size: 0.8rem; line-height: 1.2;" title="${escapeHtml(p.pendientes)}">${escapeHtml(p.pendientes || '-')}</div></td>
-                <td style="padding: 6px 10px;">${destinoChip}</td>
+            htmlArr.push(`<tr class="patient-row" data-fila="${p.fila}" onclick="toggleTableRow(this)">
+                <td style="padding: 6px 10px; text-align: center;"><span style="color: var(--accent); font-weight: 700; font-size: 0.85rem;">${escapeHtml(p.cama || '-')}</span></td>
+                <td style="padding: 6px 10px; font-size: 0.7rem; color: var(--muted); font-family: 'Fira Code', monospace; line-height: 1.3; text-align: center;">${p.fechaIngresoFormateada || '-'}</td>
+                
+                <td style="padding: 6px 10px; font-family: 'Space Mono', monospace; font-weight: 700; font-size: 0.9rem; line-height: 1.3;" class="patient-name editable-cell" data-campo="nombre" data-original="${escapeHtml(p.nombre)}" contenteditable="true" onfocus="iniciarEdicionSubtle(this)" onblur="finalizarEdicionSubtle(this)" onkeydown="manejarTeclasSubtle(this, event)" onclick="event.stopPropagation()">
+                  <div class="truncate-text" title="${escapeHtml(p.nombre)}">${escapeHtml(p.nombre)}</div>
+                </td>
+                
+                <td style="padding: 6px 10px;" class="editable-cell" data-campo="edad" data-original="${escapeHtml(p.edad)}" contenteditable="true" onfocus="iniciarEdicionSubtle(this)" onblur="finalizarEdicionSubtle(this)" onkeydown="manejarTeclasSubtle(this, event)" onclick="event.stopPropagation()">
+                  <span style="color: var(--muted); font-size: 0.85rem;" class="value">${escapeHtml(p.edad || '-')}</span>
+                </td>
+                
+                <td style="padding: 6px 10px;" class="editable-cell" data-campo="diagnostico" data-original="${escapeHtml(p.diagnostico)}" contenteditable="true" onfocus="iniciarEdicionSubtle(this)" onblur="finalizarEdicionSubtle(this)" onkeydown="manejarTeclasSubtle(this, event)" onclick="event.stopPropagation()">
+                  <div class="truncate-text" style="font-size: 0.8rem; line-height: 1.3;" title="${escapeHtml(p.diagnostico)}">${escapeHtml(p.diagnostico || '-')}</div>
+                </td>
+                
+                <td style="padding: 6px 10px;" class="editable-cell" data-campo="pendientes" data-original="${escapeHtml(p.pendientes)}" contenteditable="true" onfocus="iniciarEdicionSubtle(this)" onblur="finalizarEdicionSubtle(this)" onkeydown="manejarTeclasSubtle(this, event)" onclick="event.stopPropagation()">
+                  <div class="truncate-text" style="font-size: 0.8rem; line-height: 1.3;" title="${escapeHtml(p.pendientes)}">${escapeHtml(p.pendientes || '-')}</div>
+                </td>
+                
+                <td style="padding: 6px 10px; position: relative; text-align: center;" onclick="abrirDestinoFlotante(this, '${p.fila}', '${escapeHtml(p.destino)}', event)">
+                  ${destinoChip || '<span style="color:var(--muted); opacity:0.4;">-</span>'}
+                </td>
+                
                 <td style="padding: 4px 10px; text-align: center; white-space: nowrap;"><button class="btn-table edit" style="padding: 4px; font-size: 0.9rem; margin-right: 2px;" onclick="abrirModal('${p.fila}'); event.stopPropagation();" title="Editar">✏️</button><button class="btn-table delete" style="padding: 4px; font-size: 0.9rem;" onclick="borrarPacienteDirecto('${p.fila}', '${escapeHtml(p.nombre)}'); event.stopPropagation();" title="Borrar">🗑️</button></td>
-            </tr>`;
+            </tr>`);
           });
         });
 
-        tableHtml += `</tbody></table><button class="btn-add-table" onclick="abrirModalAgregar()">➕ NUEVO INGRESO</button></div>`;
-        content.innerHTML = tableHtml;
-        if (typeof syncPlexusPatients === 'function') syncPlexusPatients(lista);
+        htmlArr.push(`</tbody></table><button class="btn-add-table" onclick="abrirModalAgregar()">➕ NUEVO INGRESO</button></div>`);
+        content.innerHTML = htmlArr.join('');
+        
+        setTimeout(initScrollGuider, 100);
+
+        if (typeof window.syncPlexusPatients === 'function') window.syncPlexusPatients(lista);
         return;
       }
 
@@ -929,9 +1029,15 @@
             <div class="patient-list">
               ${pacientes.map((p, indexPatient) => {
                 const camaHtml = p.cama ? `<div class="patient-bed">${escapeHtml(p.cama)}</div>` : '';
-                const destinoChip = getColorfulChipHtml(p.destino);
+                
+                // MODO TARJETA: Solo Emoji para Destino (v2.25)
+                const emojiSolo = p.destino ? getEmojiOnly(p.destino) : '';
+                const destinoEmojiHtml = emojiSolo ? `<div class="chip-emoji" title="${escapeHtml(p.destino)}">${emojiSolo}</div>` : '';
+                
+                const fechaLimpia = p.fechaIngresoFormateada ? p.fechaIngresoFormateada.replace(/<[^>]*>?/gm, ' ') : '-';
+
                 const detailsHtml = [ 
-                    crearCampo('INGRESO', p.fechaIngresoFormateada),
+                    crearCampo('INGRESO', fechaLimpia),
                     crearCampo('EDAD', p.edad), 
                     crearCampo('DIAGNÓSTICO', p.diagnostico), 
                     crearCampo('PENDIENTES', p.pendientes), 
@@ -939,7 +1045,7 @@
                 ].filter(Boolean).join('');
                 const delayPatient = delayBase + (indexPatient * 50);
                 
-                return `<div class="card animate-in" data-fila="${p.fila}" data-nombre="${escapeHtml(p.nombre)}" style="animation-delay: ${delayPatient}ms;"><div class="swipe-bg"><div class="swipe-action swipe-delete">🗑️</div><div class="swipe-action swipe-edit">✏️</div></div><div class="card-content-wrapper"><div class="card-header" onclick="toggleCard(this)"><div class="patient-main"><div class="patient-name">${escapeHtml(p.nombre)}</div>${camaHtml}</div><div class="header-right">${destinoChip}<div class="caret">⌄</div></div></div><div class="details"><div class="details-content">${detailsHtml}<button class="btn-editar-tarjeta" onclick="abrirModal('${p.fila}'); event.stopPropagation();">✏️ EDITAR PACIENTE</button></div></div></div></div>`;
+                return `<div class="card animate-in" data-fila="${p.fila}" data-nombre="${escapeHtml(p.nombre)}" style="animation-delay: ${delayPatient}ms;"><div class="swipe-bg"><div class="swipe-action swipe-delete">🗑️</div><div class="swipe-action swipe-edit">✏️</div></div><div class="card-content-wrapper"><div class="card-header" onclick="toggleCard(this)"><div class="patient-main"><div class="patient-name">${escapeHtml(p.nombre)}</div>${camaHtml}</div><div class="header-right">${destinoEmojiHtml}<div class="caret">⌄</div></div></div><div class="details"><div class="details-content">${detailsHtml}<button class="btn-editar-tarjeta" onclick="abrirModal('${p.fila}'); event.stopPropagation();">✏️ EDITAR PACIENTE</button></div></div></div></div>`;
               }).join('')}
             </div>
           </section>
@@ -947,7 +1053,8 @@
         content.innerHTML += sectionHtml;
       });
       
-      if (typeof syncPlexusPatients === 'function') syncPlexusPatients(lista);
+      setTimeout(initSwipe, 50);
+      if (typeof window.syncPlexusPatients === 'function') window.syncPlexusPatients(lista);
     }
 
     function initFirebaseListener() {
@@ -970,9 +1077,9 @@
               fechaObj = new Date(data.creado);
             }
             
-            data.fechaIngresoFormateada = fechaObj.toLocaleString('es-MX', { 
-              day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: true 
-            }).toUpperCase();
+            let dStr = fechaObj.toLocaleDateString('es-MX', { day: '2-digit', month: 'short' }).toUpperCase();
+            let tStr = fechaObj.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit', hour12: true }).toUpperCase();
+            data.fechaIngresoFormateada = `${escapeHtml(dStr)}<br><span style="opacity:0.65; font-size:0.9em;">${escapeHtml(tStr)}</span>`;
 
             const tzOffset = fechaObj.getTimezoneOffset() * 60000;
             data.fechaIngresoISO = (new Date(fechaObj - tzOffset)).toISOString().slice(0, 16);
@@ -1017,6 +1124,13 @@
         camasLibresGlobal = camasLibresGlobal.map((c, i) => ({ ...c, fila: 'cama_libre_'+i }));
 
         isFetchingData = false;
+        
+        if (window.isInlineEditing) {
+          window.pendingSnapshotList = [...pacientesGlobal];
+          document.getElementById('reloadIcon').classList.remove('spin');
+          return;
+        }
+
         filtrar(); 
         document.getElementById('reloadIcon').classList.remove('spin');
       }, (error) => {
@@ -1025,6 +1139,381 @@
         document.getElementById('reloadIcon').classList.remove('spin');
       });
     }
+
+    // ==========================================================
+    // CÁLCULO INTELIGENTE Y ACTIVACIÓN DEL GUÍA DE SCROLL
+    // ==========================================================
+    let scrollGuiderHandler = null;
+
+    function initScrollGuider() {
+      const wrapper = document.getElementById('scrollTableWrapper');
+      const guider = document.getElementById('scrollGuiderObj');
+      if (!wrapper || !guider) return;
+
+      if (scrollGuiderHandler) {
+        wrapper.removeEventListener('scroll', scrollGuiderHandler);
+      }
+
+      let isScrolling = false;
+      const checkScrollPosition = () => {
+        const atBottom = wrapper.scrollHeight - wrapper.scrollTop <= wrapper.clientHeight + 20;
+        const atTop = wrapper.scrollTop <= 20;
+        const isScrollable = wrapper.scrollHeight > wrapper.clientHeight;
+
+        if (!isScrollable) {
+          guider.className = 'scroll-guider'; 
+          return;
+        }
+
+        if (!atBottom) {
+          guider.innerText = '↓';
+          guider.className = 'scroll-guider active-down';
+          guider.title = "Ir al final del censo";
+        } else if (atBottom && !atTop) {
+          guider.innerText = '↑';
+          guider.className = 'scroll-guider active-up';
+          guider.title = "Volver arriba";
+        } else {
+          guider.className = 'scroll-guider';
+        }
+      };
+
+      scrollGuiderHandler = () => {
+        if (!isScrolling) {
+          window.requestAnimationFrame(() => {
+            checkScrollPosition();
+            isScrolling = false;
+          });
+          isScrolling = true;
+        }
+      };
+
+      wrapper.addEventListener('scroll', scrollGuiderHandler, { passive: true });
+      
+      guider.onclick = (e) => {
+        e.stopPropagation();
+        vibrar(15);
+        const goesDown = guider.classList.contains('active-down');
+        wrapper.scrollTo({
+          top: goesDown ? wrapper.scrollHeight : 0,
+          behavior: 'smooth'
+        });
+      };
+
+      checkScrollPosition();
+    }
+
+    // ==========================================================
+    // NAVEGACIÓN POR TECLADO OCULTA Y AGREGADA A "NUEVO INGRESO"
+    // ==========================================================
+    document.addEventListener('keydown', (e) => {
+      if (currentViewMode !== 'table' || window.innerWidth < 768 || window.isInlineEditing) return;
+      
+      const elements = Array.from(document.querySelectorAll('.patient-row, .btn-add-table'));
+      if (!elements.length) return;
+
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        selectedNavIndex = Math.min(selectedNavIndex + 1, elements.length - 1);
+        updateNavHighlight(elements);
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        selectedNavIndex = Math.max(selectedNavIndex - 1, 0);
+        updateNavHighlight(elements);
+      } else if (e.key === 'Enter' && selectedNavIndex !== -1) {
+        e.preventDefault();
+        const el = elements[selectedNavIndex];
+        
+        if (el.classList.contains('btn-add-table')) {
+          abrirModalAgregar();
+        } else {
+          const filaId = el.getAttribute('data-fila');
+          abrirModal(filaId);
+        }
+      }
+    });
+
+    function updateNavHighlight(elements) {
+      elements.forEach(r => r.classList.remove('selected-nav'));
+      if (elements[selectedNavIndex]) {
+        const el = elements[selectedNavIndex];
+        el.classList.add('selected-nav');
+        
+        if (el.classList.contains('patient-row')) {
+          const yaEstaAbierta = el.classList.contains('expanded-row');
+          document.querySelectorAll('.patient-row').forEach(tr => tr.classList.remove('expanded-row'));
+          el.classList.add('expanded-row');
+        }
+        
+        el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+
+    // ==========================================================
+    // COMPONENTES FLOTANTES GLOBALES (LIMPIEZA DE SELECTS MODALES)
+    // ==========================================================
+    const closeAllPopovers = (e) => {
+      if (e && e.type === 'scroll' && e.target.closest && e.target.closest('.custom-select-popover')) return;
+      if (e && e.type === 'click' && e.target.closest && (e.target.closest('.custom-select-wrapper') || e.target.closest('.custom-select-popover'))) return;
+      
+      document.querySelectorAll('.custom-select-popover.active').forEach(p => {
+        p.classList.remove('active');
+        const pid = p.getAttribute('data-parent');
+        if(pid && document.getElementById(pid)) document.getElementById(pid).appendChild(p);
+      });
+    };
+    document.addEventListener('click', closeAllPopovers);
+    document.addEventListener('scroll', closeAllPopovers, true);
+
+    // ==========================================================
+    // SELECTOR PERSONALIZADO TIPO COMBOBOX (MODALES)
+    // ==========================================================
+    window.initCustomSelect = function(wrapperId, optionsHtml) {
+      const wrapper = document.getElementById(wrapperId);
+      if(!wrapper) return;
+      const display = wrapper.querySelector('.custom-select-display');
+      let popover = wrapper.querySelector('.custom-select-popover');
+      
+      if (!popover) popover = document.getElementById(wrapperId + '-popover');
+      if (!popover) return;
+      
+      popover.id = wrapperId + '-popover';
+      popover.setAttribute('data-parent', wrapperId);
+
+      const search = popover.querySelector('.custom-select-search input');
+      const list = popover.querySelector('.custom-select-options');
+      list.innerHTML = optionsHtml;
+
+      display.onclick = (e) => {
+        e.stopPropagation();
+        const isActive = popover.classList.contains('active');
+        
+        closeAllPopovers(null);
+
+        if (!isActive) {
+          document.body.appendChild(popover); 
+          
+          const rect = display.getBoundingClientRect();
+          popover.style.position = 'fixed';
+          popover.style.width = rect.width + 'px';
+          popover.style.left = rect.left + 'px';
+          popover.style.zIndex = '999999';
+          
+          const dropdownHeight = 250;
+          if (rect.bottom + dropdownHeight > window.innerHeight) {
+            popover.style.top = 'auto';
+            popover.style.bottom = (window.innerHeight - rect.top) + 'px';
+            popover.style.boxShadow = '0 -10px 25px rgba(0,0,0,0.5)';
+          } else {
+            popover.style.top = rect.bottom + 'px';
+            popover.style.bottom = 'auto';
+            popover.style.boxShadow = '0 10px 25px rgba(0,0,0,0.5)';
+          }
+
+          popover.classList.add('active');
+          search.value = '';
+          Array.from(list.children).forEach(c => c.style.display = 'block');
+          setTimeout(() => search.focus(), 50);
+        }
+      };
+
+      search.oninput = (e) => {
+        const q = normalizar(e.target.value);
+        Array.from(list.children).forEach(opt => {
+          if (opt.classList.contains('custom-select-optgroup')) return;
+          const text = normalizar(opt.innerText);
+          opt.style.display = text.includes(q) ? 'block' : 'none';
+        });
+      };
+
+      list.onclick = (e) => {
+        const opt = e.target.closest('.custom-select-option');
+        if(opt) { 
+          display.innerText = opt.innerText; 
+          display.dataset.value = opt.getAttribute('data-value'); 
+          popover.classList.remove('active'); 
+          wrapper.appendChild(popover); 
+        }
+      };
+    };
+
+    // ==========================================================
+    // EDICIÓN ULTRA SUTIL EN LÍNEA
+    // ==========================================================
+    window.iniciarEdicionSubtle = function(el) {
+      const tr = el.closest('tr');
+      if (!tr.classList.contains('expanded-row')) { toggleTableRow(tr); }
+      
+      window.isInlineEditing = true;
+      el.classList.add('is-editing');
+      
+      const trunc = el.querySelector('.truncate-text');
+      if (trunc) { el.innerText = trunc.innerText; }
+      
+      if (el.innerText.trim() === '-') { el.innerText = ''; }
+      
+      const range = document.createRange(); const sel = window.getSelection();
+      range.selectNodeContents(el); range.collapse(false); sel.removeAllRanges(); sel.addRange(range);
+    };
+
+    window.finalizarEdicionSubtle = async function(el) {
+      el.classList.remove('is-editing');
+      window.isInlineEditing = false;
+      
+      const campo = el.getAttribute('data-campo');
+      const filaId = el.closest('tr').getAttribute('data-fila');
+      const valorOriginal = el.getAttribute('data-original').toUpperCase().trim();
+      const nuevoValorRaw = el.innerText.toUpperCase().normalize('NFC').trim();
+      
+      const nuevoValorFinal = nuevoValorRaw === '' ? '-' : nuevoValorRaw;
+      
+      const campoEstilizado = (campo === 'diagnostico' || campo === 'pendientes') ? 
+        `<div class="truncate-text" style="font-size: 0.8rem; line-height: 1.3;" title="${escapeHtml(nuevoValorFinal)}">${escapeHtml(nuevoValorFinal)}</div>` : 
+        (campo === 'nombre') ? `<div class="truncate-text" title="${escapeHtml(nuevoValorFinal)}">${escapeHtml(nuevoValorFinal)}</div>` : escapeHtml(nuevoValorFinal);
+      
+      el.innerHTML = campoEstilizado;
+
+      if (window.pendingSnapshotList) {
+        pacientesGlobal = window.pendingSnapshotList;
+        window.pendingSnapshotList = null;
+        filtrar();
+      }
+
+      if (nuevoValorRaw !== valorOriginal && nuevoValorFinal !== valorOriginal) {
+        el.style.opacity = '0.3';
+        try {
+          const valorBD = nuevoValorFinal === '-' ? '' : nuevoValorFinal;
+          await updateDoc(doc(db, "pacientes", filaId), { [campo]: valorBD });
+          el.setAttribute('data-original', nuevoValorFinal);
+          const pLocal = pacientesGlobal.find(p => p.fila === filaId);
+          if (pLocal) pLocal[campo] = valorBD;
+          vibrar(15);
+        } catch (e) {
+          alert("Error al guardar campo: " + e.message);
+          el.setAttribute('data-original', valorOriginal);
+          el.innerHTML = valorOriginal;
+        } finally { el.style.opacity = '1'; }
+      }
+      
+      setTimeout(() => {
+        const trRestaurado = document.querySelector(`tr[data-fila="${filaId}"]`);
+        if (trRestaurado && !trRestaurado.classList.contains('expanded-row')) { trRestaurado.classList.add('expanded-row'); }
+      }, 40);
+    };
+
+    window.manejarTeclasSubtle = function(el, event) {
+      const campo = el.getAttribute('data-campo');
+      if (event.key === 'Enter') {
+        if (campo === 'nombre' || campo === 'edad') {
+          event.preventDefault(); el.blur();
+        }
+      } else if (event.key === 'Escape') {
+        event.preventDefault();
+        el.innerText = el.getAttribute('data-original');
+        el.blur();
+      }
+    };
+
+    // ==========================================================
+    // DESTINO SUPERPUESTO MINIMALISTA EN EL BODY (EN LÍNEA)
+    // ==========================================================
+    window.abrirDestinoFlotante = function(tdEl, filaId, destinoActual, event) {
+      event.stopPropagation();
+      const tr = tdEl.closest('tr');
+      if (!tr.classList.contains('expanded-row')) { toggleTableRow(tr); return; }
+      if (document.querySelector('.inline-destino-container')) return; 
+
+      window.isInlineEditing = true; 
+
+      const container = document.createElement('div');
+      container.className = 'inline-destino-container animate-in';
+      
+      let opcionesHtml = `
+        <div style="padding: 6px; background: var(--panel); border-bottom: 1px solid var(--line);">
+          <input type="text" class="inline-search-input input-control" placeholder="🔍 Buscar destino..." autocomplete="off" style="width: 100%; padding: 6px 10px; font-size: 0.8rem; margin: 0; outline: none;">
+        </div>
+        <div class="inline-options-wrapper">
+          <div class="inline-destino-option ${!destinoActual ? 'selected' : ''}" data-value="">(SIN DESTINO)</div>
+      `;
+      destinosGlobal.forEach(d => {
+        const dStr = d.toUpperCase().trim();
+        const sel = dStr === destinoActual.toUpperCase().trim() ? 'selected' : '';
+        opcionesHtml += `<div class="inline-destino-option ${sel}" data-value="${escapeHtml(dStr)}">${escapeHtml(dStr)}</div>`;
+      });
+      opcionesHtml += `</div>`;
+      
+      container.innerHTML = opcionesHtml;
+      document.body.appendChild(container);
+      
+      const rect = tdEl.getBoundingClientRect();
+      container.style.position = 'fixed';
+      container.style.width = Math.max(220, rect.width) + 'px';
+      container.style.left = rect.left + 'px';
+      container.style.zIndex = '99999';
+
+      const dropdownHeight = 250; 
+      if (rect.bottom + dropdownHeight > window.innerHeight) {
+        container.style.top = 'auto';
+        container.style.bottom = (window.innerHeight - rect.top) + 'px';
+        container.style.boxShadow = '0 -10px 25px rgba(0,0,0,0.5)';
+      } else {
+        container.style.top = rect.bottom + 'px';
+        container.style.bottom = 'auto';
+      }
+
+      const inputBuscador = container.querySelector('.inline-search-input');
+      const wrapperOptions = container.querySelector('.inline-options-wrapper');
+
+      inputBuscador.addEventListener('input', (e) => {
+          const q = normalizar(e.target.value);
+          wrapperOptions.querySelectorAll('.inline-destino-option').forEach(opt => {
+              const text = normalizar(opt.innerText);
+              opt.style.display = text.includes(q) ? 'block' : 'none';
+          });
+      });
+
+      const cerrarDirecto = (e) => {
+        if (e && e.type === 'scroll' && container.contains(e.target)) return;
+        window.isInlineEditing = false;
+        if (container.parentNode) container.remove();
+        if (window.pendingSnapshotList) { pacientesGlobal = window.pendingSnapshotList; window.pendingSnapshotList = null; filtrar(); }
+        document.removeEventListener('scroll', cerrarDirecto, true);
+      };
+
+      container.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        if (e.target.classList.contains('inline-search-input')) return;
+
+        const opcionEl = e.target.closest('.inline-destino-option');
+        if (!opcionEl) return;
+        
+        const nuevoDestino = opcionEl.getAttribute('data-value');
+        cerrarDirecto();
+        
+        if (nuevoDestino !== destinoActual.toUpperCase().trim()) {
+          tdEl.innerHTML = '<span class="spin" style="font-size:0.8rem;">🔄</span>';
+          try {
+            await updateDoc(doc(db, "pacientes", filaId), { destino: nuevoDestino });
+            vibrar(15);
+            const pLocal = pacientesGlobal.find(p => p.fila === filaId);
+            if (pLocal) pLocal.destino = nuevoDestino;
+          } catch (e) { alert("Error destino: " + e.message); }
+          filtrar();
+        }
+      });
+
+      const closeHandler = (e) => {
+        if (container && !container.contains(e.target)) { 
+            cerrarDirecto(); 
+            document.removeEventListener('click', closeHandler); 
+        }
+      };
+      setTimeout(() => {
+          document.addEventListener('click', closeHandler);
+          document.addEventListener('scroll', cerrarDirecto, true);
+          inputBuscador.focus();
+      }, 10);
+    };
 
     function toggleCard(headerEl) {
       vibrar(15); 
@@ -1052,31 +1541,33 @@
       document.getElementById('modalDiagnostico').value = (paciente.diagnostico || '').toUpperCase();
       document.getElementById('modalPendientes').value = (paciente.pendientes || '').toUpperCase();
 
-      const selectDestino = document.getElementById('modalDestino');
-      selectDestino.innerHTML = '<option value="">(SIN DESTINO)</option>';
       const pDestinoStr = String(paciente.destino || '').toUpperCase().trim();
-      
-      destinosGlobal.forEach(d => {
-        const dStr = String(d).toUpperCase().trim();
-        const isSelected = (pDestinoStr === dStr) ? 'selected' : '';
-        selectDestino.innerHTML += `<option value="${escapeHtml(dStr)}" ${isSelected}>${escapeHtml(dStr)}</option>`;
-      });
+      let htmlDestino = `<div class="custom-select-option" data-value="">(SIN DESTINO)</div>`;
+      destinosGlobal.forEach(d => { htmlDestino += `<div class="custom-select-option" data-value="${escapeHtml(d.toUpperCase())}">${escapeHtml(d.toUpperCase())}</div>`; });
+      initCustomSelect('editDestinoWrapper', htmlDestino);
+      const destinoDisplay = document.querySelector('#editDestinoWrapper .custom-select-display');
+      destinoDisplay.innerText = pDestinoStr || '(SIN DESTINO)';
+      destinoDisplay.dataset.value = pDestinoStr;
 
-      const selectMoverA = document.getElementById('moverA_Select');
-      selectMoverA.innerHTML = '<option value="" selected>NO MOVER (MANTENER EN CAMA ACTUAL)</option>';
+      let htmlMover = `<div class="custom-select-option" data-value="">NO MOVER (MANTENER EN CAMA ACTUAL)</div>`;
       const gruposLibres = agruparPorArea(camasLibresGlobal);
       for (const [area, camas] of Object.entries(gruposLibres)) {
-        let optgroup = `<optgroup label="${escapeHtml(area.toUpperCase())}">`;
-        camas.forEach(c => { optgroup += `<option value="${c.fila}">${escapeHtml(c.cama.toUpperCase())}</option>`; });
-        optgroup += `</optgroup>`; selectMoverA.innerHTML += optgroup;
+        htmlMover += `<div class="custom-select-optgroup">${escapeHtml(area.toUpperCase())}</div>`;
+        camas.forEach(c => { htmlMover += `<div class="custom-select-option" data-value="${c.fila}">${escapeHtml(c.cama.toUpperCase())}</div>`; });
       }
+      initCustomSelect('editMoverWrapper', htmlMover);
+      const moverDisplay = document.querySelector('#editMoverWrapper .custom-select-display');
+      moverDisplay.innerText = 'NO MOVER (MANTENER EN CAMA ACTUAL)';
+      moverDisplay.dataset.value = '';
+      
       document.getElementById('editModal').classList.add('active');
     }
 
     async function guardarEdicion() {
       const btnGuardar = document.getElementById('btnGuardarEdit');
       const filaId = document.getElementById('modalFila').value;
-      const moverAFila = document.getElementById('moverA_Select').value;
+      const destinoVal = document.querySelector('#editDestinoWrapper .custom-select-display').dataset.value || '';
+      const moverAFila = document.querySelector('#editMoverWrapper .custom-select-display').dataset.value || '';
       const fechaInput = document.getElementById('modalFechaIngreso').value;
 
       btnGuardar.disabled = true; btnGuardar.innerHTML = '<span class="spin">🔄</span> GUARDANDO...';
@@ -1087,12 +1578,10 @@
             edad: document.getElementById('modalEdad').value.toUpperCase(),
             diagnostico: document.getElementById('modalDiagnostico').value.toUpperCase(),
             pendientes: document.getElementById('modalPendientes').value.toUpperCase(),
-            destino: document.getElementById('modalDestino').value.toUpperCase()
+            destino: destinoVal
         };
 
-        if (fechaInput) {
-            updateData.creado = new Date(fechaInput);
-        }
+        if (fechaInput) updateData.creado = new Date(fechaInput);
 
         if (moverAFila && moverAFila !== "") {
             const nuevaCamaObj = camasLibresGlobal.find(c => c.fila === moverAFila);
@@ -1170,50 +1659,51 @@
 
     function abrirModalAgregar() {
       vibrar(30); 
-      
       const now = new Date();
       now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
       document.getElementById('addFechaIngreso').value = now.toISOString().slice(0,16);
 
-      const selectCama = document.getElementById('addCamaSelect');
-      selectCama.innerHTML = '<option value="" disabled selected>SELECCIONA UNA CAMA LIBRE...</option>';
+      let htmlCamas = '';
       if (camasLibresGlobal.length === 0) { 
-        selectCama.innerHTML += '<option value="" disabled>NO HAY CAMAS DISPONIBLES 🛑</option>'; 
+        htmlCamas = `<div class="custom-select-option" data-value="">NO HAY CAMAS DISPONIBLES 🛑</div>`; 
       } else {
         const gruposLibres = agruparPorArea(camasLibresGlobal);
         for (const [area, camas] of Object.entries(gruposLibres)) {
-          let optgroup = `<optgroup label="${escapeHtml(area.toUpperCase())}">`;
-          camas.forEach(c => { optgroup += `<option value="${escapeHtml(c.cama.toUpperCase())}|${escapeHtml(c.area.toUpperCase())}">${escapeHtml(c.cama.toUpperCase())}</option>`; });
-          optgroup += `</optgroup>`; selectCama.innerHTML += optgroup;
+          htmlCamas += `<div class="custom-select-optgroup">${escapeHtml(area.toUpperCase())}</div>`;
+          camas.forEach(c => { htmlCamas += `<div class="custom-select-option" data-value="${escapeHtml(c.cama.toUpperCase())}|${escapeHtml(c.area.toUpperCase())}">${escapeHtml(c.cama.toUpperCase())}</div>`; });
         }
       }
+      initCustomSelect('addCamaWrapper', htmlCamas);
+      const camaDisplay = document.querySelector('#addCamaWrapper .custom-select-display');
+      camaDisplay.innerText = 'SELECCIONA UNA CAMA LIBRE...';
+      camaDisplay.dataset.value = '';
 
-      const selectDestino = document.getElementById('addDestino');
-      selectDestino.innerHTML = '<option value="">(SIN DESTINO)</option>';
-      destinosGlobal.forEach(d => {
-        selectDestino.innerHTML += `<option value="${escapeHtml(d.toUpperCase())}">${escapeHtml(d.toUpperCase())}</option>`;
-      });
+      let htmlDestino = `<div class="custom-select-option" data-value="">(SIN DESTINO)</div>`;
+      destinosGlobal.forEach(d => { htmlDestino += `<div class="custom-select-option" data-value="${escapeHtml(d.toUpperCase())}">${escapeHtml(d.toUpperCase())}</div>`; });
+      initCustomSelect('addDestinoWrapper', htmlDestino);
+      const destinoDisplay = document.querySelector('#addDestinoWrapper .custom-select-display');
+      destinoDisplay.innerText = '(SIN DESTINO)';
+      destinoDisplay.dataset.value = '';
 
       document.getElementById('addNombre').value = ''; 
       document.getElementById('addEdad').value = ''; 
       document.getElementById('addDiagnostico').value = ''; 
       document.getElementById('addPendientes').value = '';
-      document.getElementById('addDestino').value = '';
       
       document.getElementById('addModal').classList.add('active');
     }
 
     async function guardarNuevo() {
       const btnGuardar = document.getElementById('btnGuardarAdd');
-      const selectCama = document.getElementById('addCamaSelect');
-      const fechaInput = document.getElementById('addFechaIngreso').value;
-      
-      if(!selectCama.value) { alert("POR FAVOR SELECCIONA UNA CAMA DISPONIBLE."); return; }
-      
-      const [nombreCamaReal, areaReal] = selectCama.value.split('|');
+      const selectCamaVal = document.querySelector('#addCamaWrapper .custom-select-display').dataset.value;
+      if(!selectCamaVal) { alert("POR FAVOR SELECCIONA UNA CAMA DISPONIBLE."); return; }
+      const [nombreCamaReal, areaReal] = selectCamaVal.split('|');
       
       const nom = document.getElementById('addNombre').value.toUpperCase(); 
       if(!nom) { alert("EL NOMBRE ES OBLIGATORIO."); return; }
+
+      const destinoVal = document.querySelector('#addDestinoWrapper .custom-select-display').dataset.value || '';
+      const fechaInput = document.getElementById('addFechaIngreso').value;
 
       btnGuardar.disabled = true; 
       btnGuardar.innerHTML = '<span class="spin">🔄</span> PROCESANDO...';
@@ -1226,7 +1716,7 @@
             edad: document.getElementById('addEdad').value.toUpperCase(),
             diagnostico: document.getElementById('addDiagnostico').value.toUpperCase(),
             pendientes: document.getElementById('addPendientes').value.toUpperCase(),
-            destino: document.getElementById('addDestino').value.toUpperCase(),
+            destino: destinoVal,
             cama: nombreCamaReal,
             area: areaReal,
             creado: fechaCreacion
@@ -1267,7 +1757,6 @@
     function checkEasterEggs(query) {
       const q = query.toLowerCase().replace(/\s+/g, '');
       let isEasterEggTriggered = false;
-      
       for (const key in easterEggsMap) {
         if (q.includes(key) && !activeEasterEggs.has(key)) {
           activeEasterEggs.add(key);
@@ -1303,6 +1792,51 @@
          setTimeout(() => wrapper.remove(), 200); 
       };
       wrapper.appendChild(inner); container.appendChild(wrapper);
+    }
+
+    function resetAllSwipes() {
+      document.querySelectorAll('.card').forEach(c => c.classList.remove('swipe-ready-delete', 'swipe-ready-edit'));
+      document.querySelectorAll('.card-content-wrapper').forEach(cw => cw.style.transform = 'translateX(0)');
+    }
+
+    function initSwipe() {
+      let xDown = null, yDown = null, activeCard = null;
+      document.querySelectorAll('.card-content-wrapper').forEach(el => {
+        el.addEventListener('touchstart', e => { 
+          if (e.target.closest('.btn-editar-tarjeta') || e.target.closest('.header-right')) return;
+          xDown = e.touches[0].clientX; yDown = e.touches[0].clientY; activeCard = el; 
+        }, {passive: true});
+        
+        el.addEventListener('touchmove', e => {
+          if(!xDown || !activeCard) return;
+          let xDiff = xDown - e.touches[0].clientX;
+          let yDiff = yDown - e.touches[0].clientY;
+          
+          if (Math.abs(xDiff) > Math.abs(yDiff)) {
+            if(Math.abs(xDiff) > 30) {
+              activeCard.style.transform = `translateX(${-xDiff * 0.4}px)`;
+              if(xDiff > 110) { activeCard.closest('.card').classList.add('swipe-ready-delete'); }
+              else if(xDiff < -110) { activeCard.closest('.card').classList.add('swipe-ready-edit'); }
+              else { activeCard.closest('.card').classList.remove('swipe-ready-delete', 'swipe-ready-edit'); }
+            }
+          }
+        }, {passive: true});
+        
+        el.addEventListener('touchend', e => {
+          if(!xDown || !activeCard) return;
+          let xDiff = xDown - e.changedTouches[0].clientX;
+          const fila = activeCard.closest('.card').getAttribute('data-fila');
+          const nombre = activeCard.closest('.card').getAttribute('data-nombre');
+          
+          activeCard.style.transform = 'translateX(0)';
+          activeCard.closest('.card').classList.remove('swipe-ready-delete', 'swipe-ready-edit');
+          
+          if(xDiff > 110) { setTimeout(() => borrarPacienteDirecto(fila, nombre), 100); }
+          else if(xDiff < -110) { setTimeout(() => abrirModal(fila), 100); }
+          
+          xDown = null; activeCard = null;
+        });
+      });
     }
 
     function filtrar() {
@@ -1349,7 +1883,6 @@
       applyTheme(prefersLight ? 'light' : 'dark');
     }
 
-    // EVENTOS UI
     document.getElementById('search').addEventListener('input', filtrar);
     document.getElementById('search').addEventListener('search', (e) => { if (e.target.value === '') render(pacientesGlobal); });
     
@@ -1373,7 +1906,6 @@
       if (!wrapper.classList.contains('collapsed')) { setTimeout(() => searchInput.focus(), 300); } else { searchInput.value = ''; render(pacientesGlobal); }
     });
 
-    // Evento de Enlace Externo para el Botón del Historial
     document.getElementById('historyBtn').addEventListener('click', () => {
       vibrar(15);
       window.open('https://rourog.github.io/censo/historial.html', '_blank');
@@ -1390,170 +1922,131 @@
       resizeTimer = setTimeout(() => { if (!isFetchingData) render(pacientesGlobal); }, 200);
     });
 
-    // ARRANQUE FINAL
     initTheme(); 
 
-    // SISTEMA DE PARTÍCULAS NEURAL Y SINAPSIS
+    // ==========================================================
+    // SISTEMA DE PARTÍCULAS NEURAL Y SINAPSIS (OPTIMIZADO V2.26)
+    // ==========================================================
+    let plexusRunning = false;
+    let isTabActive = true;
+    
+    document.addEventListener("visibilitychange", () => { isTabActive = !document.hidden; });
+
+    // Declaramos la función global para que "render" pueda alimentarle los pacientes
+    window.syncPlexusPatients = () => {};
+
     function initPlexus() {
+      if (plexusRunning) return;
+      plexusRunning = true;
+
       const canvas = document.getElementById('plexusCanvas');
       const ctx = canvas.getContext('2d');
       let width, height, standardParticles = [], patientParticles = [];
 
-      function resize() { width = canvas.width = canvas.offsetWidth; height = canvas.height = canvas.offsetHeight; }
+      function resize() { 
+        width = canvas.width = canvas.offsetWidth; 
+        height = canvas.height = canvas.offsetHeight; 
+        initStandardParticles();
+      }
 
       const plexusAreaColors = {
-        'SALA DE CHOQUE': { solid: '#ef4444', glow: 'rgba(239, 68, 68, 0.6)' },
-        'OBSERVACION': { solid: '#10b981', glow: 'rgba(16, 185, 129, 0.6)' },
-        'OBSERVACIÓN': { solid: '#10b981', glow: 'rgba(16, 185, 129, 0.6)' },
-        'TRAUMA MENOR': { solid: '#eab308', glow: 'rgba(234, 179, 8, 0.6)' },
-        'PEDIATRIA': { solid: '#3b82f6', glow: 'rgba(59, 130, 246, 0.6)' },
-        'PEDIATRÍA': { solid: '#3b82f6', glow: 'rgba(59, 130, 246, 0.6)' },
-        'EXTRAS': { solid: '#d946ef', glow: 'rgba(217, 70, 239, 0.6)' }
+        'SALA DE CHOQUE': { solid: '#ef4444', glow: 'rgba(239, 68, 68, 0.4)' },
+        'OBSERVACION': { solid: '#10b981', glow: 'rgba(16, 185, 129, 0.4)' },
+        'OBSERVACIÓN': { solid: '#10b981', glow: 'rgba(16, 185, 129, 0.4)' },
+        'TRAUMA MENOR': { solid: '#eab308', glow: 'rgba(234, 179, 8, 0.4)' },
+        'PEDIATRIA': { solid: '#3b82f6', glow: 'rgba(59, 130, 246, 0.4)' },
+        'PEDIATRÍA': { solid: '#3b82f6', glow: 'rgba(59, 130, 246, 0.4)' },
+        'EXTRAS': { solid: '#d946ef', glow: 'rgba(217, 70, 239, 0.4)' }
       };
 
-      class Particle {
-        constructor(isPatient = false, colorSet = null, index = 0) {
-          this.id = isPatient ? 'p_' + index : 's_' + index;
-          this.isPatient = isPatient;
-          this.x = Math.random() * width; this.y = Math.random() * height;
-          this.vx = (Math.random() - 0.5) * 0.4; this.vy = (Math.random() - 0.5) * 0.4;
-          
-          if (isPatient) { this.radius = Math.random() * 2 + 4.5; this.color = colorSet || { solid: '#ffffff', glow: 'rgba(255,255,255,0.4)' }; } 
-          else { this.radius = Math.random() * 1.5 + 0.5; this.color = null; }
-        }
-        update() { this.x += this.vx; this.y += this.vy; if (this.x < 0 || this.x > width) this.vx *= -1; if (this.y < 0 || this.y > height) this.vy *= -1; }
-        draw(defaultFill) {
-          if (this.isPatient) {
-            ctx.beginPath(); ctx.arc(this.x, this.y, this.radius + 3, 0, Math.PI * 2); ctx.fillStyle = this.color.glow; ctx.fill();
-            ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2); ctx.fillStyle = this.color.solid; ctx.fill();
-          } else {
-            ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2); ctx.fillStyle = defaultFill; ctx.fill();
-          }
+      function createParticle(isPatient, colorSet) {
+        return {
+          isPatient: isPatient,
+          x: Math.random() * width,
+          y: Math.random() * height,
+          vx: (Math.random() - 0.5) * 0.5,
+          vy: (Math.random() - 0.5) * 0.5,
+          radius: isPatient ? (Math.random() * 2 + 3) : (Math.random() * 1.5 + 0.5),
+          color: colorSet
+        };
+      }
+      
+      function initStandardParticles() {
+        standardParticles = [];
+        let num = Math.floor(width / 35); 
+        for (let i = 0; i < num; i++) {
+          standardParticles.push(createParticle(false, null));
         }
       }
 
-      function createStandardParticles() { standardParticles = []; let num = Math.floor(width / 35); for (let i = 0; i < num; i++) standardParticles.push(new Particle(false, null, i)); }
-
-      syncPlexusPatients = (listaPacientes) => {
+      // La enlazamos con la recolección de datos de Firebase
+      window.syncPlexusPatients = (listaPacientes) => {
         patientParticles = [];
-        (listaPacientes || []).forEach((p, index) => {
+        (listaPacientes || []).forEach(p => {
           let areaNormalizada = String(p.area || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().trim();
-          let colorSet = plexusAreaColors[areaNormalizada] || { solid: '#ffffff', glow: 'rgba(255,255,255,0.4)' };
-          patientParticles.push(new Particle(true, colorSet, index));
+          let colorSet = plexusAreaColors[areaNormalizada] || { solid: '#ffffff', glow: 'rgba(255,255,255,0.3)' };
+          patientParticles.push(createParticle(true, colorSet));
         });
       };
 
-      function getConnections(particles) {
-        let connections = new Map();
-        for (let i = 0; i < particles.length; i++) {
-          connections.set(particles[i].id, []);
-          for (let j = 0; j < particles.length; j++) {
-            if (i !== j) {
-              let dx = particles[i].x - particles[j].x, dy = particles[i].y - particles[j].y;
-              if (Math.sqrt(dx*dx + dy*dy) < 80) connections.get(particles[i].id).push(particles[j]);
-            }
-          }
-        }
-        return connections;
-      }
+      window.addEventListener('resize', resize);
+      resize();
 
       function animate() {
+        if (!isTabActive) {
+          requestAnimationFrame(animate);
+          return;
+        }
+
         ctx.clearRect(0, 0, width, height);
-        let defaultFill = 'rgba(255, 255, 255, 0.4)', defaultStroke = 'rgba(255, 255, 255, 0.2)';
         
-        if (document.body.classList.contains('light')) { defaultFill = 'rgba(15, 23, 42, 0.4)'; defaultStroke = 'rgba(15, 23, 42, 0.2)'; } 
-        else if (document.body.classList.contains('pink')) { defaultFill = 'rgba(219, 39, 119, 0.6)'; defaultStroke = 'rgba(219, 39, 119, 0.4)'; } 
-        else if (document.body.classList.contains('colorful')) { defaultFill = 'rgba(0, 31, 63, 0.4)'; defaultStroke = 'rgba(0, 31, 63, 0.25)'; }
+        let isLight = document.body.classList.contains('light') || document.body.classList.contains('pink') || document.body.classList.contains('colorful');
+        let defaultFill = isLight ? 'rgba(15, 23, 42, 0.3)' : 'rgba(255, 255, 255, 0.3)';
+        let defaultStroke = isLight ? 'rgba(15, 23, 42, 0.1)' : 'rgba(255, 255, 255, 0.1)';
         
-        let allParticles = standardParticles.concat(patientParticles); ctx.lineWidth = 0.8; 
+        let allParticles = standardParticles.concat(patientParticles);
+        ctx.lineWidth = 0.8; 
 
         for (let i = 0; i < allParticles.length; i++) {
-          allParticles[i].update(); allParticles[i].draw(defaultFill);
+          let p = allParticles[i];
+          p.x += p.vx; p.y += p.vy;
+          
+          if (p.x < 0 || p.x > width) p.vx *= -1; 
+          if (p.y < 0 || p.y > height) p.vy *= -1;
+          
+          if (p.isPatient) {
+            ctx.beginPath(); 
+            ctx.arc(p.x, p.y, p.radius + 3, 0, Math.PI * 2); 
+            ctx.fillStyle = p.color.glow; 
+            ctx.fill();
+            
+            ctx.beginPath(); 
+            ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2); 
+            ctx.fillStyle = p.color.solid; 
+            ctx.fill();
+          } else {
+            ctx.beginPath(); 
+            ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2); 
+            ctx.fillStyle = defaultFill; 
+            ctx.fill();
+          }
+
           for (let j = i + 1; j < allParticles.length; j++) {
-            const dx = allParticles[j].x - allParticles[i].x, dy = allParticles[j].y - allParticles[i].y;
-            if (Math.sqrt(dx * dx + dy * dy) < 80) {
-              ctx.beginPath(); ctx.strokeStyle = defaultStroke; ctx.moveTo(allParticles[i].x, allParticles[i].y); ctx.lineTo(allParticles[j].x, allParticles[j].y); ctx.stroke();
+            let p2 = allParticles[j];
+            let dx = p.x - p2.x, dy = p.y - p2.y;
+            if (dx*dx + dy*dy < 8000) { 
+              ctx.beginPath(); 
+              ctx.strokeStyle = defaultStroke; 
+              ctx.moveTo(p.x, p.y); 
+              ctx.lineTo(p2.x, p2.y); 
+              ctx.stroke();
             }
           }
         }
-
-        let timeNow = Date.now() * 0.001;
-        let connections = getConnections(allParticles);
-
-        patientParticles.forEach((patient, pIndex) => {
-           let patientHash = (pIndex * 73), cycleLength = 15 + (patientHash % 15), cycleTime = (timeNow + (patientHash % 100)) % cycleLength, cascadeDuration = 1.2; 
-           if (cycleTime <= cascadeDuration) {
-             let path = [patient], current = patient;
-             for(let step=0; step<2; step++) {
-               let neighbors = connections.get(current.id) || [], validNeighbors = neighbors.filter(n => !path.includes(n));
-               if (validNeighbors.length > 0) {
-                 let nextNode = validNeighbors[(patientHash + step) % validNeighbors.length];
-                 path.unshift(nextNode); current = nextNode;
-               } else { break; }
-             }
-
-             if (path.length > 1) {
-               let numJumps = path.length - 1, timePerJump = 0.3, totalTravelTime = numJumps * timePerJump, glowDuration = 1.2; 
-               if (cycleTime <= totalTravelTime) {
-                 let currentJumpIndex = Math.floor(cycleTime / timePerJump);
-                 if(currentJumpIndex < numJumps) {
-                   let startNode = path[currentJumpIndex], endNode = path[currentJumpIndex + 1], localT = (cycleTime % timePerJump) / timePerJump;
-                   let px = startNode.x + (endNode.x - startNode.x) * localT, py = startNode.y + (endNode.y - startNode.y) * localT;
-                   ctx.fillStyle = patient.color.solid; ctx.beginPath(); ctx.arc(px, py, 2, 0, Math.PI * 2); ctx.fill();
-                 }
-               } else if (cycleTime > totalTravelTime && cycleTime <= totalTravelTime + glowDuration) {
-                 let progress = (cycleTime - totalTravelTime) / glowDuration, ease = Math.sin(progress * Math.PI); 
-                 ctx.beginPath(); ctx.arc(patient.x, patient.y, patient.radius + (1 + 2 * ease), 0, Math.PI * 2);
-                 ctx.save(); ctx.globalAlpha = 0.5 + (0.3 * ease); ctx.fillStyle = patient.color.solid; ctx.fill(); ctx.restore();
-               }
-             }
-           }
-        });
         requestAnimationFrame(animate);
       }
-      window.addEventListener('resize', () => { resize(); createStandardParticles(); });
-      resize(); createStandardParticles(); animate();
+      animate();
     }
-
-    // LÓGICA DE SWIPE
-    function resetAllSwipes() { document.querySelectorAll('.card-content-wrapper').forEach(el => { el.style.transform = 'translateX(0px)'; }); }
-    let swipeStartX = 0, swipeStartY = 0, isSwiping = false, currentSwipeCard = null, swipeActionReady = false; 
-    const ACTION_THRESHOLD = 110; 
-
-    document.addEventListener('touchstart', e => {
-      if (e.target.closest('.swipe-action')) return; 
-      const wrapper = e.target.closest('.card-content-wrapper'); if (!wrapper) return;
-      document.querySelectorAll('.card-content-wrapper').forEach(el => { if (el !== wrapper) { el.style.transform = 'translateX(0px)'; el.closest('.card').classList.remove('swipe-ready-delete', 'swipe-ready-edit'); } });
-      swipeStartX = e.touches[0].clientX; swipeStartY = e.touches[0].clientY;
-      isSwiping = true; swipeActionReady = false; currentSwipeCard = wrapper; currentSwipeCard.classList.add('swiping');
-    }, {passive: true});
-
-    document.addEventListener('touchmove', e => {
-      if (!isSwiping || !currentSwipeCard) return;
-      const deltaX = e.touches[0].clientX - swipeStartX, deltaY = e.touches[0].clientY - swipeStartY;
-      if (Math.abs(deltaY) > Math.abs(deltaX)) { isSwiping = false; currentSwipeCard.style.transform = 'translateX(0px)'; return; }
-      let moveX = deltaX;
-      if (moveX > ACTION_THRESHOLD) { moveX = ACTION_THRESHOLD + (moveX - ACTION_THRESHOLD) * 0.3; } else if (moveX < -ACTION_THRESHOLD) { moveX = -ACTION_THRESHOLD + (moveX + ACTION_THRESHOLD) * 0.3; }
-      const cardEl = currentSwipeCard.closest('.card');
-      if (Math.abs(deltaX) >= ACTION_THRESHOLD && !swipeActionReady) {
-          swipeActionReady = true; vibrar(25); 
-          if (deltaX > 0) cardEl.classList.add('swipe-ready-delete');
-          if (deltaX < 0) cardEl.classList.add('swipe-ready-edit');
-      } else if (Math.abs(deltaX) < ACTION_THRESHOLD && swipeActionReady) {
-          swipeActionReady = false; cardEl.classList.remove('swipe-ready-delete', 'swipe-ready-edit');
-      }
-      currentSwipeCard.style.transform = `translateX(${moveX}px)`;
-    }, {passive: true});
-
-    document.addEventListener('touchend', e => {
-      if (!isSwiping || !currentSwipeCard) return;
-      isSwiping = false; currentSwipeCard.classList.remove('swiping');
-      const deltaX = e.changedTouches[0].clientX - swipeStartX, cardEl = currentSwipeCard.closest('.card');
-      const fila = cardEl.getAttribute('data-fila'); const nombre = cardEl.getAttribute('data-nombre');
-      currentSwipeCard.style.transform = 'translateX(0px)'; cardEl.classList.remove('swipe-ready-delete', 'swipe-ready-edit');
-      if (deltaX >= ACTION_THRESHOLD) { setTimeout(() => borrarPacienteDirecto(fila, nombre), 150); } else if (deltaX <= -ACTION_THRESHOLD) { setTimeout(() => abrirModal(fila), 150); }
-      currentSwipeCard = null; swipeActionReady = false;
-    });
 </script>
 </body>
 </html>
