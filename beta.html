@@ -15,9 +15,12 @@
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icono.png">
   
+  <!-- FUENTES DE GOOGLE: Fira Code, Space Mono y Material Symbols Outlined -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+  
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <style>
     :root {
@@ -27,6 +30,13 @@
       --radius-sm: 8px;
       --transition: 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
       --transition-fast: 150ms ease;
+    }
+
+    /* MATERIAL SYMBOLS BASE CONFIG */
+    .material-symbols-outlined {
+      vertical-align: middle;
+      line-height: 1;
+      font-size: 1.2em;
     }
 
     html, body { margin: 0; padding: 0; width: 100%; height: 100vh; overflow: hidden; font-size: 16px; }
@@ -159,8 +169,9 @@
 
     .icon-btn { 
       width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--accent-border); background: var(--toggle-bg); 
-      color: var(--text); display: flex; align-items: center; justify-content: center; font-size: 1rem; cursor: pointer; transition: all var(--transition-fast); padding: 0; flex-shrink: 0; 
+      color: var(--text); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all var(--transition-fast); padding: 0; flex-shrink: 0; 
     }
+    .icon-btn .material-symbols-outlined { font-size: 1.2rem; }
     .icon-btn:active { transform: scale(0.9); background: var(--accent-soft); }
     
     @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
@@ -180,7 +191,7 @@
     .section-header { width: 100%; padding: 12px 10px; background: var(--section-head); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 10; }
     .section-title { font-size: 0.9rem; font-weight: 700; line-height: 1.12; color: var(--accent); text-transform: uppercase; letter-spacing: 0.08em; display: flex; align-items: center; gap: 6px; }
     
-    /* ANIMACIONES EMOJIS */
+    /* ANIMACIONES EMOJIS (Clínicos) */
     .area-icon { display: inline-block; font-size: 1.2rem; will-change: transform; transition: transform 0.2s ease; }
     @keyframes heartbeat { 0%, 100% { transform: scale(1); } 15% { transform: scale(1.25); } 30% { transform: scale(1); } 45% { transform: scale(1.15); } 60% { transform: scale(1); } }
     @keyframes lookAround { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-3px); } 75% { transform: translateX(3px); } }
@@ -200,7 +211,8 @@
     .patient-list { display: grid; gap: 0; padding: 0; } 
     .card { background: transparent !important; position: relative; border: none; border-bottom: 1px solid var(--line) !important; border-radius: 0; box-shadow: none; margin: 0; width: 100%; } 
     .swipe-bg { position: absolute; top: 1px; left: 0; width: 100%; height: calc(100% - 2px); display: flex; justify-content: space-between; z-index: 1; overflow: hidden; }
-    .swipe-action { display: flex; align-items: center; width: 50%; height: 100%; color: white; font-size: 1.5rem; transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); }
+    .swipe-action { display: flex; align-items: center; width: 50%; height: 100%; color: white; transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); }
+    .swipe-action .material-symbols-outlined { font-size: 1.8rem; }
     .swipe-delete { background: #ef4444; justify-content: flex-start; padding-left: 24px; } .swipe-edit { background: #10b981; justify-content: flex-end; padding-right: 24px; }
     .card.swipe-ready-delete .swipe-delete { transform: scale(1.3) translateX(10px); } .card.swipe-ready-edit .swipe-edit { transform: scale(1.3) translateX(-10px); }
 
@@ -220,7 +232,8 @@
     
     .chip-emoji { font-size: 1.5rem; line-height: 1; text-align: center; display: inline-block; cursor: help; background: transparent; border: none; padding: 0; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15)); }
 
-    .caret { width: 24px; height: 24px; display: grid; place-items: center; border-radius: 999px; color: var(--muted); font-size: 1rem; transition: transform var(--transition), color var(--transition); flex-shrink: 0; }
+    .caret { width: 24px; height: 24px; display: grid; place-items: center; border-radius: 999px; color: var(--muted); transition: transform var(--transition), color var(--transition); flex-shrink: 0; }
+    .caret .material-symbols-outlined { font-size: 1.5rem; }
     .card.open .caret { transform: rotate(180deg) scale(1.1); color: var(--accent); }
     
     .details { display: grid; grid-template-rows: 0fr; opacity: 0; padding: 0 10px; transition: grid-template-rows var(--transition), opacity var(--transition), padding var(--transition); }
@@ -248,9 +261,10 @@
 
     .footer { flex-shrink: 0; display: block; text-align: center; padding: 8px 10px; color: var(--muted); font-size: 0.7rem; border-top: 1px solid var(--line); margin: 0; background: var(--panel); z-index: 50; position: relative;}
 
-    .btn-editar-tarjeta { width: 100%; margin-top: 12px; padding: 12px; border-radius: var(--radius-sm); background: var(--accent-soft); border: 1px solid var(--accent-border); color: var(--accent); font-family: 'Space Mono', monospace; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; cursor: pointer; transition: all var(--transition-fast); }
+    .btn-editar-tarjeta { width: 100%; margin-top: 12px; padding: 12px; border-radius: var(--radius-sm); background: var(--accent-soft); border: 1px solid var(--accent-border); color: var(--accent); font-family: 'Space Mono', monospace; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; cursor: pointer; transition: all var(--transition-fast); display: flex; justify-content: center; align-items: center; gap: 8px; }
     .btn-editar-tarjeta:active { transform: scale(0.98); background: var(--accent); color: #fff; }
-    .fab-btn { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; border-radius: 50%; background: var(--accent); color: white; border: none; box-shadow: 0 4px 15px var(--accent-border); font-size: 2rem; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 40; transition: transform var(--transition-fast), box-shadow var(--transition-fast); line-height: 1; }
+    
+    .fab-btn { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; border-radius: 50%; background: var(--accent); color: white; border: none; box-shadow: 0 4px 15px var(--accent-border); display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 40; transition: transform var(--transition-fast), box-shadow var(--transition-fast); }
     .fab-btn:active { transform: scale(0.9); box-shadow: 0 2px 8px var(--accent-border); }
 
     .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--modal-overlay); z-index: 100; display: none; align-items: center; justify-content: center; padding: 16px; opacity: 0; transition: opacity 0.3s; }
@@ -259,7 +273,8 @@
     .modal-overlay.active .modal-content { transform: translateY(0); }
     .modal-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
     .modal-title { font-family: 'Space Mono', monospace; font-size: 1.1rem; font-weight: 700; color: var(--text); text-transform: uppercase; }
-    .modal-close { background: transparent; border: none; color: var(--muted); font-size: 1.5rem; cursor: pointer; padding: 0; line-height: 1; }
+    .modal-close { background: transparent; border: none; color: var(--muted); cursor: pointer; padding: 0; }
+    .modal-close .material-symbols-outlined { font-size: 1.5rem; }
     
     .modal-body-grid { display: flex; flex-direction: column; gap: 12px; width: 100%; }
     .input-group { display: flex; flex-direction: column; gap: 6px; position: relative; }
@@ -276,7 +291,7 @@
     .btn-cancelar { flex: 1; padding: 12px; border-radius: var(--radius-sm); background: var(--field); border: 1px solid var(--line); color: var(--text); font-weight: 600; cursor: pointer; text-transform: uppercase; font-family: 'Space Mono', monospace; }
     .btn-guardar { flex: 2; padding: 12px; border-radius: var(--radius-sm); background: var(--accent); border: none; color: #fff; font-weight: 600; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; text-transform: uppercase; font-family: 'Space Mono', monospace; }
     .btn-guardar:disabled { opacity: 0.7; cursor: not-allowed; }
-    .btn-borrar { flex: 1; padding: 12px; border-radius: var(--radius-sm); background: var(--error-bg); border: 1px solid var(--error-border); color: var(--error-text); font-weight: 600; cursor: pointer; text-transform: uppercase; font-family: 'Space Mono', monospace; transition: all var(--transition-fast); width: 100%;}
+    .btn-borrar { flex: 1; padding: 12px; border-radius: var(--radius-sm); background: var(--error-bg); border: 1px solid var(--error-border); color: var(--error-text); font-weight: 600; cursor: pointer; text-transform: uppercase; font-family: 'Space Mono', monospace; transition: all var(--transition-fast); width: 100%; display: flex; justify-content: center; align-items: center; gap: 8px;}
     .btn-borrar:active { transform: scale(0.95); background: var(--accent); color: #fff; }
     .optional-label { color: var(--muted) !important; font-weight: 500 !important; }
 
@@ -298,7 +313,7 @@
        ========================================================= */
     .custom-select-wrapper { position: relative; width: 100%; }
     .custom-select-display { cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; }
-    .custom-select-display::after { content: '▼'; font-size: 0.8rem; margin-left: 8px; color: var(--muted); }
+    .custom-select-display::after { content: 'expand_more'; font-family: 'Material Symbols Outlined'; font-size: 1.2rem; margin-left: 8px; color: var(--muted); vertical-align: middle; }
     .custom-select-popover {
       display: none; position: absolute; top: 100%; left: 0; width: 100%; z-index: 99999;
       background: var(--panel); border: 1px solid var(--accent); border-radius: var(--radius-sm);
@@ -391,7 +406,7 @@
       
       /* SUTILEZA EXTREMA: EDICIÓN EN LÍNEA SIN BRINCO DE TAMAÑO */
       .patient-row.expanded-row td.editable-cell { cursor: text; position: relative; }
-      .patient-row.expanded-row td.editable-cell:hover::after { content: '✎'; position: absolute; top: 2px; right: 2px; font-size: 0.7rem; color: var(--muted); opacity: 0.5; pointer-events: none; }
+      .patient-row.expanded-row td.editable-cell:hover::after { content: 'edit'; font-family: 'Material Symbols Outlined'; position: absolute; top: 2px; right: 2px; font-size: 1rem; color: var(--muted); opacity: 0.5; pointer-events: none; }
       
       .patient-row.expanded-row td.editable-cell.is-editing { 
         color: var(--accent) !important; 
@@ -442,7 +457,8 @@
       .scroll-guider.active-up { top: 60px; bottom: auto; opacity: 0.85; pointer-events: auto; }
       .scroll-guider:hover { opacity: 1; background: var(--accent-soft); }
 
-      .btn-table { background: transparent; border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 6px; cursor: pointer; font-size: 1.1rem; transition: all var(--transition-fast); margin-right: 4px; }
+      .btn-table { background: transparent; border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 6px; cursor: pointer; transition: all var(--transition-fast); margin-right: 4px; display: inline-flex; align-items: center; justify-content: center; }
+      .btn-table .material-symbols-outlined { font-size: 1.1rem; }
       .btn-table:hover { transform: scale(1.1); }
       .btn-table.edit { color: #10b981; }
       .btn-table.edit:hover { background: rgba(16, 185, 129, 0.1); border-color: #10b981; }
@@ -453,7 +469,7 @@
       /* BOTÓN DE NUEVO INGRESO FIJO SÓLIDO */
       .btn-add-table { 
         position: sticky; bottom: 0; z-index: 25;
-        display: block; width: 100%; padding: 14px; 
+        display: flex; align-items: center; justify-content: center; width: 100%; padding: 14px; 
         background: var(--panel) !important; 
         color: var(--accent); border: none; border-top: 1px solid var(--accent-border); 
         font-family: 'Space Mono', monospace; font-size: 0.95rem; font-weight: 700; text-transform: uppercase; 
@@ -512,17 +528,18 @@
 
     <div style="position: absolute; bottom: 30px; font-size: 0.7rem; font-family: 'Space Mono', monospace; font-weight: 700; letter-spacing: 0.1em;">
       <span style="color: var(--muted);">ROUROG</span> <span style="color: var(--text); opacity: 0.5;">Innovations</span>
-      <span style="opacity: 0.3; margin-left: 6px;">v1.27</span>
+      <span style="opacity: 0.3; margin-left: 6px;">v2.28</span>
     </div>
   </div>
+
   <div class="app" id="mainAppContainer" style="display: none;">
     <div class="header">
       <canvas id="plexusCanvas"></canvas>
       
       <div class="header-top">
         <div class="header-left">
-          <button id="searchToggleBtn" class="icon-btn" aria-label="Buscar"><span>🔍</span></button>
-          <button id="historyBtn" class="icon-btn" type="button" aria-label="Historial" title="Ver Historial"><span>🗄️</span></button>
+          <button id="searchToggleBtn" class="icon-btn" aria-label="Buscar"><span class="material-symbols-outlined">search</span></button>
+          <button id="historyBtn" class="icon-btn" type="button" aria-label="Historial" title="Ver Historial"><span class="material-symbols-outlined">history</span></button>
         </div>
 
         <div class="main-title">
@@ -531,15 +548,15 @@
         </div>
 
         <div class="header-right">
-          <button id="viewToggleBtn" class="icon-btn hide-on-mobile" type="button" aria-label="Vista"><span id="viewIcon">📋</span></button>
-          <button id="reloadBtn" class="icon-btn" type="button" aria-label="Recargar"><span id="reloadIcon">🔄</span></button>
-          <button id="themeToggleBtn" class="icon-btn" type="button" aria-label="Tema"><span>🎨</span></button>
-          <button id="btnLogoutBtn" class="icon-btn" type="button" aria-label="Cerrar Sesión" title="Cerrar Sesión"><span>🚪</span></button>
+          <button id="viewToggleBtn" class="icon-btn hide-on-mobile" type="button" aria-label="Vista"><span id="viewIcon" class="material-symbols-outlined">table_rows</span></button>
+          <button id="reloadBtn" class="icon-btn" type="button" aria-label="Recargar"><span id="reloadIcon" class="material-symbols-outlined">refresh</span></button>
+          <button id="themeToggleBtn" class="icon-btn" type="button" aria-label="Tema"><span class="material-symbols-outlined">palette</span></button>
+          <button id="btnLogoutBtn" class="icon-btn" type="button" aria-label="Cerrar Sesión" title="Cerrar Sesión"><span class="material-symbols-outlined">logout</span></button>
         </div>
       </div>
 
       <div id="searchWrapper" class="search-wrapper collapsed">
-        <input id="search" class="search" type="search" placeholder="BUSCAR PACIENTE..." autocomplete="off" />
+        <input id="search" class="search" type="search" placeholder="Buscar paciente..." autocomplete="off" />
       </div>
     </div>
     
@@ -559,34 +576,30 @@
 
     <div class="footer">
       Hospital Regional de Delicias - <span style="color: var(--accent); font-weight: 600;">Rourog Innovations</span>
-      <span style="opacity: 0.4; font-size: 0.8em; margin-left: 8px;">v2.27</span>
+      <span style="opacity: 0.4; font-size: 0.8em; margin-left: 8px;">v2.28</span>
     </div>
 
     <div id="easterEggContainer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; pointer-events: none; overflow: hidden;"></div>
   </div>
 
-  <button class="fab-btn" id="mainFabBtn" onclick="abrirModalAgregar()" style="display: none;">+</button>
+  <button class="fab-btn" id="mainFabBtn" onclick="abrirModalAgregar()" style="display: none;"><span class="material-symbols-outlined" style="font-size: 2rem;">add</span></button>
 
-  <!-- THEME MODAL (v2.27) -->
+  <!-- THEME MODAL -->
   <div id="themeModal" class="modal-overlay">
     <div class="modal-content" style="max-width: 380px;">
       <div class="modal-header">
         <div class="modal-title" style="font-weight:700; font-family:'Space Mono';">APARIENCIA</div>
-        <button class="modal-close" onclick="cerrarModal('themeModal')">&times;</button>
+        <button class="modal-close" onclick="cerrarModal('themeModal')"><span class="material-symbols-outlined">close</span></button>
       </div>
       
       <div style="margin-bottom: 16px;">
         <label class="label" style="margin-bottom: 8px;">COLOR BASE (FONDO)</label>
-        <div class="color-picker-grid" id="baseColorPicker">
-           <!-- Inyectado por JS -->
-        </div>
+        <div class="color-picker-grid" id="baseColorPicker"></div>
       </div>
 
       <div>
         <label class="label" style="margin-bottom: 8px;">COLOR DE ACENTO</label>
-        <div class="color-picker-grid" id="accentColorPicker">
-           <!-- Inyectado por JS -->
-        </div>
+        <div class="color-picker-grid" id="accentColorPicker"></div>
       </div>
     </div>
   </div>
@@ -596,7 +609,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <div class="modal-title" style="font-weight:700; font-family:'Space Mono';">EDITAR PACIENTE</div>
-        <button class="modal-close" onclick="cerrarModal('editModal')">&times;</button>
+        <button class="modal-close" onclick="cerrarModal('editModal')"><span class="material-symbols-outlined">close</span></button>
       </div>
       <input type="hidden" id="modalFila" value="">
       <div class="modal-body-grid">
@@ -606,7 +619,7 @@
           <div class="custom-select-wrapper" id="editDestinoWrapper">
             <div class="input-control custom-select-display" data-value="">(SIN DESTINO)</div>
             <div class="custom-select-popover">
-              <div class="custom-select-search"><input type="text" placeholder="🔍 Buscar destino..." autocomplete="off"></div>
+              <div class="custom-select-search"><input type="text" placeholder="Buscar destino..." autocomplete="off"></div>
               <div class="custom-select-options"></div>
             </div>
           </div>
@@ -623,7 +636,7 @@
           <div class="custom-select-wrapper" id="editMoverWrapper">
             <div class="input-control custom-select-display" data-value="">NO MOVER (MANTENER EN CAMA ACTUAL)</div>
             <div class="custom-select-popover">
-              <div class="custom-select-search"><input type="text" placeholder="🔍 Buscar cama..." autocomplete="off"></div>
+              <div class="custom-select-search"><input type="text" placeholder="Buscar cama..." autocomplete="off"></div>
               <div class="custom-select-options"></div>
             </div>
           </div>
@@ -631,10 +644,10 @@
       </div>
       <div class="modal-actions">
         <button class="btn-cancelar" onclick="cerrarModal('editModal')">CANCELAR</button>
-        <button class="btn-guardar" id="btnGuardarEdit" onclick="guardarEdicion()">💾 GUARDAR</button>
+        <button class="btn-guardar" id="btnGuardarEdit" onclick="guardarEdicion()"><span class="material-symbols-outlined">save</span> GUARDAR</button>
       </div>
       <div class="modal-actions" style="margin-top: 4px;">
-        <button class="btn-borrar" id="btnBorrarEdit" onclick="borrarPacienteDialog()">🗑️ BORRAR PACIENTE</button>
+        <button class="btn-borrar" id="btnBorrarEdit" onclick="borrarPacienteDialog()"><span class="material-symbols-outlined">delete</span> BORRAR PACIENTE</button>
       </div>
     </div>
   </div>
@@ -644,7 +657,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <div class="modal-title" style="font-weight:700; font-family:'Space Mono';">NUEVO INGRESO</div>
-        <button class="modal-close" onclick="cerrarModal('addModal')">&times;</button>
+        <button class="modal-close" onclick="cerrarModal('addModal')"><span class="material-symbols-outlined">close</span></button>
       </div>
       <div class="modal-body-grid">
         <div class="input-group span-6"><label>Fecha y Hora de Ingreso</label><input id="addFechaIngreso" class="input-control" type="datetime-local" /></div>
@@ -653,7 +666,7 @@
           <div class="custom-select-wrapper" id="addCamaWrapper">
             <div class="input-control custom-select-display" data-value="">SELECCIONA UNA CAMA LIBRE...</div>
             <div class="custom-select-popover">
-              <div class="custom-select-search"><input type="text" placeholder="🔍 Buscar cama..." autocomplete="off"></div>
+              <div class="custom-select-search"><input type="text" placeholder="Buscar cama..." autocomplete="off"></div>
               <div class="custom-select-options"></div>
             </div>
           </div>
@@ -670,7 +683,7 @@
           <div class="custom-select-wrapper" id="addDestinoWrapper">
             <div class="input-control custom-select-display" data-value="">(SIN DESTINO)</div>
             <div class="custom-select-popover">
-              <div class="custom-select-search"><input type="text" placeholder="🔍 Buscar destino..." autocomplete="off"></div>
+              <div class="custom-select-search"><input type="text" placeholder="Buscar destino..." autocomplete="off"></div>
               <div class="custom-select-options"></div>
             </div>
           </div>
@@ -678,20 +691,20 @@
       </div>
       <div class="modal-actions">
         <button class="btn-cancelar" onclick="cerrarModal('addModal')">CANCELAR</button>
-        <button class="btn-guardar" id="btnGuardarAdd" onclick="guardarNuevo()">➕ INGRESAR</button>
+        <button class="btn-guardar" id="btnGuardarAdd" onclick="guardarNuevo()"><span class="material-symbols-outlined">add</span> INGRESAR</button>
       </div>
     </div>
   </div>
 
   <div id="deleteConfirmModal" class="modal-overlay">
     <div class="modal-content" style="border: 2px solid var(--error-border); box-shadow: 0 10px 30px rgba(239, 68, 68, 0.25);">
-      <div class="warning-icon" id="warningIconObj">🚨</div>
+      <div class="warning-icon" id="warningIconObj"><span class="material-symbols-outlined" style="font-size: inherit;">warning</span></div>
       <div class="delete-text-highlight">ESTA ACCIÓN BORRARÁ LOS DATOS PERMANENTEMENTE</div>
       <div id="deleteTargetName" style="text-align: center; color: var(--text); margin: 12px 0; font-weight: 700; font-size: 1.2rem; text-transform: uppercase;"></div>
       <div style="text-align: center; color: var(--muted); font-size: 0.9rem; margin-bottom: 16px; text-transform: uppercase;">¿DESEAS CONTINUAR?</div>
       <div class="modal-actions">
         <button class="btn-cancelar" onclick="cerrarModalBorrado()">NO</button>
-        <button class="btn-borrar" id="btnConfirmDelete" onclick="ejecutarBorrado()">SÍ, BORRAR</button>
+        <button class="btn-borrar" id="btnConfirmDelete" onclick="ejecutarBorrado()"><span class="material-symbols-outlined">delete</span> SÍ, BORRAR</button>
       </div>
     </div>
   </div>
@@ -777,7 +790,7 @@
 
       try {
         btn.disabled = true;
-        btn.innerHTML = '<span class="spin">🔄</span>';
+        btn.innerHTML = '<span class="spin material-symbols-outlined">sync</span>';
         await signInWithEmailAndPassword(auth, correoMagico, nip);
       } catch (error) {
         vibrar([50, 50, 50]);
@@ -853,6 +866,7 @@
       return c;
     }
 
+    // EXTRAER SOLO EMOJI PARA MODO TARJETA
     function getEmojiOnly(texto) {
       if (!texto) return '';
       const t = String(texto).trim();
@@ -887,6 +901,28 @@
         closeAllPopovers(null); 
     }
     function cerrarModalBorrado() { document.getElementById('deleteConfirmModal').classList.remove('active'); }
+
+    const chipPalette = [
+      { bg: '#ffe4e6', text: '#9f1239' }, { bg: '#dcfce7', text: '#166534' }, 
+      { bg: '#fef9c3', text: '#854d0e' }, { bg: '#dbeafe', text: '#1e40af' }, 
+      { bg: '#ffedd5', text: '#9a3412' }, { bg: '#f3e8ff', text: '#6b21a8' }, { bg: '#e0f7fa', text: '#006064' }  
+    ];
+
+    function getChipColor(text) {
+      if (!text) return { bg: 'var(--chip-bg)', text: 'var(--chip-text)' };
+      let hash = 0;
+      for (let i = 0; i < text.length; i++) hash = text.charCodeAt(i) + ((hash << 5) - hash);
+      return chipPalette[Math.abs(hash) % chipPalette.length];
+    }
+
+    function getColorfulChipHtml(destino) {
+      if (!destino) return '';
+      const isColorful = document.body.classList.contains('base-light') || document.body.classList.contains('base-sand') || document.body.classList.contains('base-rose');
+      if (isColorful) {
+        const colors = getChipColor(destino);
+        return `<div class="chip" style="background-color: ${colors.bg}; color: ${colors.text}; border-color: rgba(0,0,0,0.1); font-weight: 700;">${escapeHtml(destino)}</div>`;
+      } else { return `<div class="chip">${escapeHtml(destino)}</div>`; }
+    }
 
     function agruparPorArea(lista) {
       const grupos = {};
@@ -972,7 +1008,7 @@
 
         let htmlArr = [];
         htmlArr.push(`<div class="table-wrapper animate-in" id="scrollTableWrapper">
-          <div id="scrollGuiderObj" class="scroll-guider" title="Ir al extremo">↓</div>
+          <div id="scrollGuiderObj" class="scroll-guider" title="Ir al extremo"><span class="material-symbols-outlined">arrow_downward</span></div>
           <table class="censo-table"><thead><tr>
             <th style="width: 5%; text-align: center;">CAMA</th>
             <th style="width: 6%; text-align: center;">INGRESO</th>
@@ -981,7 +1017,7 @@
             <th style="width: 26%;">DIAGNÓSTICO</th>
             <th style="width: 26%;">PENDIENTES</th>
             <th style="width: 9%; text-align: center;">DESTINO</th>
-            <th style="width: 4.5%; text-align: center;">⚙️</th>
+            <th style="width: 4.5%; text-align: center;"><span class="material-symbols-outlined" style="font-size: 1.2rem;">settings</span></th>
           </tr></thead><tbody>`);
         
         areas.forEach((area) => {
@@ -991,7 +1027,7 @@
           htmlArr.push(`<tr style="background: rgba(128, 128, 128, 0.15);"><td colspan="8" style="padding: 6px 10px; font-weight: 800; font-size: 0.85rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--line);"><span class="area-icon ${visual.class}">${visual.emoji}</span> ${escapeHtml(area)}</td></tr>`);
 
           grupos[area].forEach((p) => {
-            const destinoChip = p.destino ? `<div class="chip">${escapeHtml(p.destino)}</div>` : '';
+            const destinoChip = getColorfulChipHtml(p.destino);
             htmlArr.push(`<tr class="patient-row" data-fila="${p.fila}" onclick="toggleTableRow(this)">
                 <td style="padding: 6px 10px; text-align: center;"><span style="color: var(--accent); font-weight: 700; font-size: 0.85rem;">${escapeHtml(p.cama || '-')}</span></td>
                 <td style="padding: 6px 10px; font-size: 0.7rem; color: var(--muted); font-family: 'Fira Code', monospace; line-height: 1.3; text-align: center;">${p.fechaIngresoFormateada || '-'}</td>
@@ -1016,12 +1052,12 @@
                   ${destinoChip || '<span style="color:var(--muted); opacity:0.4;">-</span>'}
                 </td>
                 
-                <td style="padding: 4px 10px; text-align: center; white-space: nowrap;"><button class="btn-table edit" style="padding: 4px; font-size: 0.9rem; margin-right: 2px;" onclick="abrirModal('${p.fila}'); event.stopPropagation();" title="Editar">✏️</button><button class="btn-table delete" style="padding: 4px; font-size: 0.9rem;" onclick="borrarPacienteDirecto('${p.fila}', '${escapeHtml(p.nombre)}'); event.stopPropagation();" title="Borrar">🗑️</button></td>
+                <td style="padding: 4px 10px; text-align: center; white-space: nowrap;"><button class="btn-table edit" style="padding: 4px; font-size: 0.9rem; margin-right: 2px;" onclick="abrirModal('${p.fila}'); event.stopPropagation();" title="Editar"><span class="material-symbols-outlined" style="font-size: 1.1rem;">edit</span></button><button class="btn-table delete" style="padding: 4px; font-size: 0.9rem;" onclick="borrarPacienteDirecto('${p.fila}', '${escapeHtml(p.nombre)}'); event.stopPropagation();" title="Borrar"><span class="material-symbols-outlined" style="font-size: 1.1rem;">delete</span></button></td>
             </tr>`);
           });
         });
 
-        htmlArr.push(`</tbody></table><button class="btn-add-table" onclick="abrirModalAgregar()">➕ NUEVO INGRESO</button></div>`);
+        htmlArr.push(`</tbody></table><button class="btn-add-table" onclick="abrirModalAgregar()"><span class="material-symbols-outlined" style="margin-right: 8px;">person_add</span> NUEVO INGRESO</button></div>`);
         content.innerHTML = htmlArr.join('');
         
         setTimeout(initScrollGuider, 100);
@@ -1048,6 +1084,7 @@
               ${pacientes.map((p, indexPatient) => {
                 const camaHtml = p.cama ? `<div class="patient-bed">${escapeHtml(p.cama)}</div>` : '';
                 
+                // MODO TARJETA: Solo Emoji para Destino
                 const emojiSolo = p.destino ? getEmojiOnly(p.destino) : '';
                 const destinoEmojiHtml = emojiSolo ? `<div class="chip-emoji" title="${escapeHtml(p.destino)}">${emojiSolo}</div>` : '';
                 
@@ -1062,7 +1099,7 @@
                 ].filter(Boolean).join('');
                 const delayPatient = delayBase + (indexPatient * 50);
                 
-                return `<div class="card animate-in" data-fila="${p.fila}" data-nombre="${escapeHtml(p.nombre)}" style="animation-delay: ${delayPatient}ms;"><div class="swipe-bg"><div class="swipe-action swipe-delete">🗑️</div><div class="swipe-action swipe-edit">✏️</div></div><div class="card-content-wrapper"><div class="card-header" onclick="toggleCard(this)"><div class="patient-main"><div class="patient-name">${escapeHtml(p.nombre)}</div>${camaHtml}</div><div class="header-right">${destinoEmojiHtml}<div class="caret">⌄</div></div></div><div class="details"><div class="details-content">${detailsHtml}<button class="btn-editar-tarjeta" onclick="abrirModal('${p.fila}'); event.stopPropagation();">✏️ EDITAR PACIENTE</button></div></div></div></div>`;
+                return `<div class="card animate-in" data-fila="${p.fila}" data-nombre="${escapeHtml(p.nombre)}" style="animation-delay: ${delayPatient}ms;"><div class="swipe-bg"><div class="swipe-action swipe-delete"><span class="material-symbols-outlined">delete</span></div><div class="swipe-action swipe-edit"><span class="material-symbols-outlined">edit</span></div></div><div class="card-content-wrapper"><div class="card-header" onclick="toggleCard(this)"><div class="patient-main"><div class="patient-name">${escapeHtml(p.nombre)}</div>${camaHtml}</div><div class="header-right">${destinoEmojiHtml}<div class="caret"><span class="material-symbols-outlined">expand_more</span></div></div></div><div class="details"><div class="details-content">${detailsHtml}<button class="btn-editar-tarjeta" onclick="abrirModal('${p.fila}'); event.stopPropagation();"><span class="material-symbols-outlined" style="font-size: 1.1rem; margin-right: 4px;">edit_square</span> EDITAR PACIENTE</button></div></div></div></div>`;
               }).join('')}
             </div>
           </section>
@@ -1183,11 +1220,11 @@
         }
 
         if (!atBottom) {
-          guider.innerText = '↓';
+          guider.innerHTML = '<span class="material-symbols-outlined">arrow_downward</span>';
           guider.className = 'scroll-guider active-down';
           guider.title = "Ir al final del censo";
         } else if (atBottom && !atTop) {
-          guider.innerText = '↑';
+          guider.innerHTML = '<span class="material-symbols-outlined">arrow_upward</span>';
           guider.className = 'scroll-guider active-up';
           guider.title = "Volver arriba";
         } else {
@@ -1447,7 +1484,7 @@
       
       let opcionesHtml = `
         <div style="padding: 6px; background: var(--panel); border-bottom: 1px solid var(--line);">
-          <input type="text" class="inline-search-input input-control" placeholder="🔍 Buscar destino..." autocomplete="off" style="width: 100%; padding: 6px 10px; font-size: 0.8rem; margin: 0; outline: none;">
+          <input type="text" class="inline-search-input input-control" placeholder="Buscar destino..." autocomplete="off" style="width: 100%; padding: 6px 10px; font-size: 0.8rem; margin: 0; outline: none;">
         </div>
         <div class="inline-options-wrapper">
           <div class="inline-destino-option ${!destinoActual ? 'selected' : ''}" data-value="">(SIN DESTINO)</div>
@@ -1508,7 +1545,7 @@
         cerrarDirecto();
         
         if (nuevoDestino !== destinoActual.toUpperCase().trim()) {
-          tdEl.innerHTML = '<span class="spin" style="font-size:0.8rem;">🔄</span>';
+          tdEl.innerHTML = '<span class="spin material-symbols-outlined" style="font-size:1.2rem;">sync</span>';
           try {
             await updateDoc(doc(db, "pacientes", filaId), { destino: nuevoDestino });
             vibrar(15);
@@ -1587,7 +1624,7 @@
       const moverAFila = document.querySelector('#editMoverWrapper .custom-select-display').dataset.value || '';
       const fechaInput = document.getElementById('modalFechaIngreso').value;
 
-      btnGuardar.disabled = true; btnGuardar.innerHTML = '<span class="spin">🔄</span> GUARDANDO...';
+      btnGuardar.disabled = true; btnGuardar.innerHTML = '<span class="spin material-symbols-outlined">sync</span> GUARDANDO...';
       
       try {
         let updateData = {
@@ -1615,7 +1652,7 @@
         vibrar([100, 50, 100]); 
         alert('ERROR AL GUARDAR: ' + error.message);
       } finally {
-        btnGuardar.disabled = false; btnGuardar.innerHTML = '💾 GUARDAR';
+        btnGuardar.disabled = false; btnGuardar.innerHTML = '<span class="material-symbols-outlined">save</span> GUARDAR';
       }
     }
 
@@ -1629,9 +1666,13 @@
       document.getElementById('deleteConfirmModal').classList.add('active');
       
       const iconEl = document.getElementById('warningIconObj');
-      let esSirena = true; iconEl.innerText = '🚨'; 
+      let esSirena = true; 
+      iconEl.innerHTML = '<span class="material-symbols-outlined" style="font-size: inherit;">warning</span>'; 
       if(iconoAlertaInterval) clearInterval(iconoAlertaInterval);
-      iconoAlertaInterval = setInterval(() => { esSirena = !esSirena; iconEl.innerText = esSirena ? '🚨' : '⚠️'; }, 400); 
+      iconoAlertaInterval = setInterval(() => { 
+        esSirena = !esSirena; 
+        iconEl.innerHTML = esSirena ? '<span class="material-symbols-outlined" style="font-size: inherit; color: var(--error-text);">warning</span>' : '<span class="material-symbols-outlined" style="font-size: inherit; color: var(--accent);">error</span>'; 
+      }, 400); 
     }
 
     function borrarPacienteDialog() {
@@ -1647,7 +1688,7 @@
       if (!filaABorrar) return;
 
       btnBorrar.disabled = true; 
-      btnBorrar.innerHTML = '<span class="spin">🔄</span>...';
+      btnBorrar.innerHTML = '<span class="spin material-symbols-outlined">sync</span>...';
       vibrar(20);
       
       try {
@@ -1670,7 +1711,7 @@
         alert('ERROR AL BORRAR: ' + error.message); 
         cerrarModalBorrado();
       } finally {
-        btnBorrar.disabled = false; btnBorrar.innerHTML = 'SÍ, BORRAR';
+        btnBorrar.disabled = false; btnBorrar.innerHTML = '<span class="material-symbols-outlined">delete</span> SÍ, BORRAR';
       }
     }
 
@@ -1723,7 +1764,7 @@
       const fechaInput = document.getElementById('addFechaIngreso').value;
 
       btnGuardar.disabled = true; 
-      btnGuardar.innerHTML = '<span class="spin">🔄</span> PROCESANDO...';
+      btnGuardar.innerHTML = '<span class="spin material-symbols-outlined">sync</span> PROCESANDO...';
 
       try {
         const fechaCreacion = fechaInput ? new Date(fechaInput) : new Date();
@@ -1744,7 +1785,7 @@
         vibrar([100, 50, 100]); 
         alert("ERROR: " + error.message); 
       } finally {
-        btnGuardar.disabled = false; btnGuardar.innerHTML = '➕ INGRESAR';
+        btnGuardar.disabled = false; btnGuardar.innerHTML = '<span class="material-symbols-outlined">add</span> INGRESAR';
       }
     }
 
@@ -1883,7 +1924,7 @@
     }
 
     // ==========================================================
-    // SISTEMA DE TEMAS (NUEVO V2.27)
+    // SISTEMA DE TEMAS (NUEVO V2.27 / v2.28)
     // ==========================================================
     const bases = [
       { id: 'base-dark', color: '#0f172a' }, { id: 'base-light', color: '#f8fafc' },
@@ -1923,11 +1964,9 @@
       localStorage.setItem('censo-base', currentBase);
       localStorage.setItem('censo-accent', currentAccent);
 
-      // Update active states
       document.querySelectorAll('.base-swatch').forEach(sw => sw.classList.toggle('active', sw.dataset.val === currentBase));
       document.querySelectorAll('.accent-swatch').forEach(sw => sw.classList.toggle('active', sw.dataset.val === currentAccent));
 
-      // Update meta color
       setTimeout(() => {
         const metaColor = getComputedStyle(document.body).getPropertyValue('--theme-meta').trim();
         if(metaColor) document.querySelector('meta[name="theme-color"]').setAttribute('content', metaColor);
@@ -1937,7 +1976,7 @@
     function initTheme() {
       const savedView = localStorage.getItem('censo-view') || 'kanban';
       currentViewMode = savedView;
-      document.getElementById('viewIcon').textContent = currentViewMode === 'kanban' ? '📋' : '🗂️'; 
+      document.getElementById('viewIcon').textContent = currentViewMode === 'kanban' ? 'table_rows' : 'grid_view'; 
       
       renderThemePickers();
       applyTheme(localStorage.getItem('censo-base'), localStorage.getItem('censo-accent'));
@@ -1956,7 +1995,7 @@
       vibrar(15);
       currentViewMode = currentViewMode === 'kanban' ? 'table' : 'kanban';
       localStorage.setItem('censo-view', currentViewMode);
-      document.getElementById('viewIcon').textContent = currentViewMode === 'kanban' ? '📋' : '🗂️';
+      document.getElementById('viewIcon').textContent = currentViewMode === 'kanban' ? 'table_rows' : 'grid_view';
       render(pacientesGlobal);
     });
     
@@ -1985,7 +2024,7 @@
     initTheme(); 
 
     // ==========================================================
-    // SISTEMA DE PARTÍCULAS NEURAL Y SINAPSIS (RESTAURADO v2.27)
+    // SISTEMA DE PARTÍCULAS NEURAL Y SINAPSIS
     // ==========================================================
     let plexusRunning = false;
     let isTabActive = true;
