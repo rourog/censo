@@ -15,9 +15,12 @@
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icono.png">
   
+  <!-- FUENTES DE GOOGLE: Fira Code, Space Mono y Material Symbols Outlined -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+  
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <style>
     :root {
@@ -29,90 +32,159 @@
       --transition-fast: 150ms ease;
     }
 
+    /* MATERIAL SYMBOLS BASE CONFIG */
+    .material-symbols-outlined {
+      vertical-align: middle;
+      line-height: 1;
+      font-size: 1.2em;
+    }
+
     html, body { margin: 0; padding: 0; width: 100%; height: 100vh; overflow: hidden; font-size: 16px; }
     body { font-family: 'Fira Code', monospace; transition: background 0.5s ease, color 0.5s ease; font-variant-ligatures: contextual; }
 
     /* ==========================================================
-       DEFINICIÓN DE TEMAS (SÓLIDOS PARA RENDIMIENTO)
+       1. COLORES BASE (FONDOS Y PANELES)
        ========================================================== */
-    body.dark {
+    body.base-dark {
       --bg: #0f172a; --panel: #1e293b; --section-head: #0f172a;
       --card: #1e293b; --card-open: #2d3e5a; --field: rgba(255,255,255,0.03);
       --text: #e5e7eb; --muted: #94a3b8; --line: rgba(255,255,255,0.08);
-      --accent: #60a5fa; --accent-soft: rgba(96,165,250,0.12); --accent-border: rgba(96,165,250,0.24);
-      --chip-bg: rgba(96,165,250,0.12); --chip-text: #dbeafe; 
-      --search-bg: rgba(255,255,255,0.05); --error-bg: rgba(239,68,68,.10); --error-border: rgba(239,68,68,.22);
-      --error-text: #fecaca; --toggle-bg: rgba(255,255,255,0.06); --toggle-icon: #dbeafe;
-      --modal-overlay: rgba(0,0,0,0.85); --success: #34d399; 
-      --skeleton: #2d3e5a; --skeleton-shimmer: rgba(255, 255, 255, 0.05);
+      --search-bg: rgba(255,255,255,0.05); --error-bg: rgba(239,68,68,0.1); --error-border: rgba(239,68,68,0.22); --error-text: #fecaca;
+      --modal-overlay: rgba(0,0,0,0.85); --skeleton: #2d3e5a; --skeleton-shimmer: rgba(255,255,255,0.05);
+      --theme-meta: #0f172a;
+    }
+    body.base-light {
+      --bg: #f8fafc; --panel: #ffffff; --section-head: #f1f5f9;
+      --card: #ffffff; --card-open: #f1f5f9; --field: rgba(0,0,0,0.02);
+      --text: #0f172a; --muted: #475569; --line: rgba(0,0,0,0.08);
+      --search-bg: rgba(0,0,0,0.03); --error-bg: rgba(254,242,242,0.92); --error-border: rgba(239,68,68,0.18); --error-text: #b91c1c;
+      --modal-overlay: rgba(15,23,42,0.6); --skeleton: #e2e8f0; --skeleton-shimmer: rgba(255,255,255,0.4);
+      --theme-meta: #f8fafc;
+    }
+    body.base-pure-white {
+      --bg: #ffffff; --panel: #ffffff; --section-head: #f8fafc;
+      --card: #ffffff; --card-open: #f1f5f9; --field: rgba(0,0,0,0.03);
+      --text: #0f172a; --muted: #64748b; --line: rgba(0,0,0,0.1);
+      --search-bg: rgba(0,0,0,0.04); --error-bg: #fef2f2; --error-border: #f87171; --error-text: #991b1b;
+      --modal-overlay: rgba(15,23,42,0.6); --skeleton: #e2e8f0; --skeleton-shimmer: rgba(255,255,255,0.6);
+      --theme-meta: #ffffff;
+    }
+    body.base-gray-light {
+      --bg: #e2e8f0; --panel: #f8fafc; --section-head: #e2e8f0;
+      --card: #f8fafc; --card-open: #e2e8f0; --field: rgba(0,0,0,0.03);
+      --text: #1e293b; --muted: #64748b; --line: rgba(0,0,0,0.08);
+      --search-bg: rgba(0,0,0,0.04); --error-bg: #fef2f2; --error-border: #f87171; --error-text: #991b1b;
+      --modal-overlay: rgba(15,23,42,0.6); --skeleton: #cbd5e1; --skeleton-shimmer: rgba(255,255,255,0.5);
+      --theme-meta: #e2e8f0;
+    }
+    body.base-gray-dark {
+      --bg: #27272a; --panel: #18181b; --section-head: #27272a;
+      --card: #18181b; --card-open: #3f3f46; --field: rgba(255,255,255,0.03);
+      --text: #e4e4e7; --muted: #a1a1aa; --line: rgba(255,255,255,0.08);
+      --search-bg: rgba(255,255,255,0.05); --error-bg: rgba(239,68,68,0.1); --error-border: rgba(239,68,68,0.22); --error-text: #fecaca;
+      --modal-overlay: rgba(0,0,0,0.85); --skeleton: #3f3f46; --skeleton-shimmer: rgba(255,255,255,0.05);
+      --theme-meta: #27272a;
+    }
+    body.base-midnight {
+      --bg: #000000; --panel: #0a0a0a; --section-head: #000000;
+      --card: #0a0a0a; --card-open: #1a1a1a; --field: rgba(255,255,255,0.04);
+      --text: #ffffff; --muted: #737373; --line: rgba(255,255,255,0.12);
+      --search-bg: rgba(255,255,255,0.05); --error-bg: rgba(220,38,38,0.1); --error-border: rgba(220,38,38,0.2); --error-text: #fca5a5;
+      --modal-overlay: rgba(0,0,0,0.92); --skeleton: #1a1a1a; --skeleton-shimmer: rgba(255,255,255,0.05);
+      --theme-meta: #000000;
+    }
+    body.base-navy {
+      --bg: #001529; --panel: #001f3f; --section-head: #001529;
+      --card: #001f3f; --card-open: #003366; --field: rgba(255,255,255,0.03);
+      --text: #e0f2fe; --muted: #7dd3fc; --line: rgba(255,255,255,0.1);
+      --search-bg: rgba(255,255,255,0.05); --error-bg: rgba(225,29,72,0.15); --error-border: rgba(225,29,72,0.3); --error-text: #fda4af;
+      --modal-overlay: rgba(0,21,41,0.85); --skeleton: #003366; --skeleton-shimmer: rgba(255,255,255,0.05);
+      --theme-meta: #001529;
+    }
+    body.base-sand {
+      --bg: #fefce8; --panel: #ffffff; --section-head: #fef9c3;
+      --card: #ffffff; --card-open: #fef08a; --field: rgba(0,0,0,0.02);
+      --text: #422006; --muted: #854d0e; --line: rgba(0,0,0,0.08);
+      --search-bg: rgba(0,0,0,0.03); --error-bg: #fee2e2; --error-border: #ef4444; --error-text: #991b1b;
+      --modal-overlay: rgba(66,32,6,0.6); --skeleton: #fef08a; --skeleton-shimmer: rgba(255,255,255,0.4);
+      --theme-meta: #fefce8;
+    }
+    body.base-rose {
+      --bg: #fff1f2; --panel: #ffffff; --section-head: #ffe4e6;
+      --card: #ffffff; --card-open: #fecdd3; --field: rgba(0,0,0,0.02);
+      --text: #881337; --muted: #e11d48; --line: rgba(225,29,72,0.15);
+      --search-bg: rgba(225,29,72,0.05); --error-bg: #ffe4e6; --error-border: #f43f5e; --error-text: #9f1239;
+      --modal-overlay: rgba(136,19,55,0.6); --skeleton: #fecdd3; --skeleton-shimmer: rgba(255,255,255,0.4);
+      --theme-meta: #fff1f2;
+    }
+    body.base-forest {
+      --bg: #064e3b; --panel: #022c22; --section-head: #064e3b;
+      --card: #022c22; --card-open: #065f46; --field: rgba(255,255,255,0.03);
+      --text: #ecfdf5; --muted: #a7f3d0; --line: rgba(255,255,255,0.1);
+      --search-bg: rgba(255,255,255,0.05); --error-bg: rgba(239,68,68,0.15); --error-border: rgba(239,68,68,0.3); --error-text: #fca5a5;
+      --modal-overlay: rgba(2,44,34,0.85); --skeleton: #065f46; --skeleton-shimmer: rgba(255,255,255,0.05);
+      --theme-meta: #064e3b;
+    }
+    body.base-plum {
+      --bg: #3b0764; --panel: #2e064e; --section-head: #3b0764;
+      --card: #2e064e; --card-open: #4c1d95; --field: rgba(255,255,255,0.03);
+      --text: #f3e8ff; --muted: #d8b4fe; --line: rgba(255,255,255,0.1);
+      --search-bg: rgba(255,255,255,0.05); --error-bg: rgba(239,68,68,0.15); --error-border: rgba(239,68,68,0.3); --error-text: #fca5a5;
+      --modal-overlay: rgba(46,6,78,0.85); --skeleton: #4c1d95; --skeleton-shimmer: rgba(255,255,255,0.05);
+      --theme-meta: #3b0764;
+    }
+    body.base-coffee {
+      --bg: #451a03; --panel: #290f02; --section-head: #451a03;
+      --card: #290f02; --card-open: #78350f; --field: rgba(255,255,255,0.03);
+      --text: #fef3c7; --muted: #fde047; --line: rgba(255,255,255,0.1);
+      --search-bg: rgba(255,255,255,0.05); --error-bg: rgba(239,68,68,0.15); --error-border: rgba(239,68,68,0.3); --error-text: #fca5a5;
+      --modal-overlay: rgba(41,15,2,0.85); --skeleton: #78350f; --skeleton-shimmer: rgba(255,255,255,0.05);
+      --theme-meta: #451a03;
+    }
+    body.base-mint {
+      --bg: #f0fdf4; --panel: #ffffff; --section-head: #dcfce7;
+      --card: #ffffff; --card-open: #bbf7d0; --field: rgba(0,0,0,0.02);
+      --text: #064e3b; --muted: #047857; --line: rgba(0,0,0,0.08);
+      --search-bg: rgba(0,0,0,0.03); --error-bg: #fee2e2; --error-border: #ef4444; --error-text: #991b1b;
+      --modal-overlay: rgba(6,78,59,0.6); --skeleton: #bbf7d0; --skeleton-shimmer: rgba(255,255,255,0.4);
+      --theme-meta: #f0fdf4;
+    }
+    body.base-lavender {
+      --bg: #faf5ff; --panel: #ffffff; --section-head: #f3e8ff;
+      --card: #ffffff; --card-open: #e9d5ff; --field: rgba(0,0,0,0.02);
+      --text: #3b0764; --muted: #7e22ce; --line: rgba(0,0,0,0.08);
+      --search-bg: rgba(0,0,0,0.03); --error-bg: #fee2e2; --error-border: #ef4444; --error-text: #991b1b;
+      --modal-overlay: rgba(59,7,100,0.6); --skeleton: #e9d5ff; --skeleton-shimmer: rgba(255,255,255,0.4);
+      --theme-meta: #faf5ff;
     }
 
-    body.light {
-      --bg: #eef4fb; --panel: #ffffff; --section-head: #f8fbff;
-      --card: #ffffff; --card-open: #dbeafe; --field: rgba(37,99,235,0.03);
-      --text: #0f172a; --muted: #475569; --line: rgba(15,23,42,0.08);
-      --accent: #2563eb; --accent-soft: rgba(37,99,235,0.10); --accent-border: rgba(37,99,235,0.16);
-      --chip-bg: rgba(37,99,235,0.10); --chip-text: #1d4ed8; 
-      --search-bg: rgba(37,99,235,0.05); --error-bg: rgba(254,242,242,0.92); --error-border: rgba(239,68,68,.18);
-      --error-text: #b91c1c; --toggle-bg: rgba(37,99,235,0.08); --toggle-icon: #1d4ed8;
-      --modal-overlay: rgba(15,23,42,0.6); --success: #10b981; 
-      --skeleton: #e2e8f0; --skeleton-shimmer: rgba(255, 255, 255, 0.4);
-    }
-
-    body.pink {
-      --bg: #fdf2f8; --panel: #ffffff; --section-head: #fdf2f8;
-      --card: #ffffff; --card-open: #fce7f3; --field: rgba(219, 39, 119, 0.03);
-      --text: #831843; --muted: #be185d; --line: rgba(219, 39, 119, 0.15);
-      --accent: #db2777; --accent-soft: rgba(219, 39, 119, 0.12); --accent-border: rgba(219, 39, 119, 0.25);
-      --chip-bg: rgba(219, 39, 119, 0.15); --chip-text: #9d174d; 
-      --search-bg: rgba(219, 39, 119, 0.05); --error-bg: rgba(225, 29, 72, 0.1); --error-border: rgba(225, 29, 72, 0.2);
-      --error-text: #e11d48; --toggle-bg: rgba(219, 39, 119, 0.1); --toggle-icon: #db2777;
-      --modal-overlay: rgba(131, 24, 67, 0.7); --success: #10b981; 
-      --skeleton: #fce7f3; --skeleton-shimmer: rgba(255, 255, 255, 0.4);
-    }
-
-    body.colorful {
-      --bg: #f8fafc; --panel: #fde68a; --section-head: #eab308; 
-      --card: #1d4ed8; --card-open: #d946ef; --field: rgba(0, 0, 0, 0.2); 
-      --text: #001f3f; --muted: #475569; --line: rgba(0, 0, 0, 0.1);
-      --accent: #16a34a; --accent-soft: rgba(22, 163, 74, 0.1); --accent-border: #15803d;
-      --chip-bg: #bef264; --chip-text: #001f3f; 
-      --search-bg: #ffffff; --error-bg: #fee2e2; --error-border: #ef4444; --error-text: #b91c1c; 
-      --toggle-bg: #f43f5e; --toggle-icon: #ffffff;
-      --modal-overlay: rgba(23, 23, 23, 0.7); --success: #16a34a; 
-      --skeleton: #bef264; --skeleton-shimmer: rgba(255, 255, 255, 0.5);
-    }
-
-    body.colorful { background-image: linear-gradient(135deg, #e0f2fe 0%, #d1fae5 50%, #ede9fe 100%) !important; background-attachment: fixed; }
-    body.colorful .header { background-image: linear-gradient(135deg, #f0abfc 0%, #bfdbfe 100%) !important; }
-    body.colorful .title-urgencias, body.colorful #meta-text, body.colorful .section-title { color: #001f3f !important; text-shadow: none; font-weight: 800; }
-    body.colorful .card .patient-name, body.colorful .card .value, body.colorful .card .caret { color: #ffffff !important; }
-    body.colorful .card .patient-bed, body.colorful .card .label { color: rgba(255, 255, 255, 0.8) !important; }
-    body.colorful .card .field { border: 1px solid rgba(255,255,255,0.2) !important; background: rgba(0,0,0,0.15) !important; }
-    body.colorful .card .btn-editar-tarjeta { background: #ffffff !important; color: #d946ef !important; border: none; font-weight: 800; box-shadow: 0 4px 6px rgba(0,0,0,0.15); }
-    body.colorful .card .btn-editar-tarjeta:active { background: #e0f2fe !important; color: #a21caf !important; }
-    body.colorful .fab-btn { background: linear-gradient(135deg, #bef264, #06b6d4) !important; color: #001f3f; }
-
-    body.midnight {
-      --bg: #000000; --panel: #111111; --section-head: #1a0000; 
-      --card: #120000; --card-open: #250000; --field: rgba(255, 0, 0, 0.05);
-      --text: #ff4d4d; --muted: #800000; --line: rgba(255, 0, 0, 0.15);
-      --accent: #ff0000; --accent-soft: rgba(255, 0, 0, 0.1); --accent-border: rgba(255, 0, 0, 0.3);
-      --chip-bg: #330000; --chip-text: #ff4d4d; 
-      --search-bg: #0a0000; --error-bg: #220000; --error-border: #aa0000; --error-text: #ff4d4d; 
-      --toggle-bg: #1a0000; --toggle-icon: #ff0000;
-      --modal-overlay: rgba(0,0,0,0.9); --success: #880000; 
-      --skeleton: #1a0000; --skeleton-shimmer: rgba(255, 0, 0, 0.1);
-    }
+    /* ==========================================================
+       2. COLORES DE ACENTO
+       ========================================================== */
+    body.accent-blue { --accent: #3b82f6; --accent-soft: rgba(59,130,246,0.12); --accent-border: rgba(59,130,246,0.25); --chip-bg: rgba(59,130,246,0.15); --chip-text: var(--accent); --toggle-bg: rgba(59,130,246,0.1); --toggle-icon: #3b82f6; }
+    body.accent-pure-blue { --accent: #1d4ed8; --accent-soft: rgba(29,78,216,0.12); --accent-border: rgba(29,78,216,0.25); --chip-bg: rgba(29,78,216,0.15); --chip-text: var(--accent); --toggle-bg: rgba(29,78,216,0.1); --toggle-icon: #1d4ed8; }
+    body.accent-green { --accent: #10b981; --accent-soft: rgba(16,185,129,0.12); --accent-border: rgba(16,185,129,0.25); --chip-bg: rgba(16,185,129,0.15); --chip-text: var(--accent); --toggle-bg: rgba(16,185,129,0.1); --toggle-icon: #10b981; }
+    body.accent-emerald { --accent: #059669; --accent-soft: rgba(5,150,105,0.12); --accent-border: rgba(5,150,105,0.25); --chip-bg: rgba(5,150,105,0.15); --chip-text: var(--accent); --toggle-bg: rgba(5,150,105,0.1); --toggle-icon: #059669; }
+    body.accent-pink { --accent: #ec4899; --accent-soft: rgba(236,72,153,0.12); --accent-border: rgba(236,72,153,0.25); --chip-bg: rgba(236,72,153,0.15); --chip-text: var(--accent); --toggle-bg: rgba(236,72,153,0.1); --toggle-icon: #ec4899; }
+    body.accent-purple { --accent: #a855f7; --accent-soft: rgba(168,85,247,0.12); --accent-border: rgba(168,85,247,0.25); --chip-bg: rgba(168,85,247,0.15); --chip-text: var(--accent); --toggle-bg: rgba(168,85,247,0.1); --toggle-icon: #a855f7; }
+    body.accent-orange { --accent: #f97316; --accent-soft: rgba(249,115,22,0.12); --accent-border: rgba(249,115,22,0.25); --chip-bg: rgba(249,115,22,0.15); --chip-text: var(--accent); --toggle-bg: rgba(249,115,22,0.1); --toggle-icon: #f97316; }
+    body.accent-amber { --accent: #d97706; --accent-soft: rgba(217,119,6,0.12); --accent-border: rgba(217,119,6,0.25); --chip-bg: rgba(217,119,6,0.15); --chip-text: var(--accent); --toggle-bg: rgba(217,119,6,0.1); --toggle-icon: #d97706; }
+    body.accent-red { --accent: #ef4444; --accent-soft: rgba(239,68,68,0.12); --accent-border: rgba(239,68,68,0.25); --chip-bg: rgba(239,68,68,0.15); --chip-text: var(--accent); --toggle-bg: rgba(239,68,68,0.1); --toggle-icon: #ef4444; }
+    body.accent-pure-red { --accent: #dc2626; --accent-soft: rgba(220,38,38,0.12); --accent-border: rgba(220,38,38,0.25); --chip-bg: rgba(220,38,38,0.15); --chip-text: var(--accent); --toggle-bg: rgba(220,38,38,0.1); --toggle-icon: #dc2626; }
+    body.accent-crimson { --accent: #be123c; --accent-soft: rgba(190,18,60,0.12); --accent-border: rgba(190,18,60,0.25); --chip-bg: rgba(190,18,60,0.15); --chip-text: var(--accent); --toggle-bg: rgba(190,18,60,0.1); --toggle-icon: #be123c; }
+    body.accent-gold { --accent: #eab308; --accent-soft: rgba(234,179,8,0.12); --accent-border: rgba(234,179,8,0.25); --chip-bg: rgba(234,179,8,0.15); --chip-text: var(--accent); --toggle-bg: rgba(234,179,8,0.1); --toggle-icon: #eab308; }
+    body.accent-teal { --accent: #14b8a6; --accent-soft: rgba(20,184,166,0.12); --accent-border: rgba(20,184,166,0.25); --chip-bg: rgba(20,184,166,0.15); --chip-text: var(--accent); --toggle-bg: rgba(20,184,166,0.1); --toggle-icon: #14b8a6; }
+    body.accent-lime { --accent: #84cc16; --accent-soft: rgba(132,204,22,0.12); --accent-border: rgba(132,204,22,0.25); --chip-bg: rgba(132,204,22,0.15); --chip-text: var(--accent); --toggle-bg: rgba(132,204,22,0.1); --toggle-icon: #84cc16; }
+    body.accent-indigo { --accent: #6366f1; --accent-soft: rgba(99,102,241,0.12); --accent-border: rgba(99,102,241,0.25); --chip-bg: rgba(99,102,241,0.15); --chip-text: var(--accent); --toggle-bg: rgba(99,102,241,0.1); --toggle-icon: #6366f1; }
+    body.accent-cyan { --accent: #06b6d4; --accent-soft: rgba(6,182,212,0.12); --accent-border: rgba(6,182,212,0.25); --chip-bg: rgba(6,182,212,0.15); --chip-text: var(--accent); --toggle-bg: rgba(6,182,212,0.1); --toggle-icon: #06b6d4; }
 
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     .app { display: flex; flex-direction: column; width: 100%; height: 100vh; background: var(--bg); overflow: hidden; }
     .hide-on-mobile { display: none !important; }
 
     .patient-name, .value, .truncate-text, .patient-bed, .chip, .section-title, .censo-table td, .input-control { text-transform: uppercase !important; }
-    body.midnight .section-title { color: #ff0000; }
 
-    /* BOTON DE LOGIN SOBRIO Y ELEGANTE */
+    /* BOTON DE LOGIN */
     .btn-login-sober {
       padding: 12px 36px; font-size: 0.9rem; font-family: 'Space Mono', monospace; font-weight: 700; letter-spacing: 0.15em;
       color: var(--text); background: transparent; border: 1px solid var(--muted); border-radius: var(--radius-sm);
@@ -147,9 +219,15 @@
 
     .icon-btn { 
       width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--accent-border); background: var(--toggle-bg); 
-      color: var(--text); display: flex; align-items: center; justify-content: center; font-size: 1rem; cursor: pointer; transition: all var(--transition-fast); padding: 0; flex-shrink: 0; 
+      color: var(--text); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all var(--transition-fast); padding: 0; flex-shrink: 0; 
     }
+    .icon-btn .material-symbols-outlined { font-size: 1.2rem; }
     .icon-btn:active { transform: scale(0.9); background: var(--accent-soft); }
+
+    /* ESTILOS DE BOTONES SOUNDBOARD (v2.31) */
+    #alfrojasSoundboard::-webkit-scrollbar { display: none; }
+    .sound-btn { width: 26px !important; height: 26px !important; flex-shrink: 0; border-color: var(--line); }
+    .sound-btn .material-symbols-outlined { font-size: 1.1rem !important; }
     
     @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     @keyframes hypnoticGradient { from { background-position: 0% center; } to { background-position: 200% center; } }
@@ -168,7 +246,7 @@
     .section-header { width: 100%; padding: 12px 10px; background: var(--section-head); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 10; }
     .section-title { font-size: 0.9rem; font-weight: 700; line-height: 1.12; color: var(--accent); text-transform: uppercase; letter-spacing: 0.08em; display: flex; align-items: center; gap: 6px; }
     
-    /* ANIMACIONES EMOJIS */
+    /* ANIMACIONES EMOJIS (Clínicos) */
     .area-icon { display: inline-block; font-size: 1.2rem; will-change: transform; transition: transform 0.2s ease; }
     @keyframes heartbeat { 0%, 100% { transform: scale(1); } 15% { transform: scale(1.25); } 30% { transform: scale(1); } 45% { transform: scale(1.15); } 60% { transform: scale(1); } }
     @keyframes lookAround { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-3px); } 75% { transform: translateX(3px); } }
@@ -188,7 +266,8 @@
     .patient-list { display: grid; gap: 0; padding: 0; } 
     .card { background: transparent !important; position: relative; border: none; border-bottom: 1px solid var(--line) !important; border-radius: 0; box-shadow: none; margin: 0; width: 100%; } 
     .swipe-bg { position: absolute; top: 1px; left: 0; width: 100%; height: calc(100% - 2px); display: flex; justify-content: space-between; z-index: 1; overflow: hidden; }
-    .swipe-action { display: flex; align-items: center; width: 50%; height: 100%; color: white; font-size: 1.5rem; transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); }
+    .swipe-action { display: flex; align-items: center; width: 50%; height: 100%; color: white; transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); }
+    .swipe-action .material-symbols-outlined { font-size: 1.8rem; }
     .swipe-delete { background: #ef4444; justify-content: flex-start; padding-left: 24px; } .swipe-edit { background: #10b981; justify-content: flex-end; padding-right: 24px; }
     .card.swipe-ready-delete .swipe-delete { transform: scale(1.3) translateX(10px); } .card.swipe-ready-edit .swipe-edit { transform: scale(1.3) translateX(-10px); }
 
@@ -206,10 +285,10 @@
     .chip { display: inline-block; font-size: 0.65rem; font-weight: 600; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--accent-border); background: var(--chip-bg); color: var(--chip-text); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: center; }
     .card .chip { max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.65rem; }
     
-    /* EMOJI CHIP PARA MODO KANBAN (v2.25) */
     .chip-emoji { font-size: 1.5rem; line-height: 1; text-align: center; display: inline-block; cursor: help; background: transparent; border: none; padding: 0; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15)); }
 
-    .caret { width: 24px; height: 24px; display: grid; place-items: center; border-radius: 999px; color: var(--muted); font-size: 1rem; transition: transform var(--transition), color var(--transition); flex-shrink: 0; }
+    .caret { width: 24px; height: 24px; display: grid; place-items: center; border-radius: 999px; color: var(--muted); transition: transform var(--transition), color var(--transition); flex-shrink: 0; }
+    .caret .material-symbols-outlined { font-size: 1.5rem; }
     .card.open .caret { transform: rotate(180deg) scale(1.1); color: var(--accent); }
     
     .details { display: grid; grid-template-rows: 0fr; opacity: 0; padding: 0 10px; transition: grid-template-rows var(--transition), opacity var(--transition), padding var(--transition); }
@@ -237,10 +316,11 @@
 
     .footer { flex-shrink: 0; display: block; text-align: center; padding: 8px 10px; color: var(--muted); font-size: 0.7rem; border-top: 1px solid var(--line); margin: 0; background: var(--panel); z-index: 50; position: relative;}
 
-    .btn-editar-tarjeta { width: 100%; margin-top: 12px; padding: 12px; border-radius: var(--radius-sm); background: var(--accent-soft); border: 1px solid var(--accent-border); color: var(--accent); font-family: 'Space Mono', monospace; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; cursor: pointer; transition: all var(--transition-fast); }
+    .btn-editar-tarjeta { width: 100%; margin-top: 12px; padding: 12px; border-radius: var(--radius-sm); background: var(--accent-soft); border: 1px solid var(--accent-border); color: var(--accent); font-family: 'Space Mono', monospace; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; cursor: pointer; transition: all var(--transition-fast); display: flex; justify-content: center; align-items: center; gap: 8px; }
     .btn-editar-tarjeta:active { transform: scale(0.98); background: var(--accent); color: #fff; }
-    .fab-btn { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #ef4444, #f97316); color: white; border: none; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4); font-size: 2rem; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 40; transition: transform var(--transition-fast), box-shadow var(--transition-fast); line-height: 1; display: flex; }
-    .fab-btn:active { transform: scale(0.9); box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4); }
+    
+    .fab-btn { position: fixed; bottom: 70px; right: 20px; width: 60px; height: 60px; border-radius: 50%; background: var(--accent); color: white; border: none; box-shadow: 0 4px 15px var(--accent-border); display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 90; transition: transform var(--transition-fast), box-shadow var(--transition-fast); line-height: 1; }
+    .fab-btn:active { transform: scale(0.9); box-shadow: 0 2px 8px var(--accent-border); }
 
     .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--modal-overlay); z-index: 100; display: none; align-items: center; justify-content: center; padding: 16px; opacity: 0; transition: opacity 0.3s; }
     .modal-overlay.active { display: flex; opacity: 1; }
@@ -248,7 +328,8 @@
     .modal-overlay.active .modal-content { transform: translateY(0); }
     .modal-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
     .modal-title { font-family: 'Space Mono', monospace; font-size: 1.1rem; font-weight: 700; color: var(--text); text-transform: uppercase; }
-    .modal-close { background: transparent; border: none; color: var(--muted); font-size: 1.5rem; cursor: pointer; padding: 0; line-height: 1; }
+    .modal-close { background: transparent; border: none; color: var(--muted); cursor: pointer; padding: 0; }
+    .modal-close .material-symbols-outlined { font-size: 1.5rem; }
     
     .modal-body-grid { display: flex; flex-direction: column; gap: 12px; width: 100%; }
     .input-group { display: flex; flex-direction: column; gap: 6px; position: relative; }
@@ -265,8 +346,8 @@
     .btn-cancelar { flex: 1; padding: 12px; border-radius: var(--radius-sm); background: var(--field); border: 1px solid var(--line); color: var(--text); font-weight: 600; cursor: pointer; text-transform: uppercase; font-family: 'Space Mono', monospace; }
     .btn-guardar { flex: 2; padding: 12px; border-radius: var(--radius-sm); background: var(--accent); border: none; color: #fff; font-weight: 600; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; text-transform: uppercase; font-family: 'Space Mono', monospace; }
     .btn-guardar:disabled { opacity: 0.7; cursor: not-allowed; }
-    .btn-borrar { flex: 1; padding: 12px; border-radius: var(--radius-sm); background: var(--error-bg); border: 1px solid var(--error-border); color: var(--error-text); font-weight: 600; cursor: pointer; text-transform: uppercase; font-family: 'Space Mono', monospace; transition: all var(--transition-fast); width: 100%;}
-    .btn-borrar:active { transform: scale(0.95); background: #ef4444; color: #fff; }
+    .btn-borrar { flex: 1; padding: 12px; border-radius: var(--radius-sm); background: var(--error-bg); border: 1px solid var(--error-border); color: var(--error-text); font-weight: 600; cursor: pointer; text-transform: uppercase; font-family: 'Space Mono', monospace; transition: all var(--transition-fast); width: 100%; display: flex; justify-content: center; align-items: center; gap: 8px;}
+    .btn-borrar:active { transform: scale(0.95); background: var(--accent); color: #fff; }
     .optional-label { color: var(--muted) !important; font-weight: 500 !important; }
 
     @keyframes pulseWarning { 0% { transform: scale(1); } 50% { transform: scale(1.15); } 100% { transform: scale(1); } }
@@ -287,7 +368,7 @@
        ========================================================= */
     .custom-select-wrapper { position: relative; width: 100%; }
     .custom-select-display { cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; }
-    .custom-select-display::after { content: '▼'; font-size: 0.8rem; margin-left: 8px; color: var(--muted); }
+    .custom-select-display::after { content: 'expand_more'; font-family: 'Material Symbols Outlined'; font-size: 1.2rem; margin-left: 8px; color: var(--muted); vertical-align: middle; }
     .custom-select-popover {
       display: none; position: absolute; top: 100%; left: 0; width: 100%; z-index: 99999;
       background: var(--panel); border: 1px solid var(--accent); border-radius: var(--radius-sm);
@@ -303,6 +384,14 @@
     .custom-select-option:hover { background: var(--field); color: var(--accent); }
     .custom-select-optgroup { padding: 6px 12px; font-weight: bold; font-size: 0.75rem; color: var(--muted); background: var(--section-head); text-transform: uppercase; border-bottom: 1px solid var(--line); border-top: 1px solid var(--line);}
     .custom-select-optgroup:first-child { border-top: none; }
+
+    /* ========================================================= 
+       TEMA: SELECTORES DE COLOR 
+       ========================================================= */
+    .color-picker-grid { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+    .color-swatch { width: 28px; height: 28px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: transform 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+    .color-swatch:hover { transform: scale(1.1); }
+    .color-swatch.active { border-color: var(--text); transform: scale(1.1); outline: 2px solid var(--accent); outline-offset: 2px; }
 
     @media (min-width: 768px) { 
       .hide-on-mobile { display: flex !important; }
@@ -372,15 +461,15 @@
       
       /* SUTILEZA EXTREMA: EDICIÓN EN LÍNEA SIN BRINCO DE TAMAÑO */
       .patient-row.expanded-row td.editable-cell { cursor: text; position: relative; }
-      .patient-row.expanded-row td.editable-cell:hover::after { content: '✎'; position: absolute; top: 2px; right: 2px; font-size: 0.7rem; color: var(--muted); opacity: 0.5; pointer-events: none; }
+      .patient-row.expanded-row td.editable-cell:hover::after { content: 'edit'; font-family: 'Material Symbols Outlined'; position: absolute; top: 2px; right: 2px; font-size: 1rem; color: var(--muted); opacity: 0.5; pointer-events: none; }
       
       .patient-row.expanded-row td.editable-cell.is-editing { 
-        color: #ef4444 !important; 
+        color: var(--accent) !important; 
         outline: none; 
-        background-color: rgba(239, 68, 68, 0.05); 
+        background-color: var(--accent-soft); 
       }
       .patient-row.expanded-row td.editable-cell.is-editing.patient-name { 
-        color: #ef4444 !important; 
+        color: var(--accent) !important; 
         font-weight: 700; 
       }
       .patient-row.expanded-row td.editable-cell.is-editing * { 
@@ -423,7 +512,8 @@
       .scroll-guider.active-up { top: 60px; bottom: auto; opacity: 0.85; pointer-events: auto; }
       .scroll-guider:hover { opacity: 1; background: var(--accent-soft); }
 
-      .btn-table { background: transparent; border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 6px; cursor: pointer; font-size: 1.1rem; transition: all var(--transition-fast); margin-right: 4px; }
+      .btn-table { background: transparent; border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 6px; cursor: pointer; transition: all var(--transition-fast); margin-right: 4px; display: inline-flex; align-items: center; justify-content: center; }
+      .btn-table .material-symbols-outlined { font-size: 1.1rem; }
       .btn-table:hover { transform: scale(1.1); }
       .btn-table.edit { color: #10b981; }
       .btn-table.edit:hover { background: rgba(16, 185, 129, 0.1); border-color: #10b981; }
@@ -434,7 +524,7 @@
       /* BOTÓN DE NUEVO INGRESO FIJO SÓLIDO */
       .btn-add-table { 
         position: sticky; bottom: 0; z-index: 25;
-        display: block; width: 100%; padding: 14px; 
+        display: flex; align-items: center; justify-content: center; width: 100%; padding: 14px; 
         background: var(--panel) !important; 
         color: var(--accent); border: none; border-top: 1px solid var(--accent-border); 
         font-family: 'Space Mono', monospace; font-size: 0.95rem; font-weight: 700; text-transform: uppercase; 
@@ -472,7 +562,7 @@
     }
   </style>
 </head>
-<body class="dark">
+<body class="base-dark accent-blue">
 
   <div id="loginScreen" class="modal-overlay active" style="z-index: 10000; background: var(--bg); flex-direction: column; justify-content: center; align-items: center; gap: 15px;">
     
@@ -493,7 +583,7 @@
 
     <div style="position: absolute; bottom: 30px; font-size: 0.7rem; font-family: 'Space Mono', monospace; font-weight: 700; letter-spacing: 0.1em;">
       <span style="color: var(--muted);">ROUROG</span> <span style="color: var(--text); opacity: 0.5;">Innovations</span>
-      <span style="opacity: 0.3; margin-left: 6px;">v1.26</span>
+      <span style="opacity: 0.3; margin-left: 6px;">v1.31</span>
     </div>
   </div>
   <div class="app" id="mainAppContainer" style="display: none;">
@@ -502,8 +592,21 @@
       
       <div class="header-top">
         <div class="header-left">
-          <button id="searchToggleBtn" class="icon-btn" aria-label="Buscar"><span>🔍</span></button>
-          <button id="historyBtn" class="icon-btn" type="button" aria-label="Historial" title="Ver Historial"><span>🗄️</span></button>
+          <button id="searchToggleBtn" class="icon-btn" aria-label="Buscar"><span class="material-symbols-outlined">search</span></button>
+          <button id="historyBtn" class="icon-btn" type="button" aria-label="Historial" title="Ver Historial"><span class="material-symbols-outlined">history</span></button>
+          
+          <!-- EASTER EGG: ALFROJAS SOUNDBOARD (v2.31) -->
+          <div id="alfrojasSoundboard" style="display: none; align-items: center; gap: 6px; margin-left: 4px; padding-right: 10px; overflow-x: auto; scrollbar-width: none;">
+            <button class="icon-btn sound-btn" type="button" title="Anime Ahh" onclick="new Audio('https://www.myinstants.com/media/sounds/anime-ahh.mp3').play()"><span class="material-symbols-outlined">music_note</span></button>
+            <button class="icon-btn sound-btn" type="button" title="Anime Ahhhh" onclick="new Audio('https://www.myinstants.com/media/sounds/anime-ahhhh.mp3').play()"><span class="material-symbols-outlined">campaign</span></button>
+            <button class="icon-btn sound-btn" type="button" title="Dad Snoring" onclick="new Audio('https://www.myinstants.com/media/sounds/my-dad-snoring.mp3').play()"><span class="material-symbols-outlined">snooze</span></button>
+            <button class="icon-btn sound-btn" type="button" title="Plankton" onclick="new Audio('https://www.myinstants.com/media/sounds/plankton-augh.mp3').play()"><span class="material-symbols-outlined">bug_report</span></button>
+            <button class="icon-btn sound-btn" type="button" title="Robot Processing" onclick="new Audio('https://www.myinstants.com/media/sounds/robot-processing.mp3').play()"><span class="material-symbols-outlined">smart_toy</span></button>
+            <button class="icon-btn sound-btn" type="button" title="Si o No" onclick="new Audio('https://www.myinstants.com/media/sounds/si-o-no-pendejo.mp3').play()"><span class="material-symbols-outlined">record_voice_over</span></button>
+            <button class="icon-btn sound-btn" type="button" title="XP Error" onclick="new Audio('https://www.myinstants.com/media/sounds/windows-xp-error.mp3').play()"><span class="material-symbols-outlined">error</span></button>
+            <button class="icon-btn sound-btn" type="button" title="XP Shutdown" onclick="new Audio('https://www.myinstants.com/media/sounds/windows-xp-shutdown.mp3').play()"><span class="material-symbols-outlined">power_settings_new</span></button>
+          </div>
+
         </div>
 
         <div class="main-title">
@@ -512,15 +615,15 @@
         </div>
 
         <div class="header-right">
-          <button id="viewToggleBtn" class="icon-btn hide-on-mobile" type="button" aria-label="Vista"><span id="viewIcon">📋</span></button>
-          <button id="reloadBtn" class="icon-btn" type="button" aria-label="Recargar"><span id="reloadIcon">🔄</span></button>
-          <button id="themeToggle" class="icon-btn" type="button" aria-label="Tema"><span id="themeIcon">☀️</span></button>
-          <button id="btnLogoutBtn" class="icon-btn" type="button" aria-label="Cerrar Sesión" title="Cerrar Sesión"><span>🚪</span></button>
+          <button id="viewToggleBtn" class="icon-btn hide-on-mobile" type="button" aria-label="Vista"><span id="viewIcon" class="material-symbols-outlined">table_rows</span></button>
+          <button id="reloadBtn" class="icon-btn" type="button" aria-label="Recargar"><span id="reloadIcon" class="material-symbols-outlined">refresh</span></button>
+          <button id="themeToggleBtn" class="icon-btn" type="button" aria-label="Tema"><span class="material-symbols-outlined">palette</span></button>
+          <button id="btnLogoutBtn" class="icon-btn" type="button" aria-label="Cerrar Sesión" title="Cerrar Sesión"><span class="material-symbols-outlined">logout</span></button>
         </div>
       </div>
 
       <div id="searchWrapper" class="search-wrapper collapsed">
-        <input id="search" class="search" type="search" placeholder="BUSCAR PACIENTE..." autocomplete="off" />
+        <input id="search" class="search" type="search" placeholder="Buscar paciente..." autocomplete="off" />
       </div>
     </div>
     
@@ -540,19 +643,40 @@
 
     <div class="footer">
       Hospital Regional de Delicias - <span style="color: var(--accent); font-weight: 600;">Rourog Innovations</span>
-      <span style="opacity: 0.4; font-size: 0.8em; margin-left: 8px;">v2.26</span>
+      <span style="opacity: 0.4; font-size: 0.8em; margin-left: 8px;">v2.31</span>
     </div>
 
     <div id="easterEggContainer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; pointer-events: none; overflow: hidden;"></div>
   </div>
 
-  <button class="fab-btn" id="mainFabBtn" onclick="abrirModalAgregar()" style="display: none;">+</button>
+  <button class="fab-btn" id="mainFabBtn" onclick="abrirModalAgregar()" style="display: none;"><span class="material-symbols-outlined" style="font-size: 2rem;">add</span></button>
 
+  <!-- THEME MODAL (v2.27+) -->
+  <div id="themeModal" class="modal-overlay">
+    <div class="modal-content" style="max-width: 380px;">
+      <div class="modal-header">
+        <div class="modal-title" style="font-weight:700; font-family:'Space Mono';">APARIENCIA</div>
+        <button class="modal-close" onclick="cerrarModal('themeModal')"><span class="material-symbols-outlined">close</span></button>
+      </div>
+      
+      <div style="margin-bottom: 16px;">
+        <label class="label" style="margin-bottom: 8px;">COLOR BASE (FONDO)</label>
+        <div class="color-picker-grid" id="baseColorPicker"></div>
+      </div>
+
+      <div>
+        <label class="label" style="margin-bottom: 8px;">COLOR DE ACENTO</label>
+        <div class="color-picker-grid" id="accentColorPicker"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EDIT MODAL -->
   <div id="editModal" class="modal-overlay">
     <div class="modal-content">
       <div class="modal-header">
         <div class="modal-title" style="font-weight:700; font-family:'Space Mono';">EDITAR PACIENTE</div>
-        <button class="modal-close" onclick="cerrarModal('editModal')">&times;</button>
+        <button class="modal-close" onclick="cerrarModal('editModal')"><span class="material-symbols-outlined">close</span></button>
       </div>
       <input type="hidden" id="modalFila" value="">
       <div class="modal-body-grid">
@@ -562,7 +686,7 @@
           <div class="custom-select-wrapper" id="editDestinoWrapper">
             <div class="input-control custom-select-display" data-value="">(SIN DESTINO)</div>
             <div class="custom-select-popover">
-              <div class="custom-select-search"><input type="text" placeholder="🔍 Buscar destino..." autocomplete="off"></div>
+              <div class="custom-select-search"><input type="text" placeholder="Buscar destino..." autocomplete="off"></div>
               <div class="custom-select-options"></div>
             </div>
           </div>
@@ -579,7 +703,7 @@
           <div class="custom-select-wrapper" id="editMoverWrapper">
             <div class="input-control custom-select-display" data-value="">NO MOVER (MANTENER EN CAMA ACTUAL)</div>
             <div class="custom-select-popover">
-              <div class="custom-select-search"><input type="text" placeholder="🔍 Buscar cama..." autocomplete="off"></div>
+              <div class="custom-select-search"><input type="text" placeholder="Buscar cama..." autocomplete="off"></div>
               <div class="custom-select-options"></div>
             </div>
           </div>
@@ -587,19 +711,20 @@
       </div>
       <div class="modal-actions">
         <button class="btn-cancelar" onclick="cerrarModal('editModal')">CANCELAR</button>
-        <button class="btn-guardar" id="btnGuardarEdit" onclick="guardarEdicion()">💾 GUARDAR</button>
+        <button class="btn-guardar" id="btnGuardarEdit" onclick="guardarEdicion()"><span class="material-symbols-outlined">save</span> GUARDAR</button>
       </div>
       <div class="modal-actions" style="margin-top: 4px;">
-        <button class="btn-borrar" id="btnBorrarEdit" onclick="borrarPacienteDialog()">🗑️ BORRAR PACIENTE</button>
+        <button class="btn-borrar" id="btnBorrarEdit" onclick="borrarPacienteDialog()"><span class="material-symbols-outlined">delete</span> BORRAR PACIENTE</button>
       </div>
     </div>
   </div>
 
+  <!-- ADD MODAL -->
   <div id="addModal" class="modal-overlay">
     <div class="modal-content">
       <div class="modal-header">
         <div class="modal-title" style="font-weight:700; font-family:'Space Mono';">NUEVO INGRESO</div>
-        <button class="modal-close" onclick="cerrarModal('addModal')">&times;</button>
+        <button class="modal-close" onclick="cerrarModal('addModal')"><span class="material-symbols-outlined">close</span></button>
       </div>
       <div class="modal-body-grid">
         <div class="input-group span-6"><label>Fecha y Hora de Ingreso</label><input id="addFechaIngreso" class="input-control" type="datetime-local" /></div>
@@ -608,7 +733,7 @@
           <div class="custom-select-wrapper" id="addCamaWrapper">
             <div class="input-control custom-select-display" data-value="">SELECCIONA UNA CAMA LIBRE...</div>
             <div class="custom-select-popover">
-              <div class="custom-select-search"><input type="text" placeholder="🔍 Buscar cama..." autocomplete="off"></div>
+              <div class="custom-select-search"><input type="text" placeholder="Buscar cama..." autocomplete="off"></div>
               <div class="custom-select-options"></div>
             </div>
           </div>
@@ -625,7 +750,7 @@
           <div class="custom-select-wrapper" id="addDestinoWrapper">
             <div class="input-control custom-select-display" data-value="">(SIN DESTINO)</div>
             <div class="custom-select-popover">
-              <div class="custom-select-search"><input type="text" placeholder="🔍 Buscar destino..." autocomplete="off"></div>
+              <div class="custom-select-search"><input type="text" placeholder="Buscar destino..." autocomplete="off"></div>
               <div class="custom-select-options"></div>
             </div>
           </div>
@@ -633,20 +758,20 @@
       </div>
       <div class="modal-actions">
         <button class="btn-cancelar" onclick="cerrarModal('addModal')">CANCELAR</button>
-        <button class="btn-guardar" id="btnGuardarAdd" onclick="guardarNuevo()">➕ INGRESAR</button>
+        <button class="btn-guardar" id="btnGuardarAdd" onclick="guardarNuevo()"><span class="material-symbols-outlined">add</span> INGRESAR</button>
       </div>
     </div>
   </div>
 
   <div id="deleteConfirmModal" class="modal-overlay">
     <div class="modal-content" style="border: 2px solid var(--error-border); box-shadow: 0 10px 30px rgba(239, 68, 68, 0.25);">
-      <div class="warning-icon" id="warningIconObj">🚨</div>
+      <div class="warning-icon" id="warningIconObj"><span class="material-symbols-outlined" style="font-size: inherit;">warning</span></div>
       <div class="delete-text-highlight">ESTA ACCIÓN BORRARÁ LOS DATOS PERMANENTEMENTE</div>
       <div id="deleteTargetName" style="text-align: center; color: var(--text); margin: 12px 0; font-weight: 700; font-size: 1.2rem; text-transform: uppercase;"></div>
       <div style="text-align: center; color: var(--muted); font-size: 0.9rem; margin-bottom: 16px; text-transform: uppercase;">¿DESEAS CONTINUAR?</div>
       <div class="modal-actions">
         <button class="btn-cancelar" onclick="cerrarModalBorrado()">NO</button>
-        <button class="btn-borrar" id="btnConfirmDelete" onclick="ejecutarBorrado()">SÍ, BORRAR</button>
+        <button class="btn-borrar" id="btnConfirmDelete" onclick="ejecutarBorrado()"><span class="material-symbols-outlined">delete</span> SÍ, BORRAR</button>
       </div>
     </div>
   </div>
@@ -691,7 +816,6 @@
 
     window.isInlineEditing = false;
     window.pendingSnapshotList = null;
-    window.syncPlexusPatients = () => {}; 
     let selectedNavIndex = -1;
 
     function showMainApp() {
@@ -733,7 +857,7 @@
 
       try {
         btn.disabled = true;
-        btn.innerHTML = '<span class="spin">🔄</span>';
+        btn.innerHTML = '<span class="spin material-symbols-outlined">sync</span>';
         await signInWithEmailAndPassword(auth, correoMagico, nip);
       } catch (error) {
         vibrar([50, 50, 50]);
@@ -809,7 +933,6 @@
       return c;
     }
 
-    // EXTRAER SOLO EMOJI PARA MODO TARJETA
     function getEmojiOnly(texto) {
       if (!texto) return '';
       const t = String(texto).trim();
@@ -837,9 +960,6 @@
     };
 
     function vibrar(patron) { if (navigator.vibrate) { navigator.vibrate(patron); } }
-    const themes = ['dark', 'light', 'pink', 'colorful', 'midnight'];
-    const themeIcons = { 'dark': '🌙', 'light': '☀️', 'pink': '🌸', 'colorful': '🎨', 'midnight': '🌑' };
-    const themeColors = { 'dark': '#0f172a', 'light': '#eef4fb', 'pink': '#fdf2f8', 'colorful': '#f8fafc', 'midnight': '#000000' };
 
     function escapeHtml(texto) { return String(texto || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;'); }
     function cerrarModal(id) { 
@@ -863,7 +983,13 @@
 
     function getColorfulChipHtml(destino) {
       if (!destino) return '';
-      const isColorful = document.body.classList.contains('colorful');
+      const isColorful = document.body.className.includes('base-light') || 
+                         document.body.className.includes('base-pure-white') || 
+                         document.body.className.includes('base-gray-light') || 
+                         document.body.className.includes('base-sand') || 
+                         document.body.className.includes('base-rose') || 
+                         document.body.className.includes('base-mint') || 
+                         document.body.className.includes('base-lavender');
       if (isColorful) {
         const colors = getChipColor(destino);
         return `<div class="chip" style="background-color: ${colors.bg}; color: ${colors.text}; border-color: rgba(0,0,0,0.1); font-weight: 700;">${escapeHtml(destino)}</div>`;
@@ -954,7 +1080,7 @@
 
         let htmlArr = [];
         htmlArr.push(`<div class="table-wrapper animate-in" id="scrollTableWrapper">
-          <div id="scrollGuiderObj" class="scroll-guider" title="Ir al extremo">↓</div>
+          <div id="scrollGuiderObj" class="scroll-guider" title="Ir al extremo"><span class="material-symbols-outlined">arrow_downward</span></div>
           <table class="censo-table"><thead><tr>
             <th style="width: 5%; text-align: center;">CAMA</th>
             <th style="width: 6%; text-align: center;">INGRESO</th>
@@ -963,7 +1089,7 @@
             <th style="width: 26%;">DIAGNÓSTICO</th>
             <th style="width: 26%;">PENDIENTES</th>
             <th style="width: 9%; text-align: center;">DESTINO</th>
-            <th style="width: 4.5%; text-align: center;">⚙️</th>
+            <th style="width: 4.5%; text-align: center;"><span class="material-symbols-outlined" style="font-size: 1.2rem;">settings</span></th>
           </tr></thead><tbody>`);
         
         areas.forEach((area) => {
@@ -998,12 +1124,12 @@
                   ${destinoChip || '<span style="color:var(--muted); opacity:0.4;">-</span>'}
                 </td>
                 
-                <td style="padding: 4px 10px; text-align: center; white-space: nowrap;"><button class="btn-table edit" style="padding: 4px; font-size: 0.9rem; margin-right: 2px;" onclick="abrirModal('${p.fila}'); event.stopPropagation();" title="Editar">✏️</button><button class="btn-table delete" style="padding: 4px; font-size: 0.9rem;" onclick="borrarPacienteDirecto('${p.fila}', '${escapeHtml(p.nombre)}'); event.stopPropagation();" title="Borrar">🗑️</button></td>
+                <td style="padding: 4px 10px; text-align: center; white-space: nowrap;"><button class="btn-table edit" style="padding: 4px; font-size: 0.9rem; margin-right: 2px;" onclick="abrirModal('${p.fila}'); event.stopPropagation();" title="Editar"><span class="material-symbols-outlined" style="font-size: 1.1rem;">edit</span></button><button class="btn-table delete" style="padding: 4px; font-size: 0.9rem;" onclick="borrarPacienteDirecto('${p.fila}', '${escapeHtml(p.nombre)}'); event.stopPropagation();" title="Borrar"><span class="material-symbols-outlined" style="font-size: 1.1rem;">delete</span></button></td>
             </tr>`);
           });
         });
 
-        htmlArr.push(`</tbody></table><button class="btn-add-table" onclick="abrirModalAgregar()">➕ NUEVO INGRESO</button></div>`);
+        htmlArr.push(`</tbody></table><button class="btn-add-table" onclick="abrirModalAgregar()"><span class="material-symbols-outlined" style="margin-right: 8px;">person_add</span> NUEVO INGRESO</button></div>`);
         content.innerHTML = htmlArr.join('');
         
         setTimeout(initScrollGuider, 100);
@@ -1030,7 +1156,7 @@
               ${pacientes.map((p, indexPatient) => {
                 const camaHtml = p.cama ? `<div class="patient-bed">${escapeHtml(p.cama)}</div>` : '';
                 
-                // MODO TARJETA: Solo Emoji para Destino (v2.25)
+                // MODO TARJETA: Solo Emoji para Destino
                 const emojiSolo = p.destino ? getEmojiOnly(p.destino) : '';
                 const destinoEmojiHtml = emojiSolo ? `<div class="chip-emoji" title="${escapeHtml(p.destino)}">${emojiSolo}</div>` : '';
                 
@@ -1045,7 +1171,7 @@
                 ].filter(Boolean).join('');
                 const delayPatient = delayBase + (indexPatient * 50);
                 
-                return `<div class="card animate-in" data-fila="${p.fila}" data-nombre="${escapeHtml(p.nombre)}" style="animation-delay: ${delayPatient}ms;"><div class="swipe-bg"><div class="swipe-action swipe-delete">🗑️</div><div class="swipe-action swipe-edit">✏️</div></div><div class="card-content-wrapper"><div class="card-header" onclick="toggleCard(this)"><div class="patient-main"><div class="patient-name">${escapeHtml(p.nombre)}</div>${camaHtml}</div><div class="header-right">${destinoEmojiHtml}<div class="caret">⌄</div></div></div><div class="details"><div class="details-content">${detailsHtml}<button class="btn-editar-tarjeta" onclick="abrirModal('${p.fila}'); event.stopPropagation();">✏️ EDITAR PACIENTE</button></div></div></div></div>`;
+                return `<div class="card animate-in" data-fila="${p.fila}" data-nombre="${escapeHtml(p.nombre)}" style="animation-delay: ${delayPatient}ms;"><div class="swipe-bg"><div class="swipe-action swipe-delete"><span class="material-symbols-outlined">delete</span></div><div class="swipe-action swipe-edit"><span class="material-symbols-outlined">edit</span></div></div><div class="card-content-wrapper"><div class="card-header" onclick="toggleCard(this)"><div class="patient-main"><div class="patient-name">${escapeHtml(p.nombre)}</div>${camaHtml}</div><div class="header-right">${destinoEmojiHtml}<div class="caret"><span class="material-symbols-outlined">expand_more</span></div></div></div><div class="details"><div class="details-content">${detailsHtml}<button class="btn-editar-tarjeta" onclick="abrirModal('${p.fila}'); event.stopPropagation();"><span class="material-symbols-outlined" style="font-size: 1.1rem; margin-right: 4px;">edit_square</span> EDITAR PACIENTE</button></div></div></div></div>`;
               }).join('')}
             </div>
           </section>
@@ -1166,11 +1292,11 @@
         }
 
         if (!atBottom) {
-          guider.innerText = '↓';
+          guider.innerHTML = '<span class="material-symbols-outlined">arrow_downward</span>';
           guider.className = 'scroll-guider active-down';
           guider.title = "Ir al final del censo";
         } else if (atBottom && !atTop) {
-          guider.innerText = '↑';
+          guider.innerHTML = '<span class="material-symbols-outlined">arrow_upward</span>';
           guider.className = 'scroll-guider active-up';
           guider.title = "Volver arriba";
         } else {
@@ -1430,7 +1556,7 @@
       
       let opcionesHtml = `
         <div style="padding: 6px; background: var(--panel); border-bottom: 1px solid var(--line);">
-          <input type="text" class="inline-search-input input-control" placeholder="🔍 Buscar destino..." autocomplete="off" style="width: 100%; padding: 6px 10px; font-size: 0.8rem; margin: 0; outline: none;">
+          <input type="text" class="inline-search-input input-control" placeholder="Buscar destino..." autocomplete="off" style="width: 100%; padding: 6px 10px; font-size: 0.8rem; margin: 0; outline: none;">
         </div>
         <div class="inline-options-wrapper">
           <div class="inline-destino-option ${!destinoActual ? 'selected' : ''}" data-value="">(SIN DESTINO)</div>
@@ -1491,7 +1617,7 @@
         cerrarDirecto();
         
         if (nuevoDestino !== destinoActual.toUpperCase().trim()) {
-          tdEl.innerHTML = '<span class="spin" style="font-size:0.8rem;">🔄</span>';
+          tdEl.innerHTML = '<span class="spin material-symbols-outlined" style="font-size:1.2rem;">sync</span>';
           try {
             await updateDoc(doc(db, "pacientes", filaId), { destino: nuevoDestino });
             vibrar(15);
@@ -1570,7 +1696,7 @@
       const moverAFila = document.querySelector('#editMoverWrapper .custom-select-display').dataset.value || '';
       const fechaInput = document.getElementById('modalFechaIngreso').value;
 
-      btnGuardar.disabled = true; btnGuardar.innerHTML = '<span class="spin">🔄</span> GUARDANDO...';
+      btnGuardar.disabled = true; btnGuardar.innerHTML = '<span class="spin material-symbols-outlined">sync</span> GUARDANDO...';
       
       try {
         let updateData = {
@@ -1598,7 +1724,7 @@
         vibrar([100, 50, 100]); 
         alert('ERROR AL GUARDAR: ' + error.message);
       } finally {
-        btnGuardar.disabled = false; btnGuardar.innerHTML = '💾 GUARDAR';
+        btnGuardar.disabled = false; btnGuardar.innerHTML = '<span class="material-symbols-outlined">save</span> GUARDAR';
       }
     }
 
@@ -1612,9 +1738,13 @@
       document.getElementById('deleteConfirmModal').classList.add('active');
       
       const iconEl = document.getElementById('warningIconObj');
-      let esSirena = true; iconEl.innerText = '🚨'; 
+      let esSirena = true; 
+      iconEl.innerHTML = '<span class="material-symbols-outlined" style="font-size: inherit;">warning</span>'; 
       if(iconoAlertaInterval) clearInterval(iconoAlertaInterval);
-      iconoAlertaInterval = setInterval(() => { esSirena = !esSirena; iconEl.innerText = esSirena ? '🚨' : '⚠️'; }, 400); 
+      iconoAlertaInterval = setInterval(() => { 
+        esSirena = !esSirena; 
+        iconEl.innerHTML = esSirena ? '<span class="material-symbols-outlined" style="font-size: inherit; color: var(--error-text);">warning</span>' : '<span class="material-symbols-outlined" style="font-size: inherit; color: var(--accent);">error</span>'; 
+      }, 400); 
     }
 
     function borrarPacienteDialog() {
@@ -1630,7 +1760,7 @@
       if (!filaABorrar) return;
 
       btnBorrar.disabled = true; 
-      btnBorrar.innerHTML = '<span class="spin">🔄</span>...';
+      btnBorrar.innerHTML = '<span class="spin material-symbols-outlined">sync</span>...';
       vibrar(20);
       
       try {
@@ -1653,7 +1783,7 @@
         alert('ERROR AL BORRAR: ' + error.message); 
         cerrarModalBorrado();
       } finally {
-        btnBorrar.disabled = false; btnBorrar.innerHTML = 'SÍ, BORRAR';
+        btnBorrar.disabled = false; btnBorrar.innerHTML = '<span class="material-symbols-outlined">delete</span> SÍ, BORRAR';
       }
     }
 
@@ -1706,7 +1836,7 @@
       const fechaInput = document.getElementById('addFechaIngreso').value;
 
       btnGuardar.disabled = true; 
-      btnGuardar.innerHTML = '<span class="spin">🔄</span> PROCESANDO...';
+      btnGuardar.innerHTML = '<span class="spin material-symbols-outlined">sync</span> PROCESANDO...';
 
       try {
         const fechaCreacion = fechaInput ? new Date(fechaInput) : new Date();
@@ -1727,7 +1857,7 @@
         vibrar([100, 50, 100]); 
         alert("ERROR: " + error.message); 
       } finally {
-        btnGuardar.disabled = false; btnGuardar.innerHTML = '➕ INGRESAR';
+        btnGuardar.disabled = false; btnGuardar.innerHTML = '<span class="material-symbols-outlined">add</span> INGRESAR';
       }
     }
 
@@ -1763,6 +1893,11 @@
           const cantidadEmojis = easterEggsMap[key].length;
           for(let i=0; i < cantidadEmojis; i++) { spawnSurfer(key, i); }
           isEasterEggTriggered = true;
+          
+          // MOSTRAR SOUNDBOARD SI ES ALFROJAS
+          if (key === 'alfrojas') {
+            document.getElementById('alfrojasSoundboard').style.display = 'flex';
+          }
         }
       }
       return isEasterEggTriggered;
@@ -1865,38 +2000,103 @@
       if(document.getElementById('meta-text')) document.getElementById('meta-text').innerHTML = `ERROR DE CONEXIÓN`; 
     }
 
-    function applyTheme(theme) {
-      if (!themes.includes(theme)) theme = 'dark';
-      const body = document.body; const themeIcon = document.getElementById('themeIcon');
-      body.classList.remove(...themes); body.classList.add(theme);
-      const metaThemeColor = document.querySelector('meta[name="theme-color"]');
-      if(metaThemeColor) metaThemeColor.setAttribute('content', themeColors[theme]);
-      if(themeIcon) themeIcon.textContent = themeIcons[theme];
-      localStorage.setItem('censo-theme', theme);
+    // ==========================================================
+    // SISTEMA DE TEMAS 
+    // ==========================================================
+    const bases = [
+      { id: 'base-dark', color: '#0f172a' }, 
+      { id: 'base-midnight', color: '#000000' }, 
+      { id: 'base-gray-dark', color: '#27272a' },
+      { id: 'base-navy', color: '#001529' },
+      { id: 'base-plum', color: '#3b0764' }, 
+      { id: 'base-forest', color: '#064e3b' }, 
+      { id: 'base-coffee', color: '#451a03' }, 
+      { id: 'base-light', color: '#f8fafc' },
+      { id: 'base-pure-white', color: '#ffffff' }, 
+      { id: 'base-gray-light', color: '#e2e8f0' },
+      { id: 'base-sand', color: '#fefce8' }, 
+      { id: 'base-rose', color: '#fff1f2' },
+      { id: 'base-mint', color: '#f0fdf4' }, 
+      { id: 'base-lavender', color: '#faf5ff' }
+    ];
+    const accents = [
+      { id: 'accent-blue', color: '#3b82f6' }, 
+      { id: 'accent-pure-blue', color: '#1d4ed8' },
+      { id: 'accent-green', color: '#10b981' }, 
+      { id: 'accent-emerald', color: '#059669' },
+      { id: 'accent-pink', color: '#ec4899' }, 
+      { id: 'accent-purple', color: '#a855f7' },
+      { id: 'accent-orange', color: '#f97316' }, 
+      { id: 'accent-amber', color: '#d97706' },
+      { id: 'accent-red', color: '#ef4444' }, 
+      { id: 'accent-pure-red', color: '#dc2626' },
+      { id: 'accent-crimson', color: '#be123c' },
+      { id: 'accent-gold', color: '#eab308' }, 
+      { id: 'accent-teal', color: '#14b8a6' },
+      { id: 'accent-lime', color: '#84cc16' }, 
+      { id: 'accent-indigo', color: '#6366f1' },
+      { id: 'accent-cyan', color: '#06b6d4' }
+    ];
+
+    function renderThemePickers() {
+      const baseGrid = document.getElementById('baseColorPicker');
+      const accentGrid = document.getElementById('accentColorPicker');
+      if(!baseGrid || !accentGrid) return;
+      
+      baseGrid.innerHTML = bases.map(b => `<div class="color-swatch base-swatch" style="background-color: ${b.color};" data-val="${b.id}"></div>`).join('');
+      accentGrid.innerHTML = accents.map(a => `<div class="color-swatch accent-swatch" style="background-color: ${a.color};" data-val="${a.id}"></div>`).join('');
+
+      baseGrid.querySelectorAll('.base-swatch').forEach(sw => {
+        sw.onclick = () => { applyTheme(sw.dataset.val, null); };
+      });
+      accentGrid.querySelectorAll('.accent-swatch').forEach(sw => {
+        sw.onclick = () => { applyTheme(null, sw.dataset.val); };
+      });
+    }
+
+    function applyTheme(newBase, newAccent) {
+      let currentBase = localStorage.getItem('censo-base') || 'base-dark';
+      let currentAccent = localStorage.getItem('censo-accent') || 'accent-blue';
+      
+      if(newBase) currentBase = newBase;
+      if(newAccent) currentAccent = newAccent;
+
+      document.body.className = `${currentBase} ${currentAccent}`;
+      localStorage.setItem('censo-base', currentBase);
+      localStorage.setItem('censo-accent', currentAccent);
+
+      document.querySelectorAll('.base-swatch').forEach(sw => sw.classList.toggle('active', sw.dataset.val === currentBase));
+      document.querySelectorAll('.accent-swatch').forEach(sw => sw.classList.toggle('active', sw.dataset.val === currentAccent));
+
+      setTimeout(() => {
+        const metaColor = getComputedStyle(document.body).getPropertyValue('--theme-meta').trim();
+        if(metaColor) document.querySelector('meta[name="theme-color"]').setAttribute('content', metaColor);
+      }, 50);
     }
 
     function initTheme() {
-      const saved = localStorage.getItem('censo-theme');
-      document.getElementById('viewIcon').textContent = currentViewMode === 'kanban' ? '📋' : '🗂️'; 
-      if (themes.includes(saved)) { applyTheme(saved); return; }
-      const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches; 
-      applyTheme(prefersLight ? 'light' : 'dark');
+      const savedView = localStorage.getItem('censo-view') || 'kanban';
+      currentViewMode = savedView;
+      document.getElementById('viewIcon').textContent = currentViewMode === 'kanban' ? 'table_rows' : 'grid_view'; 
+      
+      renderThemePickers();
+      applyTheme(localStorage.getItem('censo-base'), localStorage.getItem('censo-accent'));
     }
 
+    // EVENTOS UI
     document.getElementById('search').addEventListener('input', filtrar);
     document.getElementById('search').addEventListener('search', (e) => { if (e.target.value === '') render(pacientesGlobal); });
     
-    document.getElementById('themeToggle').addEventListener('click', () => { 
-      vibrar(15); let currentTheme = 'dark';
-      themes.forEach(t => { if(document.body.classList.contains(t)) currentTheme = t; });
-      let nextIndex = (themes.indexOf(currentTheme) + 1) % themes.length; applyTheme(themes[nextIndex]);
+    document.getElementById('themeToggleBtn').addEventListener('click', () => { 
+      vibrar(15); 
+      document.getElementById('themeModal').classList.add('active');
     });
 
     document.getElementById('viewToggleBtn').addEventListener('click', () => {
       vibrar(15);
       currentViewMode = currentViewMode === 'kanban' ? 'table' : 'kanban';
       localStorage.setItem('censo-view', currentViewMode);
-      document.getElementById('viewIcon').textContent = currentViewMode === 'kanban' ? '📋' : '🗂️';
+      document.getElementById('viewIcon').textContent = currentViewMode === 'kanban' ? 'table_rows' : 'grid_view';
       render(pacientesGlobal);
     });
     
@@ -1925,14 +2125,13 @@
     initTheme(); 
 
     // ==========================================================
-    // SISTEMA DE PARTÍCULAS NEURAL Y SINAPSIS (OPTIMIZADO V2.26)
+    // SISTEMA DE PARTÍCULAS NEURAL Y SINAPSIS
     // ==========================================================
     let plexusRunning = false;
     let isTabActive = true;
     
     document.addEventListener("visibilitychange", () => { isTabActive = !document.hidden; });
 
-    // Declaramos la función global para que "render" pueda alimentarle los pacientes
     window.syncPlexusPatients = () => {};
 
     function initPlexus() {
@@ -1979,7 +2178,6 @@
         }
       }
 
-      // La enlazamos con la recolección de datos de Firebase
       window.syncPlexusPatients = (listaPacientes) => {
         patientParticles = [];
         (listaPacientes || []).forEach(p => {
@@ -2000,7 +2198,14 @@
 
         ctx.clearRect(0, 0, width, height);
         
-        let isLight = document.body.classList.contains('light') || document.body.classList.contains('pink') || document.body.classList.contains('colorful');
+        let isLight = document.body.className.includes('base-light') || 
+                      document.body.className.includes('base-pure-white') || 
+                      document.body.className.includes('base-gray-light') || 
+                      document.body.className.includes('base-sand') || 
+                      document.body.className.includes('base-rose') || 
+                      document.body.className.includes('base-mint') || 
+                      document.body.className.includes('base-lavender');
+                      
         let defaultFill = isLight ? 'rgba(15, 23, 42, 0.3)' : 'rgba(255, 255, 255, 0.3)';
         let defaultStroke = isLight ? 'rgba(15, 23, 42, 0.1)' : 'rgba(255, 255, 255, 0.1)';
         
