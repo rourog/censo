@@ -1,35 +1,27 @@
 // ==========================================================
-// 1. IMPORTACIONES DE FIREBASE (NÚCLEO, BD Y AUTENTICACIÓN)
+// MAIN MODULAR - CENSO URGENCIAS
 // ==========================================================
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-analytics.js";
-import { initializeFirestore, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
-import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+import {
+  auth,
+  db,
+  collection,
+  onSnapshot,
+  addDoc,
+  doc,
+  updateDoc,
+  deleteDoc,
+  setDoc,
+  serverTimestamp,
+  signInWithEmailAndPassword,
+  onAuthStateChanged,
+  signOut,
+  setPersistence,
+  browserLocalPersistence
+} from './modules/firebaseClient.js';
 
-// ==========================================================
-// 2. CONFIGURACIÓN E INICIALIZACIÓN
-// ==========================================================
-const firebaseConfig = {
-  apiKey: "AIzaSyDyBGnwCaBaKEpqZshEcwbYJ8VHzbAQU48",
-  authDomain: "censo-de-urgencias.firebaseapp.com",
-  projectId: "censo-de-urgencias",
-  storageBucket: "censo-de-urgencias.firebasestorage.app",
-  messagingSenderId: "887013797611",
-  appId: "1:887013797611:web:555a63ce66aeb50b4a58ae",
-  measurementId: "G-Y8GRGC6ZP7"
-};
-
-const app = initializeApp(firebaseConfig);
-let analytics = null;
-try {
-  analytics = getAnalytics(app);
-} catch (error) {
-  console.warn('Analytics no disponible en este entorno:', error);
-}
-const db = initializeFirestore(app, { experimentalForceLongPolling: true });
-const auth = getAuth(app);
-
-// La persistencia se configura dentro de bootAuth(), antes de registrar el observador.
+import { destinosGlobal, masterCamas, areaVisuals, chipPalette } from './modules/constants.js';
+import { limpiarNombreCama, getEmojiOnly, vibrar, escapeHtml, agruparPorArea, normalizar } from './modules/utils.js';
+import { initPlexus } from './modules/plexus.js';
 
 // ==========================================================
 // 3. LÓGICA DE LOGIN SILENCIOSO Y ROLES
@@ -148,55 +140,6 @@ document.getElementById('btnLogoutBtn').addEventListener('click', async () => {
 // ==========================================================
 // 4. CONFIGURACIÓN DEL HOSPITAL Y CAMAS LIMPIAS
 // ==========================================================
-let destinosGlobal = [
-  "🟡 Observación", "🟢 Alta a domicilio", "⭕ Alta Voluntaria", "⚫ Defunción",
-  "🏥 Ingreso a Medicina Interna", "🩺 Interconsulta a Medicina Interna",
-  "🔪 Ingreso a Cirugía General", "🧵 Interconsulta a Cirugía General",
-  "✂️ Ingreso a Cirugía Plástica", "💄 Interconsulta a Cirugía Plástica",
-  "🤰 Ingreso a Ginecología", "🌸 Interconsulta a Ginecología",
-  "❤️ Ingreso a Cardiología", "💓 Interconsulta a Cardiología",
-  "👶 Ingreso a Pediatría", "🧸 Interconsulta a Pediatría",
-  "🦴 Ingreso a Traumatología y Ortopedia", "📋 Interconsulta a Traumatología y Ortopedia",
-  "🧠 Ingreso a Psiquiatría", "💭 Interconsulta a Psiquiatría",
-  "🗣️ Interconsulta a Psicología", "🤱 Ingreso a Tococirugía",
-  "💧 Interconsulta a Urologia", "🧪 Ingreso a Urologia",
-  "👓 Interconsulta a Oftalmologia", "👁️ Ingreso a Oftalmologia",
-  "🍎 Ingreso a Gastroenterologia"
-];
-
-const masterCamas = [
-  { area: "SALA DE CHOQUE", cama: "CHOQUE 1" }, { area: "SALA DE CHOQUE", cama: "CHOQUE 2" },
-  { area: "OBSERVACIÓN", cama: "CAMA 1" }, { area: "OBSERVACIÓN", cama: "CAMA 1-2" }, { area: "OBSERVACIÓN", cama: "SILLA 1" },
-  { area: "OBSERVACIÓN", cama: "CAMA 2" }, { area: "OBSERVACIÓN", cama: "CAMA 2-2" }, { area: "OBSERVACIÓN", cama: "SILLA 2" },
-  { area: "OBSERVACIÓN", cama: "CAMA 3" }, { area: "OBSERVACIÓN", cama: "CAMA 3-2" }, { area: "OBSERVACIÓN", cama: "SILLA 3" },
-  { area: "OBSERVACIÓN", cama: "CAMA 4" }, { area: "OBSERVACIÓN", cama: "CAMA 4-2" }, { area: "OBSERVACIÓN", cama: "SILLA 4" },
-  { area: "OBSERVACIÓN", cama: "CAMA 5" }, { area: "OBSERVACIÓN", cama: "CAMA 5-2" }, { area: "OBSERVACIÓN", cama: "SILLA 5" },
-  { area: "TRAUMA MENOR", cama: "CAMA 1" }, { area: "TRAUMA MENOR", cama: "CAMA 2" }, { area: "TRAUMA MENOR", cama: "CAMA 3" }, { area: "TRAUMA MENOR", cama: "CAMA 4" },
-  { area: "TRAUMA MENOR", cama: "SILLA 1" }, { area: "TRAUMA MENOR", cama: "SILLA 2" }, { area: "TRAUMA MENOR", cama: "SILLA 3" },
-  { area: "PEDIATRÍA", cama: "CUNA 1" }, { area: "PEDIATRÍA", cama: "CUNA 2" }, { area: "PEDIATRÍA", cama: "CUNA 3" }, 
-  { area: "PEDIATRÍA", cama: "SILLA 1" }, { area: "PEDIATRÍA", cama: "SILLA 2" },
-  { area: "EXTRAS", cama: "EXTRA 1" }, { area: "EXTRAS", cama: "EXTRA 2" }, { area: "EXTRAS", cama: "EXTRA 3" }, { area: "EXTRAS", cama: "EXTRA 4" }, { area: "EXTRAS", cama: "EXTRA 5" }
-];
-
-function limpiarNombreCama(camaStr) {
-  if (!camaStr) return '';
-  let c = String(camaStr).toUpperCase().replace('🔴', '').replace('🟢', '').replace('🟡', '').replace('🔵', '').replace('🟠', '').trim();
-  if (c.startsWith('OBSERVACION SILLA')) return c.replace('OBSERVACION SILLA', 'SILLA').trim();
-  if (c.startsWith('OBSERVACION')) return c.replace('OBSERVACION', 'CAMA').trim();
-  if (c.startsWith('TRAUMA SILLA')) return c.replace('TRAUMA SILLA', 'SILLA').trim();
-  if (c.startsWith('TRAUMA') && !c.includes('MENOR')) return c.replace('TRAUMA', 'CAMA').trim();
-  if (c.startsWith('PEDIATRIA CUNA')) return c.replace('PEDIATRIA CUNA', 'CUNA').trim();
-  if (c.startsWith('PEDIATRIA SILLA')) return c.replace('PEDIATRIA SILLA', 'SILLA').trim();
-  return c;
-}
-
-function getEmojiOnly(texto) {
-  if (!texto) return '';
-  const t = String(texto).trim();
-  const firstSpace = t.indexOf(' ');
-  return firstSpace > -1 ? t.substring(0, firstSpace) : t.substring(0, 2);
-}
-
 // ==========================================================
 // VARIABLES GLOBALES DEL CENSO
 // ==========================================================
@@ -205,31 +148,11 @@ let camasLibresGlobal = [];
 let currentViewMode = localStorage.getItem('censo-view') || 'kanban'; 
 let isFetchingData = true;
 
-const areaVisuals = {
-  'SALA DE CHOQUE': { emoji: '❤️', class: 'icon-heartbeat' },
-  'OBSERVACION': { emoji: '👀', class: 'icon-look' },
-  'OBSERVACIÓN': { emoji: '👀', class: 'icon-look' },
-  'TRAUMA MENOR': { emoji: '🦴', class: 'icon-spin' },
-  'PEDIATRIA': { emoji: '🧸', class: 'icon-wiggle' },
-  'PEDIATRÍA': { emoji: '🧸', class: 'icon-wiggle' },
-  'EXTRAS': { emoji: '✨', class: 'icon-twinkle' },
-  'SIN ÁREA ASIGNADA': { emoji: '🏥', class: '' }
-};
-
-function vibrar(patron) { if (navigator.vibrate) { navigator.vibrate(patron); } }
-
-function escapeHtml(texto) { return String(texto || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;'); }
 function cerrarModal(id) { 
   document.getElementById(id).classList.remove('active'); 
   closeAllPopovers(null); 
 }
 function cerrarModalBorrado() { document.getElementById('deleteConfirmModal').classList.remove('active'); }
-
-const chipPalette = [
-  { bg: '#ffe4e6', text: '#9f1239' }, { bg: '#dcfce7', text: '#166534' }, 
-  { bg: '#fef9c3', text: '#854d0e' }, { bg: '#dbeafe', text: '#1e40af' }, 
-  { bg: '#ffedd5', text: '#9a3412' }, { bg: '#f3e8ff', text: '#6b21a8' }, { bg: '#e0f7fa', text: '#006064' }  
-];
 
 function getChipColor(text) {
   if (!text) return { bg: 'var(--chip-bg)', text: 'var(--chip-text)' };
@@ -251,17 +174,6 @@ function getColorfulChipHtml(destino) {
     const colors = getChipColor(destino);
     return `<div class="chip" style="background-color: ${colors.bg}; color: ${colors.text}; border-color: rgba(0,0,0,0.1); font-weight: 700;">${escapeHtml(destino)}</div>`;
   } else { return `<div class="chip">${escapeHtml(destino)}</div>`; }
-}
-
-function agruparPorArea(lista) {
-  const grupos = {};
-  lista.forEach(p => { 
-    const areaRaw = p.area || 'SIN ÁREA ASIGNADA';
-    const area = String(areaRaw).trim(); 
-    if (!grupos[area]) grupos[area] = []; 
-    grupos[area].push(p); 
-  }); 
-  return grupos;
 }
 
 function crearCampo(label, value) {
@@ -1130,8 +1042,6 @@ window.ejecutarBorrado = ejecutarBorrado;
 window.abrirModalAgregar = abrirModalAgregar;
 window.guardarNuevo = guardarNuevo;
 
-function normalizar(texto) { return String(texto || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim(); }
-
 const easterEggsMap = {
   'yehernandez': ['❤️', '🐶', '🐕', '🦴', '🐾', '🐩', '💖', '🦮', '🎾', '💕'],
   'rodrrodriguez': ['🤖', '💻', '👾', '⚙️', '🖨️', '🔈', '🕹️', '🐺', '🎧', '🛠️'],
@@ -1380,137 +1290,6 @@ window.addEventListener('resize', () => {
 });
 
 initTheme(); 
-
-// ==========================================================
-// SISTEMA DE PARTÍCULAS NEURAL Y SINAPSIS
-// ==========================================================
-let plexusRunning = false;
-let isTabActive = true;
-
-document.addEventListener("visibilitychange", () => { isTabActive = !document.hidden; });
-
-window.syncPlexusPatients = () => {};
-
-function initPlexus() {
-  if (plexusRunning) return;
-  plexusRunning = true;
-
-  const canvas = document.getElementById('plexusCanvas');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  if (!ctx) return;
-  let width, height, standardParticles = [], patientParticles = [];
-
-  function resize() { 
-    width = canvas.width = canvas.offsetWidth; 
-    height = canvas.height = canvas.offsetHeight; 
-    initStandardParticles();
-  }
-
-  const plexusAreaColors = {
-    'SALA DE CHOQUE': { solid: '#ef4444', glow: 'rgba(239, 68, 68, 0.4)' },
-    'OBSERVACION': { solid: '#10b981', glow: 'rgba(16, 185, 129, 0.4)' },
-    'OBSERVACIÓN': { solid: '#10b981', glow: 'rgba(16, 185, 129, 0.4)' },
-    'TRAUMA MENOR': { solid: '#eab308', glow: 'rgba(234, 179, 8, 0.4)' },
-    'PEDIATRIA': { solid: '#3b82f6', glow: 'rgba(59, 130, 246, 0.4)' },
-    'PEDIATRÍA': { solid: '#3b82f6', glow: 'rgba(59, 130, 246, 0.4)' },
-    'EXTRAS': { solid: '#d946ef', glow: 'rgba(217, 70, 239, 0.4)' }
-  };
-
-  function createParticle(isPatient, colorSet) {
-    return {
-      isPatient: isPatient,
-      x: Math.random() * width,
-      y: Math.random() * height,
-      vx: (Math.random() - 0.5) * 0.5,
-      vy: (Math.random() - 0.5) * 0.5,
-      radius: isPatient ? (Math.random() * 2 + 3) : (Math.random() * 1.5 + 0.5),
-      color: colorSet
-    };
-  }
-  
-  function initStandardParticles() {
-    standardParticles = [];
-    let num = Math.floor(width / 35); 
-    for (let i = 0; i < num; i++) {
-      standardParticles.push(createParticle(false, null));
-    }
-  }
-
-  window.syncPlexusPatients = (listaPacientes) => {
-    patientParticles = [];
-    (listaPacientes || []).forEach(p => {
-      let areaNormalizada = String(p.area || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().trim();
-      let colorSet = plexusAreaColors[areaNormalizada] || { solid: '#ffffff', glow: 'rgba(255,255,255,0.3)' };
-      patientParticles.push(createParticle(true, colorSet));
-    });
-  };
-
-  window.addEventListener('resize', resize);
-  resize();
-
-  function animate() {
-    if (!isTabActive) {
-      requestAnimationFrame(animate);
-      return;
-    }
-
-    ctx.clearRect(0, 0, width, height);
-    
-    let isLight = document.body.className.includes('base-light') || 
-                  document.body.className.includes('base-pure-white') || 
-                  document.body.className.includes('base-gray-light') || 
-                  document.body.className.includes('base-sand') || 
-                  document.body.className.includes('base-rose') || 
-                  document.body.className.includes('base-mint') || 
-                  document.body.className.includes('base-lavender');
-                  
-    let defaultFill = isLight ? 'rgba(15, 23, 42, 0.3)' : 'rgba(255, 255, 255, 0.3)';
-    let defaultStroke = isLight ? 'rgba(15, 23, 42, 0.1)' : 'rgba(255, 255, 255, 0.1)';
-    
-    let allParticles = standardParticles.concat(patientParticles);
-    ctx.lineWidth = 0.8; 
-
-    for (let i = 0; i < allParticles.length; i++) {
-      let p = allParticles[i];
-      p.x += p.vx; p.y += p.vy;
-      
-      if (p.x < 0 || p.x > width) p.vx *= -1; 
-      if (p.y < 0 || p.y > height) p.vy *= -1;
-      
-      if (p.isPatient) {
-        ctx.beginPath(); 
-        ctx.arc(p.x, p.y, p.radius + 3, 0, Math.PI * 2); 
-        ctx.fillStyle = p.color.glow; 
-        ctx.fill();
-        
-        ctx.beginPath(); 
-        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2); 
-        ctx.fillStyle = p.color.solid; 
-        ctx.fill();
-      } else {
-        ctx.beginPath(); 
-        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2); 
-        ctx.fillStyle = defaultFill; 
-        ctx.fill();
-      }
-
-      for (let j = i + 1; j < allParticles.length; j++) {
-        let p2 = allParticles[j];
-        let dx = p.x - p2.x, dy = p.y - p2.y;
-        if (dx*dx + dy*dy < 8000) { 
-          ctx.beginPath(); 
-          ctx.strokeStyle = defaultStroke; 
-          ctx.moveTo(p.x, p.y); 
-          ctx.lineTo(p2.x, p2.y); 
-          ctx.stroke();
-        }
-      }
-    }
-    requestAnimationFrame(animate);
-  }
-  animate();
-}
 
 // ==========================================================
 // ARRANQUE SEGURO DE AUTENTICACIÓN
