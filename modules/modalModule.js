@@ -34,6 +34,23 @@ export function createModalModule(app) {
     document.addEventListener('scroll', closeAllPopovers, true);
   }
 
+
+  function cerrarModal(id) {
+    const modal = document.getElementById(id);
+    if (modal) modal.classList.remove('active');
+    closeAllPopovers(null);
+  }
+
+  function cerrarModalBorrado() {
+    const modal = document.getElementById('deleteConfirmModal');
+    if (modal) modal.classList.remove('active');
+    if (iconoAlertaInterval) {
+      clearInterval(iconoAlertaInterval);
+      iconoAlertaInterval = null;
+    }
+    filaABorrar = null;
+  }
+
   // ==========================================================
   // SELECTOR PERSONALIZADO TIPO COMBOBOX (MODALES)
   // ==========================================================
