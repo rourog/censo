@@ -20,12 +20,16 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+let analytics = null;
+try {
+  analytics = getAnalytics(app);
+} catch (error) {
+  console.warn('Analytics no disponible en este entorno:', error);
+}
 const db = initializeFirestore(app, { experimentalForceLongPolling: true });
 const auth = getAuth(app);
 
-// FORZAR PERSISTENCIA DE SESIÓN PARA EVITAR QUE SE CIERRE EN MÓVILES
-setPersistence(auth, browserLocalPersistence);
+// La persistencia se configura dentro de bootAuth(), antes de registrar el observador.
 
 // ==========================================================
 // 3. LÓGICA DE LOGIN SILENCIOSO Y ROLES
@@ -40,39 +44,67 @@ window.isInlineEditing = false;
 window.pendingSnapshotList = null;
 let selectedNavIndex = -1;
 
+function setLoginLoading(texto = 'CARGANDO...') {
+  const inputNip = document.getElementById('nipInput');
+  const btn = document.getElementById('btnEnter');
+
+  if (inputNip) inputNip.disabled = true;
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = `<span class="spin material-symbols-outlined" style="margin-right: 6px;">sync</span> ${texto}`;
+  }
+}
+
+function enableLoginControls() {
+  const inputNip = document.getElementById('nipInput');
+  const btn = document.getElementById('btnEnter');
+
+  if (inputNip) {
+    inputNip.disabled = false;
+    inputNip.value = '';
+  }
+
+  if (btn) {
+    btn.disabled = false;
+    btn.innerHTML = 'ENTRAR';
+  }
+}
+
 function showMainApp() {
-  loginScreen.classList.remove('active');
-  mainAppContainer.style.display = 'flex';
-  mainFabBtn.style.display = currentViewMode === 'table' && window.innerWidth >= 768 ? 'none' : 'flex';
-  initFirebaseListener(); 
+  if (loginScreen) loginScreen.classList.remove('active');
+  if (mainAppContainer) mainAppContainer.style.display = 'flex';
+  if (mainFabBtn) {
+    mainFabBtn.style.display = currentViewMode === 'table' && window.innerWidth >= 768 ? 'none' : 'flex';
+  }
+
+  if (!unsubscribe) initFirebaseListener();
   setTimeout(initPlexus, 100);
 }
 
 function showLoginScreen() {
-  loginScreen.classList.add('active');
-  mainAppContainer.style.display = 'none';
-  mainFabBtn.style.display = 'none';
-  
-  // Reactivamos los controles en caso de que Firebase confirme que no hay sesión
-  const inputNip = document.getElementById('nipInput');
-  const btn = document.getElementById('btnEnter');
-  
-  inputNip.disabled = false;
-  inputNip.value = '';
-  
-  btn.disabled = false;
-  btn.innerHTML = 'ENTRAR';
+  if (loginScreen) loginScreen.classList.add('active');
+  if (mainAppContainer) mainAppContainer.style.display = 'none';
+  if (mainFabBtn) mainFabBtn.style.display = 'none';
 
-  if(unsubscribe) unsubscribe();
-  pacientesGlobal = []; camasLibresGlobal = []; render([]); 
+  enableLoginControls();
+
+  if (unsubscribe) {
+    unsubscribe();
+    unsubscribe = null;
+  }
+
+  pacientesGlobal = [];
+  camasLibresGlobal = [];
+  isFetchingData = false;
+  render([]);
 }
 
+const AUTH_EMAIL_INTERNO = "interno@hrd.censo";
+
 document.getElementById('btnEnter').addEventListener('click', async () => {
-  const nip = document.getElementById('nipInput').value.trim();
+  const inputNip = document.getElementById('nipInput');
   const btn = document.getElementById('btnEnter');
-  
-  // Usuario fijo para no teclear correos
-  const correoOperativo = "interno@hrd.censo";
+  const nip = inputNip ? inputNip.value.trim() : '';
 
   if (!nip) {
     vibrar([50, 50, 50]);
@@ -81,16 +113,19 @@ document.getElementById('btnEnter').addEventListener('click', async () => {
   }
 
   try {
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spin material-symbols-outlined">sync</span> CARGANDO...';
-    
-    // Auth sin contraseñas quemadas
-    await signInWithEmailAndPassword(auth, correoOperativo, nip);
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spin material-symbols-outlined">sync</span> CARGANDO...';
+    }
+
+    // No se compara la contraseña en el frontend.
+    // Firebase Auth valida el password real del usuario interno@hrd.censo.
+    await signInWithEmailAndPassword(auth, AUTH_EMAIL_INTERNO, nip);
   } catch (error) {
+    console.error('Error de login:', error);
     vibrar([50, 50, 50]);
     alert("Código incorrecto o error de red. Intenta de nuevo.");
-    btn.disabled = false;
-    btn.innerHTML = 'ENTRAR';
+    enableLoginControls();
   }
 });
 
@@ -98,18 +133,16 @@ document.getElementById('nipInput').addEventListener('keypress', function (e) {
   if (e.key === 'Enter') { document.getElementById('btnEnter').click(); }
 });
 
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    rolUsuario = user.email.includes('adscrito') ? "ADSCRITO" : "INTERNO";
-    showMainApp(); 
-  } else {
-    showLoginScreen();
-  }
-});
-
-document.getElementById('btnLogoutBtn').addEventListener('click', () => {
+document.getElementById('btnLogoutBtn').addEventListener('click', async () => {
   vibrar(15);
-  if(confirm("¿Seguro que deseas cerrar la sesión?")) { signOut(auth); }
+  if (confirm("¿Seguro que deseas cerrar la sesión?")) {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error('Error al cerrar sesión:', error);
+      alert('No se pudo cerrar sesión: ' + error.message);
+    }
+  }
 });
 
 // ==========================================================
@@ -1363,7 +1396,9 @@ function initPlexus() {
   plexusRunning = true;
 
   const canvas = document.getElementById('plexusCanvas');
+  if (!canvas) return;
   const ctx = canvas.getContext('2d');
+  if (!ctx) return;
   let width, height, standardParticles = [], patientParticles = [];
 
   function resize() { 
@@ -1476,3 +1511,53 @@ function initPlexus() {
   }
   animate();
 }
+
+// ==========================================================
+// ARRANQUE SEGURO DE AUTENTICACIÓN
+// ==========================================================
+let authInitialResponded = false;
+
+async function bootAuth() {
+  setLoginLoading('CARGANDO...');
+
+  try {
+    await Promise.race([
+      setPersistence(auth, browserLocalPersistence),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout configurando persistencia local')), 3000))
+    ]);
+  } catch (error) {
+    console.warn('No se pudo fijar persistencia local. Se continúa con la persistencia disponible:', error);
+  }
+
+  const fallbackTimer = setTimeout(() => {
+    if (authInitialResponded) return;
+    authInitialResponded = true;
+    console.warn('Firebase Auth no respondió a tiempo. Se habilita login manual para evitar pantalla congelada.');
+    showLoginScreen();
+  }, 8000);
+
+  onAuthStateChanged(auth, (user) => {
+    if (!authInitialResponded) {
+      authInitialResponded = true;
+      clearTimeout(fallbackTimer);
+    }
+
+    if (user) {
+      rolUsuario = "INTERNO";
+      showMainApp();
+    } else {
+      showLoginScreen();
+    }
+  }, (error) => {
+    if (!authInitialResponded) {
+      authInitialResponded = true;
+      clearTimeout(fallbackTimer);
+    }
+
+    console.error('Error inicializando Firebase Auth:', error);
+    showLoginScreen();
+  });
+}
+
+bootAuth();
+
