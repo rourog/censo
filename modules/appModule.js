@@ -11,20 +11,22 @@
   - Hablar con Firestore directamente.
 */
 
-import * as firebase from './firebaseModule.js';
-import * as bed from './bedModule.js';
-import * as utils from './utilsModule.js';
-import { state } from './stateModule.js';
+import * as firebase from './firebaseModule.js?v=alerta-observacion-v4-20260522';
+import * as bed from './bedModule.js?v=alerta-observacion-v4-20260522';
+import * as utils from './utilsModule.js?v=alerta-observacion-v4-20260522';
+import { state } from './stateModule.js?v=alerta-observacion-v4-20260522';
 
-import { createEffectsModule } from './effectsModule.js';
-import { createRenderModule } from './renderModule.js';
-import { createPatientModule } from './patientModule.js';
-import { createThemeModule } from './themeModule.js';
-import { createModalModule } from './modalModule.js';
-import { createInteractionModule } from './interactionModule.js';
-import { createAuthModule } from './authModule.js';
+import { createEffectsModule } from './effectsModule.js?v=alerta-observacion-v4-20260522';
+import { createRenderModule } from './renderModule.js?v=alerta-observacion-v4-20260522';
+import { createPatientModule } from './patientModule.js?v=alerta-observacion-v4-20260522';
+import { createThemeModule } from './themeModule.js?v=alerta-observacion-v4-20260522';
+import { createModalModule } from './modalModule.js?v=alerta-observacion-v4-20260522';
+import { createInteractionModule } from './interactionModule.js?v=alerta-observacion-v4-20260522';
+import { createAuthModule } from './authModule.js?v=alerta-observacion-v4-20260522';
 
 export function bootApp() {
+  console.info('[CENSO] bootApp iniciado. BUILD: alerta-observacion-v4-20260522');
+  window.CensoBuild = { version: 'alerta-observacion-v4-20260522', stage: 'bootApp', appModule: true };
   const app = {
     state,
     firebase,
@@ -40,7 +42,9 @@ export function bootApp() {
   Object.assign(app, createInteractionModule(app));
   Object.assign(app, createAuthModule(app));
 
+  app.__build = 'alerta-observacion-v4-20260522';
   window.CensoApp = app;
+  window.CensoBuild = { ...window.CensoBuild, stage: 'modules-ready', appReady: true };
 
   app.bindModalBaseEvents();
   app.exposeWindowActions();

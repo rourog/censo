@@ -12,6 +12,8 @@
   - Calcular reglas de camas fuera de lo necesario para mostrar.
 */
 
+console.info('[CENSO] renderModule.js cargado. BUILD: alerta-observacion-v4-20260522');
+
 export function createRenderModule(app) {
   const { state } = app;
   const { areaVisuals, chipPalette, getEmojiOnly, agruparPorArea } = app.bed;

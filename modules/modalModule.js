@@ -13,6 +13,8 @@
   - Definir camas maestras.
 */
 
+console.info('[CENSO] modalModule.js cargado. BUILD: alerta-observacion-v4-20260522');
+
 export function createModalModule(app) {
   const { state } = app;
   const { db, collection, addDoc, doc, updateDoc, deleteDoc, setDoc, serverTimestamp } = app.firebase;
