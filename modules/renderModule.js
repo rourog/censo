@@ -12,7 +12,7 @@
   - Calcular reglas de camas fuera de lo necesario para mostrar.
 */
 
-console.info('[CENSO] renderModule.js cargado. BUILD: alerta-observacion-v5-20260522');
+console.info('[CENSO] renderModule.js cargado. BUILD: alerta-observacion-v5-1-20260522');
 
 export function createRenderModule(app) {
   const { state } = app;
@@ -381,7 +381,7 @@ export function createRenderModule(app) {
     </tr>`;
   }
 
-  function render(lista)  function render(lista) {
+  function render(lista) {
     ensureAlertStyles();
     const content = document.getElementById('content');
     const metaText = document.getElementById('meta-text');
