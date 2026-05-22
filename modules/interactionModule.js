@@ -184,7 +184,7 @@ export function createInteractionModule(app) {
     if (!q) { app.render(state.pacientesGlobal); return; }
   
     const filtrados = state.pacientesGlobal.filter(p => { 
-      return normalizar([p.nombre, p.cama, p.area || '', p.edad, p.diagnostico, p.pendientes, p.destino].join(' ')).includes(q); 
+      return normalizar([p.nombre, p.cama, p.area || '', p.edad, p.diagnostico, p.pendientes, p.destino, p.observacionAlerta || '', p.observacion || ''].join(' ')).includes(q); 
     });
     app.render(filtrados);
     document.querySelectorAll('.animate-in').forEach(el => { el.classList.remove('animate-in'); el.style.animationDelay = '0ms'; el.style.opacity = '1'; });
