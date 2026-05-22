@@ -131,7 +131,14 @@ export function createRenderModule(app) {
 
         grupos[area].forEach((p) => {
           const destinoChip = getColorfulChipHtml(p.destino);
-          htmlArr.push(`<tr class="patient-row" data-fila="${p.fila}" onclick="toggleTableRow(this)">
+          const alertaActiva = Boolean(p.alerta);
+          const rowAlertStyle = alertaActiva ? 'style="background: linear-gradient(90deg, var(--accent-soft), transparent 55%); box-shadow: inset 4px 0 0 var(--accent);"' : '';
+          const alertBtnStyle = alertaActiva
+            ? 'background: var(--accent); color: #fff; border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft);'
+            : 'color: var(--muted); border-color: var(--line); background: transparent;';
+          const alertBtnTitle = alertaActiva ? 'Quitar alerta' : 'Marcar alerta';
+          const alertIconFill = alertaActiva ? "font-variation-settings: 'FILL' 1, 'wght' 600, 'GRAD' 0, 'opsz' 24;" : '';
+          htmlArr.push(`<tr class="patient-row ${alertaActiva ? 'patient-alert' : ''}" data-fila="${p.fila}" data-alerta="${alertaActiva ? '1' : '0'}" ${rowAlertStyle} onclick="toggleTableRow(this)">
               <td style="padding: 6px 10px; text-align: center;"><span style="color: var(--accent); font-weight: 700; font-size: 0.85rem;">${escapeHtml(p.cama || '-')}</span></td>
               <td style="padding: 6px 10px; font-size: 0.7rem; color: var(--muted); font-family: 'Fira Code', monospace; line-height: 1.3; text-align: center;">${p.fechaIngresoFormateada || '-'}</td>
             
@@ -155,7 +162,7 @@ export function createRenderModule(app) {
                 ${destinoChip || '<span style="color:var(--muted); opacity:0.4;">-</span>'}
               </td>
             
-              <td style="padding: 4px 10px; text-align: center; white-space: nowrap;"><button class="btn-table edit" style="padding: 4px; font-size: 0.9rem; margin-right: 2px;" onclick="abrirModal('${p.fila}'); event.stopPropagation();" title="Editar"><span class="material-symbols-outlined" style="font-size: 1.1rem;">edit</span></button><button class="btn-table delete" style="padding: 4px; font-size: 0.9rem;" onclick="borrarPacienteDirecto('${p.fila}', '${escapeHtml(p.nombre)}'); event.stopPropagation();" title="Borrar"><span class="material-symbols-outlined" style="font-size: 1.1rem;">delete</span></button></td>
+              <td style="padding: 4px 10px; text-align: center; white-space: nowrap;"><button class="btn-table alert" style="padding: 4px; font-size: 0.9rem; margin-right: 2px; ${alertBtnStyle}" onclick="toggleAlertaPaciente('${p.fila}', event);" title="${alertBtnTitle}" aria-label="${alertBtnTitle}"><span class="material-symbols-outlined" style="font-size: 1.1rem; ${alertIconFill}">star</span></button><button class="btn-table edit" style="padding: 4px; font-size: 0.9rem; margin-right: 2px;" onclick="abrirModal('${p.fila}'); event.stopPropagation();" title="Editar"><span class="material-symbols-outlined" style="font-size: 1.1rem;">edit</span></button><button class="btn-table delete" style="padding: 4px; font-size: 0.9rem;" onclick="borrarPacienteDirecto('${p.fila}', '${escapeHtml(p.nombre)}'); event.stopPropagation();" title="Borrar"><span class="material-symbols-outlined" style="font-size: 1.1rem;">delete</span></button></td>
           </tr>`);
         });
       });
@@ -185,6 +192,13 @@ export function createRenderModule(app) {
           </div>
           <div class="patient-list">
             ${pacientes.map((p, indexPatient) => {
+              const alertaActiva = Boolean(p.alerta);
+              const cardAlertStyle = alertaActiva ? 'box-shadow: inset 4px 0 0 var(--accent), 0 0 0 1px var(--accent-border); background: linear-gradient(90deg, var(--accent-soft), var(--card) 60%);' : '';
+              const starBtnStyle = alertaActiva
+                ? 'background: var(--accent); color: #fff; border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft);'
+                : 'color: var(--muted); border-color: var(--line); background: transparent;';
+              const starIconFill = alertaActiva ? "font-variation-settings: 'FILL' 1, 'wght' 600, 'GRAD' 0, 'opsz' 24;" : '';
+              const starTitle = alertaActiva ? 'Quitar alerta' : 'Marcar alerta';
               const camaHtml = p.cama ? `<div class="patient-bed">${escapeHtml(p.cama)}</div>` : '';
             
               // MODO TARJETA: Solo Emoji para Destino
@@ -202,7 +216,7 @@ export function createRenderModule(app) {
               ].filter(Boolean).join('');
               const delayPatient = delayBase + (indexPatient * 50);
             
-              return `<div class="card animate-in" data-fila="${p.fila}" data-nombre="${escapeHtml(p.nombre)}" style="animation-delay: ${delayPatient}ms;"><div class="swipe-bg"><div class="swipe-action swipe-delete"><span class="material-symbols-outlined">delete</span></div><div class="swipe-action swipe-edit"><span class="material-symbols-outlined">edit</span></div></div><div class="card-content-wrapper"><div class="card-header" onclick="toggleCard(this)"><div class="patient-main"><div class="patient-name">${escapeHtml(p.nombre)}</div>${camaHtml}</div><div class="header-right">${destinoEmojiHtml}<div class="caret"><span class="material-symbols-outlined">expand_more</span></div></div></div><div class="details"><div class="details-content">${detailsHtml}<button class="btn-editar-tarjeta" onclick="abrirModal('${p.fila}'); event.stopPropagation();"><span class="material-symbols-outlined" style="font-size: 1.1rem; margin-right: 4px;">edit_square</span> EDITAR PACIENTE</button></div></div></div></div>`;
+              return `<div class="card animate-in ${alertaActiva ? 'patient-alert' : ''}" data-fila="${p.fila}" data-nombre="${escapeHtml(p.nombre)}" data-alerta="${alertaActiva ? '1' : '0'}" style="animation-delay: ${delayPatient}ms;"><div class="swipe-bg"><div class="swipe-action swipe-delete"><span class="material-symbols-outlined">delete</span></div><div class="swipe-action swipe-edit"><span class="material-symbols-outlined">edit</span></div></div><div class="card-content-wrapper" style="${cardAlertStyle}"><div class="card-header" onclick="toggleCard(this)"><div class="patient-main"><div class="patient-name">${alertaActiva ? '<span class="material-symbols-outlined" style="font-size:1rem; color:var(--accent); margin-right:4px; vertical-align:-2px; font-variation-settings: \'FILL\' 1, \'wght\' 600, \'GRAD\' 0, \'opsz\' 24;">star</span>' : ''}${escapeHtml(p.nombre)}</div>${camaHtml}</div><div class="header-right">${destinoEmojiHtml}<button class="icon-btn" type="button" style="width:28px; height:28px; ${starBtnStyle}" onclick="toggleAlertaPaciente('${p.fila}', event);" title="${starTitle}" aria-label="${starTitle}"><span class="material-symbols-outlined" style="font-size:1rem; ${starIconFill}">star</span></button><div class="caret"><span class="material-symbols-outlined">expand_more</span></div></div></div><div class="details"><div class="details-content">${detailsHtml}<button class="btn-editar-tarjeta" onclick="toggleAlertaPaciente('${p.fila}', event);" style="margin-bottom: 8px; border-color: var(--accent-border); ${alertaActiva ? 'background: var(--accent-soft); color: var(--accent);' : ''}"><span class="material-symbols-outlined" style="font-size: 1.1rem; margin-right: 4px; ${starIconFill}">star</span> ${alertaActiva ? 'QUITAR ALERTA' : 'MARCAR ALERTA'}</button><button class="btn-editar-tarjeta" onclick="abrirModal('${p.fila}'); event.stopPropagation();"><span class="material-symbols-outlined" style="font-size: 1.1rem; margin-right: 4px;">edit_square</span> EDITAR PACIENTE</button></div></div></div></div>`;
             }).join('')}
           </div>
         </section>
