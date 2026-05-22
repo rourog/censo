@@ -30,8 +30,31 @@ export function createModalModule(app) {
     });
   };
   function bindModalBaseEvents() {
+    document.addEventListener('click', handleCensoActionButtonClick, true);
     document.addEventListener('click', closeAllPopovers);
     document.addEventListener('scroll', closeAllPopovers, true);
+  }
+
+  function handleCensoActionButtonClick(e) {
+    const btn = e.target.closest('[data-censo-action]');
+    if (!btn) return;
+
+    const action = btn.dataset.censoAction;
+    const fila = btn.dataset.fila;
+    if (!fila) return;
+
+    if (action === 'toggle-alerta') {
+      e.preventDefault();
+      e.stopPropagation();
+      toggleAlertaPaciente(fila, e);
+      return;
+    }
+
+    if (action === 'editar-observacion') {
+      e.preventDefault();
+      e.stopPropagation();
+      editarObservacionPaciente(fila, e);
+    }
   }
 
 
@@ -315,6 +338,94 @@ export function createModalModule(app) {
     if (!yaEstaAbierta) { row.classList.add('expanded-row'); }
   }
 
+  function refrescarDespuesDeAlerta() {
+    if (typeof app.filtrar === 'function') {
+      app.filtrar();
+      return;
+    }
+
+    if (typeof app.render === 'function') {
+      app.render(state.pacientesGlobal);
+    }
+  }
+
+  async function toggleAlertaPaciente(fila, event) {
+    if (event) {
+      event.stopPropagation();
+      event.preventDefault();
+    }
+
+    const paciente = state.pacientesGlobal.find(p => String(p.fila) === String(fila));
+    if (!paciente) {
+      console.warn('[CENSO] No se encontró paciente para alerta:', fila);
+      vibrar([30, 30, 30]);
+      return;
+    }
+
+    const alertaAnterior = Boolean(paciente.alerta);
+    const alertaNueva = !alertaAnterior;
+
+    // Actualización optimista: el cambio debe sentirse inmediato.
+    paciente.alerta = alertaNueva;
+    refrescarDespuesDeAlerta();
+    vibrar(alertaNueva ? [20, 30, 20] : 15);
+
+    try {
+      await updateDoc(doc(db, "pacientes", fila), { alerta: alertaNueva });
+    } catch (error) {
+      paciente.alerta = alertaAnterior;
+      refrescarDespuesDeAlerta();
+      vibrar([80, 40, 80]);
+      alert('ERROR AL CAMBIAR ALERTA: ' + error.message);
+    }
+  }
+
+  async function editarObservacionPaciente(fila, event) {
+    if (event) {
+      event.stopPropagation();
+      event.preventDefault();
+    }
+
+    const paciente = state.pacientesGlobal.find(p => String(p.fila) === String(fila));
+    if (!paciente) {
+      console.warn('[CENSO] No se encontró paciente para observación:', fila);
+      vibrar([30, 30, 30]);
+      return;
+    }
+
+    const observacionAnterior = String(paciente.observacionAlerta || paciente.observacion || '').trim();
+    const alertaAnterior = Boolean(paciente.alerta);
+
+    const textoIngresado = window.prompt(
+      'OBSERVACIÓN / ALERTA DEL PACIENTE\n\nDeja el campo vacío para borrar la observación.',
+      observacionAnterior
+    );
+
+    if (textoIngresado === null) return;
+
+    const observacionNueva = String(textoIngresado).trim().toUpperCase();
+    const activaAlerta = observacionNueva.length > 0 ? true : alertaAnterior;
+
+    // Actualización optimista.
+    paciente.observacionAlerta = observacionNueva;
+    if (observacionNueva.length > 0) paciente.alerta = true;
+    refrescarDespuesDeAlerta();
+    vibrar(observacionNueva.length > 0 ? [20, 30, 20] : 15);
+
+    try {
+      const updateData = { observacionAlerta: observacionNueva };
+      if (observacionNueva.length > 0) updateData.alerta = true;
+      await updateDoc(doc(db, "pacientes", fila), updateData);
+    } catch (error) {
+      paciente.observacionAlerta = observacionAnterior;
+      paciente.alerta = alertaAnterior;
+      refrescarDespuesDeAlerta();
+      vibrar([80, 40, 80]);
+      alert('ERROR AL GUARDAR OBSERVACIÓN: ' + error.message);
+    }
+  }
+
+
   function abrirModal(fila) {
     vibrar(30); 
     const paciente = state.pacientesGlobal.find(p => p.fila === fila);
@@ -509,7 +620,9 @@ export function createModalModule(app) {
           destino: destinoVal,
           cama: nombreCamaReal,
           area: areaReal,
-          creado: fechaCreacion
+          creado: fechaCreacion,
+          alerta: false,
+          observacionAlerta: ''
       });
       vibrar(20); 
       cerrarModal('addModal');
@@ -531,6 +644,8 @@ export function createModalModule(app) {
     window.cerrarModalBorrado = cerrarModalBorrado;
     window.toggleCard = toggleCard;
     window.toggleTableRow = toggleTableRow;
+    window.toggleAlertaPaciente = toggleAlertaPaciente;
+    window.editarObservacionPaciente = editarObservacionPaciente;
     window.abrirModal = abrirModal;
     window.guardarEdicion = guardarEdicion;
     window.borrarPacienteDialog = borrarPacienteDialog;
@@ -549,6 +664,8 @@ export function createModalModule(app) {
     cerrarModalBorrado,
     toggleCard,
     toggleTableRow,
+    toggleAlertaPaciente,
+    editarObservacionPaciente,
     abrirModal,
     guardarEdicion,
     borrarPacienteDialog,
