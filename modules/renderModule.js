@@ -12,7 +12,7 @@
   - Calcular reglas de camas fuera de lo necesario para mostrar.
 */
 
-console.info('[CENSO] renderModule.js cargado. BUILD: alerta-observacion-v5-1-20260522');
+console.info('[CENSO] renderModule.js cargado. BUILD: alerta-observacion-v6-20260522');
 
 export function createRenderModule(app) {
   const { state } = app;
@@ -61,10 +61,34 @@ export function createRenderModule(app) {
     const style = document.createElement('style');
     style.id = 'censo-alert-styles';
     style.textContent = `
-      @keyframes censoAlertPulse {
-        0%, 100% { box-shadow: 0 0 0 1px var(--accent-border), 0 0 12px var(--accent-soft); }
-        50% { box-shadow: 0 0 0 2px rgba(255,255,255,0.7), 0 0 30px var(--accent); }
+      #content.view-table-mode {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
       }
+
+      #content.view-table-mode .table-wrapper {
+        width: 100% !important;
+        max-width: none !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        border-radius: 0 !important;
+      }
+
+      #content > .section {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+      }
+
+      #content .patient-list {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+      }
+
+      @keyframes censoAlertReflection {
+        0% { background-position: -180% 0; }
+        100% { background-position: 180% 0; }
+      }
+
 
       @keyframes censoAlertShine {
         0% { transform: translateX(-140%) skewX(-18deg); opacity: 0; }
@@ -93,7 +117,6 @@ export function createRenderModule(app) {
         color: #fff !important;
         background: var(--accent) !important;
         border-color: rgba(255,255,255,0.62) !important;
-        animation: censoAlertPulse 1.6s ease-in-out infinite;
       }
 
       .alert-star-btn.alert-active .material-symbols-outlined,
@@ -111,9 +134,9 @@ export function createRenderModule(app) {
 
       .row-action-grid {
         display: grid;
-        grid-template-columns: repeat(2, 18px);
-        grid-auto-rows: 18px;
-        gap: 2px;
+        grid-template-columns: repeat(2, 22px);
+        grid-auto-rows: 22px;
+        gap: 3px;
         justify-content: center;
         align-items: center;
         width: max-content;
@@ -121,13 +144,13 @@ export function createRenderModule(app) {
       }
 
       .row-action-grid .btn-table {
-        width: 18px !important;
-        height: 18px !important;
-        min-width: 18px !important;
-        min-height: 18px !important;
+        width: 22px !important;
+        height: 22px !important;
+        min-width: 22px !important;
+        min-height: 22px !important;
         padding: 0 !important;
         margin: 0 !important;
-        border-radius: 5px !important;
+        border-radius: 6px !important;
         display: inline-flex !important;
         align-items: center !important;
         justify-content: center !important;
@@ -135,7 +158,7 @@ export function createRenderModule(app) {
       }
 
       .row-action-grid .material-symbols-outlined {
-        font-size: 0.78rem !important;
+        font-size: 0.96rem !important;
         line-height: 1 !important;
       }
 
@@ -171,29 +194,30 @@ export function createRenderModule(app) {
       }
 
       .patient-observation-row td {
-        padding: 0 10px 5px 10px !important;
+        padding: 0 0 6px 0 !important;
         border-top: 0 !important;
         background: var(--panel);
       }
 
       .patient-observation-line {
-        min-height: 18px;
+        min-height: 24px;
         display: flex;
+        width: 100%;
         align-items: center;
         gap: 6px;
-        padding: 2px 8px;
-        border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+        padding: 5px 10px;
+        border-radius: 0;
         border-left: 4px solid var(--accent);
         background: var(--accent-soft);
         color: var(--text);
-        font-size: 0.68rem;
-        line-height: 1.22;
+        font-size: 0.8rem;
+        line-height: 1.3;
         letter-spacing: 0.02em;
         box-shadow: inset 0 1px 0 var(--accent-border);
       }
 
       .patient-observation-line .material-symbols-outlined {
-        font-size: 0.82rem;
+        font-size: 0.95rem;
         color: var(--accent);
         flex: 0 0 auto;
       }
@@ -210,10 +234,7 @@ export function createRenderModule(app) {
         overflow: hidden;
         background: var(--accent) !important;
         color: #fff !important;
-        box-shadow:
-          inset 0 0 0 1px rgba(255,255,255,0.34),
-          0 0 0 1px var(--accent-border),
-          0 0 32px var(--accent) !important;
+        box-shadow: inset 0 0 0 1px rgba(255,255,255,0.34) !important;
       }
 
       .card.patient-alert .card-content-wrapper::after {
@@ -236,7 +257,6 @@ export function createRenderModule(app) {
       .card.patient-alert .caret,
       .card.patient-alert .material-symbols-outlined {
         color: #fff !important;
-        text-shadow: 0 0 14px rgba(255,255,255,0.24);
       }
 
       .card.patient-alert .field,
@@ -246,29 +266,35 @@ export function createRenderModule(app) {
       }
 
       .patient-row.patient-alert td {
-        background: var(--accent) !important;
+        background-color: var(--accent) !important;
+        background-image: linear-gradient(
+          105deg,
+          transparent 0%,
+          transparent 38%,
+          rgba(255,255,255,0.18) 46%,
+          rgba(255,255,255,0.52) 50%,
+          rgba(255,255,255,0.18) 54%,
+          transparent 62%,
+          transparent 100%
+        ) !important;
+        background-size: 240% 100% !important;
+        animation: censoAlertReflection 3.2s ease-in-out infinite;
         color: #fff !important;
         border-bottom-color: rgba(255,255,255,0.18) !important;
-        box-shadow: inset 0 1px 0 rgba(255,255,255,0.20), inset 0 -1px 0 rgba(0,0,0,0.08);
+        box-shadow: none !important;
       }
 
       .patient-row.patient-alert td:first-child {
-        box-shadow:
-          inset 5px 0 0 rgba(255,255,255,0.70),
-          inset 0 1px 0 rgba(255,255,255,0.20),
-          -10px 0 28px var(--accent);
+        box-shadow: inset 5px 0 0 rgba(255,255,255,0.70) !important;
       }
 
       .patient-row.patient-alert td:last-child {
-        box-shadow:
-          inset 0 1px 0 rgba(255,255,255,0.20),
-          10px 0 28px var(--accent);
+        box-shadow: none !important;
       }
 
       .patient-row.patient-alert,
       .patient-row.patient-alert * {
         color: #fff !important;
-        text-shadow: 0 0 12px rgba(255,255,255,0.18);
       }
 
       .patient-row.patient-alert .chip,
@@ -284,7 +310,6 @@ export function createRenderModule(app) {
       .patient-row.patient-alert .alert-star-btn.alert-active,
       .patient-row.patient-alert .obs-note-btn.obs-active {
         background: rgba(255,255,255,0.28) !important;
-        box-shadow: 0 0 14px rgba(255,255,255,0.42) !important;
       }
 
       .patient-observation-row.patient-alert-observation td {
@@ -293,10 +318,22 @@ export function createRenderModule(app) {
       }
 
       .patient-observation-row.patient-alert-observation .patient-observation-line {
-        background: rgba(255,255,255,0.18);
+        background-color: rgba(255,255,255,0.18);
+        background-image: linear-gradient(
+          105deg,
+          transparent 0%,
+          transparent 40%,
+          rgba(255,255,255,0.16) 47%,
+          rgba(255,255,255,0.42) 50%,
+          rgba(255,255,255,0.16) 53%,
+          transparent 60%,
+          transparent 100%
+        );
+        background-size: 240% 100%;
+        animation: censoAlertReflection 3.2s ease-in-out infinite;
         border-left-color: rgba(255,255,255,0.74);
         color: #fff;
-        box-shadow: inset 0 1px 0 rgba(255,255,255,0.22), 0 8px 22px rgba(0,0,0,0.08);
+        box-shadow: none;
       }
 
       .patient-observation-row.patient-alert-observation .patient-observation-label,
@@ -456,7 +493,7 @@ export function createRenderModule(app) {
               <td style="padding: 6px 10px; font-size: 0.7rem; color: var(--muted); font-family: 'Fira Code', monospace; line-height: 1.3; text-align: center;">${p.fechaIngresoFormateada || '-'}</td>
 
               <td style="padding: 6px 10px; font-family: 'Space Mono', monospace; font-weight: 700; font-size: 0.9rem; line-height: 1.3;" class="patient-name editable-cell" data-campo="nombre" data-original="${escapeHtml(p.nombre)}" contenteditable="true" onfocus="iniciarEdicionSubtle(this)" onblur="finalizarEdicionSubtle(this)" onkeydown="manejarTeclasSubtle(this, event)" onclick="event.stopPropagation()">
-                <div class="truncate-text" title="${escapeHtml(p.nombre)}">${alertaActiva ? '<span class="material-symbols-outlined" style="font-size:.9rem; color:var(--accent); vertical-align:-2px; margin-right:3px; font-variation-settings: \'FILL\' 1, \'wght\' 700, \'GRAD\' 0, \'opsz\' 24;">star</span>' : ''}${escapeHtml(p.nombre)}</div>
+                <div class="truncate-text" title="${escapeHtml(p.nombre)}">${escapeHtml(p.nombre)}</div>
               </td>
 
               <td style="padding: 6px 10px;" class="editable-cell" data-campo="edad" data-original="${escapeHtml(p.edad)}" contenteditable="true" onfocus="iniciarEdicionSubtle(this)" onblur="finalizarEdicionSubtle(this)" onkeydown="manejarTeclasSubtle(this, event)" onclick="event.stopPropagation()">
