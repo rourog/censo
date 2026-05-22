@@ -4,7 +4,7 @@
   RESPONSABILIDAD:
   - Pintar el censo: skeleton, vacío, vista kanban/tarjetas y vista tabla.
   - Generar HTML de pacientes.
-  - Pintar alerta visual y observación breve del paciente.
+  - Pintar alerta visual y observación de escritorio.
 
   NO DEBE:
   - Hablar directamente con Firebase.
@@ -12,7 +12,7 @@
   - Calcular reglas de camas fuera de lo necesario para mostrar.
 */
 
-console.info('[CENSO] renderModule.js cargado. BUILD: alerta-observacion-v4-20260522');
+console.info('[CENSO] renderModule.js cargado. BUILD: alerta-observacion-v5-20260522');
 
 export function createRenderModule(app) {
   const { state } = app;
@@ -63,13 +63,13 @@ export function createRenderModule(app) {
     style.textContent = `
       @keyframes censoAlertPulse {
         0%, 100% { box-shadow: 0 0 0 1px var(--accent-border), 0 0 12px var(--accent-soft); }
-        50% { box-shadow: 0 0 0 2px var(--accent), 0 0 26px var(--accent); }
+        50% { box-shadow: 0 0 0 2px rgba(255,255,255,0.7), 0 0 30px var(--accent); }
       }
 
       @keyframes censoAlertShine {
         0% { transform: translateX(-140%) skewX(-18deg); opacity: 0; }
-        18% { opacity: 0.65; }
-        45% { opacity: 0.15; }
+        18% { opacity: 0.75; }
+        45% { opacity: 0.18; }
         100% { transform: translateX(140%) skewX(-18deg); opacity: 0; }
       }
 
@@ -92,17 +92,18 @@ export function createRenderModule(app) {
       .obs-note-btn.obs-active {
         color: #fff !important;
         background: var(--accent) !important;
-        border-color: var(--accent) !important;
+        border-color: rgba(255,255,255,0.62) !important;
         animation: censoAlertPulse 1.6s ease-in-out infinite;
       }
 
       .alert-star-btn.alert-active .material-symbols-outlined,
       .obs-note-btn.obs-active .material-symbols-outlined {
+        color: #fff !important;
         font-variation-settings: 'FILL' 1, 'wght' 700, 'GRAD' 0, 'opsz' 24;
       }
 
       .row-action-cell {
-        padding: 2px 6px !important;
+        padding: 2px 5px !important;
         text-align: center;
         vertical-align: middle;
         white-space: nowrap;
@@ -110,8 +111,8 @@ export function createRenderModule(app) {
 
       .row-action-grid {
         display: grid;
-        grid-template-columns: repeat(2, 19px);
-        grid-auto-rows: 19px;
+        grid-template-columns: repeat(2, 18px);
+        grid-auto-rows: 18px;
         gap: 2px;
         justify-content: center;
         align-items: center;
@@ -120,10 +121,10 @@ export function createRenderModule(app) {
       }
 
       .row-action-grid .btn-table {
-        width: 19px !important;
-        height: 19px !important;
-        min-width: 19px !important;
-        min-height: 19px !important;
+        width: 18px !important;
+        height: 18px !important;
+        min-width: 18px !important;
+        min-height: 18px !important;
         padding: 0 !important;
         margin: 0 !important;
         border-radius: 5px !important;
@@ -134,7 +135,7 @@ export function createRenderModule(app) {
       }
 
       .row-action-grid .material-symbols-outlined {
-        font-size: 0.82rem !important;
+        font-size: 0.78rem !important;
         line-height: 1 !important;
       }
 
@@ -161,8 +162,7 @@ export function createRenderModule(app) {
         font-size: 1rem !important;
       }
 
-      .patient-observation-field .value,
-      .patient-observation-pill {
+      .patient-observation-field .value {
         color: var(--text);
         background: var(--accent-soft);
         border: 1px solid var(--accent-border);
@@ -170,26 +170,50 @@ export function createRenderModule(app) {
         border-radius: var(--radius-sm);
       }
 
-      .patient-observation-pill {
-        margin-top: 6px;
-        padding: 5px 7px;
-        font-size: 0.72rem;
-        line-height: 1.25;
+      .patient-observation-row td {
+        padding: 0 10px 5px 10px !important;
+        border-top: 0 !important;
+        background: var(--panel);
+      }
+
+      .patient-observation-line {
+        min-height: 18px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 2px 8px;
+        border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+        border-left: 4px solid var(--accent);
+        background: var(--accent-soft);
         color: var(--text);
-        max-height: 2.7em;
-        overflow: hidden;
+        font-size: 0.68rem;
+        line-height: 1.22;
+        letter-spacing: 0.02em;
+        box-shadow: inset 0 1px 0 var(--accent-border);
+      }
+
+      .patient-observation-line .material-symbols-outlined {
+        font-size: 0.82rem;
+        color: var(--accent);
+        flex: 0 0 auto;
+      }
+
+      .patient-observation-label {
+        font-weight: 800;
+        color: var(--accent);
+        letter-spacing: 0.08em;
+        white-space: nowrap;
       }
 
       .card.patient-alert .card-content-wrapper {
         position: relative;
         overflow: hidden;
-        background:
-          linear-gradient(90deg, var(--accent-soft), transparent 38%),
-          var(--card) !important;
+        background: var(--accent) !important;
+        color: #fff !important;
         box-shadow:
-          inset 6px 0 0 var(--accent),
+          inset 0 0 0 1px rgba(255,255,255,0.34),
           0 0 0 1px var(--accent-border),
-          0 0 26px var(--accent-soft) !important;
+          0 0 32px var(--accent) !important;
       }
 
       .card.patient-alert .card-content-wrapper::after {
@@ -198,35 +222,86 @@ export function createRenderModule(app) {
         top: 0;
         bottom: 0;
         left: -40%;
-        width: 40%;
+        width: 42%;
         pointer-events: none;
-        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.28), transparent);
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.30), transparent);
         animation: censoAlertShine 2.8s ease-in-out infinite;
         z-index: 3;
       }
 
-      .card.patient-alert .patient-name {
-        color: var(--accent);
-        text-shadow: 0 0 18px var(--accent-soft);
+      .card.patient-alert .patient-name,
+      .card.patient-alert .patient-bed,
+      .card.patient-alert .label,
+      .card.patient-alert .value,
+      .card.patient-alert .caret,
+      .card.patient-alert .material-symbols-outlined {
+        color: #fff !important;
+        text-shadow: 0 0 14px rgba(255,255,255,0.24);
+      }
+
+      .card.patient-alert .field,
+      .card.patient-alert .patient-observation-field .value {
+        background: rgba(255,255,255,0.14) !important;
+        border-color: rgba(255,255,255,0.35) !important;
       }
 
       .patient-row.patient-alert td {
-        background: linear-gradient(90deg, var(--accent-soft), transparent 55%) !important;
+        background: var(--accent) !important;
+        color: #fff !important;
+        border-bottom-color: rgba(255,255,255,0.18) !important;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.20), inset 0 -1px 0 rgba(0,0,0,0.08);
       }
 
       .patient-row.patient-alert td:first-child {
-        box-shadow: inset 6px 0 0 var(--accent);
+        box-shadow:
+          inset 5px 0 0 rgba(255,255,255,0.70),
+          inset 0 1px 0 rgba(255,255,255,0.20),
+          -10px 0 28px var(--accent);
       }
 
-      .patient-row.patient-alert .patient-name,
-      .patient-row.patient-alert .patient-name .truncate-text {
-        color: var(--accent) !important;
-        text-shadow: 0 0 18px var(--accent-soft);
+      .patient-row.patient-alert td:last-child {
+        box-shadow:
+          inset 0 1px 0 rgba(255,255,255,0.20),
+          10px 0 28px var(--accent);
       }
 
-      .patient-row.patient-alert {
-        outline: 1px solid var(--accent-border);
-        outline-offset: -1px;
+      .patient-row.patient-alert,
+      .patient-row.patient-alert * {
+        color: #fff !important;
+        text-shadow: 0 0 12px rgba(255,255,255,0.18);
+      }
+
+      .patient-row.patient-alert .chip,
+      .patient-row.patient-alert .chip-emoji,
+      .patient-row.patient-alert .btn-table,
+      .patient-row.patient-alert .alert-star-btn,
+      .patient-row.patient-alert .obs-note-btn {
+        background: rgba(255,255,255,0.18) !important;
+        border-color: rgba(255,255,255,0.38) !important;
+        color: #fff !important;
+      }
+
+      .patient-row.patient-alert .alert-star-btn.alert-active,
+      .patient-row.patient-alert .obs-note-btn.obs-active {
+        background: rgba(255,255,255,0.28) !important;
+        box-shadow: 0 0 14px rgba(255,255,255,0.42) !important;
+      }
+
+      .patient-observation-row.patient-alert-observation td {
+        background: var(--accent) !important;
+        padding-top: 0 !important;
+      }
+
+      .patient-observation-row.patient-alert-observation .patient-observation-line {
+        background: rgba(255,255,255,0.18);
+        border-left-color: rgba(255,255,255,0.74);
+        color: #fff;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.22), 0 8px 22px rgba(0,0,0,0.08);
+      }
+
+      .patient-observation-row.patient-alert-observation .patient-observation-label,
+      .patient-observation-row.patient-alert-observation .material-symbols-outlined {
+        color: #fff;
       }
     `;
 
@@ -281,20 +356,9 @@ export function createRenderModule(app) {
       </td>`;
   }
 
-  function renderCardActions(p, alertaActiva, observacion) {
-    const alertBtnTitle = alertaActiva ? 'Quitar alerta' : 'Marcar alerta';
-    const obsTitle = observacion ? 'Editar observación' : 'Agregar observación';
-    const alertIconFill = getAlertIconFill(alertaActiva);
-    const obsIconFill = getAlertIconFill(Boolean(observacion));
-
+  function renderCardActions(p) {
     return `
       <div class="card-action-grid">
-        <button class="btn-editar-tarjeta ${alertaActiva ? 'alert-star-btn alert-active' : 'alert-star-btn'}" type="button" data-censo-action="toggle-alerta" data-fila="${escapeHtml(p.fila)}" onclick="event.stopPropagation(); toggleAlertaPaciente(this.dataset.fila, event);" title="${escapeHtml(alertBtnTitle)}">
-          <span class="material-symbols-outlined" style="${alertIconFill}">star</span> ${alertaActiva ? 'QUITAR' : 'ALERTA'}
-        </button>
-        <button class="btn-editar-tarjeta ${observacion ? 'obs-note-btn obs-active' : 'obs-note-btn'}" type="button" data-censo-action="editar-observacion" data-fila="${escapeHtml(p.fila)}" onclick="event.stopPropagation(); editarObservacionPaciente(this.dataset.fila, event);" title="${escapeHtml(obsTitle)}">
-          <span class="material-symbols-outlined" style="${obsIconFill}">sticky_note_2</span> NOTA
-        </button>
         <button class="btn-editar-tarjeta" type="button" data-fila="${escapeHtml(p.fila)}" onclick="event.stopPropagation(); abrirModal(this.dataset.fila);">
           <span class="material-symbols-outlined">edit_square</span> EDITAR
         </button>
@@ -304,7 +368,20 @@ export function createRenderModule(app) {
       </div>`;
   }
 
-  function render(lista) {
+  function renderObservationRow(p, observacion, alertaActiva) {
+    if (!observacion) return '';
+    return `<tr class="patient-observation-row ${alertaActiva ? 'patient-alert-observation' : ''}" data-fila="${escapeHtml(p.fila)}">
+      <td colspan="8">
+        <div class="patient-observation-line" title="${escapeHtml(observacion)}">
+          <span class="material-symbols-outlined">sticky_note_2</span>
+          <span class="patient-observation-label">OBSERVACIÓN</span>
+          <span>${escapeHtml(observacion)}</span>
+        </div>
+      </td>
+    </tr>`;
+  }
+
+  function render(lista)  function render(lista) {
     ensureAlertStyles();
     const content = document.getElementById('content');
     const metaText = document.getElementById('meta-text');
@@ -374,14 +451,12 @@ export function createRenderModule(app) {
           const destinoChip = getColorfulChipHtml(p.destino);
           const alertaActiva = Boolean(p.alerta);
           const observacion = getObservacion(p);
-          const obsSuffix = observacion ? `<div class="patient-observation-pill" title="${escapeHtml(observacion)}"><span class="material-symbols-outlined" style="font-size:.85rem; color:var(--accent); vertical-align:-2px; margin-right:3px;">sticky_note_2</span>${escapeHtml(observacion)}</div>` : '';
-
           htmlArr.push(`<tr class="patient-row ${alertaActiva ? 'patient-alert' : ''}" data-fila="${escapeHtml(p.fila)}" data-alerta="${alertaActiva ? '1' : '0'}" onclick="toggleTableRow(this)">
               <td style="padding: 6px 10px; text-align: center;"><span style="color: var(--accent); font-weight: 700; font-size: 0.85rem;">${escapeHtml(p.cama || '-')}</span></td>
               <td style="padding: 6px 10px; font-size: 0.7rem; color: var(--muted); font-family: 'Fira Code', monospace; line-height: 1.3; text-align: center;">${p.fechaIngresoFormateada || '-'}</td>
 
               <td style="padding: 6px 10px; font-family: 'Space Mono', monospace; font-weight: 700; font-size: 0.9rem; line-height: 1.3;" class="patient-name editable-cell" data-campo="nombre" data-original="${escapeHtml(p.nombre)}" contenteditable="true" onfocus="iniciarEdicionSubtle(this)" onblur="finalizarEdicionSubtle(this)" onkeydown="manejarTeclasSubtle(this, event)" onclick="event.stopPropagation()">
-                <div class="truncate-text" title="${escapeHtml(p.nombre)}">${alertaActiva ? '<span class="material-symbols-outlined" style="font-size:.9rem; color:var(--accent); vertical-align:-2px; margin-right:3px; font-variation-settings: \'FILL\' 1, \'wght\' 700, \'GRAD\' 0, \'opsz\' 24;">star</span>' : ''}${escapeHtml(p.nombre)}</div>${obsSuffix}
+                <div class="truncate-text" title="${escapeHtml(p.nombre)}">${alertaActiva ? '<span class="material-symbols-outlined" style="font-size:.9rem; color:var(--accent); vertical-align:-2px; margin-right:3px; font-variation-settings: \'FILL\' 1, \'wght\' 700, \'GRAD\' 0, \'opsz\' 24;">star</span>' : ''}${escapeHtml(p.nombre)}</div>
               </td>
 
               <td style="padding: 6px 10px;" class="editable-cell" data-campo="edad" data-original="${escapeHtml(p.edad)}" contenteditable="true" onfocus="iniciarEdicionSubtle(this)" onblur="finalizarEdicionSubtle(this)" onkeydown="manejarTeclasSubtle(this, event)" onclick="event.stopPropagation()">
@@ -401,7 +476,7 @@ export function createRenderModule(app) {
               </td>
 
               ${renderTableActions(p, alertaActiva, observacion)}
-          </tr>`);
+          </tr>${renderObservationRow(p, observacion, alertaActiva)}`);
         });
       });
 
@@ -430,12 +505,6 @@ export function createRenderModule(app) {
             ${pacientes.map((p, indexPatient) => {
               const alertaActiva = Boolean(p.alerta);
               const observacion = getObservacion(p);
-              const starBtnClass = alertaActiva ? 'icon-btn alert-star-btn alert-active' : 'icon-btn alert-star-btn';
-              const noteBtnClass = observacion ? 'icon-btn obs-note-btn obs-active' : 'icon-btn obs-note-btn';
-              const starIconFill = getAlertIconFill(alertaActiva);
-              const noteIconFill = getAlertIconFill(Boolean(observacion));
-              const starTitle = alertaActiva ? 'Quitar alerta' : 'Marcar alerta';
-              const noteTitle = observacion ? `Observación: ${observacion}` : 'Agregar observación';
               const camaHtml = p.cama ? `<div class="patient-bed">${escapeHtml(p.cama)}</div>` : '';
 
               const emojiSolo = p.destino ? getEmojiOnly(p.destino) : '';
@@ -458,18 +527,15 @@ export function createRenderModule(app) {
                 <div class="card-content-wrapper">
                   <div class="card-header" onclick="toggleCard(this)">
                     <div class="patient-main">
-                      <div class="patient-name">${alertaActiva ? '<span class="material-symbols-outlined" style="font-size:1.05rem; color:var(--accent); margin-right:4px; vertical-align:-2px; font-variation-settings: \'FILL\' 1, \'wght\' 600, \'GRAD\' 0, \'opsz\' 24;">star</span>' : ''}${escapeHtml(p.nombre)}</div>
+                      <div class="patient-name">${escapeHtml(p.nombre)}</div>
                       ${camaHtml}
-                      ${observacion ? `<div class="patient-observation-pill" title="${escapeHtml(observacion)}"><span class="material-symbols-outlined" style="font-size:.85rem; color:var(--accent); vertical-align:-2px; margin-right:3px;">sticky_note_2</span>${escapeHtml(observacion)}</div>` : ''}
                     </div>
                     <div class="header-right">
                       ${destinoEmojiHtml}
-                      <button class="${starBtnClass}" type="button" data-censo-action="toggle-alerta" data-fila="${escapeHtml(p.fila)}" onclick="event.stopPropagation(); toggleAlertaPaciente(this.dataset.fila, event);" style="width:28px; height:28px;" title="${escapeHtml(starTitle)}" aria-label="${escapeHtml(starTitle)}"><span class="material-symbols-outlined" style="font-size:1rem; ${starIconFill}">star</span></button>
-                      <button class="${noteBtnClass}" type="button" data-censo-action="editar-observacion" data-fila="${escapeHtml(p.fila)}" onclick="event.stopPropagation(); editarObservacionPaciente(this.dataset.fila, event);" style="width:28px; height:28px;" title="${escapeHtml(noteTitle)}" aria-label="${escapeHtml(noteTitle)}"><span class="material-symbols-outlined" style="font-size:1rem; ${noteIconFill}">sticky_note_2</span></button>
                       <div class="caret"><span class="material-symbols-outlined">expand_more</span></div>
                     </div>
                   </div>
-                  <div class="details"><div class="details-content">${detailsHtml}${renderCardActions(p, alertaActiva, observacion)}</div></div>
+                  <div class="details"><div class="details-content">${detailsHtml}${renderCardActions(p)}</div></div>
                 </div>
               </div>`;
             }).join('')}
