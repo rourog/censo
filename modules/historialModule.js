@@ -27,15 +27,15 @@ import {
   signOut,
   setPersistence,
   browserLocalPersistence
-} from './firebaseModule.js?v=historial-admin-v2-20260522';
+} from './firebaseModule.js?v=historial-admin-v3-20260522';
 
 import {
   escapeHtml,
   normalizar,
   vibrar
-} from './utilsModule.js?v=historial-admin-v2-20260522';
+} from './utilsModule.js?v=historial-admin-v3-20260522';
 
-const BUILD = 'historial-admin-v2-20260522';
+const BUILD = 'historial-admin-v3-20260522';
 const AUTH_EMAIL_ADMIN = 'adscrito@hrd.censo';
 
 const BASE_THEMES = [
@@ -352,11 +352,11 @@ function cerrarSecureModal() {
 
 async function ejecutarPurga() {
   const input = $('deleteConfirmInput');
-  const confirmText = normalizar(input?.value || '');
+  const adminPassword = input?.value.trim() || '';
 
-  if (confirmText !== 'eliminar') {
+  if (!adminPassword) {
     vibrar([50, 50, 50]);
-    alert('Para confirmar la purga escribe ELIMINAR.');
+    alert('Ingresa la contraseña del usuario administrador.');
     return;
   }
 
@@ -369,6 +369,10 @@ async function ejecutarPurga() {
   }
 
   try {
+    // No se compara la contraseña en el frontend.
+    // Firebase Auth valida la contraseña real del usuario administrador.
+    await signInWithEmailAndPassword(auth, AUTH_EMAIL_ADMIN, adminPassword);
+
     await deleteDoc(doc(db, 'historial', state.targetDeleteId));
 
     const deletedId = state.targetDeleteId;
@@ -379,7 +383,8 @@ async function ejecutarPurga() {
     vibrar(25);
   } catch (error) {
     console.error('[HISTORIAL] Error al purgar registro:', error);
-    alert('Error al borrar el registro: ' + (error?.message || String(error)));
+    vibrar([80, 50, 80]);
+    alert('Contraseña de administrador incorrecta o error al borrar el registro.');
   } finally {
     if (btn) {
       btn.disabled = false;
