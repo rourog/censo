@@ -12,7 +12,7 @@
   - Calcular reglas de camas fuera de lo necesario para mostrar.
 */
 
-console.info('[CENSO] renderModule.js cargado. BUILD: alerta-observacion-v6-20260522');
+console.info('[CENSO] renderModule.js cargado. BUILD: alerta-observacion-v7-20260522');
 
 export function createRenderModule(app) {
   const { state } = app;
@@ -85,8 +85,8 @@ export function createRenderModule(app) {
       }
 
       @keyframes censoAlertReflection {
-        0% { background-position: -180% 0; }
-        100% { background-position: 180% 0; }
+        0% { background-position: 220% 0; }
+        100% { background-position: -220% 0; }
       }
 
 
@@ -265,20 +265,26 @@ export function createRenderModule(app) {
         border-color: rgba(255,255,255,0.35) !important;
       }
 
-      .patient-row.patient-alert td {
+      .patient-row.patient-alert {
         background-color: var(--accent) !important;
         background-image: linear-gradient(
           105deg,
           transparent 0%,
-          transparent 38%,
-          rgba(255,255,255,0.18) 46%,
-          rgba(255,255,255,0.52) 50%,
-          rgba(255,255,255,0.18) 54%,
-          transparent 62%,
+          transparent 42%,
+          rgba(255,255,255,0.16) 47%,
+          rgba(255,255,255,0.58) 50%,
+          rgba(255,255,255,0.16) 53%,
+          transparent 58%,
           transparent 100%
         ) !important;
-        background-size: 240% 100% !important;
-        animation: censoAlertReflection 3.2s ease-in-out infinite;
+        background-size: 260% 100% !important;
+        background-repeat: no-repeat !important;
+        animation: censoAlertReflection 2.9s linear infinite;
+        color: #fff !important;
+      }
+
+      .patient-row.patient-alert td {
+        background: transparent !important;
         color: #fff !important;
         border-bottom-color: rgba(255,255,255,0.18) !important;
         box-shadow: none !important;
@@ -312,6 +318,38 @@ export function createRenderModule(app) {
         background: rgba(255,255,255,0.28) !important;
       }
 
+      .editable-cell.is-editing,
+      .editable-cell[contenteditable="true"]:focus {
+        background: var(--panel) !important;
+        color: var(--text) !important;
+        -webkit-text-fill-color: var(--text) !important;
+        caret-color: var(--accent) !important;
+        outline: 2px solid var(--accent) !important;
+        outline-offset: -2px !important;
+        box-shadow: inset 0 0 0 1px var(--accent-border) !important;
+        text-shadow: none !important;
+      }
+
+      .editable-cell.is-editing *,
+      .editable-cell[contenteditable="true"]:focus * {
+        color: var(--text) !important;
+        -webkit-text-fill-color: var(--text) !important;
+        text-shadow: none !important;
+      }
+
+      .patient-row.patient-alert .editable-cell.is-editing,
+      .patient-row.patient-alert .editable-cell[contenteditable="true"]:focus {
+        background: var(--panel) !important;
+        color: var(--text) !important;
+        -webkit-text-fill-color: var(--text) !important;
+      }
+
+      .patient-row.patient-alert .editable-cell.is-editing *,
+      .patient-row.patient-alert .editable-cell[contenteditable="true"]:focus * {
+        color: var(--text) !important;
+        -webkit-text-fill-color: var(--text) !important;
+      }
+
       .patient-observation-row.patient-alert-observation td {
         background: var(--accent) !important;
         padding-top: 0 !important;
@@ -330,7 +368,7 @@ export function createRenderModule(app) {
           transparent 100%
         );
         background-size: 240% 100%;
-        animation: censoAlertReflection 3.2s ease-in-out infinite;
+        animation: censoAlertReflection 2.9s linear infinite;
         border-left-color: rgba(255,255,255,0.74);
         color: #fff;
         box-shadow: none;
