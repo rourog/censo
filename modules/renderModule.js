@@ -12,7 +12,7 @@
   - Calcular reglas de camas fuera de lo necesario para mostrar.
 */
 
-console.info('[CENSO] renderModule.js cargado. BUILD: destinos-iconos-v11-20260522');
+console.info('[CENSO] renderModule.js cargado. BUILD: compact-vertical-v12-20260522');
 
 export function createRenderModule(app) {
   const { state } = app;
@@ -82,6 +82,44 @@ export function createRenderModule(app) {
       #content .patient-list {
         padding-left: 0 !important;
         padding-right: 0 !important;
+      }
+
+
+      #content.view-table-mode {
+        padding-bottom: 32px !important;
+      }
+
+      #content.view-table-mode .censo-table {
+        min-width: 1080px !important;
+      }
+
+      .table-is-active .footer,
+      .footer {
+        padding: 3px 8px !important;
+        font-size: 0.62rem !important;
+        line-height: 1.05 !important;
+        min-height: 0 !important;
+      }
+
+      .footer span {
+        line-height: 1.05 !important;
+      }
+
+      .btn-add-table {
+        position: sticky !important;
+        bottom: 0 !important;
+        z-index: 45 !important;
+        margin: 4px auto 0 auto !important;
+        min-height: 32px !important;
+        padding: 6px 14px !important;
+        border-radius: 999px !important;
+        box-shadow: 0 -6px 18px rgba(0,0,0,0.18), 0 0 0 1px var(--accent-border) !important;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+      }
+
+      #mainFabBtn {
+        bottom: calc(8px + env(safe-area-inset-bottom, 0px)) !important;
       }
 
       @keyframes censoAlertReflection {
@@ -174,28 +212,29 @@ export function createRenderModule(app) {
       }
 
       .row-action-cell {
-        padding: 2px 5px !important;
+        padding: 2px 4px !important;
         text-align: center;
         vertical-align: middle;
         white-space: nowrap;
       }
 
       .row-action-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 26px);
-        grid-auto-rows: 26px;
-        gap: 4px;
+        display: inline-flex;
+        flex-direction: row;
+        gap: 3px;
         justify-content: center;
         align-items: center;
         width: max-content;
+        max-width: 100%;
         margin: 0 auto;
+        flex-wrap: nowrap;
       }
 
       .row-action-grid .btn-table {
-        width: 26px !important;
-        height: 26px !important;
-        min-width: 26px !important;
-        min-height: 26px !important;
+        width: 24px !important;
+        height: 24px !important;
+        min-width: 24px !important;
+        min-height: 24px !important;
         padding: 0 !important;
         margin: 0 !important;
         border-radius: var(--radius-sm) !important;
@@ -231,7 +270,7 @@ export function createRenderModule(app) {
       }
 
       .row-action-grid .material-symbols-outlined {
-        font-size: 1.12rem !important;
+        font-size: 1.04rem !important;
         line-height: 1 !important;
       }
 
@@ -591,12 +630,12 @@ export function createRenderModule(app) {
         <table class="censo-table"><thead><tr>
           <th style="width: 5%; text-align: center;">CAMA</th>
           <th style="width: 6%; text-align: center;">INGRESO</th>
-          <th style="width: 19%;">PACIENTE</th>
+          <th style="width: 18%;">PACIENTE</th>
           <th style="width: 3.5%;">EDAD</th>
-          <th style="width: 26%;">DIAGNÓSTICO</th>
-          <th style="width: 25%;">PENDIENTES</th>
+          <th style="width: 25%;">DIAGNÓSTICO</th>
+          <th style="width: 23.5%;">PENDIENTES</th>
           <th style="width: 9%; text-align: center;">DESTINO</th>
-          <th style="width: 6.5%; text-align: center;"><span class="material-symbols-outlined" style="font-size: 1.2rem;">settings</span></th>
+          <th style="width: 10%; text-align: center;"><span class="material-symbols-outlined" style="font-size: 1.2rem;">settings</span></th>
         </tr></thead><tbody>`);
 
       areas.forEach((area) => {

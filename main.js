@@ -1,19 +1,19 @@
 // main.js
 // Entrada mínima con diagnóstico de carga de módulos.
-// BUILD: destinos-iconos-v11-20260522
+// BUILD: compact-vertical-v12-20260522
 // Ruta ideal en GitHub:
 //   index.html
 //   style.css
 //   main.js
 //   modules/appModule.js
 
-console.info('[CENSO] main.js cargado. BUILD: destinos-iconos-v11-20260522');
-window.CensoBuild = { version: 'destinos-iconos-v11-20260522', stage: 'main-loaded' };
+console.info('[CENSO] main.js cargado. BUILD: compact-vertical-v12-20260522');
+window.CensoBuild = { version: 'compact-vertical-v12-20260522', stage: 'main-loaded' };
 
 async function loadBootModule() {
   const candidates = [
-    './modules/appModule.js?v=destinos-iconos-v11-20260522',
-    './censo_modular_grande/modules/appModule.js?v=destinos-iconos-v11-20260522'
+    './modules/appModule.js?v=compact-vertical-v12-20260522',
+    './censo_modular_grande/modules/appModule.js?v=compact-vertical-v12-20260522'
   ];
 
   let lastError = null;

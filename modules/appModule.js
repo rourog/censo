@@ -11,22 +11,22 @@
   - Hablar con Firestore directamente.
 */
 
-import * as firebase from './firebaseModule.js?v=destinos-iconos-v11-20260522';
-import * as bed from './bedModule.js?v=destinos-iconos-v11-20260522';
-import * as utils from './utilsModule.js?v=destinos-iconos-v11-20260522';
-import { state } from './stateModule.js?v=destinos-iconos-v11-20260522';
+import * as firebase from './firebaseModule.js?v=compact-vertical-v12-20260522';
+import * as bed from './bedModule.js?v=compact-vertical-v12-20260522';
+import * as utils from './utilsModule.js?v=compact-vertical-v12-20260522';
+import { state } from './stateModule.js?v=compact-vertical-v12-20260522';
 
-import { createEffectsModule } from './effectsModule.js?v=destinos-iconos-v11-20260522';
-import { createRenderModule } from './renderModule.js?v=destinos-iconos-v11-20260522';
-import { createPatientModule } from './patientModule.js?v=destinos-iconos-v11-20260522';
-import { createThemeModule } from './themeModule.js?v=destinos-iconos-v11-20260522';
-import { createModalModule } from './modalModule.js?v=destinos-iconos-v11-20260522';
-import { createInteractionModule } from './interactionModule.js?v=destinos-iconos-v11-20260522';
-import { createAuthModule } from './authModule.js?v=destinos-iconos-v11-20260522';
+import { createEffectsModule } from './effectsModule.js?v=compact-vertical-v12-20260522';
+import { createRenderModule } from './renderModule.js?v=compact-vertical-v12-20260522';
+import { createPatientModule } from './patientModule.js?v=compact-vertical-v12-20260522';
+import { createThemeModule } from './themeModule.js?v=compact-vertical-v12-20260522';
+import { createModalModule } from './modalModule.js?v=compact-vertical-v12-20260522';
+import { createInteractionModule } from './interactionModule.js?v=compact-vertical-v12-20260522';
+import { createAuthModule } from './authModule.js?v=compact-vertical-v12-20260522';
 
 export function bootApp() {
-  console.info('[CENSO] bootApp iniciado. BUILD: destinos-iconos-v11-20260522');
-  window.CensoBuild = { version: 'destinos-iconos-v11-20260522', stage: 'bootApp', appModule: true };
+  console.info('[CENSO] bootApp iniciado. BUILD: compact-vertical-v12-20260522');
+  window.CensoBuild = { version: 'compact-vertical-v12-20260522', stage: 'bootApp', appModule: true };
   const app = {
     state,
     firebase,
@@ -42,7 +42,7 @@ export function bootApp() {
   Object.assign(app, createInteractionModule(app));
   Object.assign(app, createAuthModule(app));
 
-  app.__build = 'destinos-iconos-v11-20260522';
+  app.__build = 'compact-vertical-v12-20260522';
   window.CensoApp = app;
   window.CensoBuild = { ...window.CensoBuild, stage: 'modules-ready', appReady: true };
 
