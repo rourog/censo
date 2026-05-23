@@ -12,7 +12,7 @@
   - Calcular reglas de camas fuera de lo necesario para mostrar.
 */
 
-console.info('[CENSO] renderModule.js cargado. BUILD: destinos-material-theme-v9-20260522');
+console.info('[CENSO] renderModule.js cargado. BUILD: destinos-material-theme-v10-20260522');
 
 export function createRenderModule(app) {
   const { state } = app;
@@ -182,9 +182,9 @@ export function createRenderModule(app) {
 
       .row-action-grid {
         display: grid;
-        grid-template-columns: repeat(2, 22px);
-        grid-auto-rows: 22px;
-        gap: 3px;
+        grid-template-columns: repeat(2, 26px);
+        grid-auto-rows: 26px;
+        gap: 4px;
         justify-content: center;
         align-items: center;
         width: max-content;
@@ -192,13 +192,13 @@ export function createRenderModule(app) {
       }
 
       .row-action-grid .btn-table {
-        width: 22px !important;
-        height: 22px !important;
-        min-width: 22px !important;
-        min-height: 22px !important;
+        width: 26px !important;
+        height: 26px !important;
+        min-width: 26px !important;
+        min-height: 26px !important;
         padding: 0 !important;
         margin: 0 !important;
-        border-radius: 6px !important;
+        border-radius: var(--radius-sm) !important;
         display: inline-flex !important;
         align-items: center !important;
         justify-content: center !important;
@@ -209,8 +209,9 @@ export function createRenderModule(app) {
       .row-action-grid .btn-table.edit,
       .row-action-grid .btn-table.delete {
         background: var(--toggle-bg, var(--field)) !important;
-        border-color: var(--accent-border) !important;
+        border: 1px solid var(--accent-border) !important;
         color: var(--text) !important;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.12);
       }
 
       .row-action-grid .btn-table:hover,
@@ -219,6 +220,7 @@ export function createRenderModule(app) {
         background: var(--accent-soft) !important;
         border-color: var(--accent) !important;
         color: var(--accent) !important;
+        transform: scale(1.06);
       }
 
       .row-action-grid .btn-table.alert-active,
@@ -229,7 +231,7 @@ export function createRenderModule(app) {
       }
 
       .row-action-grid .material-symbols-outlined {
-        font-size: 0.96rem !important;
+        font-size: 1.12rem !important;
         line-height: 1 !important;
       }
 

@@ -134,7 +134,7 @@ export function parseDestinoClinico(texto) {
 export function getDestinoMaterialIcon(texto) {
   const parsed = parseDestinoClinico(texto);
   if (!parsed) return '';
-  return parsed.tipo === 'ingreso' ? 'login' : 'clinical_notes';
+  return parsed.tipo === 'ingreso' ? 'login' : 'search';
 }
 
 export function getDestinoActionLabel(texto) {
