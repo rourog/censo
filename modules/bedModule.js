@@ -13,8 +13,8 @@
   - Abrir modales.
 */
 
-const ICONO_INGRESO = "⬆️";
-const ICONO_VALORACION = "🔎";
+const ICONO_INGRESO = "INGRESO";
+const ICONO_VALORACION = "VALORACIÓN";
 
 function destinoIngreso(emoji, especialidad) {
   return `${ICONO_INGRESO} ${emoji} ${especialidad}`;
@@ -114,17 +114,41 @@ export function limpiarNombreCama(camaStr) {
   return c;
 }
 
+export function parseDestinoClinico(texto) {
+  if (!texto) return null;
+  const raw = String(texto).trim();
+  const partes = raw.split(/\s+/).filter(Boolean);
+  if (partes.length < 2) return null;
+
+  const accionRaw = partes[0].normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase();
+  let tipo = null;
+  if (accionRaw === 'INGRESO' || partes[0] === '⬆️') tipo = 'ingreso';
+  if (accionRaw === 'VALORACION' || accionRaw === 'VALORACIÓN' || partes[0] === '🔎') tipo = 'valoracion';
+  if (!tipo) return null;
+
+  const emoji = partes[1] || '';
+  const especialidad = partes.slice(2).join(' ').trim();
+  return { tipo, emoji, especialidad, raw };
+}
+
+export function getDestinoMaterialIcon(texto) {
+  const parsed = parseDestinoClinico(texto);
+  if (!parsed) return '';
+  return parsed.tipo === 'ingreso' ? 'login' : 'clinical_notes';
+}
+
+export function getDestinoActionLabel(texto) {
+  const parsed = parseDestinoClinico(texto);
+  if (!parsed) return '';
+  return parsed.tipo === 'ingreso' ? 'Ingreso' : 'Valoración';
+}
+
 export function getEmojiOnly(texto) {
   if (!texto) return '';
+  const parsed = parseDestinoClinico(texto);
+  if (parsed) return parsed.emoji || '';
+
   const t = String(texto).trim();
-  const partes = t.split(/\s+/).filter(Boolean);
-
-  // Destinos nuevos: "⬆️ 🫁 Terapia Intensiva" / "🔎 🫁 Terapia Intensiva".
-  // En vista compacta mostramos acción + especialidad, no solo la flecha.
-  if ((partes[0] === '⬆️' || partes[0] === '🔎') && partes[1]) {
-    return `${partes[0]} ${partes[1]}`;
-  }
-
   const firstSpace = t.indexOf(' ');
   return firstSpace > -1 ? t.substring(0, firstSpace) : t.substring(0, 2);
 }

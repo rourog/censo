@@ -14,7 +14,7 @@
   - Guardar pacientes directamente.
 */
 
-console.info('[CENSO] interactionModule.js cargado. BUILD: destinos-terapia-observacion-v8-20260522');
+console.info('[CENSO] interactionModule.js cargado. BUILD: destinos-material-theme-v9-20260522');
 
 export function createInteractionModule(app) {
   const { state } = app;

@@ -12,34 +12,34 @@
   - Calcular reglas de camas fuera de lo necesario para mostrar.
 */
 
-console.info('[CENSO] renderModule.js cargado. BUILD: destinos-terapia-observacion-v8-20260522');
+console.info('[CENSO] renderModule.js cargado. BUILD: destinos-material-theme-v9-20260522');
 
 export function createRenderModule(app) {
   const { state } = app;
-  const { areaVisuals, chipPalette, getEmojiOnly, agruparPorArea } = app.bed;
+  const { areaVisuals, getEmojiOnly, agruparPorArea, parseDestinoClinico, getDestinoMaterialIcon, getDestinoActionLabel } = app.bed;
   const { escapeHtml } = app.utils;
 
-  function getChipColor(text) {
-    if (!text) return { bg: 'var(--chip-bg)', text: 'var(--chip-text)' };
-    let hash = 0;
-    for (let i = 0; i < text.length; i++) hash = text.charCodeAt(i) + ((hash << 5) - hash);
-    return chipPalette[Math.abs(hash) % chipPalette.length];
+  function renderDestinoHtml(destino, mode = 'chip') {
+    if (!destino) return '';
+    const parsed = parseDestinoClinico(destino);
+    const modeClass = mode === 'compact' ? 'destino-chip destino-chip-compact' : 'chip destino-chip';
+
+    if (parsed) {
+      const icon = getDestinoMaterialIcon(destino);
+      const label = getDestinoActionLabel(destino);
+      const especialidad = parsed.especialidad || '';
+      return `<div class="${modeClass}" title="${escapeHtml(label)} · ${escapeHtml(especialidad)}">
+        <span class="material-symbols-outlined destino-action-icon" aria-hidden="true">${escapeHtml(icon)}</span>
+        <span class="destino-specialty-emoji" aria-hidden="true">${escapeHtml(parsed.emoji)}</span>
+        ${mode === 'compact' ? '' : `<span class="destino-specialty-text">${escapeHtml(especialidad)}</span>`}
+      </div>`;
+    }
+
+    return `<div class="${modeClass}">${escapeHtml(destino)}</div>`;
   }
 
   function getColorfulChipHtml(destino) {
-    if (!destino) return '';
-    const isColorful = document.body.className.includes('base-light') ||
-                       document.body.className.includes('base-pure-white') ||
-                       document.body.className.includes('base-gray-light') ||
-                       document.body.className.includes('base-sand') ||
-                       document.body.className.includes('base-rose') ||
-                       document.body.className.includes('base-mint') ||
-                       document.body.className.includes('base-lavender');
-    if (isColorful) {
-      const colors = getChipColor(destino);
-      return `<div class="chip" style="background-color: ${colors.bg}; color: ${colors.text}; border-color: rgba(0,0,0,0.1); font-weight: 700;">${escapeHtml(destino)}</div>`;
-    }
-    return `<div class="chip">${escapeHtml(destino)}</div>`;
+    return renderDestinoHtml(destino, 'chip');
   }
 
   function crearCampo(label, value, extraClass = '') {
@@ -95,6 +95,54 @@ export function createRenderModule(app) {
         18% { opacity: 0.75; }
         45% { opacity: 0.18; }
         100% { transform: translateX(140%) skewX(-18deg); opacity: 0; }
+      }
+
+      .destino-chip {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 5px !important;
+        max-width: 100% !important;
+        min-height: 24px !important;
+        padding: 4px 8px !important;
+        border-radius: 999px !important;
+        border: 1px solid var(--accent-border) !important;
+        background: var(--chip-bg, var(--accent-soft)) !important;
+        color: var(--chip-text, var(--text)) !important;
+        font-weight: 700 !important;
+        line-height: 1.1 !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+      }
+
+      .destino-chip .destino-action-icon {
+        font-size: 1rem !important;
+        line-height: 1 !important;
+        color: var(--accent) !important;
+        font-variation-settings: 'FILL' 0, 'wght' 650, 'GRAD' 0, 'opsz' 24;
+        flex-shrink: 0;
+      }
+
+      .destino-chip .destino-specialty-emoji {
+        flex-shrink: 0;
+      }
+
+      .destino-chip .destino-specialty-text {
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .destino-chip-compact {
+        width: 42px !important;
+        height: 28px !important;
+        padding: 3px 5px !important;
+        gap: 3px !important;
+        border-radius: 999px !important;
+      }
+
+      .destino-chip-compact .destino-action-icon {
+        font-size: 0.96rem !important;
       }
 
       .alert-star-btn,
@@ -157,6 +205,29 @@ export function createRenderModule(app) {
         line-height: 1 !important;
       }
 
+      .row-action-grid .btn-table,
+      .row-action-grid .btn-table.edit,
+      .row-action-grid .btn-table.delete {
+        background: var(--toggle-bg, var(--field)) !important;
+        border-color: var(--accent-border) !important;
+        color: var(--text) !important;
+      }
+
+      .row-action-grid .btn-table:hover,
+      .row-action-grid .btn-table.edit:hover,
+      .row-action-grid .btn-table.delete:hover {
+        background: var(--accent-soft) !important;
+        border-color: var(--accent) !important;
+        color: var(--accent) !important;
+      }
+
+      .row-action-grid .btn-table.alert-active,
+      .row-action-grid .btn-table.obs-active {
+        background: var(--accent) !important;
+        border-color: var(--accent) !important;
+        color: #fff !important;
+      }
+
       .row-action-grid .material-symbols-outlined {
         font-size: 0.96rem !important;
         line-height: 1 !important;
@@ -170,6 +241,9 @@ export function createRenderModule(app) {
       }
 
       .card-action-grid .btn-editar-tarjeta {
+        background: var(--toggle-bg, var(--field)) !important;
+        border-color: var(--accent-border) !important;
+        color: var(--text) !important;
         margin: 0 !important;
         min-height: 34px;
         padding: 7px 8px !important;
@@ -179,6 +253,13 @@ export function createRenderModule(app) {
         gap: 4px;
         font-size: 0.72rem;
         line-height: 1.1;
+      }
+
+      .card-action-grid .btn-editar-tarjeta:hover,
+      .card-action-grid .btn-editar-tarjeta.delete:hover {
+        background: var(--accent-soft) !important;
+        border-color: var(--accent) !important;
+        color: var(--accent) !important;
       }
 
       .card-action-grid .material-symbols-outlined {
@@ -582,8 +663,7 @@ export function createRenderModule(app) {
               const observacion = getObservacion(p);
               const camaHtml = p.cama ? `<div class="patient-bed">${escapeHtml(p.cama)}</div>` : '';
 
-              const emojiSolo = p.destino ? getEmojiOnly(p.destino) : '';
-              const destinoEmojiHtml = emojiSolo ? `<div class="chip-emoji" title="${escapeHtml(p.destino)}">${emojiSolo}</div>` : '';
+              const destinoEmojiHtml = p.destino ? renderDestinoHtml(p.destino, 'compact') : '';
 
               const fechaLimpia = p.fechaIngresoFormateada ? p.fechaIngresoFormateada.replace(/<[^>]*>?/gm, ' ') : '-';
               const detailsHtml = [

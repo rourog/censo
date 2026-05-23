@@ -1,19 +1,19 @@
 // main.js
 // Entrada mínima con diagnóstico de carga de módulos.
-// BUILD: destinos-terapia-observacion-v8-20260522
+// BUILD: destinos-material-theme-v9-20260522
 // Ruta ideal en GitHub:
 //   index.html
 //   style.css
 //   main.js
 //   modules/appModule.js
 
-console.info('[CENSO] main.js cargado. BUILD: destinos-terapia-observacion-v8-20260522');
-window.CensoBuild = { version: 'destinos-terapia-observacion-v8-20260522', stage: 'main-loaded' };
+console.info('[CENSO] main.js cargado. BUILD: destinos-material-theme-v9-20260522');
+window.CensoBuild = { version: 'destinos-material-theme-v9-20260522', stage: 'main-loaded' };
 
 async function loadBootModule() {
   const candidates = [
-    './modules/appModule.js?v=destinos-terapia-observacion-v8-20260522',
-    './censo_modular_grande/modules/appModule.js?v=destinos-terapia-observacion-v8-20260522'
+    './modules/appModule.js?v=destinos-material-theme-v9-20260522',
+    './censo_modular_grande/modules/appModule.js?v=destinos-material-theme-v9-20260522'
   ];
 
   let lastError = null;

@@ -13,13 +13,76 @@
   - Definir camas maestras.
 */
 
-console.info('[CENSO] modalModule.js cargado. BUILD: destinos-terapia-observacion-v8-20260522');
+console.info('[CENSO] modalModule.js cargado. BUILD: destinos-material-theme-v9-20260522');
 
 export function createModalModule(app) {
   const { state } = app;
   const { db, collection, addDoc, doc, updateDoc, deleteDoc, setDoc, serverTimestamp } = app.firebase;
-  const { destinosGlobal, agruparPorArea } = app.bed;
+  const { destinosGlobal, agruparPorArea, parseDestinoClinico, getDestinoMaterialIcon, getDestinoActionLabel } = app.bed;
   const { escapeHtml, normalizar, vibrar } = app.utils;
+
+
+  function renderDestinoLabelHtml(destino) {
+    if (!destino) return '(SIN DESTINO)';
+    const parsed = parseDestinoClinico(destino);
+    if (!parsed) return escapeHtml(destino);
+
+    const icon = getDestinoMaterialIcon(destino);
+    const label = getDestinoActionLabel(destino);
+    const especialidad = parsed.especialidad || '';
+    return `<span class="destino-option-label" title="${escapeHtml(label)} · ${escapeHtml(especialidad)}">
+      <span class="material-symbols-outlined destino-action-icon" aria-hidden="true">${escapeHtml(icon)}</span>
+      <span class="destino-specialty-emoji" aria-hidden="true">${escapeHtml(parsed.emoji)}</span>
+      <span class="destino-specialty-text">${escapeHtml(especialidad)}</span>
+    </span>`;
+  }
+
+  function renderDestinoOptionHtml(destino, selectedClass = '') {
+    const value = String(destino || '').toUpperCase().trim();
+    const search = value;
+    return `<div class="custom-select-option ${selectedClass}" data-value="${escapeHtml(value)}" data-search="${escapeHtml(search)}">${renderDestinoLabelHtml(value)}</div>`;
+  }
+
+  function setDestinoDisplay(display, destino) {
+    const value = String(destino || '').toUpperCase().trim();
+    display.dataset.value = value;
+    display.innerHTML = value ? renderDestinoLabelHtml(value) : '(SIN DESTINO)';
+  }
+
+  function ensureDestinoOptionStyles() {
+    if (document.getElementById('censo-destino-option-styles')) return;
+    const style = document.createElement('style');
+    style.id = 'censo-destino-option-styles';
+    style.textContent = `
+      .custom-select-display .destino-option-label,
+      .custom-select-option .destino-option-label,
+      .inline-destino-option .destino-option-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        max-width: 100%;
+        min-width: 0;
+      }
+
+      .custom-select-display .destino-action-icon,
+      .custom-select-option .destino-action-icon,
+      .inline-destino-option .destino-action-icon {
+        font-size: 1rem;
+        line-height: 1;
+        color: var(--accent);
+        font-variation-settings: 'FILL' 0, 'wght' 650, 'GRAD' 0, 'opsz' 24;
+        flex-shrink: 0;
+      }
+
+      .custom-select-display .destino-specialty-text,
+      .custom-select-option .destino-specialty-text,
+      .inline-destino-option .destino-specialty-text {
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    `;
+    document.head.appendChild(style);
+  }
 
   const closeAllPopovers = (e) => {
     if (e && e.type === 'scroll' && e.target.closest && e.target.closest('.custom-select-popover')) return;
@@ -80,6 +143,7 @@ export function createModalModule(app) {
   // SELECTOR PERSONALIZADO TIPO COMBOBOX (MODALES)
   // ==========================================================
   function initCustomSelect(wrapperId, optionsHtml) {
+    ensureDestinoOptionStyles();
     const wrapper = document.getElementById(wrapperId);
     if(!wrapper) return;
     const display = wrapper.querySelector('.custom-select-display');
@@ -132,7 +196,7 @@ export function createModalModule(app) {
       const q = normalizar(e.target.value);
       Array.from(list.children).forEach(opt => {
         if (opt.classList.contains('custom-select-optgroup')) return;
-        const text = normalizar(opt.innerText);
+        const text = normalizar(opt.dataset.search || opt.innerText);
         opt.style.display = text.includes(q) ? 'block' : 'none';
       });
     };
@@ -140,7 +204,7 @@ export function createModalModule(app) {
     list.onclick = (e) => {
       const opt = e.target.closest('.custom-select-option');
       if(opt) { 
-        display.innerText = opt.innerText; 
+        display.innerHTML = opt.innerHTML; 
         display.dataset.value = opt.getAttribute('data-value'); 
         popover.classList.remove('active'); 
         wrapper.appendChild(popover); 
@@ -229,6 +293,7 @@ export function createModalModule(app) {
   // DESTINO SUPERPUESTO MINIMALISTA EN EL BODY (EN LÍNEA)
   // ==========================================================
   function abrirDestinoFlotante(tdEl, filaId, destinoActual, event) {
+    ensureDestinoOptionStyles();
     event.stopPropagation();
     const tr = tdEl.closest('tr');
     if (!tr.classList.contains('expanded-row')) { toggleTableRow(tr); return; }
@@ -244,12 +309,12 @@ export function createModalModule(app) {
         <input type="text" class="inline-search-input input-control" placeholder="Buscar destino..." autocomplete="off" style="width: 100%; padding: 6px 10px; font-size: 0.8rem; margin: 0; outline: none;">
       </div>
       <div class="inline-options-wrapper">
-        <div class="inline-destino-option ${!destinoActual ? 'selected' : ''}" data-value="">(SIN DESTINO)</div>
+        <div class="inline-destino-option ${!destinoActual ? 'selected' : ''}" data-value="" data-search="">(SIN DESTINO)</div>
     `;
     destinosGlobal.forEach(d => {
-      const dStr = d.toUpperCase().trim();
+      const dStr = String(d).toUpperCase().trim();
       const sel = dStr === destinoActual.toUpperCase().trim() ? 'selected' : '';
-      opcionesHtml += `<div class="inline-destino-option ${sel}" data-value="${escapeHtml(dStr)}">${escapeHtml(dStr)}</div>`;
+      opcionesHtml += `<div class="inline-destino-option ${sel}" data-value="${escapeHtml(dStr)}" data-search="${escapeHtml(dStr)}">${renderDestinoLabelHtml(dStr)}</div>`;
     });
     opcionesHtml += `</div>`;
   
@@ -278,7 +343,7 @@ export function createModalModule(app) {
     inputBuscador.addEventListener('input', (e) => {
         const q = normalizar(e.target.value);
         wrapperOptions.querySelectorAll('.inline-destino-option').forEach(opt => {
-            const text = normalizar(opt.innerText);
+            const text = normalizar(opt.dataset.search || opt.innerText);
             opt.style.display = text.includes(q) ? 'block' : 'none';
         });
     });
@@ -432,12 +497,11 @@ export function createModalModule(app) {
     document.getElementById('modalPendientes').value = (paciente.pendientes || '').toUpperCase();
 
     const pDestinoStr = String(paciente.destino || '').toUpperCase().trim();
-    let htmlDestino = `<div class="custom-select-option" data-value="">(SIN DESTINO)</div>`;
-    destinosGlobal.forEach(d => { htmlDestino += `<div class="custom-select-option" data-value="${escapeHtml(d.toUpperCase())}">${escapeHtml(d.toUpperCase())}</div>`; });
+    let htmlDestino = `<div class="custom-select-option" data-value="" data-search="">(SIN DESTINO)</div>`;
+    destinosGlobal.forEach(d => { htmlDestino += renderDestinoOptionHtml(d); });
     initCustomSelect('editDestinoWrapper', htmlDestino);
     const destinoDisplay = document.querySelector('#editDestinoWrapper .custom-select-display');
-    destinoDisplay.innerText = pDestinoStr || '(SIN DESTINO)';
-    destinoDisplay.dataset.value = pDestinoStr;
+    setDestinoDisplay(destinoDisplay, pDestinoStr);
 
     let htmlMover = `<div class="custom-select-option" data-value="">NO MOVER (MANTENER EN CAMA ACTUAL)</div>`;
     const gruposLibres = agruparPorArea(state.camasLibresGlobal);
@@ -572,12 +636,11 @@ export function createModalModule(app) {
     camaDisplay.innerText = 'SELECCIONA UNA CAMA LIBRE...';
     camaDisplay.dataset.value = '';
 
-    let htmlDestino = `<div class="custom-select-option" data-value="">(SIN DESTINO)</div>`;
-    destinosGlobal.forEach(d => { htmlDestino += `<div class="custom-select-option" data-value="${escapeHtml(d.toUpperCase())}">${escapeHtml(d.toUpperCase())}</div>`; });
+    let htmlDestino = `<div class="custom-select-option" data-value="" data-search="">(SIN DESTINO)</div>`;
+    destinosGlobal.forEach(d => { htmlDestino += renderDestinoOptionHtml(d); });
     initCustomSelect('addDestinoWrapper', htmlDestino);
     const destinoDisplay = document.querySelector('#addDestinoWrapper .custom-select-display');
-    destinoDisplay.innerText = '(SIN DESTINO)';
-    destinoDisplay.dataset.value = '';
+    setDestinoDisplay(destinoDisplay, '');
 
     document.getElementById('addNombre').value = ''; 
     document.getElementById('addEdad').value = ''; 
