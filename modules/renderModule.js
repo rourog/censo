@@ -12,7 +12,7 @@
   - Calcular reglas de camas fuera de lo necesario para mostrar.
 */
 
-console.info('[CENSO] renderModule.js cargado. BUILD: alerta-observacion-v7-20260522');
+console.info('[CENSO] renderModule.js cargado. BUILD: destinos-terapia-observacion-v8-20260522');
 
 export function createRenderModule(app) {
   const { state } = app;
@@ -591,7 +591,7 @@ export function createRenderModule(app) {
                 crearCampo('EDAD', p.edad),
                 crearCampo('DIAGNÓSTICO', p.diagnostico),
                 crearCampo('PENDIENTES', p.pendientes),
-                crearCampo('OBSERVACIÓN / ALERTA', observacion, 'patient-observation-field'),
+                crearCampo('OBSERVACIÓN', observacion, 'patient-observation-field'),
                 crearCampo('DESTINO', p.destino)
               ].filter(Boolean).join('');
 

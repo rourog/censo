@@ -13,7 +13,7 @@
   - Definir camas maestras.
 */
 
-console.info('[CENSO] modalModule.js cargado. BUILD: alerta-observacion-v4-20260522');
+console.info('[CENSO] modalModule.js cargado. BUILD: destinos-terapia-observacion-v8-20260522');
 
 export function createModalModule(app) {
   const { state } = app;
@@ -375,7 +375,6 @@ export function createModalModule(app) {
     try {
       await updateDoc(doc(db, "pacientes", fila), { alerta: alertaNueva });
     } catch (error) {
-      paciente.alerta = alertaAnterior;
       refrescarDespuesDeAlerta();
       vibrar([80, 40, 80]);
       alert('ERROR AL CAMBIAR ALERTA: ' + error.message);
@@ -396,31 +395,23 @@ export function createModalModule(app) {
     }
 
     const observacionAnterior = String(paciente.observacionAlerta || paciente.observacion || '').trim();
-    const alertaAnterior = Boolean(paciente.alerta);
-
     const textoIngresado = window.prompt(
-      'OBSERVACIÓN / ALERTA DEL PACIENTE\n\nDeja el campo vacío para borrar la observación.',
+      'OBSERVACIÓN DEL PACIENTE\n\nDeja el campo vacío para borrar la observación.',
       observacionAnterior
     );
 
     if (textoIngresado === null) return;
 
     const observacionNueva = String(textoIngresado).trim().toUpperCase();
-    const activaAlerta = observacionNueva.length > 0 ? true : alertaAnterior;
-
     // Actualización optimista.
     paciente.observacionAlerta = observacionNueva;
-    if (observacionNueva.length > 0) paciente.alerta = true;
     refrescarDespuesDeAlerta();
     vibrar(observacionNueva.length > 0 ? [20, 30, 20] : 15);
 
     try {
-      const updateData = { observacionAlerta: observacionNueva };
-      if (observacionNueva.length > 0) updateData.alerta = true;
-      await updateDoc(doc(db, "pacientes", fila), updateData);
+      await updateDoc(doc(db, "pacientes", fila), { observacionAlerta: observacionNueva });
     } catch (error) {
       paciente.observacionAlerta = observacionAnterior;
-      paciente.alerta = alertaAnterior;
       refrescarDespuesDeAlerta();
       vibrar([80, 40, 80]);
       alert('ERROR AL GUARDAR OBSERVACIÓN: ' + error.message);

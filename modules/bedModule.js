@@ -13,20 +13,61 @@
   - Abrir modales.
 */
 
+const ICONO_INGRESO = "⬆️";
+const ICONO_VALORACION = "🔎";
+
+function destinoIngreso(emoji, especialidad) {
+  return `${ICONO_INGRESO} ${emoji} ${especialidad}`;
+}
+
+function destinoValoracion(emoji, especialidad) {
+  return `${ICONO_VALORACION} ${emoji} ${especialidad}`;
+}
+
 export const destinosGlobal = [
-  "🟡 Observación", "🟢 Alta a domicilio", "⭕ Alta Voluntaria", "⚫ Defunción",
-  "🏥 Ingreso a Medicina Interna", "🩺 Interconsulta a Medicina Interna",
-  "🔪 Ingreso a Cirugía General", "🧵 Interconsulta a Cirugía General",
-  "✂️ Ingreso a Cirugía Plástica", "💄 Interconsulta a Cirugía Plástica",
-  "🤰 Ingreso a Ginecología", "🌸 Interconsulta a Ginecología",
-  "❤️ Ingreso a Cardiología", "💓 Interconsulta a Cardiología",
-  "👶 Ingreso a Pediatría", "🧸 Interconsulta a Pediatría",
-  "🦴 Ingreso a Traumatología y Ortopedia", "📋 Interconsulta a Traumatología y Ortopedia",
-  "🧠 Ingreso a Psiquiatría", "💭 Interconsulta a Psiquiatría",
-  "🗣️ Interconsulta a Psicología", "🤱 Ingreso a Tococirugía",
-  "💧 Interconsulta a Urologia", "🧪 Ingreso a Urologia",
-  "👓 Interconsulta a Oftalmologia", "👁️ Ingreso a Oftalmologia",
-  "🍎 Ingreso a Gastroenterologia"
+  "🟡 Observación",
+  "🟢 Alta a domicilio",
+  "⭕ Alta Voluntaria",
+  "⚫ Defunción",
+
+  destinoIngreso("🏥", "Medicina Interna"),
+  destinoValoracion("🏥", "Medicina Interna"),
+
+  destinoIngreso("🔪", "Cirugía General"),
+  destinoValoracion("🔪", "Cirugía General"),
+
+  destinoIngreso("✂️", "Cirugía Plástica"),
+  destinoValoracion("✂️", "Cirugía Plástica"),
+
+  destinoIngreso("🤰", "Ginecología"),
+  destinoValoracion("🤰", "Ginecología"),
+
+  destinoIngreso("❤️", "Cardiología"),
+  destinoValoracion("❤️", "Cardiología"),
+
+  destinoIngreso("🫁", "Terapia Intensiva"),
+  destinoValoracion("🫁", "Terapia Intensiva"),
+
+  destinoIngreso("👶", "Pediatría"),
+  destinoValoracion("👶", "Pediatría"),
+
+  destinoIngreso("🦴", "Traumatología y Ortopedia"),
+  destinoValoracion("🦴", "Traumatología y Ortopedia"),
+
+  destinoIngreso("🧠", "Psiquiatría"),
+  destinoValoracion("🧠", "Psiquiatría"),
+
+  destinoValoracion("🗣️", "Psicología"),
+  destinoIngreso("🤱", "Tococirugía"),
+
+  destinoIngreso("💧", "Urología"),
+  destinoValoracion("💧", "Urología"),
+
+  destinoIngreso("👁️", "Oftalmología"),
+  destinoValoracion("👁️", "Oftalmología"),
+
+  destinoIngreso("🍎", "Gastroenterología"),
+  destinoValoracion("🍎", "Gastroenterología")
 ];
 
 export const masterCamas = [
@@ -76,6 +117,14 @@ export function limpiarNombreCama(camaStr) {
 export function getEmojiOnly(texto) {
   if (!texto) return '';
   const t = String(texto).trim();
+  const partes = t.split(/\s+/).filter(Boolean);
+
+  // Destinos nuevos: "⬆️ 🫁 Terapia Intensiva" / "🔎 🫁 Terapia Intensiva".
+  // En vista compacta mostramos acción + especialidad, no solo la flecha.
+  if ((partes[0] === '⬆️' || partes[0] === '🔎') && partes[1]) {
+    return `${partes[0]} ${partes[1]}`;
+  }
+
   const firstSpace = t.indexOf(' ');
   return firstSpace > -1 ? t.substring(0, firstSpace) : t.substring(0, 2);
 }
