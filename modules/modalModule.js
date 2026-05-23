@@ -13,7 +13,7 @@
   - Definir camas maestras.
 */
 
-console.info('[CENSO] modalModule.js cargado. BUILD: destinos-material-theme-v10-20260522');
+console.info('[CENSO] modalModule.js cargado. BUILD: destinos-iconos-v11-20260522');
 
 export function createModalModule(app) {
   const { state } = app;

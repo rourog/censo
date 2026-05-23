@@ -16,6 +16,57 @@
 const ICONO_INGRESO = "INGRESO";
 const ICONO_VALORACION = "VALORACIÓN";
 
+export const destinoIconos = {
+  observacion: "👀",
+  altaDomicilio: "🏠",
+  altaVoluntaria: "✍️",
+  defuncion: "✝️",
+  medicinaInterna: "🩺",
+  cirugiaGeneral: "🔪",
+  cirugiaPlastica: "✂️",
+  ginecologia: "🤰",
+  cardiologia: "❤️",
+  pediatria: "👶",
+  traumatologia: "🦴",
+  psiquiatria: "🧠",
+  psicologia: "💬",
+  tococirugia: "🤰",
+  urologia: "💧",
+  oftalmologia: "👁️",
+  gastroenterologia: "🍎",
+  terapiaIntensiva: "🚨"
+};
+
+function normalizarEspecialidad(texto) {
+  return String(texto || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toUpperCase()
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function getIconoEspecialidad(especialidad) {
+  const key = normalizarEspecialidad(especialidad);
+
+  if (key.includes('MEDICINA INTERNA')) return destinoIconos.medicinaInterna;
+  if (key.includes('CIRUGIA PLASTICA')) return destinoIconos.cirugiaPlastica;
+  if (key.includes('CIRUGIA GENERAL')) return destinoIconos.cirugiaGeneral;
+  if (key.includes('GINECOLOGIA')) return destinoIconos.ginecologia;
+  if (key.includes('CARDIOLOGIA')) return destinoIconos.cardiologia;
+  if (key.includes('PEDIATRIA')) return destinoIconos.pediatria;
+  if (key.includes('TRAUMATOLOGIA')) return destinoIconos.traumatologia;
+  if (key.includes('PSIQUIATRIA')) return destinoIconos.psiquiatria;
+  if (key.includes('PSICOLOGIA')) return destinoIconos.psicologia;
+  if (key.includes('TOCOCIRUGIA')) return destinoIconos.tococirugia;
+  if (key.includes('UROLOGIA')) return destinoIconos.urologia;
+  if (key.includes('OFTALMOLOGIA')) return destinoIconos.oftalmologia;
+  if (key.includes('GASTROENTEROLOGIA')) return destinoIconos.gastroenterologia;
+  if (key.includes('TERAPIA INTENSIVA')) return destinoIconos.terapiaIntensiva;
+
+  return '';
+}
+
 function destinoIngreso(emoji, especialidad) {
   return `${ICONO_INGRESO} ${emoji} ${especialidad}`;
 }
@@ -25,49 +76,49 @@ function destinoValoracion(emoji, especialidad) {
 }
 
 export const destinosGlobal = [
-  "🟡 Observación",
-  "🟢 Alta a domicilio",
-  "⭕ Alta Voluntaria",
-  "⚫ Defunción",
+  `${destinoIconos.observacion} Observación`,
+  `${destinoIconos.altaDomicilio} Alta a domicilio`,
+  `${destinoIconos.altaVoluntaria} Alta voluntaria`,
+  `${destinoIconos.defuncion} Defunción`,
 
-  destinoIngreso("🏥", "Medicina Interna"),
-  destinoValoracion("🏥", "Medicina Interna"),
+  destinoIngreso(destinoIconos.medicinaInterna, "Medicina Interna"),
+  destinoValoracion(destinoIconos.medicinaInterna, "Medicina Interna"),
 
-  destinoIngreso("🔪", "Cirugía General"),
-  destinoValoracion("🔪", "Cirugía General"),
+  destinoIngreso(destinoIconos.cirugiaGeneral, "Cirugía General"),
+  destinoValoracion(destinoIconos.cirugiaGeneral, "Cirugía General"),
 
-  destinoIngreso("✂️", "Cirugía Plástica"),
-  destinoValoracion("✂️", "Cirugía Plástica"),
+  destinoIngreso(destinoIconos.cirugiaPlastica, "Cirugía Plástica"),
+  destinoValoracion(destinoIconos.cirugiaPlastica, "Cirugía Plástica"),
 
-  destinoIngreso("🤰", "Ginecología"),
-  destinoValoracion("🤰", "Ginecología"),
+  destinoIngreso(destinoIconos.ginecologia, "Ginecología"),
+  destinoValoracion(destinoIconos.ginecologia, "Ginecología"),
 
-  destinoIngreso("❤️", "Cardiología"),
-  destinoValoracion("❤️", "Cardiología"),
+  destinoIngreso(destinoIconos.cardiologia, "Cardiología"),
+  destinoValoracion(destinoIconos.cardiologia, "Cardiología"),
 
-  destinoIngreso("🫁", "Terapia Intensiva"),
-  destinoValoracion("🫁", "Terapia Intensiva"),
+  destinoIngreso(destinoIconos.pediatria, "Pediatría"),
+  destinoValoracion(destinoIconos.pediatria, "Pediatría"),
 
-  destinoIngreso("👶", "Pediatría"),
-  destinoValoracion("👶", "Pediatría"),
+  destinoIngreso(destinoIconos.traumatologia, "Traumatología y Ortopedia"),
+  destinoValoracion(destinoIconos.traumatologia, "Traumatología y Ortopedia"),
 
-  destinoIngreso("🦴", "Traumatología y Ortopedia"),
-  destinoValoracion("🦴", "Traumatología y Ortopedia"),
+  destinoIngreso(destinoIconos.psiquiatria, "Psiquiatría"),
+  destinoValoracion(destinoIconos.psiquiatria, "Psiquiatría"),
 
-  destinoIngreso("🧠", "Psiquiatría"),
-  destinoValoracion("🧠", "Psiquiatría"),
+  destinoValoracion(destinoIconos.psicologia, "Psicología"),
+  destinoIngreso(destinoIconos.tococirugia, "Tococirugía"),
 
-  destinoValoracion("🗣️", "Psicología"),
-  destinoIngreso("🤱", "Tococirugía"),
+  destinoIngreso(destinoIconos.urologia, "Urología"),
+  destinoValoracion(destinoIconos.urologia, "Urología"),
 
-  destinoIngreso("💧", "Urología"),
-  destinoValoracion("💧", "Urología"),
+  destinoIngreso(destinoIconos.oftalmologia, "Oftalmología"),
+  destinoValoracion(destinoIconos.oftalmologia, "Oftalmología"),
 
-  destinoIngreso("👁️", "Oftalmología"),
-  destinoValoracion("👁️", "Oftalmología"),
+  destinoIngreso(destinoIconos.gastroenterologia, "Gastroenterología"),
+  destinoValoracion(destinoIconos.gastroenterologia, "Gastroenterología"),
 
-  destinoIngreso("🍎", "Gastroenterología"),
-  destinoValoracion("🍎", "Gastroenterología")
+  destinoIngreso(destinoIconos.terapiaIntensiva, "Terapia Intensiva"),
+  destinoValoracion(destinoIconos.terapiaIntensiva, "Terapia Intensiva")
 ];
 
 export const masterCamas = [
@@ -126,9 +177,11 @@ export function parseDestinoClinico(texto) {
   if (accionRaw === 'VALORACION' || accionRaw === 'VALORACIÓN' || partes[0] === '🔎') tipo = 'valoracion';
   if (!tipo) return null;
 
-  const emoji = partes[1] || '';
+  const emojiOriginal = partes[1] || '';
   const especialidad = partes.slice(2).join(' ').trim();
-  return { tipo, emoji, especialidad, raw };
+  const emojiActual = getIconoEspecialidad(especialidad) || emojiOriginal;
+
+  return { tipo, emoji: emojiActual, especialidad, raw, emojiOriginal };
 }
 
 export function getDestinoMaterialIcon(texto) {

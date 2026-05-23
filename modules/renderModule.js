@@ -12,7 +12,7 @@
   - Calcular reglas de camas fuera de lo necesario para mostrar.
 */
 
-console.info('[CENSO] renderModule.js cargado. BUILD: destinos-material-theme-v10-20260522');
+console.info('[CENSO] renderModule.js cargado. BUILD: destinos-iconos-v11-20260522');
 
 export function createRenderModule(app) {
   const { state } = app;
