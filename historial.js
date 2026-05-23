@@ -1,14 +1,14 @@
 // historial.js
 // Entrada modular del archivo histórico.
-// BUILD: historial-admin-v2-20260522
+// BUILD: historial-admin-v3-20260522
 
-console.info('[HISTORIAL] historial.js cargado. BUILD: historial-admin-v2-20260522');
-window.HistorialBuild = { version: 'historial-admin-v2-20260522', stage: 'entry-loaded' };
+console.info('[HISTORIAL] historial.js cargado. BUILD: historial-admin-v3-20260522');
+window.HistorialBuild = { version: 'historial-admin-v3-20260522', stage: 'entry-loaded' };
 
 async function loadHistorialModule() {
   const candidates = [
-    './modules/historialModule.js?v=historial-admin-v2-20260522',
-    './censo_modular_grande/modules/historialModule.js?v=historial-admin-v2-20260522'
+    './modules/historialModule.js?v=historial-admin-v3-20260522',
+    './censo_modular_grande/modules/historialModule.js?v=historial-admin-v3-20260522'
   ];
 
   let lastError = null;
