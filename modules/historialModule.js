@@ -27,15 +27,15 @@ import {
   signOut,
   setPersistence,
   browserLocalPersistence
-} from './firebaseModule.js?v=historial-admin-v3-1-20260522';
+} from './firebaseModule.js?v=historial-admin-v3-2-20260522';
 
 import {
   escapeHtml,
   normalizar,
   vibrar
-} from './utilsModule.js?v=historial-admin-v3-1-20260522';
+} from './utilsModule.js?v=historial-admin-v3-2-20260522';
 
-const BUILD = 'historial-admin-v3-1-20260522';
+const BUILD = 'historial-admin-v3-2-20260522';
 const AUTH_EMAIL_ADMIN = 'adscrito@hrd.censo';
 
 const BASE_THEMES = [
@@ -614,4 +614,26 @@ export function bootHistorial() {
   applyStoredTheme();
   bindEvents();
   bootAuth();
+}
+
+
+// ==========================================================
+// EXPORT COMPATIBLE CON historial.js
+// ==========================================================
+// historial.js espera una fábrica llamada createHistorialModule().
+// Se conserva bootHistorial() para compatibilidad con usos anteriores.
+
+export function createHistorialModule(options = {}) {
+  return {
+    __build: BUILD,
+    options,
+    state,
+    boot: bootHistorial,
+    descargarHistorial,
+    aplicarFiltros,
+    renderTable,
+    abrirSecureDelete,
+    cerrarSecureModal,
+    ejecutarPurga
+  };
 }

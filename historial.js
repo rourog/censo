@@ -7,7 +7,7 @@
 //   modules/firebaseModule.js
 //   modules/utilsModule.js
 
-const BUILD = "historial-admin-v3-1-20260522";
+const BUILD = "historial-admin-v3-2-20260522";
 
 window.HistorialBuild = BUILD;
 console.info("[HISTORIAL] historial.js cargado. BUILD:", BUILD);
