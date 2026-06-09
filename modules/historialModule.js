@@ -27,15 +27,15 @@ import {
   signOut,
   setPersistence,
   browserLocalPersistence
-} from './firebaseModule.js?v=historial-admin-v3-20260522';
+} from './firebaseModule.js?v=historial-admin-v3-1-20260522';
 
 import {
   escapeHtml,
   normalizar,
   vibrar
-} from './utilsModule.js?v=historial-admin-v3-20260522';
+} from './utilsModule.js?v=historial-admin-v3-1-20260522';
 
-const BUILD = 'historial-admin-v3-20260522';
+const BUILD = 'historial-admin-v3-1-20260522';
 const AUTH_EMAIL_ADMIN = 'adscrito@hrd.censo';
 
 const BASE_THEMES = [

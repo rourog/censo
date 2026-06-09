@@ -1,82 +1,94 @@
 // historial.js
-// Entrada modular del archivo histórico.
-// BUILD: historial-admin-v3-20260522
+// Entrada del historial modular.
+// Estructura esperada:
+//   historial.html
+//   historial.js
+//   modules/historialModule.js
+//   modules/firebaseModule.js
+//   modules/utilsModule.js
 
-console.info('[HISTORIAL] historial.js cargado. BUILD: historial-admin-v3-20260522');
-window.HistorialBuild = { version: 'historial-admin-v3-20260522', stage: 'entry-loaded' };
+const BUILD = "historial-admin-v3-1-20260522";
+
+window.HistorialBuild = BUILD;
+console.info("[HISTORIAL] historial.js cargado. BUILD:", BUILD);
 
 async function loadHistorialModule() {
-  const candidates = [
-    './modules/historialModule.js?v=historial-admin-v3-20260522',
-    './censo_modular_grande/modules/historialModule.js?v=historial-admin-v3-20260522'
-  ];
+  const path = `./modules/historialModule.js?v=${BUILD}`;
 
-  let lastError = null;
-
-  for (const path of candidates) {
-    try {
-      const module = await import(path);
-      console.info(`[HISTORIAL] historialModule cargado desde: ${path}`);
-      return module;
-    } catch (error) {
-      lastError = error;
-      console.warn(`[HISTORIAL] No se pudo cargar ${path}`, error);
-    }
+  try {
+    const module = await import(path);
+    console.info("[HISTORIAL] historialModule cargado desde:", path);
+    return module;
+  } catch (error) {
+    console.error("[HISTORIAL] No se pudo cargar:", path, error);
+    throw error;
   }
-
-  throw lastError || new Error('No se pudo cargar historialModule.js');
 }
 
 function showBootError(error) {
-  console.error('[HISTORIAL] Error fatal de arranque:', error);
+  console.error("[HISTORIAL] Error fatal de arranque:", error);
 
-  const btn = document.getElementById('btnEnter');
-  const input = document.getElementById('nipInput');
-  const loginScreen = document.getElementById('loginScreen');
+  const btn = document.getElementById("btnEnter");
+  const input = document.getElementById("nipInput");
+  const loginScreen = document.getElementById("loginScreen");
 
   if (input) input.disabled = true;
 
   if (btn) {
     btn.disabled = true;
-    btn.innerHTML = 'ERROR AL CARGAR HISTORIAL';
+    btn.innerHTML = "ERROR AL CARGAR HISTORIAL";
   }
 
   if (loginScreen) {
-    const box = document.createElement('div');
+    const existing = document.getElementById("historialBootError");
+    if (existing) existing.remove();
+
+    const box = document.createElement("div");
+    box.id = "historialBootError";
     box.style.cssText = [
-      'max-width: 360px',
-      'margin-top: 14px',
-      'padding: 12px',
-      'border: 1px solid rgba(239,68,68,.45)',
-      'border-radius: 10px',
-      'color: #fecaca',
-      'background: rgba(239,68,68,.12)',
-      'font-family: Fira Code, monospace',
-      'font-size: .72rem',
-      'line-height: 1.45',
-      'text-align: left',
-      'white-space: pre-wrap'
-    ].join(';');
+      "max-width: 420px",
+      "margin-top: 14px",
+      "padding: 12px",
+      "border: 1px solid rgba(239,68,68,.45)",
+      "border-radius: 10px",
+      "color: #fecaca",
+      "background: rgba(239,68,68,.12)",
+      "font-family: Fira Code, monospace",
+      "font-size: .72rem",
+      "line-height: 1.45",
+      "text-align: left",
+      "white-space: pre-wrap"
+    ].join(";");
 
     box.textContent =
-      'No se pudo cargar modules/historialModule.js.\n\n' +
-      'Estructura esperada:\n' +
-      'historial.html\n' +
-      'historial.js\n' +
-      'modules/historialModule.js\n' +
-      'modules/firebaseModule.js\n' +
-      'modules/utilsModule.js\n\n' +
-      'Detalle: ' + (error?.message || String(error));
+      "No se pudo cargar modules/historialModule.js.\n\n" +
+      "Estructura esperada en el root del repo:\n" +
+      "historial.html\n" +
+      "historial.js\n" +
+      "modules/historialModule.js\n" +
+      "modules/firebaseModule.js\n" +
+      "modules/utilsModule.js\n\n" +
+      "Prueba directa:\n" +
+      "https://rourog.github.io/censo/modules/historialModule.js?v=" + BUILD + "\n\n" +
+      "Detalle: " + (error?.message || String(error));
 
     loginScreen.appendChild(box);
   }
 }
 
 loadHistorialModule()
-  .then(({ bootHistorial }) => {
-    if (typeof bootHistorial !== 'function') {
-      throw new Error('historialModule.js cargó, pero no exporta bootHistorial().');
+  .then(({ createHistorialModule }) => {
+    if (typeof createHistorialModule !== "function") {
+      throw new Error("historialModule.js cargó, pero no exporta createHistorialModule().");
     }
-    bootHistorial();
+
+    const historial = createHistorialModule({ build: BUILD });
+    window.HistorialApp = historial;
+
+    if (!historial || typeof historial.boot !== "function") {
+      throw new Error("createHistorialModule() no devolvió un objeto con boot().");
+    }
+
+    historial.boot();
   })
   .catch(showBootError);
