@@ -14,7 +14,15 @@
   - Guardar pacientes directamente.
 */
 
-console.info('[CENSO] interactionModule.js cargado. BUILD: destinos-iconos-v11-20260522');
+console.info('[CENSO] interactionModule.js cargado. BUILD: mobile-actions-v14-20260722');
+
+export const MOBILE_SWIPE_THRESHOLD = 110;
+
+export function getMobileSwipeAction(deltaX, threshold = MOBILE_SWIPE_THRESHOLD) {
+  if (deltaX <= -threshold) return 'edit';
+  if (deltaX >= threshold) return 'delete';
+  return null;
+}
 
 export function createInteractionModule(app) {
   const { state } = app;
@@ -128,46 +136,93 @@ export function createInteractionModule(app) {
 
   function resetAllSwipes() {
     document.querySelectorAll('.card').forEach(c => c.classList.remove('swipe-ready-delete', 'swipe-ready-edit'));
-    document.querySelectorAll('.card-content-wrapper').forEach(cw => cw.style.transform = 'translateX(0)');
+    document.querySelectorAll('.card-content-wrapper').forEach(cw => {
+      cw.classList.remove('swiping');
+      cw.style.transform = 'translateX(0)';
+    });
   }
 
   function initSwipe() {
-    let xDown = null, yDown = null, activeCard = null;
+    let gesture = null;
+
+    const finishGesture = (el) => {
+      const card = el?.closest('.card');
+      if (el) {
+        el.classList.remove('swiping');
+        el.style.transform = 'translateX(0)';
+      }
+      card?.classList.remove('swipe-ready-delete', 'swipe-ready-edit');
+      gesture = null;
+    };
+
     document.querySelectorAll('.card-content-wrapper').forEach(el => {
-      el.addEventListener('touchstart', e => { 
-        if (e.target.closest('.btn-editar-tarjeta') || e.target.closest('.header-right')) return;
-        xDown = e.touches[0].clientX; yDown = e.touches[0].clientY; activeCard = el; 
-      }, {passive: true});
+      let suppressNextClick = false;
+
+      el.addEventListener('click', (event) => {
+        if (!suppressNextClick) return;
+        event.preventDefault();
+        event.stopPropagation();
+        suppressNextClick = false;
+      }, true);
+
+      el.addEventListener('touchstart', e => {
+        if (e.target.closest('button, a, input, textarea, select, [contenteditable="true"], .header-right')) return;
+        const touch = e.touches[0];
+        if (!touch) return;
+
+        gesture = {
+          el,
+          startX: touch.clientX,
+          startY: touch.clientY,
+          axis: null
+        };
+      }, { passive: true });
     
       el.addEventListener('touchmove', e => {
-        if(!xDown || !activeCard) return;
-        let xDiff = xDown - e.touches[0].clientX;
-        let yDiff = yDown - e.touches[0].clientY;
-      
-        if (Math.abs(xDiff) > Math.abs(yDiff)) {
-          if(Math.abs(xDiff) > 30) {
-            activeCard.style.transform = `translateX(${-xDiff * 0.4}px)`;
-            if(xDiff > 110) { activeCard.closest('.card').classList.add('swipe-ready-delete'); }
-            else if(xDiff < -110) { activeCard.closest('.card').classList.add('swipe-ready-edit'); }
-            else { activeCard.closest('.card').classList.remove('swipe-ready-delete', 'swipe-ready-edit'); }
-          }
+        if (gesture?.el !== el) return;
+        const touch = e.touches[0];
+        if (!touch) return;
+
+        const deltaX = touch.clientX - gesture.startX;
+        const deltaY = touch.clientY - gesture.startY;
+
+        if (!gesture.axis && Math.max(Math.abs(deltaX), Math.abs(deltaY)) >= 10) {
+          gesture.axis = Math.abs(deltaX) > Math.abs(deltaY) ? 'horizontal' : 'vertical';
         }
-      }, {passive: true});
+        if (gesture.axis !== 'horizontal') return;
+
+        const card = el.closest('.card');
+        const action = getMobileSwipeAction(deltaX);
+        const translatedX = Math.max(-72, Math.min(72, deltaX * 0.4));
+
+        el.classList.add('swiping');
+        el.style.transform = `translateX(${translatedX}px)`;
+        card?.classList.toggle('swipe-ready-edit', action === 'edit');
+        card?.classList.toggle('swipe-ready-delete', action === 'delete');
+      }, { passive: true });
     
       el.addEventListener('touchend', e => {
-        if(!xDown || !activeCard) return;
-        let xDiff = xDown - e.changedTouches[0].clientX;
-        const fila = activeCard.closest('.card').getAttribute('data-fila');
-        const nombre = activeCard.closest('.card').getAttribute('data-nombre');
-      
-        activeCard.style.transform = 'translateX(0)';
-        activeCard.closest('.card').classList.remove('swipe-ready-delete', 'swipe-ready-edit');
-      
-        if(xDiff > 110) { setTimeout(() => app.borrarPacienteDirecto(fila, nombre), 100); }
-        else if(xDiff < -110) { setTimeout(() => app.abrirModal(fila), 100); }
-      
-        xDown = null; activeCard = null;
+        if (gesture?.el !== el) return;
+        const touch = e.changedTouches[0];
+        const card = el.closest('.card');
+        const deltaX = touch ? touch.clientX - gesture.startX : 0;
+        const action = gesture.axis === 'horizontal' ? getMobileSwipeAction(deltaX) : null;
+        const fila = card?.getAttribute('data-fila');
+        const nombre = card?.getAttribute('data-nombre');
+
+        finishGesture(el);
+
+        if (!action || !fila) return;
+        suppressNextClick = true;
+        setTimeout(() => { suppressNextClick = false; }, 400);
+
+        if (action === 'edit') setTimeout(() => app.abrirModal(fila), 100);
+        if (action === 'delete') setTimeout(() => app.borrarPacienteDirecto(fila, nombre), 100);
       });
+
+      el.addEventListener('touchcancel', () => {
+        if (gesture?.el === el) finishGesture(el);
+      }, { passive: true });
     });
   }
 

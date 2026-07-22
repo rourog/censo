@@ -11,20 +11,20 @@
   - Hablar con Firestore directamente.
 */
 
-import * as firebase from './firebaseModule.js?v=stability-v13-20260722';
-import * as bed from './bedModule.js?v=stability-v13-20260722';
-import * as utils from './utilsModule.js?v=stability-v13-20260722';
-import { state } from './stateModule.js?v=stability-v13-20260722';
+import * as firebase from './firebaseModule.js?v=mobile-actions-v14-20260722';
+import * as bed from './bedModule.js?v=mobile-actions-v14-20260722';
+import * as utils from './utilsModule.js?v=mobile-actions-v14-20260722';
+import { state } from './stateModule.js?v=mobile-actions-v14-20260722';
 
-import { createEffectsModule } from './effectsModule.js?v=stability-v13-20260722';
-import { createRenderModule } from './renderModule.js?v=stability-v13-20260722';
-import { createPatientModule } from './patientModule.js?v=stability-v13-20260722';
-import { createThemeModule } from './themeModule.js?v=stability-v13-20260722';
-import { createModalModule } from './modalModule.js?v=stability-v13-20260722';
-import { createInteractionModule } from './interactionModule.js?v=stability-v13-20260722';
-import { createAuthModule } from './authModule.js?v=stability-v13-20260722';
+import { createEffectsModule } from './effectsModule.js?v=mobile-actions-v14-20260722';
+import { createRenderModule } from './renderModule.js?v=mobile-actions-v14-20260722';
+import { createPatientModule } from './patientModule.js?v=mobile-actions-v14-20260722';
+import { createThemeModule } from './themeModule.js?v=mobile-actions-v14-20260722';
+import { createModalModule } from './modalModule.js?v=mobile-actions-v14-20260722';
+import { createInteractionModule } from './interactionModule.js?v=mobile-actions-v14-20260722';
+import { createAuthModule } from './authModule.js?v=mobile-actions-v14-20260722';
 
-const BUILD = 'stability-v13-20260722';
+const BUILD = 'mobile-actions-v14-20260722';
 
 export async function bootApp() {
   console.info(`[CENSO] bootApp iniciado. BUILD: ${BUILD}`);

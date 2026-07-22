@@ -12,7 +12,7 @@
   - Calcular reglas de camas fuera de lo necesario para mostrar.
 */
 
-console.info('[CENSO] renderModule.js cargado. BUILD: compact-vertical-v12-20260522');
+console.info('[CENSO] renderModule.js cargado. BUILD: mobile-actions-v14-20260722');
 
 export function createRenderModule(app) {
   const { state } = app;
@@ -307,6 +307,18 @@ export function createRenderModule(app) {
         font-size: 1rem !important;
       }
 
+      .card.patient-alert .card-action-grid .btn-editar-tarjeta {
+        background: rgba(255,255,255,0.16) !important;
+        border-color: rgba(255,255,255,0.42) !important;
+        color: #fff !important;
+      }
+
+      .card.patient-alert .card-action-grid .btn-editar-tarjeta.alert-active,
+      .card.patient-alert .card-action-grid .btn-editar-tarjeta.obs-active {
+        background: rgba(255,255,255,0.30) !important;
+        border-color: rgba(255,255,255,0.72) !important;
+      }
+
       .patient-observation-field .value {
         color: var(--text);
         background: var(--accent-soft);
@@ -553,13 +565,24 @@ export function createRenderModule(app) {
       </td>`;
   }
 
-  function renderCardActions(p) {
+  function renderCardActions(p, alertaActiva, observacion) {
+    const alertBtnTitle = alertaActiva ? 'Quitar destacado' : 'Destacar paciente';
+    const obsTitle = observacion ? `Editar observación: ${observacion}` : 'Agregar observación';
+    const alertBtnClass = alertaActiva ? 'alert-star-btn alert-active' : 'alert-star-btn';
+    const obsBtnClass = observacion ? 'obs-note-btn obs-active' : 'obs-note-btn';
+
     return `
       <div class="card-action-grid">
-        <button class="btn-editar-tarjeta" type="button" data-fila="${escapeHtml(p.fila)}" onclick="event.stopPropagation(); abrirModal(this.dataset.fila);">
+        <button class="btn-editar-tarjeta ${alertBtnClass}" type="button" data-censo-action="toggle-alerta" data-fila="${escapeHtml(p.fila)}" onclick="event.stopPropagation(); toggleAlertaPaciente(this.dataset.fila, event);" title="${escapeHtml(alertBtnTitle)}" aria-label="${escapeHtml(alertBtnTitle)}">
+          <span class="material-symbols-outlined" style="${getAlertIconFill(alertaActiva)}">star</span> ${alertaActiva ? 'DESTACADO' : 'DESTACAR'}
+        </button>
+        <button class="btn-editar-tarjeta ${obsBtnClass}" type="button" data-censo-action="editar-observacion" data-fila="${escapeHtml(p.fila)}" onclick="event.stopPropagation(); editarObservacionPaciente(this.dataset.fila, event);" title="${escapeHtml(obsTitle)}" aria-label="${escapeHtml(obsTitle)}">
+          <span class="material-symbols-outlined" style="${getAlertIconFill(Boolean(observacion))}">sticky_note_2</span> ${observacion ? 'EDITAR NOTA' : 'OBSERVACIÓN'}
+        </button>
+        <button class="btn-editar-tarjeta" type="button" data-fila="${escapeHtml(p.fila)}" onclick="event.stopPropagation(); abrirModal(this.dataset.fila);" title="Editar paciente" aria-label="Editar paciente">
           <span class="material-symbols-outlined">edit_square</span> EDITAR
         </button>
-        <button class="btn-editar-tarjeta delete" type="button" data-fila="${escapeHtml(p.fila)}" data-nombre="${escapeHtml(p.nombre)}" onclick="event.stopPropagation(); borrarPacienteDirecto(this.dataset.fila, this.dataset.nombre);">
+        <button class="btn-editar-tarjeta delete" type="button" data-fila="${escapeHtml(p.fila)}" data-nombre="${escapeHtml(p.nombre)}" onclick="event.stopPropagation(); borrarPacienteDirecto(this.dataset.fila, this.dataset.nombre);" title="Borrar paciente" aria-label="Borrar paciente">
           <span class="material-symbols-outlined">delete</span> BORRAR
         </button>
       </div>`;
@@ -719,7 +742,7 @@ export function createRenderModule(app) {
               const delayPatient = delayBase + (indexPatient * 50);
 
               return `<div class="card animate-in ${alertaActiva ? 'patient-alert' : ''}" data-fila="${escapeHtml(p.fila)}" data-nombre="${escapeHtml(p.nombre)}" data-alerta="${alertaActiva ? '1' : '0'}" style="animation-delay: ${delayPatient}ms;">
-                <div class="swipe-bg"><div class="swipe-action swipe-delete"><span class="material-symbols-outlined">delete</span></div><div class="swipe-action swipe-edit"><span class="material-symbols-outlined">edit</span></div></div>
+                <div class="swipe-bg" aria-hidden="true"><div class="swipe-action swipe-delete"><span class="material-symbols-outlined">delete</span><span class="swipe-action-label">BORRAR</span></div><div class="swipe-action swipe-edit"><span class="swipe-action-label">EDITAR</span><span class="material-symbols-outlined">edit</span></div></div>
                 <div class="card-content-wrapper">
                   <div class="card-header" onclick="toggleCard(this)">
                     <div class="patient-main">
@@ -731,7 +754,7 @@ export function createRenderModule(app) {
                       <div class="caret"><span class="material-symbols-outlined">expand_more</span></div>
                     </div>
                   </div>
-                  <div class="details"><div class="details-content">${detailsHtml}${renderCardActions(p)}</div></div>
+                  <div class="details"><div class="details-content">${detailsHtml}${renderCardActions(p, alertaActiva, observacion)}</div></div>
                 </div>
               </div>`;
             }).join('')}
