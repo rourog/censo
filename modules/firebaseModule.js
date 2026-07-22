@@ -25,6 +25,7 @@ import {
   updateDoc,
   deleteDoc,
   setDoc,
+  writeBatch,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 import {
@@ -69,6 +70,7 @@ export {
   updateDoc,
   deleteDoc,
   setDoc,
+  writeBatch,
   serverTimestamp,
   signInWithEmailAndPassword,
   onAuthStateChanged,

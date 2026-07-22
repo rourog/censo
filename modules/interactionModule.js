@@ -249,9 +249,7 @@ export function createInteractionModule(app) {
     if (reloadBtn) {
       reloadBtn.addEventListener('click', () => {
         app.utils.vibrar(15);
-        document.getElementById('reloadIcon')?.classList.add('spin');
-        app.render(state.pacientesGlobal);
-        setTimeout(() => document.getElementById('reloadIcon')?.classList.remove('spin'), 800);
+        app.initFirebaseListener();
       });
     }
 

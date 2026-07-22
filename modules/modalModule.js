@@ -17,7 +17,7 @@ console.info('[CENSO] modalModule.js cargado. BUILD: destinos-iconos-v11-2026052
 
 export function createModalModule(app) {
   const { state } = app;
-  const { db, collection, addDoc, doc, updateDoc, deleteDoc, setDoc, serverTimestamp } = app.firebase;
+  const { db, collection, addDoc, doc, updateDoc, writeBatch, serverTimestamp } = app.firebase;
   const { destinosGlobal, agruparPorArea, parseDestinoClinico, getDestinoMaterialIcon, getDestinoActionLabel } = app.bed;
   const { escapeHtml, normalizar, vibrar } = app.utils;
 
@@ -440,6 +440,7 @@ export function createModalModule(app) {
     try {
       await updateDoc(doc(db, "pacientes", fila), { alerta: alertaNueva });
     } catch (error) {
+      paciente.alerta = alertaAnterior;
       refrescarDespuesDeAlerta();
       vibrar([80, 40, 80]);
       alert('ERROR AL CAMBIAR ALERTA: ' + error.message);
@@ -523,19 +524,34 @@ export function createModalModule(app) {
     const destinoVal = document.querySelector('#editDestinoWrapper .custom-select-display').dataset.value || '';
     const moverAFila = document.querySelector('#editMoverWrapper .custom-select-display').dataset.value || '';
     const fechaInput = document.getElementById('modalFechaIngreso').value;
+    const nombre = document.getElementById('modalNombre').value.trim().toUpperCase();
+
+    if (!filaId) {
+      alert('NO SE PUDO IDENTIFICAR AL PACIENTE. CIERRA Y ABRE DE NUEVO LA EDICIÓN.');
+      return;
+    }
+
+    if (!nombre) {
+      alert('EL NOMBRE ES OBLIGATORIO.');
+      return;
+    }
 
     btnGuardar.disabled = true; btnGuardar.innerHTML = '<span class="spin material-symbols-outlined">sync</span> GUARDANDO...';
   
     try {
       let updateData = {
-          nombre: document.getElementById('modalNombre').value.toUpperCase(),
+          nombre,
           edad: document.getElementById('modalEdad').value.toUpperCase(),
           diagnostico: document.getElementById('modalDiagnostico').value.toUpperCase(),
           pendientes: document.getElementById('modalPendientes').value.toUpperCase(),
           destino: destinoVal
       };
 
-      if (fechaInput) updateData.creado = new Date(fechaInput);
+      if (fechaInput) {
+        const fechaIngreso = new Date(fechaInput);
+        if (Number.isNaN(fechaIngreso.getTime())) throw new Error('La fecha de ingreso no es válida.');
+        updateData.creado = fechaIngreso;
+      }
 
       if (moverAFila && moverAFila !== "") {
           const nuevaCamaObj = state.camasLibresGlobal.find(c => c.fila === moverAFila);
@@ -586,23 +602,27 @@ export function createModalModule(app) {
   async function ejecutarBorrado() {
     const btnBorrar = document.getElementById('btnConfirmDelete');
     if (!filaABorrar) return;
+    const filaObjetivo = filaABorrar;
 
     btnBorrar.disabled = true; 
     btnBorrar.innerHTML = '<span class="spin material-symbols-outlined">sync</span>...';
     vibrar(20);
   
     try {
-      const pacienteData = state.pacientesGlobal.find(p => p.fila === filaABorrar);
-      if (pacienteData) {
-        const { fila, fechaIngresoFormateada, fechaIngresoISO, ...datosParaArchivar } = pacienteData;
-        await setDoc(doc(db, "historial", filaABorrar), {
-          ...datosParaArchivar,
-          fechaEgreso: serverTimestamp(),
-          egresadoPor: state.rolUsuario
-        });
+      const pacienteData = state.pacientesGlobal.find(p => p.fila === filaObjetivo);
+      if (!pacienteData) {
+        throw new Error('El paciente ya no está disponible. Actualiza el censo antes de intentar borrarlo.');
       }
 
-      await deleteDoc(doc(db, "pacientes", filaABorrar));
+      const { fila, fechaIngresoFormateada, fechaIngresoISO, ...datosParaArchivar } = pacienteData;
+      const batch = writeBatch(db);
+      batch.set(doc(db, "historial", filaObjetivo), {
+        ...datosParaArchivar,
+        fechaEgreso: serverTimestamp(),
+        egresadoPor: state.rolUsuario
+      });
+      batch.delete(doc(db, "pacientes", filaObjetivo));
+      await batch.commit();
       vibrar([30, 50, 30]); 
       cerrarModalBorrado(); 
       if (typeof confetti === 'function') { confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, colors: ['#ef4444', '#10b981', '#3b82f6', '#fbbf24'] }); }
@@ -656,7 +676,7 @@ export function createModalModule(app) {
     if(!selectCamaVal) { alert("POR FAVOR SELECCIONA UNA CAMA DISPONIBLE."); return; }
     const [nombreCamaReal, areaReal] = selectCamaVal.split('|');
   
-    const nom = document.getElementById('addNombre').value.toUpperCase(); 
+    const nom = document.getElementById('addNombre').value.trim().toUpperCase();
     if(!nom) { alert("EL NOMBRE ES OBLIGATORIO."); return; }
 
     const destinoVal = document.querySelector('#addDestinoWrapper .custom-select-display').dataset.value || '';
@@ -667,6 +687,7 @@ export function createModalModule(app) {
 
     try {
       const fechaCreacion = fechaInput ? new Date(fechaInput) : new Date();
+      if (Number.isNaN(fechaCreacion.getTime())) throw new Error('La fecha de ingreso no es válida.');
 
       await addDoc(collection(db, "pacientes"), {
           nombre: nom,
