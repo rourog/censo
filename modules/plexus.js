@@ -13,7 +13,6 @@ export const PLEXUS_DEFAULTS = Object.freeze({
   independence: 0.65,
   speed: 0.70,
   maxConnectionDistance: 80,
-  bannerHeight: 168,
   rewireMinMs: 5200,
   rewireMaxMs: 9000
 });
@@ -760,19 +759,6 @@ export function createPlexusController(canvas, options = {}) {
     ctx.strokeStyle = `rgba(255,255,255,${0.22 + brightness * 0.20})`;
     ctx.lineWidth = 0.42;
     ctx.stroke();
-
-    ctx.beginPath();
-    ctx.ellipse(
-      node.x - radius * 0.30,
-      node.y - radius * 0.35,
-      Math.max(0.40, radius * (0.15 + brightness * 0.035)),
-      Math.max(0.24, radius * 0.085),
-      -0.55,
-      0,
-      Math.PI * 2
-    );
-    ctx.fillStyle = `rgba(255,255,255,${clamp(0.70 + brightness * 0.26, 0, 1)})`;
-    ctx.fill();
 
     if (sparkle > 0.06) {
       const flash = ctx.createRadialGradient(

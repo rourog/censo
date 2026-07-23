@@ -24,8 +24,7 @@ assert.deepEqual(
     waveAmplitude: PLEXUS_DEFAULTS.waveAmplitude,
     independence: PLEXUS_DEFAULTS.independence,
     speed: PLEXUS_DEFAULTS.speed,
-    maxConnectionDistance: PLEXUS_DEFAULTS.maxConnectionDistance,
-    bannerHeight: PLEXUS_DEFAULTS.bannerHeight
+    maxConnectionDistance: PLEXUS_DEFAULTS.maxConnectionDistance
   },
   {
     cohesion: 0.25,
@@ -33,8 +32,7 @@ assert.deepEqual(
     waveAmplitude: 20,
     independence: 0.65,
     speed: 0.70,
-    maxConnectionDistance: 80,
-    bannerHeight: 168
+    maxConnectionDistance: 80
   },
   'Los valores aprobados del standalone deben permanecer intactos.'
 );
@@ -56,6 +54,11 @@ assert.match(plexusSource, /mode: 'connecting'/u);
 assert.match(plexusSource, /countComponents\(currentNodes, currentLinks, oldKey\) > initialComponents/u);
 assert.match(plexusSource, /createEventWave\(node\.x, node\.y, 'admission'/u);
 assert.match(plexusSource, /createEventWave\(node\.x, node\.y, 'discharge'/u);
+assert.doesNotMatch(
+  plexusSource,
+  /Math\.max\(0\.40, radius \* \(0\.15 \+ brightness/u,
+  'El reflejo especular blanco no debe reaparecer sobre los orbes.'
+);
 assert.match(effectsSource, /createPlexusController\(canvas\)/u);
 
 assert.equal(
@@ -63,6 +66,10 @@ assert.equal(
   3,
   'Búsquedas y cambios de vista no deben reducir los nodos del plexus.'
 );
-assert.match(styleSource, /\.header\s*\{[\s\S]*?height:\s*168px;[\s\S]*?min-height:\s*168px;/u);
+const headerRule = styleSource.match(/\.header\s*\{([\s\S]*?)\}/u)?.[1] || '';
+assert.doesNotMatch(headerRule, /(?:^|[;\s])(?:min-)?height\s*:/u, 'El encabezado debe conservar su altura original y natural.');
+assert.match(headerRule, /padding:\s*14px 10px/u);
+assert.match(styleSource, /\.header::before\s*\{[\s\S]*?background-size:\s*36px 64px;/u);
+assert.match(styleSource, /--plexus-hex-line:\s*color-mix\(in srgb, var\(--accent\) 9%, transparent\)/u);
 
 console.log('OK: configuración e integración del plexus verificadas.');

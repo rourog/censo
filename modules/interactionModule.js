@@ -14,7 +14,7 @@
   - Guardar pacientes directamente.
 */
 
-console.info('[CENSO] interactionModule.js cargado. BUILD: plexus-membrane-v17-20260722');
+console.info('[CENSO] interactionModule.js cargado. BUILD: plexus-membrane-v18-20260722');
 
 export const MOBILE_SWIPE_THRESHOLD = 110;
 

@@ -13,7 +13,7 @@
   - Definir camas maestras.
 */
 
-console.info('[CENSO] modalModule.js cargado. BUILD: plexus-membrane-v17-20260722');
+console.info('[CENSO] modalModule.js cargado. BUILD: plexus-membrane-v18-20260722');
 
 export function createModalModule(app) {
   const { state } = app;

@@ -12,7 +12,7 @@
   - Calcular reglas de camas fuera de lo necesario para mostrar.
 */
 
-console.info('[CENSO] renderModule.js cargado. BUILD: plexus-membrane-v17-20260722');
+console.info('[CENSO] renderModule.js cargado. BUILD: plexus-membrane-v18-20260722');
 
 export function createRenderModule(app) {
   const { state } = app;

@@ -1,13 +1,13 @@
 // main.js
 // Entrada mínima con diagnóstico de carga de módulos.
-// BUILD: plexus-membrane-v17-20260722
+// BUILD: plexus-membrane-v18-20260722
 // Ruta ideal en GitHub:
 //   index.html
 //   style.css
 //   main.js
 //   modules/appModule.js
 
-const BUILD = 'plexus-membrane-v17-20260722';
+const BUILD = 'plexus-membrane-v18-20260722';
 
 console.info(`[CENSO] main.js cargado. BUILD: ${BUILD}`);
 window.CensoBuild = { version: BUILD, stage: 'main-loaded' };
