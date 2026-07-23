@@ -1,4 +1,4 @@
-import { createPlexusController } from './plexus.js?v=quick-bed-v20-20260722';
+import { createPlexusController } from './plexus.js?v=bulk-reset-v1-20260722';
 
 /*
   MÓDULO: effectsModule.js

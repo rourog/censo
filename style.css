@@ -334,6 +334,11 @@
     input[type="datetime-local"].input-control::-webkit-calendar-picker-indicator { filter: invert(0.5); cursor: pointer; }
 
     .modal-actions { display: flex; gap: 10px; margin-top: 10px; width: 100%; }
+    .bulk-maintenance-content { border: 2px solid var(--error-border); box-shadow: 0 10px 30px rgba(239, 68, 68, 0.22); }
+    .bulk-maintenance-icon { display: flex; justify-content: center; color: var(--error-text); margin: 2px 0 4px; }
+    .bulk-maintenance-icon .material-symbols-outlined { font-size: 3.2rem; }
+    .bulk-maintenance-lead { color: var(--text); font-family: 'Space Mono', monospace; font-size: 0.95rem; font-weight: 700; line-height: 1.45; text-align: center; }
+    .bulk-maintenance-detail { color: var(--muted); font-size: 0.78rem; line-height: 1.55; text-align: center; text-transform: uppercase; }
     .btn-cancelar { flex: 1; padding: 12px; border-radius: var(--radius-sm); background: var(--field); border: 1px solid var(--line); color: var(--text); font-weight: 600; cursor: pointer; text-transform: uppercase; font-family: 'Space Mono', monospace; }
     .btn-guardar { flex: 2; padding: 12px; border-radius: var(--radius-sm); background: var(--accent); border: none; color: #fff; font-weight: 600; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; text-transform: uppercase; font-family: 'Space Mono', monospace; }
     .btn-guardar:disabled { opacity: 0.7; cursor: not-allowed; }

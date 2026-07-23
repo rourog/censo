@@ -33,7 +33,8 @@ const requiredFiles = [
   'modules/firebaseModule.js',
   'modules/authModule.js',
   'modules/patientModule.js',
-  'modules/modalModule.js'
+  'modules/modalModule.js',
+  'modules/maintenanceModule.js'
 ];
 
 for (const file of requiredFiles) {

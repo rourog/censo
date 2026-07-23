@@ -13,7 +13,7 @@
   - Definir camas maestras.
 */
 
-console.info('[CENSO] modalModule.js cargado. BUILD: quick-bed-v20-20260722');
+console.info('[CENSO] modalModule.js cargado. BUILD: bulk-reset-v1-20260722');
 
 export function createModalModule(app) {
   const { state } = app;

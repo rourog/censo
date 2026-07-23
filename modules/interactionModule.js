@@ -14,7 +14,7 @@
   - Guardar pacientes directamente.
 */
 
-console.info('[CENSO] interactionModule.js cargado. BUILD: quick-bed-v20-20260722');
+console.info('[CENSO] interactionModule.js cargado. BUILD: bulk-reset-v1-20260722');
 
 export const MOBILE_SWIPE_THRESHOLD = 110;
 
@@ -229,6 +229,16 @@ export function createInteractionModule(app) {
   function filtrar() {
     const searchInput = document.getElementById('search');
     const q = normalizar(searchInput.value);
+    const maintenanceCommand = app.handleMaintenanceSearchCommand?.(q);
+
+    if (maintenanceCommand) {
+      searchInput.value = '';
+      searchInput.blur();
+      document.getElementById('searchWrapper').classList.add('collapsed');
+      app.render(state.pacientesGlobal);
+      return;
+    }
+
     const eggFound = app.checkEasterEggs(q); 
   
     if (eggFound) {
