@@ -1,0 +1,486 @@
+/*
+  CENSO DE URGENCIAS · BARRA DE AVISOS/NOTICIAS
+  Versión del módulo: 1.0
+*/
+
+:root {
+  --censo-newsbar-height: 34px;
+  --censo-newsbar-z: 9200;
+  --censo-newsbar-modal-z: 12000;
+}
+
+.censo-newsbar {
+  position: fixed;
+  z-index: var(--censo-newsbar-z);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: var(--censo-newsbar-height);
+  display: none;
+  grid-template-columns: var(--censo-newsbar-height) minmax(0, 1fr) auto;
+  align-items: stretch;
+  color: var(--text, #f8fafc);
+  background: color-mix(in srgb, var(--bg, #0f172a) 91%, var(--text, #fff) 9%);
+  border-top: 1px solid color-mix(in srgb, var(--accent, #3b82f6) 42%, transparent);
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, .24);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+
+.censo-newsbar__icon {
+  display: grid;
+  place-items: center;
+  border: 0;
+  padding: 0;
+  color: #fff;
+  background: var(--accent, #3b82f6);
+  cursor: pointer;
+}
+
+.censo-newsbar__icon svg {
+  width: 19px;
+  height: 19px;
+  fill: currentColor;
+}
+
+.censo-newsbar__viewport {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.censo-newsbar[data-feed-mode="external"] .censo-newsbar__viewport,
+.censo-newsbar[data-feed-mode="external"] .censo-newsbar__icon,
+.censo-newsbar[data-feed-mode="external"] .censo-newsbar__signature {
+  cursor: default;
+}
+
+.censo-newsbar__viewport::before,
+.censo-newsbar__viewport::after {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  bottom: 0;
+  width: 26px;
+  pointer-events: none;
+}
+
+.censo-newsbar__viewport::before {
+  left: 0;
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--bg, #0f172a) 91%, var(--text, #fff) 9%),
+    transparent
+  );
+}
+
+.censo-newsbar__viewport::after {
+  right: 0;
+  background: linear-gradient(
+    -90deg,
+    color-mix(in srgb, var(--bg, #0f172a) 91%, var(--text, #fff) 9%),
+    transparent
+  );
+}
+
+.censo-newsbar__track {
+  width: max-content;
+  display: flex;
+  align-items: center;
+  will-change: transform;
+  animation: censoNewsTicker var(--censo-newsbar-duration, 20s) linear infinite;
+}
+
+@keyframes censoNewsTicker {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.censo-newsbar__group {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+}
+
+.censo-newsbar__item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 0 20px;
+  color: var(--text, #f8fafc);
+  font-family: "Space Mono", monospace;
+  font-size: 11px;
+  line-height: var(--censo-newsbar-height);
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.censo-newsbar__item::after {
+  content: "•";
+  margin-left: 18px;
+  color: var(--accent, #3b82f6);
+  opacity: .85;
+}
+
+.censo-newsbar__item-label {
+  color: var(--accent, #3b82f6);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .04em;
+}
+
+.censo-newsbar__link {
+  cursor: pointer;
+}
+
+.censo-newsbar__link:hover span:last-child,
+.censo-newsbar__link:focus-visible span:last-child {
+  color: var(--accent, #3b82f6);
+}
+
+.censo-newsbar__signature {
+  display: flex;
+  align-items: center;
+  padding: 0 11px;
+  border-left: 1px solid color-mix(in srgb, var(--accent, #3b82f6) 28%, transparent);
+  background: color-mix(in srgb, var(--accent, #3b82f6) 10%, transparent);
+  color: var(--muted, #94a3b8);
+  font-family: "Space Mono", monospace;
+  font-size: 9px;
+  font-weight: 700;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.censo-newsbar__signature strong {
+  margin: 0 3px;
+  color: var(--text, #f8fafc);
+  letter-spacing: .08em;
+}
+
+/* Lista de avisos internos */
+.censo-newsdrawer {
+  position: fixed;
+  z-index: calc(var(--censo-newsbar-z) - 1);
+  left: 12px;
+  right: 12px;
+  bottom: calc(var(--censo-newsbar-height) + 8px);
+  max-width: 900px;
+  max-height: min(56vh, 480px);
+  margin: 0 auto;
+  overflow: auto;
+  border: 1px solid color-mix(in srgb, var(--accent, #3b82f6) 25%, transparent);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--bg, #0f172a) 94%, var(--text, #fff) 6%);
+  color: var(--text, #f8fafc);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, .42);
+}
+
+.censo-newsdrawer[hidden] {
+  display: none;
+}
+
+.censo-newsdrawer__head {
+  position: sticky;
+  z-index: 2;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 13px;
+  border-bottom: 1px solid color-mix(in srgb, var(--text, #fff) 10%, transparent);
+  background: color-mix(in srgb, var(--bg, #0f172a) 94%, var(--text, #fff) 6%);
+}
+
+.censo-newsdrawer__head h2 {
+  margin: 0;
+  font-family: "Space Mono", monospace;
+  font-size: 13px;
+}
+
+.censo-newsdrawer__head small {
+  display: block;
+  margin-top: 3px;
+  color: var(--muted, #94a3b8);
+  font-size: 9px;
+}
+
+.censo-newsdrawer__close,
+.censo-newsmodal__close {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 9px;
+  color: var(--text, #f8fafc);
+  background: color-mix(in srgb, var(--text, #fff) 7%, transparent);
+  cursor: pointer;
+}
+
+.censo-newsdrawer__list {
+  padding: 7px;
+}
+
+.censo-newsdrawer__item {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  gap: 10px;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.censo-newsdrawer__item:hover {
+  background: color-mix(in srgb, var(--accent, #3b82f6) 7%, transparent);
+}
+
+.censo-newsdrawer__item time {
+  color: var(--accent, #3b82f6);
+  font-family: "Space Mono", monospace;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.censo-newsdrawer__item p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.38;
+}
+
+/* Modal administrativo */
+.censo-newsmodal {
+  position: fixed;
+  z-index: var(--censo-newsbar-modal-z);
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(0, 0, 0, .68);
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+}
+
+.censo-newsmodal[hidden] {
+  display: none;
+}
+
+.censo-newsmodal__card {
+  width: min(620px, 100%);
+  max-height: min(88vh, 760px);
+  overflow: auto;
+  border: 1px solid color-mix(in srgb, var(--accent, #3b82f6) 28%, transparent);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--bg, #0f172a) 94%, var(--text, #fff) 6%);
+  color: var(--text, #f8fafc);
+  box-shadow: 0 32px 90px rgba(0, 0, 0, .58);
+}
+
+.censo-newsmodal__head {
+  position: sticky;
+  z-index: 3;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 13px 15px;
+  border-bottom: 1px solid color-mix(in srgb, var(--text, #fff) 10%, transparent);
+  background: color-mix(in srgb, var(--bg, #0f172a) 94%, var(--text, #fff) 6%);
+}
+
+.censo-newsmodal__head h2 {
+  margin: 0;
+  font-family: "Space Mono", monospace;
+  font-size: 14px;
+}
+
+.censo-newsmodal__body {
+  padding: 15px;
+}
+
+.censo-newsmodal__copy,
+.censo-newsmodal__note {
+  color: var(--muted, #94a3b8);
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.censo-newsmodal__field {
+  display: grid;
+  gap: 6px;
+  margin-top: 11px;
+}
+
+.censo-newsmodal__field label {
+  color: var(--muted, #94a3b8);
+  font-family: "Space Mono", monospace;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .055em;
+  text-transform: uppercase;
+}
+
+.censo-newsmodal__field input,
+.censo-newsmodal__field select,
+.censo-newsmodal__field textarea {
+  width: 100%;
+  padding: 10px 11px;
+  border: 1px solid color-mix(in srgb, var(--text, #fff) 12%, transparent);
+  border-radius: 9px;
+  outline: none;
+  color: var(--text, #f8fafc);
+  background: color-mix(in srgb, var(--bg, #0f172a) 88%, var(--text, #fff) 12%);
+  font: inherit;
+}
+
+.censo-newsmodal__field textarea {
+  min-height: 88px;
+  resize: vertical;
+}
+
+.censo-newsmodal__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 180px;
+  gap: 10px;
+}
+
+.censo-newsmodal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 13px;
+}
+
+.censo-newsmodal__button {
+  min-height: 37px;
+  padding: 0 13px;
+  border: 1px solid color-mix(in srgb, var(--text, #fff) 12%, transparent);
+  border-radius: 9px;
+  color: var(--text, #f8fafc);
+  background: color-mix(in srgb, var(--text, #fff) 7%, transparent);
+  cursor: pointer;
+}
+
+.censo-newsmodal__button--primary {
+  border-color: transparent;
+  color: #fff;
+  background: var(--accent, #3b82f6);
+}
+
+.censo-newsmodal__button--danger {
+  color: #fb7185;
+  border-color: color-mix(in srgb, #fb7185 32%, transparent);
+  background: color-mix(in srgb, #fb7185 10%, transparent);
+}
+
+.censo-newsmodal__error {
+  min-height: 17px;
+  margin: 8px 0 0;
+  color: #fb7185;
+  font-size: 11px;
+}
+
+.censo-newsmodal__success {
+  min-height: 17px;
+  margin: 8px 0 0;
+  color: #34d399;
+  font-size: 11px;
+}
+
+.censo-newsadmin-list {
+  display: grid;
+  gap: 7px;
+  margin-top: 14px;
+}
+
+.censo-newsadmin-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid color-mix(in srgb, var(--text, #fff) 10%, transparent);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--text, #fff) 5%, transparent);
+}
+
+.censo-newsadmin-item p {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.38;
+}
+
+.censo-newsadmin-item small {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted, #94a3b8);
+  font-size: 9px;
+}
+
+.censo-newsadmin-delete {
+  width: 33px;
+  height: 33px;
+  display: grid;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, #fb7185 28%, transparent);
+  border-radius: 8px;
+  color: #fb7185;
+  background: color-mix(in srgb, #fb7185 9%, transparent);
+  cursor: pointer;
+}
+
+.censo-news-empty {
+  padding: 22px 14px;
+  color: var(--muted, #94a3b8);
+  text-align: center;
+  font-size: 11px;
+}
+
+
+/* La barra existe únicamente en escritorio. */
+@media (min-width: 769px) {
+  body.censo-newsbar-visible .censo-newsbar {
+    display: grid;
+  }
+
+  body.censo-newsbar-visible .footer {
+    display: none !important;
+  }
+
+  body.censo-newsbar-visible #mainFabBtn {
+    bottom: calc(var(--censo-newsbar-height) + 18px) !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .censo-newsbar,
+  .censo-newsdrawer {
+    display: none !important;
+  }
+}
+
+@media (max-width: 700px) {
+  .censo-newsbar__signature {
+    padding: 0 7px;
+    font-size: 8px;
+  }
+
+  .censo-newsbar__signature .censo-newsbar__by {
+    display: none;
+  }
+
+  .censo-newsbar__item {
+    padding: 0 12px;
+    font-size: 10px;
+  }
+
+  .censo-newsmodal__row {
+    grid-template-columns: 1fr;
+  }
+}
