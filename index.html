@@ -4,44 +4,44 @@
   <base target="_top">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  
+
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0f172a">
   <meta name="theme-color" media="(prefers-color-scheme: light)" content="#eef4fb">
-  
+
   <title>Censo Urgencias</title>
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icono.png">
-  
+
   <!-- FUENTES DE GOOGLE -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
-  
+
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-  
+
   <!-- AQUÍ ENLAZAS TU NUEVO ARCHIVO DE ESTILOS -->
-  <link rel="stylesheet" href="style.css?v=bulk-reset-v1-20260722">
+  <link rel="stylesheet" href="style.css?v=newsbar-v1.4-20260723">
 </head>
 <body class="base-dark accent-blue">
 
   <div id="loginScreen" class="modal-overlay active" style="z-index: 10000; background: var(--bg); flex-direction: column; justify-content: center; align-items: center; gap: 15px;">
-    
+
     <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 2vh;">
       <div class="title-censo" style="font-size: 3.5rem; padding-bottom: 5px;">CENSO</div>
       <div class="title-urgencias" style="font-size: 1.2rem; letter-spacing: 0.4em; margin-top: -5px;">URGENCIAS</div>
     </div>
-    
+
     <div style="color: var(--muted); font-family: 'Space Mono', monospace; text-align: center; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; max-width: 300px; margin-bottom: 3vh;">
       Hospital Regional de Delicias
     </div>
-    
+
     <!-- DESACTIVADOS POR DEFECTO PARA LA LECTURA SILENCIOSA DE FIREBASE -->
     <input id="nipInput" type="password" class="input-control" placeholder="CÓDIGO" style="max-width: 220px; text-align: center; font-size: 1.2rem; letter-spacing: 0.2em; margin-bottom: 10px;" disabled>
-    
+
     <button id="btnEnter" class="btn-login-sober" disabled>
       <span class="spin material-symbols-outlined" style="margin-right: 6px;">sync</span> CARGANDO...
     </button>
@@ -56,12 +56,12 @@
     <!-- TODO EL RESTO DE TU HTML SE QUEDA EXACTAMENTE IGUAL -->
     <div class="header">
       <canvas id="plexusCanvas"></canvas>
-      
+
       <div class="header-top">
         <div class="header-left">
           <button id="searchToggleBtn" class="icon-btn" aria-label="Buscar"><span class="material-symbols-outlined">search</span></button>
           <button id="historyBtn" class="icon-btn" type="button" aria-label="Historial" title="Ver Historial"><span class="material-symbols-outlined">history</span></button>
-          
+
           <div id="alfrojasSoundboard" style="display: none; align-items: center; gap: 6px; margin-left: 4px; padding-right: 10px; overflow-x: auto; scrollbar-width: none;">
             <button class="icon-btn sound-btn" type="button" title="Anime Ahh" onclick="new Audio('https://www.myinstants.com/media/sounds/anime-ahh.mp3').play()"><span class="material-symbols-outlined">music_note</span></button>
             <button class="icon-btn sound-btn" type="button" title="Anime Ahhhh" onclick="new Audio('https://www.myinstants.com/media/sounds/anime-ahhhh.mp3').play()"><span class="material-symbols-outlined">campaign</span></button>
@@ -91,7 +91,7 @@
         <input id="search" class="search" type="search" placeholder="Buscar paciente..." autocomplete="off" />
       </div>
     </div>
-    
+
     <div class="desktop-waves-bg hide-on-mobile">
       <svg class="waves" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto">
         <defs><path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" /></defs>
@@ -103,12 +103,12 @@
         </g>
       </svg>
     </div>
-    
+
     <div id="content"></div>
 
     <div class="footer">
       Hospital Regional de Delicias - <span style="color: var(--accent); font-weight: 600;">Rourog Innovations</span>
-      <span style="opacity: 0.4; font-size: 0.8em; margin-left: 8px;">v2.40</span>
+      <span style="opacity: 0.4; font-size: 0.8em; margin-left: 8px;">v2.45</span>
     </div>
 
     <div id="easterEggContainer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; pointer-events: none; overflow: hidden;"></div>
@@ -123,7 +123,7 @@
         <div class="modal-title" style="font-weight:700; font-family:'Space Mono';">APARIENCIA</div>
         <button class="modal-close" onclick="cerrarModal('themeModal')"><span class="material-symbols-outlined">close</span></button>
       </div>
-      
+
       <div style="margin-bottom: 16px;">
         <label class="label" style="margin-bottom: 8px;">COLOR BASE (FONDO)</label>
         <div class="color-picker-grid" id="baseColorPicker"></div>
@@ -156,13 +156,13 @@
             </div>
           </div>
         </div>
-        
+
         <div class="input-group span-9"><label>Nombre del Paciente</label><input id="modalNombre" class="input-control" type="text" /></div>
         <div class="input-group span-3"><label>Edad</label><input id="modalEdad" class="input-control" type="text" /></div>
-        
+
         <div class="input-group span-6"><label>Diagnóstico</label><textarea id="modalDiagnostico" class="input-control" rows="3"></textarea></div>
         <div class="input-group span-6"><label>Pendientes</label><textarea id="modalPendientes" class="input-control" rows="3"></textarea></div>
-        
+
         <div class="input-group span-12">
           <label class="optional-label">Mover a otra cama (Opcional)</label>
           <div class="custom-select-wrapper" id="editMoverWrapper">
@@ -203,13 +203,13 @@
             </div>
           </div>
         </div>
-        
+
         <div class="input-group span-9"><label>Nombre del Paciente</label><input id="addNombre" class="input-control" type="text" /></div>
         <div class="input-group span-3"><label>Edad</label><input id="addEdad" class="input-control" type="text" placeholder="EJ: 45 AÑOS" /></div>
-        
+
         <div class="input-group span-6"><label>Diagnóstico</label><textarea id="addDiagnostico" class="input-control" rows="3"></textarea></div>
         <div class="input-group span-6"><label>Pendientes</label><textarea id="addPendientes" class="input-control" rows="3"></textarea></div>
-        
+
         <div class="input-group span-12">
           <label>Destino</label>
           <div class="custom-select-wrapper" id="addDestinoWrapper">
@@ -264,6 +264,6 @@
   </div>
 
   <!-- AQUÍ ENLAZAS TU NUEVO ARCHIVO JAVASCRIPT -->
-  <script type="module" src="main.js?v=bulk-reset-v1-20260722"></script>
+  <script type="module" src="main.js?v=newsbar-v1.4-20260723"></script>
 </body>
 </html>

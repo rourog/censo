@@ -1,6 +1,6 @@
 /*
   CENSO DE URGENCIAS · newsBarModule.js
-  Versión: 1.3
+  Versión: 1.4
 
   RESPONSABILIDAD:
   - Escuchar anuncios internos desde Firestore.
@@ -10,7 +10,8 @@
   - Administrar anuncios mediante Ctrl + Alt + N.
 */
 
-const MODULE_VERSION = '1.3';
+const MODULE_VERSION = '1.4';
+const NEWSBAR_BUILD = 'newsbar-v1.4-20260723';
 const ANNOUNCEMENTS_COLLECTION = 'announcements';
 const AUTH_EMAIL_INTERNO = 'interno@hrd.censo';
 const DESKTOP_MEDIA = window.matchMedia('(min-width: 769px)');
@@ -24,7 +25,7 @@ const ACTIVITY_THROTTLE = 15 * 1000;
 const EXTERNAL_REQUEST_TIMEOUT = 9000;
 
 const STORAGE = {
-  externalCache: 'censo-newsbar-external-cache-v1',
+  externalCache: 'censo-newsbar-external-cache-v2',
   adminSession: 'censo-newsbar-admin-session-v1'
 };
 
@@ -231,7 +232,11 @@ export function createNewsBarModule(app) {
     const link = document.createElement('link');
     link.id = id;
     link.rel = 'stylesheet';
-    link.href = new URL('./newsBar.css', import.meta.url).href;
+
+    const cssUrl = new URL('./newsBar.css', import.meta.url);
+    cssUrl.searchParams.set('v', NEWSBAR_BUILD);
+    link.href = cssUrl.href;
+
     document.head.appendChild(link);
   }
 
@@ -824,7 +829,10 @@ export function createNewsBarModule(app) {
       .slice(0, feed.limit * 2)
       .map((entry, index) => {
         const parsed = splitGoogleNewsTitle(entry.title);
-        const publishedAt = Date.parse(entry.pubDate || '') || Date.now();
+        const publishedAt = Date.parse(entry.pubDate || '');
+
+        // Una noticia sin fecha válida no puede clasificarse como publicada hoy.
+        if (!Number.isFinite(publishedAt)) return null;
 
         return {
           id: `external-${feed.code}-${publishedAt}-${index}`,
@@ -837,6 +845,7 @@ export function createNewsBarModule(app) {
           createdAt: publishedAt
         };
       })
+      .filter(Boolean)
       .filter((item) =>
         item.text &&
         item.url &&
