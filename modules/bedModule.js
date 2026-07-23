@@ -196,14 +196,45 @@ export function getDestinoActionLabel(texto) {
   return parsed.tipo === 'ingreso' ? 'Ingreso' : 'Valoración';
 }
 
+export function getDestinoTextLabel(texto) {
+  if (!texto) return '';
+
+  const parsed = parseDestinoClinico(texto);
+  if (parsed) {
+    const accion = parsed.tipo === 'ingreso' ? 'INGRESO A' : 'VALORACIÓN POR';
+    return `${accion} ${parsed.especialidad || ''}`.replace(/\s+/g, ' ').trim().toLocaleUpperCase('es-MX');
+  }
+
+  // Los destinos simples y los registros heredados pueden comenzar con emoji.
+  // La etiqueta de selección y el tooltip deben ser texto clínico, nunca pictogramas.
+  return String(texto)
+    .trim()
+    .replace(/^[\p{Extended_Pictographic}\uFE0F\u200D\s]+/u, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLocaleUpperCase('es-MX');
+}
+
 export function getEmojiOnly(texto) {
   if (!texto) return '';
   const parsed = parseDestinoClinico(texto);
   if (parsed) return parsed.emoji || '';
 
   const t = String(texto).trim();
+  const key = normalizarEspecialidad(t);
+
+  // Compatibilidad con registros antiguos que guardaron sólo el texto.
+  if (key.includes('OBSERVACION')) return destinoIconos.observacion;
+  if (key.includes('ALTA A DOMICILIO')) return destinoIconos.altaDomicilio;
+  if (key.includes('ALTA VOLUNTARIA')) return destinoIconos.altaVoluntaria;
+  if (key.includes('DEFUNCION')) return destinoIconos.defuncion;
+
   const firstSpace = t.indexOf(' ');
-  return firstSpace > -1 ? t.substring(0, firstSpace) : t.substring(0, 2);
+  const firstToken = firstSpace > -1 ? t.substring(0, firstSpace) : t;
+  if (/\p{Extended_Pictographic}/u.test(firstToken)) return firstToken;
+
+  // Un destino desconocido no debe filtrar texto a la cabecera móvil.
+  return '📍';
 }
 
 export function agruparPorArea(lista) {

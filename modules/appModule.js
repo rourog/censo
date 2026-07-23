@@ -11,20 +11,20 @@
   - Hablar con Firestore directamente.
 */
 
-import * as firebase from './firebaseModule.js?v=mobile-actions-v14-20260722';
-import * as bed from './bedModule.js?v=mobile-actions-v14-20260722';
-import * as utils from './utilsModule.js?v=mobile-actions-v14-20260722';
-import { state } from './stateModule.js?v=mobile-actions-v14-20260722';
+import * as firebase from './firebaseModule.js?v=plexus-membrane-v17-20260722';
+import * as bed from './bedModule.js?v=plexus-membrane-v17-20260722';
+import * as utils from './utilsModule.js?v=plexus-membrane-v17-20260722';
+import { state } from './stateModule.js?v=plexus-membrane-v17-20260722';
 
-import { createEffectsModule } from './effectsModule.js?v=mobile-actions-v14-20260722';
-import { createRenderModule } from './renderModule.js?v=mobile-actions-v14-20260722';
-import { createPatientModule } from './patientModule.js?v=mobile-actions-v14-20260722';
-import { createThemeModule } from './themeModule.js?v=mobile-actions-v14-20260722';
-import { createModalModule } from './modalModule.js?v=mobile-actions-v14-20260722';
-import { createInteractionModule } from './interactionModule.js?v=mobile-actions-v14-20260722';
-import { createAuthModule } from './authModule.js?v=mobile-actions-v14-20260722';
+import { createEffectsModule } from './effectsModule.js?v=plexus-membrane-v17-20260722';
+import { createRenderModule } from './renderModule.js?v=plexus-membrane-v17-20260722';
+import { createPatientModule } from './patientModule.js?v=plexus-membrane-v17-20260722';
+import { createThemeModule } from './themeModule.js?v=plexus-membrane-v17-20260722';
+import { createModalModule } from './modalModule.js?v=plexus-membrane-v17-20260722';
+import { createInteractionModule } from './interactionModule.js?v=plexus-membrane-v17-20260722';
+import { createAuthModule } from './authModule.js?v=plexus-membrane-v17-20260722';
 
-const BUILD = 'mobile-actions-v14-20260722';
+const BUILD = 'plexus-membrane-v17-20260722';
 
 export async function bootApp() {
   console.info(`[CENSO] bootApp iniciado. BUILD: ${BUILD}`);

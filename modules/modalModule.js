@@ -13,33 +13,24 @@
   - Definir camas maestras.
 */
 
-console.info('[CENSO] modalModule.js cargado. BUILD: destinos-iconos-v11-20260522');
+console.info('[CENSO] modalModule.js cargado. BUILD: plexus-membrane-v17-20260722');
 
 export function createModalModule(app) {
   const { state } = app;
   const { db, collection, addDoc, doc, updateDoc, writeBatch, serverTimestamp } = app.firebase;
-  const { destinosGlobal, agruparPorArea, parseDestinoClinico, getDestinoMaterialIcon, getDestinoActionLabel } = app.bed;
+  const { destinosGlobal, agruparPorArea, getDestinoTextLabel } = app.bed;
   const { escapeHtml, normalizar, vibrar } = app.utils;
 
 
   function renderDestinoLabelHtml(destino) {
     if (!destino) return '(SIN DESTINO)';
-    const parsed = parseDestinoClinico(destino);
-    if (!parsed) return escapeHtml(destino);
-
-    const icon = getDestinoMaterialIcon(destino);
-    const label = getDestinoActionLabel(destino);
-    const especialidad = parsed.especialidad || '';
-    return `<span class="destino-option-label" title="${escapeHtml(label)} · ${escapeHtml(especialidad)}">
-      <span class="material-symbols-outlined destino-action-icon" aria-hidden="true">${escapeHtml(icon)}</span>
-      <span class="destino-specialty-emoji" aria-hidden="true">${escapeHtml(parsed.emoji)}</span>
-      <span class="destino-specialty-text">${escapeHtml(especialidad)}</span>
-    </span>`;
+    const textLabel = getDestinoTextLabel(destino);
+    return `<span class="destino-option-label" title="${escapeHtml(textLabel)}">${escapeHtml(textLabel)}</span>`;
   }
 
   function renderDestinoOptionHtml(destino, selectedClass = '') {
     const value = String(destino || '').toUpperCase().trim();
-    const search = value;
+    const search = getDestinoTextLabel(value);
     return `<div class="custom-select-option ${selectedClass}" data-value="${escapeHtml(value)}" data-search="${escapeHtml(search)}">${renderDestinoLabelHtml(value)}</div>`;
   }
 
@@ -57,28 +48,12 @@ export function createModalModule(app) {
       .custom-select-display .destino-option-label,
       .custom-select-option .destino-option-label,
       .inline-destino-option .destino-option-label {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
+        display: block;
         max-width: 100%;
         min-width: 0;
-      }
-
-      .custom-select-display .destino-action-icon,
-      .custom-select-option .destino-action-icon,
-      .inline-destino-option .destino-action-icon {
-        font-size: 1rem;
-        line-height: 1;
-        color: var(--accent);
-        font-variation-settings: 'FILL' 0, 'wght' 650, 'GRAD' 0, 'opsz' 24;
-        flex-shrink: 0;
-      }
-
-      .custom-select-display .destino-specialty-text,
-      .custom-select-option .destino-specialty-text,
-      .inline-destino-option .destino-specialty-text {
         overflow: hidden;
         text-overflow: ellipsis;
+        white-space: nowrap;
       }
     `;
     document.head.appendChild(style);
@@ -314,7 +289,7 @@ export function createModalModule(app) {
     destinosGlobal.forEach(d => {
       const dStr = String(d).toUpperCase().trim();
       const sel = dStr === destinoActual.toUpperCase().trim() ? 'selected' : '';
-      opcionesHtml += `<div class="inline-destino-option ${sel}" data-value="${escapeHtml(dStr)}" data-search="${escapeHtml(dStr)}">${renderDestinoLabelHtml(dStr)}</div>`;
+      opcionesHtml += `<div class="inline-destino-option ${sel}" data-value="${escapeHtml(dStr)}" data-search="${escapeHtml(getDestinoTextLabel(dStr))}">${renderDestinoLabelHtml(dStr)}</div>`;
     });
     opcionesHtml += `</div>`;
   

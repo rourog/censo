@@ -12,6 +12,7 @@ async function importLocalModule(path) {
 }
 
 const { getMobileSwipeAction, MOBILE_SWIPE_THRESHOLD } = await importLocalModule('modules/interactionModule.js');
+const { getEmojiOnly, getDestinoTextLabel } = await importLocalModule('modules/bedModule.js');
 
 assert.equal(
   getMobileSwipeAction(-MOBILE_SWIPE_THRESHOLD),
@@ -42,5 +43,33 @@ for (const action of ['toggle-alerta', 'editar-observacion']) {
 assert.match(renderSource, /renderCardActions\(p, alertaActiva, observacion\)/u);
 assert.match(renderSource, /swipe-action-label">BORRAR/u);
 assert.match(renderSource, /swipe-action-label">EDITAR/u);
+assert.match(
+  renderSource,
+  /if \(mode === 'compact'\)[\s\S]*getEmojiOnly\(destino\)[\s\S]*destino-specialty-emoji/u,
+  'Los destinos simples deben renderizar sólo su icono en la cabecera móvil.'
+);
+assert.equal(getEmojiOnly('👀 Observación'), '👀');
+assert.equal(getEmojiOnly('OBSERVACIÓN'), '👀', 'Los registros antiguos de Observación deben conservar un icono.');
+assert.equal(getEmojiOnly('🏠 Alta a domicilio'), '🏠');
+assert.equal(getEmojiOnly('DESTINO ANTIGUO DESCONOCIDO'), '📍', 'Un destino desconocido no debe mostrar texto en móvil.');
 
-console.log('OK: acciones y gestos móviles verificados.');
+assert.equal(getDestinoTextLabel('INGRESO 🔪 Cirugía General'), 'INGRESO A CIRUGÍA GENERAL');
+assert.equal(getDestinoTextLabel('VALORACIÓN 🔪 Cirugía General'), 'VALORACIÓN POR CIRUGÍA GENERAL');
+assert.equal(getDestinoTextLabel('👀 Observación'), 'OBSERVACIÓN');
+assert.equal(getDestinoTextLabel('🏥 Ingreso a Medicina Interna'), 'INGRESO A MEDICINA INTERNA');
+
+const modalSource = readFileSync(resolve(root, 'modules/modalModule.js'), 'utf8');
+assert.match(modalSource, /const textLabel = getDestinoTextLabel\(destino\)/u);
+assert.match(modalSource, /const search = getDestinoTextLabel\(value\)/u);
+assert.doesNotMatch(
+  modalSource,
+  /destino-action-icon|destino-specialty-emoji/u,
+  'Los selectores de destino no deben volver a mostrar iconos.'
+);
+assert.match(
+  renderSource,
+  /title="\$\{escapeHtml\(textLabel\)\}" aria-label="\$\{escapeHtml\(textLabel\)\}"/u,
+  'Los tooltips de destino deben usar la misma etiqueta textual del selector.'
+);
+
+console.log('OK: acciones móviles y etiquetas de destino verificadas.');

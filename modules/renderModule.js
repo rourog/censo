@@ -12,30 +12,37 @@
   - Calcular reglas de camas fuera de lo necesario para mostrar.
 */
 
-console.info('[CENSO] renderModule.js cargado. BUILD: mobile-actions-v14-20260722');
+console.info('[CENSO] renderModule.js cargado. BUILD: plexus-membrane-v17-20260722');
 
 export function createRenderModule(app) {
   const { state } = app;
-  const { areaVisuals, getEmojiOnly, agruparPorArea, parseDestinoClinico, getDestinoMaterialIcon, getDestinoActionLabel } = app.bed;
+  const { areaVisuals, getEmojiOnly, agruparPorArea, parseDestinoClinico, getDestinoMaterialIcon, getDestinoTextLabel } = app.bed;
   const { escapeHtml } = app.utils;
 
   function renderDestinoHtml(destino, mode = 'chip') {
     if (!destino) return '';
     const parsed = parseDestinoClinico(destino);
     const modeClass = mode === 'compact' ? 'destino-chip destino-chip-compact' : 'chip destino-chip';
+    const textLabel = getDestinoTextLabel(destino);
 
     if (parsed) {
       const icon = getDestinoMaterialIcon(destino);
-      const label = getDestinoActionLabel(destino);
       const especialidad = parsed.especialidad || '';
-      return `<div class="${modeClass}" title="${escapeHtml(label)} · ${escapeHtml(especialidad)}">
+      return `<div class="${modeClass}" title="${escapeHtml(textLabel)}" aria-label="${escapeHtml(textLabel)}">
         <span class="material-symbols-outlined destino-action-icon" aria-hidden="true">${escapeHtml(icon)}</span>
         <span class="destino-specialty-emoji" aria-hidden="true">${escapeHtml(parsed.emoji)}</span>
         ${mode === 'compact' ? '' : `<span class="destino-specialty-text">${escapeHtml(especialidad)}</span>`}
       </div>`;
     }
 
-    return `<div class="${modeClass}">${escapeHtml(destino)}</div>`;
+    if (mode === 'compact') {
+      const icono = getEmojiOnly(destino);
+      return `<div class="${modeClass}" title="${escapeHtml(textLabel)}" aria-label="${escapeHtml(textLabel)}">
+        <span class="destino-specialty-emoji" aria-hidden="true">${escapeHtml(icono)}</span>
+      </div>`;
+    }
+
+    return `<div class="${modeClass}" title="${escapeHtml(textLabel)}">${escapeHtml(destino)}</div>`;
   }
 
   function getColorfulChipHtml(destino) {
@@ -617,7 +624,7 @@ export function createRenderModule(app) {
     if (!lista.length) {
       if (state.isFetchingData) content.innerHTML = generarSkeletonHtml();
       else content.innerHTML = `<div class="empty animate-in">NO HAY PACIENTES EN EL CENSO.</div>`;
-      if (typeof app.syncPlexusPatients === 'function') app.syncPlexusPatients(lista);
+      if (typeof app.syncPlexusPatients === 'function') app.syncPlexusPatients(state.pacientesGlobal);
       return;
     }
 
@@ -704,7 +711,7 @@ export function createRenderModule(app) {
       content.innerHTML = htmlArr.join('');
 
       setTimeout(app.initScrollGuider, 100);
-      if (typeof app.syncPlexusPatients === 'function') app.syncPlexusPatients(lista);
+      if (typeof app.syncPlexusPatients === 'function') app.syncPlexusPatients(state.pacientesGlobal);
       return;
     }
 
@@ -764,7 +771,7 @@ export function createRenderModule(app) {
 
     content.innerHTML = sections.join('');
     setTimeout(app.initSwipe, 50);
-    if (typeof app.syncPlexusPatients === 'function') app.syncPlexusPatients(lista);
+    if (typeof app.syncPlexusPatients === 'function') app.syncPlexusPatients(state.pacientesGlobal);
   }
 
   function mostrarError(error) {
