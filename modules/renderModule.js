@@ -12,7 +12,7 @@
   - Calcular reglas de camas fuera de lo necesario para mostrar.
 */
 
-console.info('[CENSO] renderModule.js cargado. BUILD: plexus-membrane-v18-20260722');
+console.info('[CENSO] renderModule.js cargado. BUILD: quick-bed-v19-20260722');
 
 export function createRenderModule(app) {
   const { state } = app;
@@ -189,6 +189,42 @@ export function createRenderModule(app) {
       .destino-chip-compact .destino-action-icon {
         font-size: 0.96rem !important;
       }
+
+      .quick-bed-trigger {
+        appearance: none;
+        -webkit-appearance: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        max-width: 100%;
+        margin: 0;
+        padding: 3px 6px;
+        border: 1px solid transparent;
+        border-radius: 7px;
+        background: transparent;
+        color: var(--accent);
+        font: inherit;
+        font-weight: 700;
+        line-height: 1.15;
+        text-transform: uppercase;
+        cursor: pointer;
+        touch-action: manipulation;
+        transition: background 150ms ease, border-color 150ms ease, transform 150ms ease;
+      }
+
+      .quick-bed-trigger:hover,
+      .quick-bed-trigger:focus-visible {
+        background: var(--accent-soft);
+        border-color: var(--accent-border);
+        outline: none;
+      }
+
+      .quick-bed-trigger:active { transform: scale(0.95); }
+      .quick-bed-trigger .material-symbols-outlined { font-size: 0.9rem !important; flex: 0 0 auto; }
+      .quick-bed-trigger .quick-bed-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .patient-bed.quick-bed-trigger { margin-top: 6px; color: var(--muted); font-size: 0.8rem; font-weight: 600; }
+      .patient-alert .quick-bed-trigger { color: #fff !important; }
 
       .alert-star-btn,
       .obs-note-btn {
@@ -679,7 +715,11 @@ export function createRenderModule(app) {
           const alertaActiva = Boolean(p.alerta);
           const observacion = getObservacion(p);
           htmlArr.push(`<tr class="patient-row ${alertaActiva ? 'patient-alert' : ''}" data-fila="${escapeHtml(p.fila)}" data-alerta="${alertaActiva ? '1' : '0'}" onclick="toggleTableRow(this)">
-              <td style="padding: 6px 10px; text-align: center;"><span style="color: var(--accent); font-weight: 700; font-size: 0.85rem;">${escapeHtml(p.cama || '-')}</span></td>
+              <td class="quick-bed-cell" style="padding: 6px 10px; text-align: center;">
+                <button class="quick-bed-trigger" type="button" data-fila="${escapeHtml(p.fila)}" onclick="abrirCamaFlotante(this, this.dataset.fila, event)" title="Cambiar cama: ${escapeHtml(p.cama || 'SIN CAMA')}" aria-label="Cambiar cama de ${escapeHtml(p.nombre)}. Cama actual: ${escapeHtml(p.cama || 'sin cama')}">
+                  <span class="quick-bed-label">${escapeHtml(p.cama || '-')}</span><span class="material-symbols-outlined" aria-hidden="true">swap_horiz</span>
+                </button>
+              </td>
               <td style="padding: 6px 10px; font-size: 0.7rem; color: var(--muted); font-family: 'Fira Code', monospace; line-height: 1.3; text-align: center;">${p.fechaIngresoFormateada || '-'}</td>
 
               <td style="padding: 6px 10px; font-family: 'Space Mono', monospace; font-weight: 700; font-size: 0.9rem; line-height: 1.3;" class="patient-name editable-cell" data-campo="nombre" data-original="${escapeHtml(p.nombre)}" contenteditable="true" onfocus="iniciarEdicionSubtle(this)" onblur="finalizarEdicionSubtle(this)" onkeydown="manejarTeclasSubtle(this, event)" onclick="event.stopPropagation()">
@@ -732,7 +772,7 @@ export function createRenderModule(app) {
             ${pacientes.map((p, indexPatient) => {
               const alertaActiva = Boolean(p.alerta);
               const observacion = getObservacion(p);
-              const camaHtml = p.cama ? `<div class="patient-bed">${escapeHtml(p.cama)}</div>` : '';
+              const camaHtml = p.cama ? `<button class="patient-bed quick-bed-trigger" type="button" data-fila="${escapeHtml(p.fila)}" onclick="abrirCamaFlotante(this, this.dataset.fila, event)" title="Cambiar cama: ${escapeHtml(p.cama)}" aria-label="Cambiar cama de ${escapeHtml(p.nombre)}. Cama actual: ${escapeHtml(p.cama)}"><span class="quick-bed-label">${escapeHtml(p.cama)}</span><span class="material-symbols-outlined" aria-hidden="true">swap_horiz</span></button>` : '';
 
               const destinoEmojiHtml = p.destino ? renderDestinoHtml(p.destino, 'compact') : '';
 

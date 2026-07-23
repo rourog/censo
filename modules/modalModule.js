@@ -13,13 +13,14 @@
   - Definir camas maestras.
 */
 
-console.info('[CENSO] modalModule.js cargado. BUILD: plexus-membrane-v18-20260722');
+console.info('[CENSO] modalModule.js cargado. BUILD: quick-bed-v19-20260722');
 
 export function createModalModule(app) {
   const { state } = app;
-  const { db, collection, addDoc, doc, updateDoc, writeBatch, serverTimestamp } = app.firebase;
-  const { destinosGlobal, agruparPorArea, getDestinoTextLabel } = app.bed;
+  const { db, collection, addDoc, doc, updateDoc, getDocs, query, where, writeBatch, serverTimestamp } = app.firebase;
+  const { destinosGlobal, masterCamas, agruparPorArea, getDestinoTextLabel } = app.bed;
   const { escapeHtml, normalizar, vibrar } = app.utils;
+  const movimientosCamaPendientes = new Set();
 
 
   function renderDestinoLabelHtml(destino) {
@@ -40,6 +41,25 @@ export function createModalModule(app) {
     display.innerHTML = value ? renderDestinoLabelHtml(value) : '(SIN DESTINO)';
   }
 
+  function getCamaCatalogo(area, cama) {
+    const areaKey = normalizar(area);
+    const camaKey = normalizar(cama);
+    return masterCamas.find(item => normalizar(item.area) === areaKey && normalizar(item.cama) === camaKey) || null;
+  }
+
+  function getCamaSearchText(cama) {
+    return [cama.area, cama.cama, cama.descripcion || ''].filter(Boolean).join(' ');
+  }
+
+  function renderCamaLabelHtml(cama, { actual = false } = {}) {
+    const descripcion = cama.descripcion
+      ? `<span class="inline-bed-description">${escapeHtml(cama.descripcion)}</span>`
+      : '';
+    const actualLabel = actual ? '<span class="inline-bed-current">ACTUAL</span>' : '';
+
+    return `<span class="inline-bed-name">${escapeHtml(cama.cama)}</span>${descripcion}${actualLabel}`;
+  }
+
   function ensureDestinoOptionStyles() {
     if (document.getElementById('censo-destino-option-styles')) return;
     const style = document.createElement('style');
@@ -55,6 +75,45 @@ export function createModalModule(app) {
         text-overflow: ellipsis;
         white-space: nowrap;
       }
+
+      .inline-selector-container {
+        background: var(--panel);
+        border: 1px solid var(--accent);
+        border-radius: var(--radius-sm);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        z-index: 99999;
+      }
+
+      .inline-selector-container .inline-options-wrapper {
+        max-height: min(320px, 52vh);
+        overflow-y: auto;
+        width: 100%;
+      }
+
+      .inline-selector-container .inline-destino-option {
+        padding: 10px 12px;
+        font-size: 0.8rem;
+        color: var(--text);
+        cursor: pointer;
+        transition: background var(--transition-fast);
+        text-transform: uppercase;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .inline-selector-container .inline-destino-option:hover,
+      .inline-selector-container .inline-destino-option.selected {
+        background: var(--accent-soft);
+        color: var(--accent);
+      }
+
+      .inline-selector-container .inline-destino-option.selected { font-weight: 700; }
+      .inline-selector-container .custom-select-optgroup { position: sticky; top: 0; z-index: 1; }
+      .inline-bed-name { display: block; font-weight: 750; }
+      .inline-bed-description { display: block; margin-top: 2px; color: var(--muted); font-size: 0.67rem; line-height: 1.25; }
+      .inline-bed-current { display: inline-block; margin-top: 4px; padding: 2px 5px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-size: 0.6rem; letter-spacing: 0.06em; }
     `;
     document.head.appendChild(style);
   }
@@ -272,12 +331,12 @@ export function createModalModule(app) {
     event.stopPropagation();
     const tr = tdEl.closest('tr');
     if (!tr.classList.contains('expanded-row')) { toggleTableRow(tr); return; }
-    if (document.querySelector('.inline-destino-container')) return; 
+    if (document.querySelector('.inline-selector-container')) return;
 
     window.isInlineEditing = true; 
 
     const container = document.createElement('div');
-    container.className = 'inline-destino-container animate-in';
+    container.className = 'inline-selector-container inline-destino-container animate-in';
   
     let opcionesHtml = `
       <div style="padding: 6px; background: var(--panel); border-bottom: 1px solid var(--line);">
@@ -330,6 +389,7 @@ export function createModalModule(app) {
       if (window.pendingSnapshotList) { state.pacientesGlobal = window.pendingSnapshotList; window.pendingSnapshotList = null; app.filtrar(); }
       document.removeEventListener('scroll', cerrarDirecto, true);
     };
+    container.addEventListener('censo:close', cerrarDirecto, { once: true });
 
     container.addEventListener('click', async (e) => {
       e.stopPropagation();
@@ -363,6 +423,181 @@ export function createModalModule(app) {
         document.addEventListener('click', closeHandler);
         document.addEventListener('scroll', cerrarDirecto, true);
         inputBuscador.focus();
+    }, 10);
+  }
+
+  // ==========================================================
+  // CAMBIO RÁPIDO DE CAMA DESDE TABLA O TARJETA
+  // ==========================================================
+  function abrirCamaFlotante(anchorEl, filaId, event) {
+    ensureDestinoOptionStyles();
+    event?.preventDefault();
+    event?.stopPropagation();
+
+    if (document.querySelector('.inline-selector-container')) return;
+    if (movimientosCamaPendientes.has(String(filaId))) {
+      vibrar([20, 20, 20]);
+      return;
+    }
+
+    const paciente = state.pacientesGlobal.find(p => String(p.fila) === String(filaId));
+    if (!paciente) {
+      vibrar([30, 30, 30]);
+      return;
+    }
+
+    window.isInlineEditing = true;
+
+    const camaActual = getCamaCatalogo(paciente.area, paciente.cama) || {
+      area: String(paciente.area || 'SIN ÁREA ASIGNADA').toUpperCase(),
+      cama: String(paciente.cama || 'SIN CAMA').toUpperCase()
+    };
+    const libres = state.camasLibresGlobal.filter(cama =>
+      normalizar(cama.area) !== normalizar(camaActual.area) || normalizar(cama.cama) !== normalizar(camaActual.cama)
+    );
+
+    const container = document.createElement('div');
+    container.className = 'inline-selector-container inline-cama-container animate-in';
+
+    let opcionesHtml = `
+      <div style="padding: 6px; background: var(--panel); border-bottom: 1px solid var(--line);">
+        <input type="text" class="inline-search-input input-control" placeholder="Buscar cama o área..." autocomplete="off" style="width: 100%; padding: 7px 10px; font-size: 0.8rem; margin: 0; outline: none;">
+      </div>
+      <div class="inline-options-wrapper">
+        <div class="custom-select-optgroup">CAMA ACTUAL · ${escapeHtml(camaActual.area)}</div>
+        <div class="inline-destino-option inline-cama-option selected" data-area="${escapeHtml(camaActual.area)}" data-cama="${escapeHtml(camaActual.cama)}" data-search="${escapeHtml(getCamaSearchText(camaActual))}">
+          ${renderCamaLabelHtml(camaActual, { actual: true })}
+        </div>`;
+
+    if (libres.length > 0) {
+      const gruposLibres = agruparPorArea(libres);
+      for (const [area, camas] of Object.entries(gruposLibres)) {
+        opcionesHtml += `<div class="custom-select-optgroup">${escapeHtml(area.toUpperCase())}</div>`;
+        camas.forEach(cama => {
+          opcionesHtml += `<div class="inline-destino-option inline-cama-option" data-area="${escapeHtml(cama.area)}" data-cama="${escapeHtml(cama.cama)}" data-search="${escapeHtml(getCamaSearchText(cama))}">${renderCamaLabelHtml(cama)}</div>`;
+        });
+      }
+    } else {
+      opcionesHtml += '<div class="inline-destino-option" aria-disabled="true">NO HAY OTRAS CAMAS DISPONIBLES</div>';
+    }
+    opcionesHtml += '</div>';
+
+    container.innerHTML = opcionesHtml;
+    document.body.appendChild(container);
+
+    const rect = anchorEl.getBoundingClientRect();
+    const viewportPadding = 8;
+    const selectorWidth = Math.min(Math.max(280, rect.width), window.innerWidth - (viewportPadding * 2));
+    const selectorLeft = Math.min(
+      Math.max(viewportPadding, rect.left),
+      Math.max(viewportPadding, window.innerWidth - selectorWidth - viewportPadding)
+    );
+    container.style.position = 'fixed';
+    container.style.width = selectorWidth + 'px';
+    container.style.left = selectorLeft + 'px';
+
+    const dropdownHeight = Math.min(380, Math.round(window.innerHeight * 0.58));
+    if (rect.bottom + dropdownHeight > window.innerHeight) {
+      container.style.bottom = Math.max(viewportPadding, window.innerHeight - rect.top + 4) + 'px';
+      container.style.top = 'auto';
+      container.style.boxShadow = '0 -10px 25px rgba(0,0,0,0.5)';
+    } else {
+      container.style.top = (rect.bottom + 4) + 'px';
+      container.style.bottom = 'auto';
+    }
+
+    const inputBuscador = container.querySelector('.inline-search-input');
+    const wrapperOptions = container.querySelector('.inline-options-wrapper');
+
+    inputBuscador.addEventListener('input', (e) => {
+      const q = normalizar(e.target.value);
+      wrapperOptions.querySelectorAll('.inline-cama-option').forEach(opt => {
+        opt.style.display = normalizar(opt.dataset.search || opt.innerText).includes(q) ? 'block' : 'none';
+      });
+    });
+
+    const cerrarDirecto = (e) => {
+      if (e && e.type === 'scroll' && container.contains(e.target)) return;
+      window.isInlineEditing = false;
+      if (container.parentNode) container.remove();
+      if (window.pendingSnapshotList) {
+        state.pacientesGlobal = window.pendingSnapshotList;
+        window.pendingSnapshotList = null;
+        app.filtrar();
+      }
+      document.removeEventListener('scroll', cerrarDirecto, true);
+    };
+    container.addEventListener('censo:close', cerrarDirecto, { once: true });
+
+    container.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      if (e.target.classList.contains('inline-search-input')) return;
+
+      const opcionEl = e.target.closest('.inline-cama-option');
+      if (!opcionEl) return;
+
+      const nuevaArea = String(opcionEl.dataset.area || '').toUpperCase().trim();
+      const nuevaCama = String(opcionEl.dataset.cama || '').toUpperCase().trim();
+      const mismaCama = normalizar(nuevaArea) === normalizar(camaActual.area) && normalizar(nuevaCama) === normalizar(camaActual.cama);
+      cerrarDirecto();
+      if (mismaCama) return;
+
+      const sigueLibreLocal = state.camasLibresGlobal.some(cama =>
+        normalizar(cama.area) === normalizar(nuevaArea) && normalizar(cama.cama) === normalizar(nuevaCama)
+      );
+      if (!sigueLibreLocal) {
+        vibrar([60, 40, 60]);
+        alert('ESA CAMA YA NO ESTÁ DISPONIBLE. EL CENSO SE ACTUALIZÓ MIENTRAS ELEGÍAS.');
+        app.filtrar();
+        return;
+      }
+
+      anchorEl.innerHTML = '<span class="spin material-symbols-outlined" style="font-size:1rem;">sync</span>';
+      movimientosCamaPendientes.add(String(filaId));
+
+      try {
+        // Relectura del servidor justo antes de escribir: reduce colisiones entre usuarios
+        // sin modificar el esquema actual de Firestore.
+        const ocupantes = await getDocs(query(collection(db, 'pacientes'), where('cama', '==', nuevaCama)));
+        let ocupadaPorOtro = false;
+        ocupantes.forEach(snapshot => {
+          const data = snapshot.data() || {};
+          if (String(snapshot.id) !== String(filaId) && normalizar(data.area) === normalizar(nuevaArea)) {
+            ocupadaPorOtro = true;
+          }
+        });
+
+        if (ocupadaPorOtro) {
+          throw new Error('LA CAMA FUE OCUPADA POR OTRO USUARIO. SE RECARGARÁ LA LISTA DISPONIBLE.');
+        }
+
+        await updateDoc(doc(db, 'pacientes', filaId), { cama: nuevaCama, area: nuevaArea });
+        const pacienteLocal = state.pacientesGlobal.find(p => String(p.fila) === String(filaId));
+        if (pacienteLocal) {
+          pacienteLocal.cama = nuevaCama;
+          pacienteLocal.area = nuevaArea;
+        }
+        vibrar([18, 24, 18]);
+      } catch (error) {
+        vibrar([80, 40, 80]);
+        alert('ERROR AL CAMBIAR CAMA: ' + error.message);
+      } finally {
+        movimientosCamaPendientes.delete(String(filaId));
+        app.filtrar();
+      }
+    });
+
+    const closeHandler = (e) => {
+      if (!container.contains(e.target)) {
+        cerrarDirecto();
+        document.removeEventListener('click', closeHandler);
+      }
+    };
+
+    setTimeout(() => {
+      document.addEventListener('click', closeHandler);
+      document.addEventListener('scroll', cerrarDirecto, true);
+      inputBuscador.focus();
     }, 10);
   }
 
@@ -692,6 +927,7 @@ export function createModalModule(app) {
     window.finalizarEdicionSubtle = finalizarEdicionSubtle;
     window.manejarTeclasSubtle = manejarTeclasSubtle;
     window.abrirDestinoFlotante = abrirDestinoFlotante;
+    window.abrirCamaFlotante = abrirCamaFlotante;
     window.cerrarModal = cerrarModal;
     window.cerrarModalBorrado = cerrarModalBorrado;
     window.toggleCard = toggleCard;
@@ -728,6 +964,7 @@ export function createModalModule(app) {
     iniciarEdicionSubtle,
     finalizarEdicionSubtle,
     manejarTeclasSubtle,
-    abrirDestinoFlotante
+    abrirDestinoFlotante,
+    abrirCamaFlotante
   };
 }

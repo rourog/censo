@@ -1,4 +1,4 @@
-import { createPlexusController } from './plexus.js?v=plexus-membrane-v18-20260722';
+import { createPlexusController } from './plexus.js?v=quick-bed-v19-20260722';
 
 /*
   MÓDULO: effectsModule.js
