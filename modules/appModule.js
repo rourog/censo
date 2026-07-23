@@ -11,22 +11,22 @@
   - Hablar con Firestore directamente.
 */
 
-import * as firebase from './firebaseModule.js?v=newsbar-v1.2-20260723';
-import * as bed from './bedModule.js?v=newsbar-v1.2-20260723';
-import * as utils from './utilsModule.js?v=newsbar-v1.2-20260723';
-import { state } from './stateModule.js?v=newsbar-v1.2-20260723';
+import * as firebase from './firebaseModule.js?v=newsbar-v1.3-20260723';
+import * as bed from './bedModule.js?v=newsbar-v1.3-20260723';
+import * as utils from './utilsModule.js?v=newsbar-v1.3-20260723';
+import { state } from './stateModule.js?v=newsbar-v1.3-20260723';
 
-import { createEffectsModule } from './effectsModule.js?v=newsbar-v1.2-20260723';
-import { createRenderModule } from './renderModule.js?v=newsbar-v1.2-20260723';
-import { createPatientModule } from './patientModule.js?v=newsbar-v1.2-20260723';
-import { createThemeModule } from './themeModule.js?v=newsbar-v1.2-20260723';
-import { createModalModule } from './modalModule.js?v=newsbar-v1.2-20260723';
-import { createMaintenanceModule } from './maintenanceModule.js?v=newsbar-v1.2-20260723';
-import { createInteractionModule } from './interactionModule.js?v=newsbar-v1.2-20260723';
-import { createNewsBarModule } from './newsBarModule.js?v=newsbar-v1.2-20260723';
-import { createAuthModule } from './authModule.js?v=newsbar-v1.2-20260723';
+import { createEffectsModule } from './effectsModule.js?v=newsbar-v1.3-20260723';
+import { createRenderModule } from './renderModule.js?v=newsbar-v1.3-20260723';
+import { createPatientModule } from './patientModule.js?v=newsbar-v1.3-20260723';
+import { createThemeModule } from './themeModule.js?v=newsbar-v1.3-20260723';
+import { createModalModule } from './modalModule.js?v=newsbar-v1.3-20260723';
+import { createMaintenanceModule } from './maintenanceModule.js?v=newsbar-v1.3-20260723';
+import { createInteractionModule } from './interactionModule.js?v=newsbar-v1.3-20260723';
+import { createNewsBarModule } from './newsBarModule.js?v=newsbar-v1.3-20260723';
+import { createAuthModule } from './authModule.js?v=newsbar-v1.3-20260723';
 
-const BUILD = 'newsbar-v1.2-20260723';
+const BUILD = 'newsbar-v1.3-20260723';
 
 export async function bootApp() {
   console.info(`[CENSO] bootApp iniciado. BUILD: ${BUILD}`);

@@ -1,16 +1,16 @@
 /*
   CENSO DE URGENCIAS · newsBarModule.js
-  Versión: 1.2
+  Versión: 1.3
 
   RESPONSABILIDAD:
   - Escuchar anuncios internos desde Firestore.
   - Mostrar noticias externas solamente cuando no hay anuncios activos.
   - Mantener una velocidad lineal constante para ambos tipos de contenido.
-  - Priorizar Delicias, Chihuahua y México con máximo 12 noticias.
+  - Priorizar Delicias, Chihuahua, medicina y México con máximo 12 noticias.
   - Administrar anuncios mediante Ctrl + Alt + N.
 */
 
-const MODULE_VERSION = '1.2';
+const MODULE_VERSION = '1.3';
 const ANNOUNCEMENTS_COLLECTION = 'announcements';
 const AUTH_EMAIL_INTERNO = 'interno@hrd.censo';
 const DESKTOP_MEDIA = window.matchMedia('(min-width: 769px)');
@@ -48,6 +48,17 @@ const EXTERNAL_FEEDS = [
       '&hl=es-419&gl=MX&ceid=MX:es-419'
   },
   {
+    region: 'Medicina',
+    code: 'MED',
+    limit: 12,
+    rssUrl:
+      'https://news.google.com/rss/search?q=' +
+      encodeURIComponent(
+        '("salud" OR "medicina" OR "hospitales" OR "medicamentos" OR "enfermedades") México when:1d'
+      ) +
+      '&hl=es-419&gl=MX&ceid=MX:es-419'
+  },
+  {
     region: 'México',
     code: 'MX',
     limit: 12,
@@ -57,9 +68,25 @@ const EXTERNAL_FEEDS = [
 ];
 
 const EXTERNAL_PRIORITY = [
-  { code: 'DEL', preferred: 5 },
-  { code: 'CHIH', preferred: 4 },
-  { code: 'MX', preferred: 3 }
+  { code: 'DEL', preferred: 4, maximum: 6 },
+  { code: 'CHIH', preferred: 3, maximum: 5 },
+  { code: 'MED', preferred: 3, maximum: 3 },
+  { code: 'MX', preferred: 2, maximum: 12 }
+];
+
+const EXTERNAL_DISPLAY_SEQUENCE = [
+  'DEL',
+  'CHIH',
+  'MED',
+  'DEL',
+  'MX',
+  'CHIH',
+  'MED',
+  'DEL',
+  'MX',
+  'MED',
+  'CHIH',
+  'DEL'
 ];
 
 function selectPrioritizedExternalNews(items) {
@@ -75,36 +102,90 @@ function selectPrioritizedExternalNews(items) {
       if (bucket) bucket.push(item);
     });
 
-  const selected = [];
+  const selectedByCode = new Map(
+    EXTERNAL_PRIORITY.map(({ code }) => [code, []])
+  );
   const selectedIds = new Set();
 
-  function takeFromRegion(code, amount) {
-    const bucket = grouped.get(code) || [];
+  function takeFromRegion(code, amount, maximum) {
+    const source = grouped.get(code) || [];
+    const destination = selectedByCode.get(code) || [];
     let taken = 0;
 
-    for (const item of bucket) {
-      if (selected.length >= EXTERNAL_MAX_ITEMS || taken >= amount) break;
+    for (const item of source) {
+      if (taken >= amount || destination.length >= maximum) break;
       if (selectedIds.has(item.id)) continue;
 
-      selected.push(item);
+      destination.push(item);
       selectedIds.add(item.id);
       taken += 1;
     }
+
+    selectedByCode.set(code, destination);
   }
 
-  // Primera pasada: distribución preferida.
-  EXTERNAL_PRIORITY.forEach(({ code, preferred }) => {
-    takeFromRegion(code, preferred);
+  // Primera pasada: reserva la mezcla recomendada.
+  EXTERNAL_PRIORITY.forEach(({ code, preferred, maximum }) => {
+    takeFromRegion(code, preferred, maximum);
   });
 
-  // Segunda pasada: completar espacios respetando la prioridad regional.
-  if (selected.length < EXTERNAL_MAX_ITEMS) {
-    EXTERNAL_PRIORITY.forEach(({ code }) => {
-      takeFromRegion(code, EXTERNAL_MAX_ITEMS);
-    });
+  // Completa espacios con prioridad geográfica.
+  // Medicina permanece limitada a tres titulares.
+  const fillPriority = ['DEL', 'CHIH', 'MX'];
+
+  while (
+    Array.from(selectedByCode.values()).flat().length < EXTERNAL_MAX_ITEMS
+  ) {
+    let addedInPass = false;
+
+    for (const code of fillPriority) {
+      const config = EXTERNAL_PRIORITY.find((item) => item.code === code);
+      const before = selectedByCode.get(code).length;
+
+      takeFromRegion(code, 1, config.maximum);
+
+      if (selectedByCode.get(code).length > before) {
+        addedInPass = true;
+      }
+
+      if (
+        Array.from(selectedByCode.values()).flat().length >=
+        EXTERNAL_MAX_ITEMS
+      ) {
+        break;
+      }
+    }
+
+    if (!addedInPass) break;
   }
 
-  return selected.slice(0, EXTERNAL_MAX_ITEMS);
+  // Intercala MED entre las noticias regionales.
+  const queues = new Map(
+    Array.from(selectedByCode.entries()).map(([code, list]) => [
+      code,
+      [...list]
+    ])
+  );
+
+  const ordered = [];
+
+  for (const code of EXTERNAL_DISPLAY_SEQUENCE) {
+    const queue = queues.get(code) || [];
+    const item = queue.shift();
+
+    if (item) ordered.push(item);
+    queues.set(code, queue);
+  }
+
+  ['DEL', 'CHIH', 'MED', 'MX'].forEach((code) => {
+    const queue = queues.get(code) || [];
+
+    while (queue.length && ordered.length < EXTERNAL_MAX_ITEMS) {
+      ordered.push(queue.shift());
+    }
+  });
+
+  return ordered.slice(0, EXTERNAL_MAX_ITEMS);
 }
 
 
