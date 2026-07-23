@@ -1,6 +1,6 @@
 /*
   CENSO DE URGENCIAS · BARRA DE AVISOS/NOTICIAS
-  Versión del módulo: 1.0
+  Versión del módulo: 1.1
 */
 
 :root {
@@ -161,6 +161,14 @@
   margin: 0 3px;
   color: var(--text, #f8fafc);
   letter-spacing: .08em;
+}
+
+
+.censo-newsbar__cycle-gap {
+  display: block;
+  flex: 0 0 auto;
+  height: 1px;
+  pointer-events: none;
 }
 
 /* Lista de avisos internos */

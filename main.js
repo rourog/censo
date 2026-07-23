@@ -1,13 +1,13 @@
 // main.js
 // Entrada mínima con diagnóstico de carga de módulos.
-// BUILD: newsbar-v1-20260723
+// BUILD: newsbar-v1.1-20260723
 // Ruta ideal en GitHub:
 //   index.html
 //   style.css
 //   main.js
 //   modules/appModule.js
 
-const BUILD = 'newsbar-v1-20260723';
+const BUILD = 'newsbar-v1.1-20260723';
 
 console.info(`[CENSO] main.js cargado. BUILD: ${BUILD}`);
 window.CensoBuild = { version: BUILD, stage: 'main-loaded' };

@@ -1,6 +1,6 @@
 /*
   CENSO DE URGENCIAS · newsBarModule.js
-  Versión: 1.0
+  Versión: 1.1
 
   RESPONSABILIDAD:
   - Escuchar anuncios internos desde Firestore.
@@ -9,7 +9,7 @@
   - Administrar anuncios mediante Ctrl + Alt + N.
 */
 
-const MODULE_VERSION = '1.0';
+const MODULE_VERSION = '1.1';
 const ANNOUNCEMENTS_COLLECTION = 'announcements';
 const AUTH_EMAIL_INTERNO = 'interno@hrd.censo';
 const DESKTOP_MEDIA = window.matchMedia('(min-width: 769px)');
@@ -81,6 +81,7 @@ export function createNewsBarModule(app) {
   let lastActivityCheckAt = 0;
 
   let currentTickerItemHtml = '';
+  let currentTickerItemCount = 0;
   let tickerFrame = 0;
   let resizeObserver = null;
   let desktopMediaHandler = null;
@@ -438,6 +439,7 @@ export function createNewsBarModule(app) {
 
     if (!state.items.length) {
       currentTickerItemHtml = '';
+      currentTickerItemCount = 0;
 
       const message = externalLoading
         ? 'Cargando noticias externas…'
@@ -459,6 +461,7 @@ export function createNewsBarModule(app) {
       return;
     }
 
+    currentTickerItemCount = state.items.length;
     currentTickerItemHtml = state.items.map((item) => {
       const label = item.kind === 'external'
         ? item.regionCode
@@ -529,16 +532,39 @@ export function createNewsBarModule(app) {
 
     if (groups.length < 2 || !currentTickerItemHtml) return;
 
+    // Cada aviso aparece una sola vez dentro de cada ciclo.
+    // Los dos grupos existen únicamente para cerrar el bucle sin saltos.
     groups.forEach((group) => {
       group.innerHTML = currentTickerItemHtml;
     });
 
-    const baseWidth = Math.max(1, groups[0].scrollWidth);
-    const targetWidth = Math.max(1, elements.viewport.clientWidth * 1.25);
-    const repetitions = Math.max(1, Math.ceil(targetWidth / baseWidth));
+    const contentWidth = Math.max(1, groups[0].scrollWidth);
+    const viewportWidth = Math.max(1, elements.viewport.clientWidth);
+
+    // Con un solo aviso dejamos un tramo vacío amplio para que no parezca
+    // repetido continuamente. Con varios avisos solo separamos los ciclos.
+    const minimumGap =
+      currentTickerItemCount === 1
+        ? Math.max(viewportWidth, 360)
+        : 180;
+
+    // Si el contenido es muy corto, garantizamos que el siguiente ciclo
+    // no entre antes de que el anterior haya abandonado la pantalla.
+    const clearanceGap = Math.max(
+      minimumGap,
+      viewportWidth - contentWidth + 120
+    );
+
+    const spacerHtml = `
+      <span
+        class="censo-newsbar__cycle-gap"
+        aria-hidden="true"
+        style="width:${Math.ceil(clearanceGap)}px"
+      ></span>
+    `;
 
     groups.forEach((group) => {
-      group.innerHTML = currentTickerItemHtml.repeat(repetitions);
+      group.insertAdjacentHTML('beforeend', spacerHtml);
     });
 
     const travelDistance = Math.max(1, groups[0].scrollWidth);
