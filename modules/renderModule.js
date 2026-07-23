@@ -12,7 +12,7 @@
   - Calcular reglas de camas fuera de lo necesario para mostrar.
 */
 
-console.info('[CENSO] renderModule.js cargado. BUILD: quick-bed-v19-20260722');
+console.info('[CENSO] renderModule.js cargado. BUILD: quick-bed-v20-20260722');
 
 export function createRenderModule(app) {
   const { state } = app;
@@ -56,6 +56,12 @@ export function createRenderModule(app) {
 
   function getObservacion(p) {
     return String(p?.observacionAlerta || p?.observacion || '').trim();
+  }
+
+  function getCamaLabelClass(cama) {
+    return String(cama || '').trim().toUpperCase() === 'PEDILUVIO'
+      ? ' quick-bed-label--pediluvio'
+      : '';
   }
 
   function getAlertIconFill(isActive) {
@@ -196,10 +202,9 @@ export function createRenderModule(app) {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        gap: 4px;
         max-width: 100%;
         margin: 0;
-        padding: 3px 6px;
+        padding: 3px 2px;
         border: 1px solid transparent;
         border-radius: 7px;
         background: transparent;
@@ -221,9 +226,19 @@ export function createRenderModule(app) {
       }
 
       .quick-bed-trigger:active { transform: scale(0.95); }
-      .quick-bed-trigger .material-symbols-outlined { font-size: 0.9rem !important; flex: 0 0 auto; }
-      .quick-bed-trigger .quick-bed-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .quick-bed-trigger .quick-bed-label {
+        display: block;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .quick-bed-trigger .quick-bed-label--pediluvio {
+        font-size: 0.66rem;
+        letter-spacing: -0.045em;
+      }
       .patient-bed.quick-bed-trigger { margin-top: 6px; color: var(--muted); font-size: 0.8rem; font-weight: 600; }
+      .patient-bed.quick-bed-trigger .quick-bed-label--pediluvio { font-size: 0.68rem; }
       .patient-alert .quick-bed-trigger { color: #fff !important; }
 
       .alert-star-btn,
@@ -717,7 +732,7 @@ export function createRenderModule(app) {
           htmlArr.push(`<tr class="patient-row ${alertaActiva ? 'patient-alert' : ''}" data-fila="${escapeHtml(p.fila)}" data-alerta="${alertaActiva ? '1' : '0'}" onclick="toggleTableRow(this)">
               <td class="quick-bed-cell" style="padding: 6px 10px; text-align: center;">
                 <button class="quick-bed-trigger" type="button" data-fila="${escapeHtml(p.fila)}" onclick="abrirCamaFlotante(this, this.dataset.fila, event)" title="Cambiar cama: ${escapeHtml(p.cama || 'SIN CAMA')}" aria-label="Cambiar cama de ${escapeHtml(p.nombre)}. Cama actual: ${escapeHtml(p.cama || 'sin cama')}">
-                  <span class="quick-bed-label">${escapeHtml(p.cama || '-')}</span><span class="material-symbols-outlined" aria-hidden="true">swap_horiz</span>
+                  <span class="quick-bed-label${getCamaLabelClass(p.cama)}">${escapeHtml(p.cama || '-')}</span>
                 </button>
               </td>
               <td style="padding: 6px 10px; font-size: 0.7rem; color: var(--muted); font-family: 'Fira Code', monospace; line-height: 1.3; text-align: center;">${p.fechaIngresoFormateada || '-'}</td>
@@ -772,7 +787,7 @@ export function createRenderModule(app) {
             ${pacientes.map((p, indexPatient) => {
               const alertaActiva = Boolean(p.alerta);
               const observacion = getObservacion(p);
-              const camaHtml = p.cama ? `<button class="patient-bed quick-bed-trigger" type="button" data-fila="${escapeHtml(p.fila)}" onclick="abrirCamaFlotante(this, this.dataset.fila, event)" title="Cambiar cama: ${escapeHtml(p.cama)}" aria-label="Cambiar cama de ${escapeHtml(p.nombre)}. Cama actual: ${escapeHtml(p.cama)}"><span class="quick-bed-label">${escapeHtml(p.cama)}</span><span class="material-symbols-outlined" aria-hidden="true">swap_horiz</span></button>` : '';
+              const camaHtml = p.cama ? `<button class="patient-bed quick-bed-trigger" type="button" data-fila="${escapeHtml(p.fila)}" onclick="abrirCamaFlotante(this, this.dataset.fila, event)" title="Cambiar cama: ${escapeHtml(p.cama)}" aria-label="Cambiar cama de ${escapeHtml(p.nombre)}. Cama actual: ${escapeHtml(p.cama)}"><span class="quick-bed-label${getCamaLabelClass(p.cama)}">${escapeHtml(p.cama)}</span></button>` : '';
 
               const destinoEmojiHtml = p.destino ? renderDestinoHtml(p.destino, 'compact') : '';
 

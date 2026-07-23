@@ -14,7 +14,7 @@
   - Guardar pacientes directamente.
 */
 
-console.info('[CENSO] interactionModule.js cargado. BUILD: quick-bed-v19-20260722');
+console.info('[CENSO] interactionModule.js cargado. BUILD: quick-bed-v20-20260722');
 
 export const MOBILE_SWIPE_THRESHOLD = 110;
 

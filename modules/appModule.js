@@ -11,20 +11,20 @@
   - Hablar con Firestore directamente.
 */
 
-import * as firebase from './firebaseModule.js?v=quick-bed-v19-20260722';
-import * as bed from './bedModule.js?v=quick-bed-v19-20260722';
-import * as utils from './utilsModule.js?v=quick-bed-v19-20260722';
-import { state } from './stateModule.js?v=quick-bed-v19-20260722';
+import * as firebase from './firebaseModule.js?v=quick-bed-v20-20260722';
+import * as bed from './bedModule.js?v=quick-bed-v20-20260722';
+import * as utils from './utilsModule.js?v=quick-bed-v20-20260722';
+import { state } from './stateModule.js?v=quick-bed-v20-20260722';
 
-import { createEffectsModule } from './effectsModule.js?v=quick-bed-v19-20260722';
-import { createRenderModule } from './renderModule.js?v=quick-bed-v19-20260722';
-import { createPatientModule } from './patientModule.js?v=quick-bed-v19-20260722';
-import { createThemeModule } from './themeModule.js?v=quick-bed-v19-20260722';
-import { createModalModule } from './modalModule.js?v=quick-bed-v19-20260722';
-import { createInteractionModule } from './interactionModule.js?v=quick-bed-v19-20260722';
-import { createAuthModule } from './authModule.js?v=quick-bed-v19-20260722';
+import { createEffectsModule } from './effectsModule.js?v=quick-bed-v20-20260722';
+import { createRenderModule } from './renderModule.js?v=quick-bed-v20-20260722';
+import { createPatientModule } from './patientModule.js?v=quick-bed-v20-20260722';
+import { createThemeModule } from './themeModule.js?v=quick-bed-v20-20260722';
+import { createModalModule } from './modalModule.js?v=quick-bed-v20-20260722';
+import { createInteractionModule } from './interactionModule.js?v=quick-bed-v20-20260722';
+import { createAuthModule } from './authModule.js?v=quick-bed-v20-20260722';
 
-const BUILD = 'quick-bed-v19-20260722';
+const BUILD = 'quick-bed-v20-20260722';
 
 export async function bootApp() {
   console.info(`[CENSO] bootApp iniciado. BUILD: ${BUILD}`);

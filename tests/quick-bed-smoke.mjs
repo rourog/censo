@@ -33,6 +33,9 @@ const firebaseSource = readFileSync(resolve(root, 'modules/firebaseModule.js'), 
 
 assert.match(renderSource, /abrirCamaFlotante\(this, this\.dataset\.fila, event\)/u, 'Las camas renderizadas deben abrir el selector rápido.');
 assert.match(renderSource, /patient-bed quick-bed-trigger/u, 'La cama móvil debe ser un control táctil independiente.');
+assert.doesNotMatch(renderSource, /swap_horiz/u, 'La cama debe conservar todo su ancho sin icono de cambio.');
+assert.match(renderSource, /quick-bed-label--pediluvio/u, 'PEDILUVIO debe usar una tipografía compacta exclusiva.');
+assert.match(renderSource, /getCamaLabelClass\(p\.cama\)/u, 'El ajuste de PEDILUVIO debe aplicarse en las vistas renderizadas.');
 assert.match(modalSource, /function abrirCamaFlotante/u);
 assert.match(modalSource, /if \(mismaCama\) return;/u, 'Elegir la cama actual no debe escribir en Firestore.');
 assert.match(modalSource, /where\('cama', '==', nuevaCama\)/u, 'El cambio debe volver a verificar la ocupación en el servidor.');
