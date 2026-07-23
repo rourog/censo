@@ -1,22 +1,25 @@
 /*
   CENSO DE URGENCIAS · newsBarModule.js
-  Versión: 1.1
+  Versión: 1.2
 
   RESPONSABILIDAD:
   - Escuchar anuncios internos desde Firestore.
   - Mostrar noticias externas solamente cuando no hay anuncios activos.
   - Mantener una velocidad lineal constante para ambos tipos de contenido.
+  - Priorizar Delicias, Chihuahua y México con máximo 12 noticias.
   - Administrar anuncios mediante Ctrl + Alt + N.
 */
 
-const MODULE_VERSION = '1.1';
+const MODULE_VERSION = '1.2';
 const ANNOUNCEMENTS_COLLECTION = 'announcements';
 const AUTH_EMAIL_INTERNO = 'interno@hrd.censo';
 const DESKTOP_MEDIA = window.matchMedia('(min-width: 769px)');
 const NEWS_TIME_ZONE = 'America/Chihuahua';
 
 const PIXELS_PER_SECOND = 55;
-const EXTERNAL_REFRESH_INTERVAL = 30 * 60 * 1000;
+const EXTERNAL_REFRESH_INTERVAL = 20 * 60 * 1000;
+const EXTERNAL_RETRY_INTERVAL = 10 * 60 * 1000;
+const EXTERNAL_MAX_ITEMS = 12;
 const ACTIVITY_THROTTLE = 15 * 1000;
 const EXTERNAL_REQUEST_TIMEOUT = 9000;
 
@@ -29,7 +32,7 @@ const EXTERNAL_FEEDS = [
   {
     region: 'Delicias',
     code: 'DEL',
-    limit: 4,
+    limit: 12,
     rssUrl:
       'https://news.google.com/rss/search?q=' +
       encodeURIComponent('"Delicias" Chihuahua when:1d') +
@@ -38,7 +41,7 @@ const EXTERNAL_FEEDS = [
   {
     region: 'Chihuahua',
     code: 'CHIH',
-    limit: 4,
+    limit: 12,
     rssUrl:
       'https://news.google.com/rss/search?q=' +
       encodeURIComponent('Chihuahua México when:1d') +
@@ -47,11 +50,63 @@ const EXTERNAL_FEEDS = [
   {
     region: 'México',
     code: 'MX',
-    limit: 5,
+    limit: 12,
     rssUrl:
       'https://news.google.com/rss?hl=es-419&gl=MX&ceid=MX:es-419'
   }
 ];
+
+const EXTERNAL_PRIORITY = [
+  { code: 'DEL', preferred: 5 },
+  { code: 'CHIH', preferred: 4 },
+  { code: 'MX', preferred: 3 }
+];
+
+function selectPrioritizedExternalNews(items) {
+  const grouped = new Map(
+    EXTERNAL_PRIORITY.map(({ code }) => [code, []])
+  );
+
+  items
+    .slice()
+    .sort((a, b) => b.createdAt - a.createdAt)
+    .forEach((item) => {
+      const bucket = grouped.get(item.regionCode);
+      if (bucket) bucket.push(item);
+    });
+
+  const selected = [];
+  const selectedIds = new Set();
+
+  function takeFromRegion(code, amount) {
+    const bucket = grouped.get(code) || [];
+    let taken = 0;
+
+    for (const item of bucket) {
+      if (selected.length >= EXTERNAL_MAX_ITEMS || taken >= amount) break;
+      if (selectedIds.has(item.id)) continue;
+
+      selected.push(item);
+      selectedIds.add(item.id);
+      taken += 1;
+    }
+  }
+
+  // Primera pasada: distribución preferida.
+  EXTERNAL_PRIORITY.forEach(({ code, preferred }) => {
+    takeFromRegion(code, preferred);
+  });
+
+  // Segunda pasada: completar espacios respetando la prioridad regional.
+  if (selected.length < EXTERNAL_MAX_ITEMS) {
+    EXTERNAL_PRIORITY.forEach(({ code }) => {
+      takeFromRegion(code, EXTERNAL_MAX_ITEMS);
+    });
+  }
+
+  return selected.slice(0, EXTERNAL_MAX_ITEMS);
+}
+
 
 export function createNewsBarModule(app) {
   const {
@@ -586,7 +641,9 @@ export function createNewsBarModule(app) {
         localStorage.getItem(STORAGE.externalCache) || '{}'
       );
 
-      externalNews = Array.isArray(cache.items) ? cache.items : [];
+      externalNews = Array.isArray(cache.items)
+        ? selectPrioritizedExternalNews(cache.items)
+        : [];
       externalFetchedAt = Number(cache.fetchedAt) || 0;
       externalLastAttemptAt = externalFetchedAt;
     } catch {
@@ -617,10 +674,14 @@ export function createNewsBarModule(app) {
       externalFetchedAt > 0 &&
       getDateKey(externalFetchedAt) === getDateKey();
 
+    const requiredInterval = externalLoadFailed
+      ? EXTERNAL_RETRY_INTERVAL
+      : EXTERNAL_REFRESH_INTERVAL;
+
     const refreshIsDue =
       externalLastAttemptAt === 0 ||
       !cacheBelongsToToday ||
-      now - externalLastAttemptAt >= EXTERNAL_REFRESH_INTERVAL;
+      now - externalLastAttemptAt >= requiredInterval;
 
     if (!force && !refreshIsDue) return;
 
@@ -633,7 +694,7 @@ export function createNewsBarModule(app) {
       EXTERNAL_FEEDS.map(fetchExternalFeed)
     );
 
-    const items = [];
+    const candidates = [];
     const seen = new Set();
     let successfulFeeds = 0;
 
@@ -646,17 +707,17 @@ export function createNewsBarModule(app) {
         if (!key || seen.has(key)) return;
 
         seen.add(key);
-        items.push(item);
+        candidates.push(item);
       });
     });
 
+    const selectedItems = selectPrioritizedExternalNews(candidates);
     externalLoading = false;
 
     if (successfulFeeds > 0) {
-      // Incluso una respuesta válida sin noticias de hoy se guarda:
-      // evita repetir consultas en cada interacción.
+      // Se guarda incluso una lista vacía válida para evitar consultas repetidas.
       externalLoadFailed = false;
-      saveExternalCache(items);
+      saveExternalCache(selectedItems);
     } else {
       externalLoadFailed = true;
     }
