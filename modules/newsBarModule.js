@@ -1,6 +1,6 @@
 /*
   CENSO DE URGENCIAS · newsBarModule.js
-  Versión: 1.4
+  Versión: 1.5
 
   RESPONSABILIDAD:
   - Escuchar anuncios internos desde Firestore.
@@ -10,8 +10,8 @@
   - Administrar anuncios mediante Ctrl + Alt + N.
 */
 
-const MODULE_VERSION = '1.4';
-const NEWSBAR_BUILD = 'newsbar-v1.4-20260723';
+const MODULE_VERSION = '1.5';
+const NEWSBAR_BUILD = 'newsbar-v1.5-20260723';
 const ANNOUNCEMENTS_COLLECTION = 'announcements';
 const AUTH_EMAIL_INTERNO = 'interno@hrd.censo';
 const DESKTOP_MEDIA = window.matchMedia('(min-width: 769px)');
@@ -220,6 +220,9 @@ export function createNewsBarModule(app) {
   let currentTickerItemHtml = '';
   let currentTickerItemCount = 0;
   let tickerFrame = 0;
+  let tickerAnimation = null;
+  let tickerRestartRequested = false;
+  let lastTickerSignature = '';
   let resizeObserver = null;
   let desktopMediaHandler = null;
 
@@ -493,10 +496,14 @@ export function createNewsBarModule(app) {
       if (document.visibilityState === 'visible') handleCensusActivity();
     });
 
-    window.addEventListener('resize', scheduleTickerSpeed, { passive: true });
+    window.addEventListener(
+      'resize',
+      () => scheduleTickerSpeed(false),
+      { passive: true }
+    );
 
     if ('ResizeObserver' in window) {
-      resizeObserver = new ResizeObserver(scheduleTickerSpeed);
+      resizeObserver = new ResizeObserver(() => scheduleTickerSpeed(false));
       resizeObserver.observe(elements.viewport);
     }
   }
@@ -568,6 +575,34 @@ export function createNewsBarModule(app) {
     };
   }
 
+  function createTickerSignature(state) {
+    const items = state.items.map((item) => [
+      item.kind || '',
+      item.id || '',
+      item.text || '',
+      item.url || '',
+      item.displayTime || '',
+      item.createdAt || item.createdAtMs || 0
+    ]);
+
+    const emptyStatus = state.items.length
+      ? ''
+      : `${externalLoading ? 1 : 0}:${externalLoadFailed ? 1 : 0}`;
+
+    return JSON.stringify([state.mode, emptyStatus, items]);
+  }
+
+  function stopTickerAnimation() {
+    if (tickerAnimation) {
+      tickerAnimation.cancel();
+      tickerAnimation = null;
+    }
+
+    if (elements.track) {
+      elements.track.style.transform = 'translate3d(0, 0, 0)';
+    }
+  }
+
   function render() {
     if (!initialized) return;
 
@@ -578,9 +613,26 @@ export function createNewsBarModule(app) {
       closeDrawer();
     }
 
+    const tickerSignature = createTickerSignature(state);
+
+    // No reconstruir el contenido si nada cambió. El render periódico se
+    // conserva para detectar caducidades, pero ya no reinicia la animación.
+    if (tickerSignature === lastTickerSignature) {
+      renderAdminList();
+
+      if (state.mode === 'external') {
+        ensureExternalFeed();
+      }
+
+      return;
+    }
+
+    lastTickerSignature = tickerSignature;
+
     if (!state.items.length) {
       currentTickerItemHtml = '';
       currentTickerItemCount = 0;
+      stopTickerAnimation();
 
       const message = externalLoading
         ? 'Cargando noticias externas…'
@@ -636,7 +688,7 @@ export function createNewsBarModule(app) {
     `;
 
     elements.track.innerHTML = group + group;
-    scheduleTickerSpeed();
+    scheduleTickerSpeed(true);
 
     if (state.mode === 'internal') {
       elements.drawerStatus.textContent =
@@ -657,50 +709,60 @@ export function createNewsBarModule(app) {
     }
   }
 
-  function scheduleTickerSpeed() {
+  function scheduleTickerSpeed(restart = false) {
     if (!elements.track || !elements.viewport) return;
 
+    if (restart) tickerRestartRequested = true;
     if (tickerFrame) cancelAnimationFrame(tickerFrame);
 
     tickerFrame = requestAnimationFrame(() => {
       tickerFrame = 0;
-      applyConstantTickerSpeed();
+
+      const shouldRestart = tickerRestartRequested;
+      tickerRestartRequested = false;
+      applyConstantTickerSpeed(shouldRestart);
     });
   }
 
-  function applyConstantTickerSpeed() {
+  function applyConstantTickerSpeed(restart = false) {
     const groups = elements.track.querySelectorAll('.censo-newsbar__group');
 
-    if (groups.length < 2 || !currentTickerItemHtml) return;
+    if (groups.length < 2 || !currentTickerItemHtml) {
+      stopTickerAnimation();
+      return;
+    }
 
-    // Cada aviso aparece una sola vez dentro de cada ciclo.
-    // Los dos grupos existen únicamente para cerrar el bucle sin saltos.
+    let previousProgress = 0;
+
+    if (!restart && tickerAnimation) {
+      const timing = tickerAnimation.effect?.getComputedTiming?.();
+      const progress = Number(timing?.progress);
+
+      if (Number.isFinite(progress)) {
+        previousProgress = Math.min(1, Math.max(0, progress));
+      }
+    }
+
     groups.forEach((group) => {
       group.innerHTML = currentTickerItemHtml;
     });
 
-    const contentWidth = Math.max(1, groups[0].scrollWidth);
     const viewportWidth = Math.max(1, elements.viewport.clientWidth);
 
-    // Con un solo aviso dejamos un tramo vacío amplio para que no parezca
-    // repetido continuamente. Con varios avisos solo separamos los ciclos.
-    const minimumGap =
-      currentTickerItemCount === 1
-        ? Math.max(viewportWidth, 360)
-        : 180;
-
-    // Si el contenido es muy corto, garantizamos que el siguiente ciclo
-    // no entre antes de que el anterior haya abandonado la pantalla.
-    const clearanceGap = Math.max(
-      minimumGap,
-      viewportWidth - contentWidth + 120
-    );
+    // El espacio nunca puede ser tan ancho como para vaciar por completo
+    // la barra. Con un solo aviso, la siguiente copia comienza a entrar
+    // prácticamente en el mismo instante en que la anterior termina de salir.
+    const maximumGapWithoutBlank = Math.max(24, viewportWidth - 2);
+    const desiredGap = currentTickerItemCount === 1
+      ? maximumGapWithoutBlank
+      : 180;
+    const cycleGap = Math.min(desiredGap, maximumGapWithoutBlank);
 
     const spacerHtml = `
       <span
         class="censo-newsbar__cycle-gap"
         aria-hidden="true"
-        style="width:${Math.ceil(clearanceGap)}px"
+        style="width:${Math.ceil(cycleGap)}px"
       ></span>
     `;
 
@@ -708,17 +770,35 @@ export function createNewsBarModule(app) {
       group.insertAdjacentHTML('beforeend', spacerHtml);
     });
 
+    // La distancia se toma del primer grupo completo. El segundo grupo es
+    // idéntico, por lo que al terminar el ciclo ocupa exactamente la misma
+    // posición visual y no existe salto de reinicio.
     const travelDistance = Math.max(1, groups[0].scrollWidth);
-    const durationSeconds = Math.max(4, travelDistance / PIXELS_PER_SECOND);
-
-    elements.track.style.setProperty(
-      '--censo-newsbar-duration',
-      `${durationSeconds.toFixed(3)}s`
+    const durationMs = Math.max(
+      4000,
+      (travelDistance / PIXELS_PER_SECOND) * 1000
     );
 
+    stopTickerAnimation();
     elements.track.style.animation = 'none';
-    void elements.track.offsetWidth;
-    elements.track.style.animation = '';
+
+    tickerAnimation = elements.track.animate(
+      [
+        { transform: 'translate3d(0, 0, 0)' },
+        { transform: `translate3d(-${travelDistance}px, 0, 0)` }
+      ],
+      {
+        duration: durationMs,
+        iterations: Infinity,
+        easing: 'linear'
+      }
+    );
+
+    // En resize se conserva la posición relativa del ciclo. Cuando cambia
+    // realmente el texto se inicia un ciclo nuevo desde el principio.
+    if (!restart && previousProgress > 0) {
+      tickerAnimation.currentTime = previousProgress * durationMs;
+    }
   }
 
   function loadExternalCache() {
@@ -1203,6 +1283,10 @@ export function createNewsBarModule(app) {
       startAnnouncementListener();
       render();
 
+      if (tickerAnimation?.playState === 'paused') {
+        tickerAnimation.play();
+      }
+
       if (!getActiveAnnouncements().length) {
         ensureExternalFeed();
       }
@@ -1213,6 +1297,10 @@ export function createNewsBarModule(app) {
     closeDrawer();
     closeAdmin();
     stopAnnouncementListener();
+
+    if (tickerAnimation?.playState === 'running') {
+      tickerAnimation.pause();
+    }
   }
 
   function startNewsBar() {
@@ -1243,6 +1331,7 @@ export function createNewsBarModule(app) {
   function destroyNewsBar() {
     hideNewsBar();
     stopAnnouncementListener();
+    stopTickerAnimation();
 
     if (newsAuthUnsubscribe) {
       newsAuthUnsubscribe();

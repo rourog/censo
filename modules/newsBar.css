@@ -1,6 +1,6 @@
 /*
   CENSO DE URGENCIAS · BARRA DE AVISOS/NOTICIAS
-  Versión del módulo: 1.4
+  Versión del módulo: 1.5
 */
 
 :root {
@@ -93,7 +93,8 @@
   display: flex;
   align-items: center;
   will-change: transform;
-  animation: censoNewsTicker var(--censo-newsbar-duration, 20s) linear infinite;
+  transform: translate3d(0, 0, 0);
+  animation: none;
 }
 
 @keyframes censoNewsTicker {
