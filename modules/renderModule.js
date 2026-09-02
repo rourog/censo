@@ -12,7 +12,7 @@
   - Calcular reglas de camas fuera de lo necesario para mostrar.
 */
 
-console.info('[CENSO] renderModule.js cargado. BUILD: bulk-reset-v1-20260722');
+console.info('[CENSO] renderModule.js cargado. BUILD: camas-sonidos-v2-20260902');
 
 export function createRenderModule(app) {
   const { state } = app;
@@ -225,20 +225,23 @@ export function createRenderModule(app) {
         outline: none;
       }
 
+      .censo-table .quick-bed-cell { padding: 6px 4px; text-align: center; }
+      .quick-bed-cell .quick-bed-trigger { width: 100%; min-height: 32px; }
       .quick-bed-trigger:active { transform: scale(0.95); }
       .quick-bed-trigger .quick-bed-label {
         display: block;
         max-width: 100%;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+        min-width: 0;
+        white-space: normal;
+        overflow-wrap: anywhere;
+        font-variant-numeric: tabular-nums;
       }
       .quick-bed-trigger .quick-bed-label--pediluvio {
-        font-size: 0.66rem;
-        letter-spacing: -0.045em;
+        font-size: 0.8rem;
+        letter-spacing: 0;
       }
       .patient-bed.quick-bed-trigger { margin-top: 6px; color: var(--muted); font-size: 0.8rem; font-weight: 600; }
-      .patient-bed.quick-bed-trigger .quick-bed-label--pediluvio { font-size: 0.68rem; }
+      .patient-bed.quick-bed-trigger .quick-bed-label--pediluvio { font-size: 0.8rem; }
       .patient-alert .quick-bed-trigger { color: #fff !important; }
 
       .alert-star-btn,
@@ -709,12 +712,12 @@ export function createRenderModule(app) {
       htmlArr.push(`<div class="table-wrapper animate-in" id="scrollTableWrapper">
         <div id="scrollGuiderObj" class="scroll-guider" title="Ir al extremo"><span class="material-symbols-outlined">arrow_downward</span></div>
         <table class="censo-table"><thead><tr>
-          <th style="width: 5%; text-align: center;">CAMA</th>
+          <th style="width: 7.5rem; text-align: center;">CAMA</th>
           <th style="width: 6%; text-align: center;">INGRESO</th>
-          <th style="width: 18%;">PACIENTE</th>
+          <th style="width: 17%;">PACIENTE</th>
           <th style="width: 3.5%;">EDAD</th>
-          <th style="width: 25%;">DIAGNÓSTICO</th>
-          <th style="width: 23.5%;">PENDIENTES</th>
+          <th style="width: 23%;">DIAGNÓSTICO</th>
+          <th style="width: 21.5%;">PENDIENTES</th>
           <th style="width: 9%; text-align: center;">DESTINO</th>
           <th style="width: 10%; text-align: center;"><span class="material-symbols-outlined" style="font-size: 1.2rem;">settings</span></th>
         </tr></thead><tbody>`);
@@ -730,7 +733,7 @@ export function createRenderModule(app) {
           const alertaActiva = Boolean(p.alerta);
           const observacion = getObservacion(p);
           htmlArr.push(`<tr class="patient-row ${alertaActiva ? 'patient-alert' : ''}" data-fila="${escapeHtml(p.fila)}" data-alerta="${alertaActiva ? '1' : '0'}" onclick="toggleTableRow(this)">
-              <td class="quick-bed-cell" style="padding: 6px 10px; text-align: center;">
+              <td class="quick-bed-cell">
                 <button class="quick-bed-trigger" type="button" data-fila="${escapeHtml(p.fila)}" onclick="abrirCamaFlotante(this, this.dataset.fila, event)" title="Cambiar cama: ${escapeHtml(p.cama || 'SIN CAMA')}" aria-label="Cambiar cama de ${escapeHtml(p.nombre)}. Cama actual: ${escapeHtml(p.cama || 'sin cama')}">
                   <span class="quick-bed-label${getCamaLabelClass(p.cama)}">${escapeHtml(p.cama || '-')}</span>
                 </button>
