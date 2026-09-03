@@ -34,7 +34,11 @@ const requiredFiles = [
   'modules/authModule.js',
   'modules/patientModule.js',
   'modules/modalModule.js',
-  'modules/maintenanceModule.js'
+  'modules/maintenanceModule.js',
+  'modules/newsBarModule.js',
+  'modules/newsBar.css',
+  'modules/soundboardModule.js',
+  'modules/soundCatalog.js'
 ];
 
 for (const file of requiredFiles) {

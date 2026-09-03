@@ -11,21 +11,23 @@
   - Hablar con Firestore directamente.
 */
 
-import * as firebase from './firebaseModule.js?v=bulk-reset-v1-20260722';
-import * as bed from './bedModule.js?v=camas-sonidos-v2-20260902';
-import * as utils from './utilsModule.js?v=bulk-reset-v1-20260722';
-import { state } from './stateModule.js?v=bulk-reset-v1-20260722';
+import * as firebase from './firebaseModule.js?v=admin-sonidos-v4-20260903';
+import * as bed from './bedModule.js?v=admin-sonidos-v4-20260903';
+import * as utils from './utilsModule.js?v=admin-sonidos-v4-20260903';
+import { state } from './stateModule.js?v=admin-sonidos-v4-20260903';
 
-import { createEffectsModule } from './effectsModule.js?v=camas-sonidos-v2-20260902';
-import { createRenderModule } from './renderModule.js?v=camas-sonidos-v2-20260902';
-import { createPatientModule } from './patientModule.js?v=bulk-reset-v1-20260722';
-import { createThemeModule } from './themeModule.js?v=bulk-reset-v1-20260722';
-import { createModalModule } from './modalModule.js?v=bulk-reset-v1-20260722';
-import { createMaintenanceModule } from './maintenanceModule.js?v=bulk-reset-v1-20260722';
-import { createInteractionModule } from './interactionModule.js?v=bulk-reset-v1-20260722';
-import { createAuthModule } from './authModule.js?v=bulk-reset-v1-20260722';
+import { createSoundboardModule } from './soundboardModule.js?v=admin-sonidos-v4-20260903';
+import { createEffectsModule } from './effectsModule.js?v=admin-sonidos-v4-20260903';
+import { createRenderModule } from './renderModule.js?v=admin-sonidos-v4-20260903';
+import { createPatientModule } from './patientModule.js?v=admin-sonidos-v4-20260903';
+import { createThemeModule } from './themeModule.js?v=admin-sonidos-v4-20260903';
+import { createModalModule } from './modalModule.js?v=admin-sonidos-v4-20260903';
+import { createMaintenanceModule } from './maintenanceModule.js?v=admin-sonidos-v4-20260903';
+import { createInteractionModule } from './interactionModule.js?v=admin-sonidos-v4-20260903';
+import { createNewsBarModule } from './newsBarModule.js?v=admin-sonidos-v4-20260903';
+import { createAuthModule } from './authModule.js?v=admin-sonidos-v4-20260903';
 
-const BUILD = 'camas-sonidos-v2-20260902';
+const BUILD = 'admin-sonidos-v4-20260903';
 
 export async function bootApp() {
   console.info(`[CENSO] bootApp iniciado. BUILD: ${BUILD}`);
@@ -37,6 +39,7 @@ export async function bootApp() {
     utils
   };
 
+  Object.assign(app, createSoundboardModule(app));
   Object.assign(app, createEffectsModule(app));
   Object.assign(app, createRenderModule(app));
   Object.assign(app, createPatientModule(app));
@@ -44,6 +47,7 @@ export async function bootApp() {
   Object.assign(app, createModalModule(app));
   Object.assign(app, createMaintenanceModule(app));
   Object.assign(app, createInteractionModule(app));
+  Object.assign(app, createNewsBarModule(app));
   Object.assign(app, createAuthModule(app));
 
   app.__build = BUILD;
@@ -55,6 +59,10 @@ export async function bootApp() {
   app.exposeWindowActions();
   app.initTheme();
   app.bindUiEvents();
+  // Restaurar el puente que muestra noticias y avisos después de iniciar sesión.
+  app.initSoundboardAuthBridge();
+  app.initNewsBarAuthBridge();
+
   app.bindAuthEvents();
   await app.bootAuth();
 }

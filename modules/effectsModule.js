@@ -51,112 +51,18 @@ export function createEffectsModule(app) {
 
   let activeEasterEggs = new Set();
 
-  const rodrSonidos = [
-    { nombre: 'FAHHHH', icono: 'campaign', archivo: 'fahhhhhhhhhhhhhh.mp3' },
-    { nombre: 'Anime Wow', icono: 'auto_awesome', archivo: 'anime-wow-sound-effect.mp3' },
-    { nombre: 'Spiderman meme song', icono: 'music_note', archivo: 'spiderman-meme-song.mp3' },
-    { nombre: 'Romance', icono: 'favorite', archivo: 'romanceeeeeeeeeeeeee.mp3' },
-    { nombre: 'M e o w', icono: 'pets', archivo: 'm-e-o-w.mp3' },
-    { nombre: 'Hola muy buenas tardes', icono: 'waving_hand', archivo: 'hola-muy-buenas-tardes.mp3' },
-    { nombre: 'Evil Morty', icono: 'psychology', archivo: 'audio-cortado-2.mp3' }
-  ];
-
-  function mostrarRodrSoundboard() {
-    const existente = document.getElementById('rodrrodriguezSoundboard');
-    if (existente) {
-      existente.style.display = 'flex';
-      return;
-    }
-    const host = document.getElementById('alfrojasSoundboard')?.parentElement
-      || document.querySelector('.header-top .header-left');
-    if (!host) return;
-
-    const soundboard = document.createElement('div');
-    soundboard.id = 'rodrrodriguezSoundboard';
-    soundboard.setAttribute('role', 'group');
-    soundboard.setAttribute('aria-label', 'Sonidos de RODRRODRIGUEZ');
-    soundboard.style.cssText = 'display: flex; align-items: center; gap: 6px; margin-left: 4px; padding: 2px 4px; min-width: 0; max-width: min(240px, 34vw); overflow-x: auto; scrollbar-width: thin;';
-    let activeAudio = null;
-    let activeButton = null;
-
-    function stopAudio() {
-      const audio = activeAudio;
-      const button = activeButton;
-      activeAudio = null;
-      activeButton = null;
-      if (audio) {
-        audio.pause();
-        audio.currentTime = 0;
-      }
-      if (button) {
-        button.setAttribute('aria-pressed', 'false');
-        button.title = button.dataset.nombreSonido;
-      }
-    }
-
-    rodrSonidos.forEach(({ nombre, icono, archivo }) => {
-      const button = document.createElement('button');
-      button.className = 'icon-btn sound-btn';
-      button.type = 'button';
-      button.title = nombre;
-      button.dataset.nombreSonido = nombre;
-      button.setAttribute('aria-label', nombre);
-      button.setAttribute('aria-pressed', 'false');
-      const icon = document.createElement('span');
-      icon.className = 'material-symbols-outlined';
-      icon.setAttribute('aria-hidden', 'true');
-      icon.textContent = icono;
-      button.appendChild(icon);
-      button.addEventListener('click', (event) => {
-        event.stopPropagation();
-        const detener = activeButton === button;
-        stopAudio();
-        if (detener) return;
-
-        // La descarga y la reproducción comienzan únicamente al pulsar.
-        const audio = new Audio();
-        audio.preload = 'none';
-        audio.src = `https://www.myinstants.com/media/sounds/${archivo}`;
-        activeAudio = audio;
-        activeButton = button;
-        button.setAttribute('aria-pressed', 'true');
-        button.title = `${nombre} · Pulsar para detener`;
-        const onError = () => {
-          if (activeAudio !== audio) return;
-          stopAudio();
-          button.title = `${nombre} · No se pudo reproducir. Pulsa para reintentar`;
-        };
-        audio.addEventListener('ended', () => {
-          if (activeAudio === audio) stopAudio();
-        }, { once: true });
-        audio.addEventListener('error', onError, { once: true });
-        try {
-          Promise.resolve(audio.play()).catch(onError);
-        } catch {
-          onError();
-        }
-      });
-      soundboard.appendChild(button);
-    });
-    host.appendChild(soundboard);
-  }
-
   function checkEasterEggs(query) {
     const q = query.toLowerCase().replace(/\s+/g, '');
     let isEasterEggTriggered = false;
     for (const key in easterEggsMap) {
+      if (q.includes(key)) app.activateSoundboard(key);
       if (q.includes(key) && !activeEasterEggs.has(key)) {
         activeEasterEggs.add(key);
         const cantidadEmojis = easterEggsMap[key].length;
         for(let i=0; i < cantidadEmojis; i++) { spawnSurfer(key, i); }
         isEasterEggTriggered = true;
       
-        // MOSTRAR SOUNDBOARD SI ES ALFROJAS
-        if (key === 'alfrojas') {
-          const soundboard = document.getElementById('alfrojasSoundboard');
-          if (soundboard) soundboard.style.display = 'flex';
-        }
-        if (key === 'rodrrodriguez') mostrarRodrSoundboard();
+
       }
     }
     return isEasterEggTriggered;

@@ -11,7 +11,7 @@
 */
 
 const MODULE_VERSION = '1.5';
-const NEWSBAR_BUILD = 'newsbar-v1.5-20260723';
+const NEWSBAR_BUILD = 'admin-sonidos-v4-20260903';
 const ANNOUNCEMENTS_COLLECTION = 'announcements';
 const AUTH_EMAIL_INTERNO = 'interno@hrd.censo';
 const DESKTOP_MEDIA = window.matchMedia('(min-width: 769px)');
@@ -314,7 +314,7 @@ export function createNewsBarModule(app) {
           aria-labelledby="censoNewsAdminTitle"
         >
           <div class="censo-newsmodal__head">
-            <h2 id="censoNewsAdminTitle">Administración de avisos</h2>
+            <h2 id="censoNewsAdminTitle">Administración</h2>
             <button
               id="censoNewsAdminClose"
               class="censo-newsmodal__close"
@@ -350,6 +350,11 @@ export function createNewsBarModule(app) {
             </div>
 
             <div id="censoNewsManagerView" hidden>
+              <div class="censo-admin-tabs" role="tablist" aria-label="Administración">
+                <button id="censoAdminNoticesTab" type="button" role="tab" aria-selected="true" aria-controls="censoAdminNoticesPanel">Avisos</button>
+                <button id="censoAdminSoundsTab" type="button" role="tab" aria-selected="false" aria-controls="censoAdminSoundsPanel" tabindex="-1">Sonidos</button>
+              </div>
+              <section id="censoAdminNoticesPanel" role="tabpanel" aria-labelledby="censoAdminNoticesTab">
               <form id="censoNewsForm">
                 <div class="censo-newsmodal__field">
                   <label for="censoNewsText">Nuevo aviso</label>
@@ -382,11 +387,7 @@ export function createNewsBarModule(app) {
                 <p id="censoNewsManagerMessage" class="censo-newsmodal__success"></p>
 
                 <div class="censo-newsmodal__actions">
-                  <button
-                    id="censoNewsAdminLock"
-                    class="censo-newsmodal__button"
-                    type="button"
-                  >Bloquear</button>
+
                   <button
                     class="censo-newsmodal__button censo-newsmodal__button--primary"
                     type="submit"
@@ -403,6 +404,9 @@ export function createNewsBarModule(app) {
                   type="button"
                 >Eliminar todos</button>
               </div>
+              </section>
+              <section id="censoAdminSoundsPanel" role="tabpanel" aria-labelledby="censoAdminSoundsTab" hidden></section>
+              <div class="censo-newsmodal__actions"><button id="censoNewsAdminLock" class="censo-newsmodal__button" type="button">Bloquear administración</button></div>
             </div>
           </div>
         </section>
@@ -432,11 +436,37 @@ export function createNewsBarModule(app) {
       managerMessage: document.getElementById('censoNewsManagerMessage'),
       adminList: document.getElementById('censoNewsAdminList'),
       adminLock: document.getElementById('censoNewsAdminLock'),
+      noticesTab: document.getElementById('censoAdminNoticesTab'),
+      soundsTab: document.getElementById('censoAdminSoundsTab'),
+      noticesPanel: document.getElementById('censoAdminNoticesPanel'),
+      soundsPanel: document.getElementById('censoAdminSoundsPanel'),
       deleteAll: document.getElementById('censoNewsDeleteAll')
     };
   }
 
+  function selectAdminTab(sounds) {
+    elements.noticesPanel.hidden = sounds;
+    elements.soundsPanel.hidden = !sounds;
+    elements.noticesTab.setAttribute('aria-selected', String(!sounds));
+    elements.soundsTab.setAttribute('aria-selected', String(sounds));
+    elements.noticesTab.tabIndex = sounds ? -1 : 0;
+    elements.soundsTab.tabIndex = sounds ? 0 : -1;
+    if (!sounds) app.stopSoundPreview();
+  }
+
   function bindEvents() {
+    app.mountSoundAdmin(elements.soundsPanel);
+    elements.noticesTab.addEventListener('click', () => selectAdminTab(false));
+    elements.soundsTab.addEventListener('click', () => selectAdminTab(true));
+    [elements.noticesTab, elements.soundsTab].forEach(tab => {
+      tab.addEventListener('keydown', event => {
+        if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+        event.preventDefault();
+        const sounds = event.key === 'End' || (event.key !== 'Home' && tab === elements.noticesTab);
+        selectAdminTab(sounds);
+        (sounds ? elements.soundsTab : elements.noticesTab).focus();
+      });
+    });
     elements.bar.addEventListener('click', (event) => {
       if (event.target.closest('.censo-newsbar__link')) return;
       if (elements.bar.dataset.feedMode !== 'internal') return;
@@ -1014,10 +1044,12 @@ export function createNewsBarModule(app) {
   }
 
   function closeAdmin() {
+    app.stopSoundPreview();
     if (elements.adminModal) elements.adminModal.hidden = true;
   }
 
   function showAuthView() {
+    app.setSoundAdminUnlocked(false);
     elements.authView.hidden = false;
     elements.managerView.hidden = true;
 
@@ -1025,12 +1057,16 @@ export function createNewsBarModule(app) {
   }
 
   function showManagerView() {
+    app.setSoundAdminUnlocked(true);
     elements.authView.hidden = true;
     elements.managerView.hidden = false;
     setCurrentTime();
     renderAdminList();
 
-    setTimeout(() => elements.text.focus(), 40);
+    setTimeout(() => {
+      const target = elements.soundsPanel.hidden ? elements.text : document.getElementById('censoSoundUser');
+      target?.focus();
+    }, 40);
   }
 
   async function authenticateAdmin() {
@@ -1265,7 +1301,11 @@ export function createNewsBarModule(app) {
         // Cede el ciclo actual para que authModule actualice primero la pantalla.
         window.setTimeout(() => {
           if (user) startNewsBar();
-          else hideNewsBar();
+          else {
+            sessionStorage.removeItem(STORAGE.adminSession);
+            app.setSoundAdminUnlocked(false);
+            hideNewsBar();
+          }
         }, 0);
       },
       (error) => {

@@ -279,6 +279,23 @@
   display: none;
 }
 
+.censo-newsmodal [hidden] { display: none !important; }
+.censo-admin-tabs { display: flex; gap: 6px; margin-bottom: 18px; border-bottom: 1px solid var(--line, #334155); }
+.censo-admin-tabs button { flex: 1; padding: 12px; border: 0; border-bottom: 3px solid transparent; color: var(--muted, #94a3b8); background: transparent; font: inherit; font-size: 0.9rem; cursor: pointer; }
+.censo-admin-tabs button[aria-selected="true"] { color: var(--accent, #38bdf8); border-bottom-color: currentColor; font-weight: 700; }
+.censo-admin-tabs button:focus-visible, .censo-sound-actions button:focus-visible { outline: 2px solid var(--accent, #38bdf8); outline-offset: 2px; }
+.censo-sound-heading { display: flex; justify-content: space-between; align-items: center; margin-top: 16px; }
+.censo-sound-heading span { font-variant-numeric: tabular-nums; color: var(--muted, #94a3b8); }
+.censo-sound-item > div:first-child { display: flex; gap: 8px; align-items: center; min-width: 0; overflow-wrap: anywhere; }
+.censo-sound-item strong { font-size: 0.85rem; }
+.censo-sound-item .material-symbols-outlined { flex-shrink: 0; color: var(--accent, #38bdf8); }
+.censo-sound-actions { display: flex; gap: 6px; }
+.censo-sound-form { display: grid; gap: 12px; margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--line, #334155); }
+.censo-sound-form input { text-transform: none !important; }
+.censo-sound-form a { color: var(--accent, #38bdf8); text-decoration: underline; }
+.censo-sound-form .censo-newsmodal__copy, #censoSoundStatus { font-size: 0.85rem; line-height: 1.5; overflow-wrap: anywhere; }
+.censo-newsmodal__button:disabled { opacity: 0.5; cursor: not-allowed; }
+
 .censo-newsmodal__card {
   width: min(620px, 100%);
   max-height: min(88vh, 760px);

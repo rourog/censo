@@ -1,13 +1,13 @@
 // main.js
 // Entrada mínima con diagnóstico de carga de módulos.
-// BUILD: camas-sonidos-v2-20260902
+// BUILD: admin-sonidos-v4-20260903
 // Ruta ideal en GitHub:
 //   index.html
 //   style.css
 //   main.js
 //   modules/appModule.js
 
-const BUILD = 'camas-sonidos-v2-20260902';
+const BUILD = 'admin-sonidos-v4-20260903';
 
 console.info(`[CENSO] main.js cargado. BUILD: ${BUILD}`);
 window.CensoBuild = { version: BUILD, stage: 'main-loaded' };

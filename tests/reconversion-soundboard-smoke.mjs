@@ -27,6 +27,7 @@ const elements = new Map();
 function element() {
   return {
     style: {}, dataset: {}, attributes: {}, children: [], listeners: {},
+    replaceChildren() { this.children = []; },
     setAttribute(name, value) { this.attributes[name] = value; },
     appendChild(child) { this.children.push(child); child.parentElement = this; if (child.id) elements.set(child.id, child); },
     addEventListener(name, callback) { this.listeners[name] = callback; },
@@ -54,7 +55,12 @@ globalThis.Audio = class {
 const plexusUrl = asModule(read('modules/plexus.js'));
 const source = read('modules/effectsModule.js').replace(/\.\/plexus\.js\?v=[^']+/, plexusUrl);
 const { createEffectsModule } = await import(asModule(source));
-const app = createEffectsModule({ utils: { vibrar() {} }, state: { pacientesGlobal: [] } });
+const catalogUrl = 'data:text/javascript;base64,' + Buffer.from(read('modules/soundCatalog.js')).toString('base64');
+const soundSource = read('modules/soundboardModule.js').replace(/\.\/soundCatalog\.js\?v=[^']+/, catalogUrl);
+const { createSoundboardModule } = await import('data:text/javascript;base64,' + Buffer.from(soundSource).toString('base64'));
+const context = { utils: { vibrar() {} }, state: { pacientesGlobal: [] }, firebase: {} };
+Object.assign(context, createSoundboardModule(context));
+const app = createEffectsModule(context);
 assert.equal(app.checkEasterEggs('otro usuario'), false);
 assert.equal(elements.has('rodrrodriguezSoundboard'), false);
 assert.equal(app.checkEasterEggs(' RODRRODRIGUEZ '), true);
