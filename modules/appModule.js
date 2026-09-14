@@ -11,23 +11,24 @@
   - Hablar con Firestore directamente.
 */
 
-import * as firebase from './firebaseModule.js?v=admin-sonidos-v4-20260903';
-import * as bed from './bedModule.js?v=admin-sonidos-v4-20260903';
-import * as utils from './utilsModule.js?v=admin-sonidos-v4-20260903';
-import { state } from './stateModule.js?v=admin-sonidos-v4-20260903';
+import * as firebase from './firebaseModule.js?v=print-censo-v1-20260914';
+import * as bed from './bedModule.js?v=print-censo-v1-20260914';
+import * as utils from './utilsModule.js?v=print-censo-v1-20260914';
+import { state } from './stateModule.js?v=print-censo-v1-20260914';
 
-import { createSoundboardModule } from './soundboardModule.js?v=admin-sonidos-v4-20260903';
-import { createEffectsModule } from './effectsModule.js?v=admin-sonidos-v4-20260903';
-import { createRenderModule } from './renderModule.js?v=admin-sonidos-v4-20260903';
-import { createPatientModule } from './patientModule.js?v=admin-sonidos-v4-20260903';
-import { createThemeModule } from './themeModule.js?v=admin-sonidos-v4-20260903';
-import { createModalModule } from './modalModule.js?v=admin-sonidos-v4-20260903';
-import { createMaintenanceModule } from './maintenanceModule.js?v=admin-sonidos-v4-20260903';
-import { createInteractionModule } from './interactionModule.js?v=admin-sonidos-v4-20260903';
-import { createNewsBarModule } from './newsBarModule.js?v=admin-sonidos-v4-20260903';
-import { createAuthModule } from './authModule.js?v=admin-sonidos-v4-20260903';
+import { createSoundboardModule } from './soundboardModule.js?v=print-censo-v1-20260914';
+import { createEffectsModule } from './effectsModule.js?v=print-censo-v1-20260914';
+import { createRenderModule } from './renderModule.js?v=print-censo-v1-20260914';
+import { createPatientModule } from './patientModule.js?v=print-censo-v1-20260914';
+import { createThemeModule } from './themeModule.js?v=print-censo-v1-20260914';
+import { createModalModule } from './modalModule.js?v=print-censo-v1-20260914';
+import { createMaintenanceModule } from './maintenanceModule.js?v=print-censo-v1-20260914';
+import { createInteractionModule } from './interactionModule.js?v=print-censo-v1-20260914';
+import { createNewsBarModule } from './newsBarModule.js?v=print-censo-v1-20260914';
+import { createPrintModule } from './printModule.js?v=print-censo-v1-20260914';
+import { createAuthModule } from './authModule.js?v=print-censo-v1-20260914';
 
-const BUILD = 'admin-sonidos-v4-20260903';
+const BUILD = 'print-censo-v1-20260914';
 
 export async function bootApp() {
   console.info(`[CENSO] bootApp iniciado. BUILD: ${BUILD}`);
@@ -48,6 +49,7 @@ export async function bootApp() {
   Object.assign(app, createMaintenanceModule(app));
   Object.assign(app, createInteractionModule(app));
   Object.assign(app, createNewsBarModule(app));
+  Object.assign(app, createPrintModule(app));
   Object.assign(app, createAuthModule(app));
 
   app.__build = BUILD;
@@ -58,6 +60,7 @@ export async function bootApp() {
   app.bindMaintenanceEvents();
   app.exposeWindowActions();
   app.initTheme();
+  app.initPrintUi();
   app.bindUiEvents();
   // Restaurar el puente que muestra noticias y avisos después de iniciar sesión.
   app.initSoundboardAuthBridge();

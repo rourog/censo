@@ -14,7 +14,7 @@
   - Guardar pacientes directamente.
 */
 
-console.info('[CENSO] interactionModule.js cargado. BUILD: bulk-reset-v1-20260722');
+console.info('[CENSO] interactionModule.js cargado. BUILD: print-censo-v1-20260914');
 
 export const MOBILE_SWIPE_THRESHOLD = 110;
 
@@ -26,7 +26,7 @@ export function getMobileSwipeAction(deltaX, threshold = MOBILE_SWIPE_THRESHOLD)
 
 export function createInteractionModule(app) {
   const { state } = app;
-  const { normalizar, escapeHtml } = app.utils;
+  const { normalizar } = app.utils;
 
   let scrollGuiderHandler = null;
 
@@ -46,18 +46,18 @@ export function createInteractionModule(app) {
       const isScrollable = wrapper.scrollHeight > wrapper.clientHeight;
 
       if (!isScrollable) {
-        guider.className = 'scroll-guider'; 
+        guider.className = 'scroll-guider';
         return;
       }
 
       if (!atBottom) {
         guider.innerHTML = '<span class="material-symbols-outlined">arrow_downward</span>';
         guider.className = 'scroll-guider active-down';
-        guider.title = "Ir al final del censo";
+        guider.title = 'Ir al final del censo';
       } else if (atBottom && !atTop) {
         guider.innerHTML = '<span class="material-symbols-outlined">arrow_upward</span>';
         guider.className = 'scroll-guider active-up';
-        guider.title = "Volver arriba";
+        guider.title = 'Volver arriba';
       } else {
         guider.className = 'scroll-guider';
       }
@@ -74,7 +74,7 @@ export function createInteractionModule(app) {
     };
 
     wrapper.addEventListener('scroll', scrollGuiderHandler, { passive: true });
-  
+
     guider.onclick = (e) => {
       e.stopPropagation();
       app.utils.vibrar(15);
@@ -88,12 +88,9 @@ export function createInteractionModule(app) {
     checkScrollPosition();
   }
 
-  // ==========================================================
-  // NAVEGACIÓN POR TECLADO OCULTA Y AGREGADA A "NUEVO INGRESO"
-  // ==========================================================
   document.addEventListener('keydown', (e) => {
     if (state.currentViewMode !== 'table' || window.innerWidth < 768 || window.isInlineEditing) return;
-  
+
     const elements = Array.from(document.querySelectorAll('.patient-row, .btn-add-table'));
     if (!elements.length) return;
 
@@ -108,7 +105,7 @@ export function createInteractionModule(app) {
     } else if (e.key === 'Enter' && state.selectedNavIndex !== -1) {
       e.preventDefault();
       const el = elements[state.selectedNavIndex];
-    
+
       if (el.classList.contains('btn-add-table')) {
         app.abrirModalAgregar();
       } else {
@@ -123,13 +120,12 @@ export function createInteractionModule(app) {
     if (elements[state.selectedNavIndex]) {
       const el = elements[state.selectedNavIndex];
       el.classList.add('selected-nav');
-    
+
       if (el.classList.contains('patient-row')) {
-        const yaEstaAbierta = el.classList.contains('expanded-row');
         document.querySelectorAll('.patient-row').forEach(tr => tr.classList.remove('expanded-row'));
         el.classList.add('expanded-row');
       }
-    
+
       el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
   }
@@ -177,7 +173,7 @@ export function createInteractionModule(app) {
           axis: null
         };
       }, { passive: true });
-    
+
       el.addEventListener('touchmove', e => {
         if (gesture?.el !== el) return;
         const touch = e.touches[0];
@@ -200,7 +196,7 @@ export function createInteractionModule(app) {
         card?.classList.toggle('swipe-ready-edit', action === 'edit');
         card?.classList.toggle('swipe-ready-delete', action === 'delete');
       }, { passive: true });
-    
+
       el.addEventListener('touchend', e => {
         if (gesture?.el !== el) return;
         const touch = e.changedTouches[0];
@@ -239,30 +235,40 @@ export function createInteractionModule(app) {
       return;
     }
 
-    const eggFound = app.checkEasterEggs(q); 
-  
+    const eggFound = app.checkEasterEggs(q);
+
     if (eggFound) {
-      searchInput.value = ''; searchInput.blur();
+      searchInput.value = '';
+      searchInput.blur();
       document.getElementById('searchWrapper').classList.add('collapsed');
       app.utils.vibrar([40, 60, 40]);
-      app.render(state.pacientesGlobal); return;
+      app.render(state.pacientesGlobal);
+      return;
     }
-    if (state.isFetchingData) return; 
-    if (!q) { app.render(state.pacientesGlobal); return; }
-  
-    const filtrados = state.pacientesGlobal.filter(p => { 
-      return normalizar([p.nombre, p.cama, p.area || '', p.edad, p.diagnostico, p.pendientes, p.destino, p.observacionAlerta || '', p.observacion || ''].join(' ')).includes(q); 
+    if (state.isFetchingData) return;
+    if (!q) {
+      app.render(state.pacientesGlobal);
+      return;
+    }
+
+    const filtrados = state.pacientesGlobal.filter(p => {
+      return normalizar([p.nombre, p.cama, p.area || '', p.edad, p.diagnostico, p.pendientes, p.destino, p.observacionAlerta || '', p.observacion || ''].join(' ')).includes(q);
     });
     app.render(filtrados);
-    document.querySelectorAll('.animate-in').forEach(el => { el.classList.remove('animate-in'); el.style.animationDelay = '0ms'; el.style.opacity = '1'; });
+    document.querySelectorAll('.animate-in').forEach(el => {
+      el.classList.remove('animate-in');
+      el.style.animationDelay = '0ms';
+      el.style.opacity = '1';
+    });
   }
-
 
   function bindUiEvents() {
     const search = document.getElementById('search');
     if (search) {
       search.addEventListener('input', filtrar);
-      search.addEventListener('search', (e) => { if (e.target.value === '') app.render(state.pacientesGlobal); });
+      search.addEventListener('search', (e) => {
+        if (e.target.value === '') app.render(state.pacientesGlobal);
+      });
     }
 
     const themeToggleBtn = document.getElementById('themeToggleBtn');
@@ -282,6 +288,14 @@ export function createInteractionModule(app) {
         const viewIcon = document.getElementById('viewIcon');
         if (viewIcon) viewIcon.textContent = state.currentViewMode === 'kanban' ? 'table_rows' : 'grid_view';
         app.render(state.pacientesGlobal);
+      });
+    }
+
+    const printBtn = document.getElementById('printBtn');
+    if (printBtn) {
+      printBtn.addEventListener('click', () => {
+        app.utils.vibrar(15);
+        app.imprimirCenso();
       });
     }
 
@@ -321,10 +335,11 @@ export function createInteractionModule(app) {
     let resizeTimer;
     window.addEventListener('resize', () => {
       clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(() => { if (!state.isFetchingData) app.render(state.pacientesGlobal); }, 200);
+      resizeTimer = setTimeout(() => {
+        if (!state.isFetchingData) app.render(state.pacientesGlobal);
+      }, 200);
     });
   }
-
 
   return {
     initScrollGuider,
