@@ -1,9 +1,8 @@
-import { SOUND_USERS, SOUND_ICONS, MAX_SOUNDS, defaultSounds, parseMyinstantsLink, validateSounds, changeSounds } from './soundCatalog.js?v=admin-sonidos-v4-20260903';
-
 const ADMIN_SESSION = 'censo-newsbar-admin-session-v1';
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 export function createSoundboardModule(app) {
+  const { SOUND_USERS, SOUND_ICONS, MAX_SOUNDS, defaultSounds, parseMyinstantsLink, validateSounds, changeSounds } = app.soundCatalog;
   const { db, auth, collection, doc, onSnapshot, onAuthStateChanged, runTransaction, serverTimestamp } = app.firebase;
   const configs = new Map();
   const activated = new Set();
@@ -70,7 +69,7 @@ export function createSoundboardModule(app) {
     }
     if (!board) return;
     if (currentAudio?.scope === user) stopSound();
-    board.replaceChildren(); // Retira también los onclick antiguos de ALFROJAS.
+    board.replaceChildren();
     board.setAttribute('role', 'group');
     board.setAttribute('aria-label', `Sonidos de ${user.toUpperCase()}`);
     board.style.cssText = 'align-items: center; gap: 6px; margin-left: 4px; padding: 2px 4px; min-width: 0; max-width: min(260px, 34vw); overflow-x: auto; scrollbar-width: thin;';
@@ -161,7 +160,6 @@ export function createSoundboardModule(app) {
     if (syncState !== 'ready') throw new Error('Espera a que termine la sincronización.');
     const uid = auth.currentUser.uid;
     const ref = doc(db, 'soundboards', user);
-    // La lista se lee y modifica en una transacción: dos equipos no pueden añadir un noveno sonido.
     await runTransaction(db, async transaction => {
       const snapshot = await transaction.get(ref);
       if (!unlocked || auth.currentUser?.uid !== uid || sessionStorage.getItem(ADMIN_SESSION) !== '1') throw new Error('La administración se bloqueó. Vuelve a entrar.');
@@ -187,7 +185,7 @@ export function createSoundboardModule(app) {
         admin.help.hidden = false; admin.direct.required = true;
         admin.open.href = parsed.pageUrl;
       }
-    } catch { /* El error se presenta al probar o guardar. */ }
+    } catch { }
   }
 
   function mountSoundAdmin(container) {
