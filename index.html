@@ -15,7 +15,6 @@
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icono.png">
 
-  <!-- FUENTES DE GOOGLE -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -23,8 +22,10 @@
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
-  <!-- AQUÍ ENLAZAS TU NUEVO ARCHIVO DE ESTILOS -->
-  <link rel="stylesheet" href="style.css?v=newsbar-v1.5-20260723">
+  <!-- style.css recibe su versión desde version.json. El body permanece oculto
+       hasta terminar la carga para evitar un parpadeo sin estilos. -->
+  <style id="censoBootStyle">html{background:#0f172a}body{visibility:hidden}</style>
+  <link id="censoAppStylesheet" rel="stylesheet">
 </head>
 <body class="base-dark accent-blue">
 
@@ -39,7 +40,6 @@
       Hospital Regional de Delicias
     </div>
 
-    <!-- DESACTIVADOS POR DEFECTO PARA LA LECTURA SILENCIOSA DE FIREBASE -->
     <input id="nipInput" type="password" class="input-control" placeholder="CÓDIGO" style="max-width: 220px; text-align: center; font-size: 1.2rem; letter-spacing: 0.2em; margin-bottom: 10px;" disabled>
 
     <button id="btnEnter" class="btn-login-sober" disabled>
@@ -48,12 +48,11 @@
 
     <div style="position: absolute; bottom: 30px; font-size: 0.7rem; font-family: 'Space Mono', monospace; font-weight: 700; letter-spacing: 0.1em;">
       <span style="color: var(--muted);">ROUROG</span> <span style="color: var(--text); opacity: 0.5;">Innovations</span>
-      <span style="opacity: 0.3; margin-left: 6px;">v1.33</span>
+      <span data-censo-version style="opacity: 0.3; margin-left: 6px;">v—</span>
     </div>
   </div>
 
   <div class="app" id="mainAppContainer" style="display: none;">
-    <!-- TODO EL RESTO DE TU HTML SE QUEDA EXACTAMENTE IGUAL -->
     <div class="header">
       <canvas id="plexusCanvas"></canvas>
 
@@ -108,7 +107,7 @@
 
     <div class="footer">
       Hospital Regional de Delicias - <span style="color: var(--accent); font-weight: 600;">Rourog Innovations</span>
-      <span style="opacity: 0.4; font-size: 0.8em; margin-left: 8px;">v2.46</span>
+      <span data-censo-version style="opacity: 0.4; font-size: 0.8em; margin-left: 8px;">v—</span>
     </div>
 
     <div id="easterEggContainer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; pointer-events: none; overflow: hidden;"></div>
@@ -116,7 +115,6 @@
 
   <button class="fab-btn" id="mainFabBtn" onclick="abrirModalAgregar()" style="display: none;"><span class="material-symbols-outlined" style="font-size: 2rem;">add</span></button>
 
-  <!-- THEME MODAL (v2.27+) -->
   <div id="themeModal" class="modal-overlay">
     <div class="modal-content" style="max-width: 380px;">
       <div class="modal-header">
@@ -136,7 +134,6 @@
     </div>
   </div>
 
-  <!-- EDIT MODAL -->
   <div id="editModal" class="modal-overlay">
     <div class="modal-content">
       <div class="modal-header">
@@ -184,7 +181,6 @@
     </div>
   </div>
 
-  <!-- ADD MODAL -->
   <div id="addModal" class="modal-overlay">
     <div class="modal-content">
       <div class="modal-header">
@@ -263,7 +259,68 @@
     </div>
   </div>
 
-  <!-- AQUÍ ENLAZAS TU NUEVO ARCHIVO JAVASCRIPT -->
-  <script type="module" src="main.js?v=newsbar-v1.5-20260723"></script>
+  <script type="module">
+    const revealPage = () => {
+      document.body.style.visibility = 'visible';
+      document.getElementById('censoBootStyle')?.remove();
+    };
+
+    const showBootstrapError = (error) => {
+      console.error('[CENSO] Error durante bootstrap:', error);
+      revealPage();
+      const btn = document.getElementById('btnEnter');
+      const input = document.getElementById('nipInput');
+      if (input) input.disabled = true;
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'ERROR AL CARGAR APP';
+      }
+    };
+
+    try {
+      let manifest = null;
+      try {
+        const manifestUrl = new URL(`version.json?ts=${Date.now()}`, document.baseURI);
+        const response = await fetch(manifestUrl, { cache: 'no-store' });
+        if (!response.ok) throw new Error(`version.json HTTP ${response.status}`);
+        manifest = await response.json();
+      } catch (error) {
+        console.warn('[CENSO] No se pudo leer version.json; se fuerza una carga fresca.', error);
+      }
+
+      const build = String(manifest?.build || `runtime-${Date.now()}`).trim();
+      const displayVersion = String(manifest?.displayVersion || build).trim();
+      if (!build) throw new Error('version.json no contiene un build válido.');
+
+      window.CensoBuild = {
+        version: build,
+        displayVersion,
+        stage: 'bootstrap'
+      };
+
+      document.querySelectorAll('[data-censo-version]').forEach((element) => {
+        element.textContent = `v${displayVersion}`;
+      });
+
+      const stylesheet = document.getElementById('censoAppStylesheet');
+      const styleReady = new Promise((resolve) => {
+        if (!stylesheet) return resolve();
+        const finish = () => resolve();
+        stylesheet.addEventListener('load', finish, { once: true });
+        stylesheet.addEventListener('error', finish, { once: true });
+        setTimeout(finish, 4000);
+      });
+
+      if (stylesheet) {
+        stylesheet.href = new URL(`style.css?v=${encodeURIComponent(build)}`, document.baseURI).href;
+      }
+
+      await styleReady;
+      revealPage();
+      await import(`./main.js?v=${encodeURIComponent(build)}`);
+    } catch (error) {
+      showBootstrapError(error);
+    }
+  </script>
 </body>
 </html>

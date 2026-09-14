@@ -1,36 +1,63 @@
 // main.js
 // Entrada mínima con diagnóstico de carga de módulos.
-// BUILD: print-censo-v1-20260914
-// Ruta ideal en GitHub:
-//   index.html
-//   style.css
-//   main.js
-//   modules/appModule.js
+// La versión se inyecta desde index.html -> version.json.
 
-const BUILD = 'print-censo-v1-20260914';
+const BUILD = String(window.CensoBuild?.version || `runtime-${Date.now()}`);
 
 console.info(`[CENSO] main.js cargado. BUILD: ${BUILD}`);
-window.CensoBuild = { version: BUILD, stage: 'main-loaded' };
+window.CensoBuild = {
+  ...(window.CensoBuild || {}),
+  version: BUILD,
+  stage: 'main-loaded'
+};
+
+function enforceRuntimeVersionOnLocalStyles() {
+  const applyVersion = (node) => {
+    if (!(node instanceof HTMLLinkElement) || node.rel !== 'stylesheet' || !node.href) return;
+
+    try {
+      const url = new URL(node.href, document.baseURI);
+      if (url.origin !== location.origin) return;
+      if (!url.pathname.endsWith('.css')) return;
+      if (url.searchParams.get('v') === BUILD) return;
+
+      url.searchParams.set('v', BUILD);
+      node.href = url.href;
+    } catch (error) {
+      console.warn('[CENSO] No se pudo versionar una hoja de estilos local:', error);
+    }
+  };
+
+  document.querySelectorAll('link[rel="stylesheet"]').forEach(applyVersion);
+
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      mutation.addedNodes.forEach((node) => {
+        if (node instanceof HTMLLinkElement) applyVersion(node);
+        if (node instanceof Element) {
+          node.querySelectorAll?.('link[rel="stylesheet"]').forEach(applyVersion);
+        }
+      });
+    });
+  });
+
+  observer.observe(document.head, { childList: true, subtree: true });
+  window.CensoAssetVersionObserver = observer;
+}
+
+enforceRuntimeVersionOnLocalStyles();
 
 async function loadBootModule() {
-  const candidates = [
-    `./modules/appModule.js?v=${BUILD}`
-  ];
+  const path = `./modules/appModule.js?v=${encodeURIComponent(BUILD)}`;
 
-  let lastError = null;
-
-  for (const path of candidates) {
-    try {
-      const module = await import(path);
-      console.info(`[CENSO] appModule cargado desde: ${path}`);
-      return module;
-    } catch (error) {
-      lastError = error;
-      console.warn(`[CENSO] No se pudo cargar ${path}`, error);
-    }
+  try {
+    const module = await import(path);
+    console.info(`[CENSO] appModule cargado desde: ${path}`);
+    return module;
+  } catch (error) {
+    console.warn(`[CENSO] No se pudo cargar ${path}`, error);
+    throw error;
   }
-
-  throw lastError || new Error('No se pudo cargar appModule.js');
 }
 
 function showBootError(error) {
@@ -48,7 +75,11 @@ function showBootError(error) {
   }
 
   if (loginScreen) {
+    const existing = document.getElementById('censoBootError');
+    existing?.remove();
+
     const box = document.createElement('div');
+    box.id = 'censoBootError';
     box.style.cssText = [
       'max-width: 340px',
       'margin-top: 14px',
@@ -65,9 +96,8 @@ function showBootError(error) {
     ].join(';');
 
     box.textContent =
-      'No se pudo cargar modules/appModule.js.\n\n' +
-      'Revisa que la estructura sea:\n' +
-      'index.html\nstyle.css\nmain.js\nmodules/appModule.js\n\n' +
+      'No se pudo cargar la aplicación.\n\n' +
+      `BUILD: ${BUILD}\n\n` +
       'Detalle: ' + (error?.message || String(error));
 
     loginScreen.appendChild(box);
