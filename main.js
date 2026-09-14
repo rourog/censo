@@ -11,6 +11,42 @@ window.CensoBuild = {
   stage: 'main-loaded'
 };
 
+function enforceRuntimeVersionOnLocalStyles() {
+  const applyVersion = (node) => {
+    if (!(node instanceof HTMLLinkElement) || node.rel !== 'stylesheet' || !node.href) return;
+
+    try {
+      const url = new URL(node.href, document.baseURI);
+      if (url.origin !== location.origin) return;
+      if (!url.pathname.endsWith('.css')) return;
+      if (url.searchParams.get('v') === BUILD) return;
+
+      url.searchParams.set('v', BUILD);
+      node.href = url.href;
+    } catch (error) {
+      console.warn('[CENSO] No se pudo versionar una hoja de estilos local:', error);
+    }
+  };
+
+  document.querySelectorAll('link[rel="stylesheet"]').forEach(applyVersion);
+
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      mutation.addedNodes.forEach((node) => {
+        if (node instanceof HTMLLinkElement) applyVersion(node);
+        if (node instanceof Element) {
+          node.querySelectorAll?.('link[rel="stylesheet"]').forEach(applyVersion);
+        }
+      });
+    });
+  });
+
+  observer.observe(document.head, { childList: true, subtree: true });
+  window.CensoAssetVersionObserver = observer;
+}
+
+enforceRuntimeVersionOnLocalStyles();
+
 async function loadBootModule() {
   const path = `./modules/appModule.js?v=${encodeURIComponent(BUILD)}`;
 
