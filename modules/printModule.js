@@ -136,7 +136,7 @@ export function createPrintModule(app) {
 
   function imprimirCenso() {
     const lista = Array.isArray(state.pacientesGlobal) ? state.pacientesGlobal : [];
-    const ventana = window.open('', '_blank', 'noopener,noreferrer');
+    const ventana = window.open('', '_blank');
 
     if (!ventana) {
       window.alert('El navegador bloqueó la ventana de impresión. Permite ventanas emergentes para este sitio e inténtalo de nuevo.');
