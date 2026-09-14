@@ -6,11 +6,6 @@
   - Normalizar pacientes entrantes.
   - Ordenar pacientes.
   - Calcular camas libres usando bedModule.
-
-  NO DEBE:
-  - Construir HTML.
-  - Abrir modales.
-  - Manejar login.
 */
 
 export function createPatientModule(app) {
@@ -53,6 +48,17 @@ export function createPatientModule(app) {
       console.warn('[CENSO] Fecha de ingreso inválida:', value, error);
       return null;
     }
+  }
+
+  function normalizeBedKey(area, cama) {
+    const normalize = value => String(value || '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLocaleUpperCase('es-MX')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    return `${normalize(area)}|${normalize(cama)}`;
   }
 
   function normalizePatient(docSnapshot) {
@@ -116,31 +122,22 @@ export function createPatientModule(app) {
       state.unsubscribe = onSnapshot(collection(db, 'pacientes'), (snapshot) => {
         try {
           const nextPatients = [];
-          const occupiedBeds = new Set();
 
           snapshot.forEach((docSnapshot) => {
             try {
-              const data = normalizePatient(docSnapshot);
-
-              if (data.cama) {
-                const areaName = data.area.toUpperCase().trim();
-                occupiedBeds.add(`${areaName}|${data.cama}`);
-              }
-
-              nextPatients.push(data);
+              nextPatients.push(normalizePatient(docSnapshot));
             } catch (error) {
               console.error(`[CENSO] Se omitió el paciente ${docSnapshot.id} por datos inválidos:`, error);
             }
           });
 
-          const ordenCamas = masterCamas.map(c => c.cama.toUpperCase().trim());
+          const bedOrder = new Map(
+            masterCamas.map((bed, index) => [normalizeBedKey(bed.area, bed.cama), index])
+          );
 
           nextPatients.sort((a, b) => {
-            let idxA = ordenCamas.indexOf(a.cama.toUpperCase().trim());
-            let idxB = ordenCamas.indexOf(b.cama.toUpperCase().trim());
-
-            idxA = idxA === -1 ? 9999 : idxA;
-            idxB = idxB === -1 ? 9999 : idxB;
+            const idxA = bedOrder.get(normalizeBedKey(a.area, a.cama)) ?? 9999;
+            const idxB = bedOrder.get(normalizeBedKey(b.area, b.cama)) ?? 9999;
 
             if (idxA !== idxB) return idxA - idxB;
 
@@ -150,13 +147,7 @@ export function createPatientModule(app) {
           });
 
           state.pacientesGlobal = nextPatients;
-          state.camasLibresGlobal = masterCamas
-            .filter((c) => {
-              const areaName = c.area.toUpperCase().trim();
-              const camaName = c.cama.toUpperCase().trim();
-              return !occupiedBeds.has(`${areaName}|${camaName}`);
-            })
-            .map((c, i) => ({ ...c, fila: `cama_libre_${i}` }));
+          state.camasLibresGlobal = app.bed.calcularCamasLibres(masterCamas, nextPatients);
 
           state.isFetchingData = false;
           setReloadState();
