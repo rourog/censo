@@ -4,7 +4,7 @@
   RESPONSABILIDAD:
   - Generar una vista de impresión independiente del censo.
   - Imprimir únicamente: cama, ingreso, paciente, edad, diagnóstico y pendientes.
-  - No modificar el DOM principal ni hablar con Firebase.
+  - No hablar con Firebase.
 */
 
 export function createPrintModule(app) {
@@ -20,6 +20,24 @@ export function createPrintModule(app) {
     'EXTRAS',
     'SIN ÁREA ASIGNADA'
   ];
+
+  function initPrintUi() {
+    if (document.getElementById('printBtn')) return;
+    const headerRight = document.querySelector('.header-right');
+    const viewBtn = document.getElementById('viewToggleBtn');
+    if (!headerRight) return;
+
+    const button = document.createElement('button');
+    button.id = 'printBtn';
+    button.className = 'icon-btn hide-on-mobile';
+    button.type = 'button';
+    button.setAttribute('aria-label', 'Imprimir censo');
+    button.title = 'Imprimir censo';
+    button.innerHTML = '<span class="material-symbols-outlined">print</span>';
+
+    if (viewBtn) headerRight.insertBefore(button, viewBtn);
+    else headerRight.prepend(button);
+  }
 
   function ordenarAreas(areas) {
     return [...areas].sort((a, b) => {
@@ -43,10 +61,7 @@ export function createPrintModule(app) {
     const filas = [];
 
     areas.forEach((area) => {
-      filas.push(`
-        <tr class="area-row">
-          <td colspan="6">${escapeHtml(area)}</td>
-        </tr>`);
+      filas.push(`<tr class="area-row"><td colspan="6">${escapeHtml(area)}</td></tr>`);
 
       grupos[area].forEach((p) => {
         filas.push(`
@@ -79,97 +94,40 @@ export function createPrintModule(app) {
   <style>
     @page { size: landscape; margin: 9mm; }
     * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      color: #111;
-      background: #fff;
-      font-family: Arial, Helvetica, sans-serif;
-      font-size: 9pt;
-    }
-    .print-header {
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 7mm;
-    }
-    .print-header h1 {
-      margin: 0;
-      font-size: 16pt;
-      letter-spacing: .04em;
-      text-transform: uppercase;
-    }
-    .print-meta {
-      text-align: right;
-      font-size: 8pt;
-      color: #444;
-      line-height: 1.35;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      table-layout: fixed;
-    }
+    body { margin: 0; color: #111; background: #fff; font-family: Arial, Helvetica, sans-serif; font-size: 9pt; }
+    .print-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 7mm; }
+    .print-header h1 { margin: 0; font-size: 16pt; letter-spacing: .04em; text-transform: uppercase; }
+    .print-meta { text-align: right; font-size: 8pt; color: #444; line-height: 1.35; }
+    table { width: 100%; border-collapse: collapse; table-layout: fixed; }
     thead { display: table-header-group; }
     tr { break-inside: avoid; page-break-inside: avoid; }
-    th, td {
-      border: 1px solid #777;
-      padding: 4px 5px;
-      vertical-align: top;
-      overflow-wrap: anywhere;
-      word-break: normal;
-      white-space: normal;
-    }
-    th {
-      background: #e7e7e7;
-      font-size: 8pt;
-      text-transform: uppercase;
-      text-align: left;
-    }
-    .area-row td {
-      background: #d6d6d6;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: .04em;
-      padding: 3px 5px;
-    }
+    th, td { border: 1px solid #777; padding: 4px 5px; vertical-align: top; overflow-wrap: anywhere; word-break: normal; white-space: normal; }
+    th { background: #e7e7e7; font-size: 8pt; text-transform: uppercase; text-align: left; }
+    .area-row td { background: #d6d6d6; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; padding: 3px 5px; }
     .cama { width: 9%; text-align: center; font-weight: 700; }
     .ingreso { width: 10%; text-align: center; font-size: 8pt; }
     .paciente { width: 18%; font-weight: 700; }
     .edad { width: 7%; text-align: center; }
     .diagnostico { width: 28%; }
     .pendientes { width: 28%; }
-    .empty {
-      border: 1px solid #999;
-      padding: 12mm;
-      text-align: center;
-      font-weight: 700;
-    }
+    .empty { border: 1px solid #999; padding: 12mm; text-align: center; font-weight: 700; }
   </style>
 </head>
 <body>
   <header class="print-header">
-    <div>
-      <h1>Censo de Urgencias</h1>
-      <div>Hospital Regional de Delicias</div>
-    </div>
-    <div class="print-meta">
-      <div>${lista.length} paciente${lista.length === 1 ? '' : 's'}</div>
-      <div>Impreso: ${escapeHtml(fecha)}</div>
-    </div>
+    <div><h1>Censo de Urgencias</h1><div>Hospital Regional de Delicias</div></div>
+    <div class="print-meta"><div>${lista.length} paciente${lista.length === 1 ? '' : 's'}</div><div>Impreso: ${escapeHtml(fecha)}</div></div>
   </header>
   ${lista.length ? `
   <table>
-    <thead>
-      <tr>
-        <th class="cama">Cama</th>
-        <th class="ingreso">Ingreso</th>
-        <th class="paciente">Paciente</th>
-        <th class="edad">Edad</th>
-        <th class="diagnostico">Diagnóstico</th>
-        <th class="pendientes">Pendientes</th>
-      </tr>
-    </thead>
+    <thead><tr>
+      <th class="cama">Cama</th>
+      <th class="ingreso">Ingreso</th>
+      <th class="paciente">Paciente</th>
+      <th class="edad">Edad</th>
+      <th class="diagnostico">Diagnóstico</th>
+      <th class="pendientes">Pendientes</th>
+    </tr></thead>
     <tbody>${generarFilas(lista)}</tbody>
   </table>` : '<div class="empty">NO HAY PACIENTES EN EL CENSO.</div>'}
 </body>
@@ -199,6 +157,7 @@ export function createPrintModule(app) {
   }
 
   return {
+    initPrintUi,
     construirDocumentoImpresion,
     imprimirCenso
   };
