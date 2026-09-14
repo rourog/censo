@@ -1,5 +1,3 @@
-import { createPlexusController } from './plexus.js?v=bulk-reset-v1-20260722';
-
 /*
   MÓDULO: effectsModule.js
 
@@ -11,6 +9,11 @@ import { createPlexusController } from './plexus.js?v=bulk-reset-v1-20260722';
   - Tocar Firebase.
   - Modificar datos clínicos.
 */
+
+const PLEXUS_BUILD = String(window.CensoBuild?.version || `runtime-${Date.now()}`);
+const plexusUrl = new URL('./plexus.js', import.meta.url);
+plexusUrl.searchParams.set('v', PLEXUS_BUILD);
+const { createPlexusController } = await import(plexusUrl.href);
 
 export function createEffectsModule(app) {
   const { vibrar } = app.utils;
@@ -61,8 +64,6 @@ export function createEffectsModule(app) {
         const cantidadEmojis = easterEggsMap[key].length;
         for(let i=0; i < cantidadEmojis; i++) { spawnSurfer(key, i); }
         isEasterEggTriggered = true;
-      
-
       }
     }
     return isEasterEggTriggered;
@@ -74,22 +75,22 @@ export function createEffectsModule(app) {
     const emoji = easterEggsMap[key][index];
     const wrapper = document.createElement('div');
     wrapper.className = 'surfer-wrapper';
-    const duration = 15 + Math.random() * 15; 
+    const duration = 15 + Math.random() * 15;
     wrapper.style.animationDuration = `${duration}s`;
-    wrapper.style.animationDelay = `-${Math.random() * duration}s`; 
-    wrapper.style.bottom = `${5 + Math.random() * 40}px`; 
-  
+    wrapper.style.animationDelay = `-${Math.random() * duration}s`;
+    wrapper.style.bottom = `${5 + Math.random() * 40}px`;
+
     const inner = document.createElement('span');
     inner.className = 'surfer-emoji';
     inner.innerText = emoji;
-    const bobDuration = 2 + Math.random() * 2; 
+    const bobDuration = 2 + Math.random() * 2;
     inner.style.animationDuration = `${bobDuration}s`;
-    inner.style.animationDelay = `-${Math.random() * 2}s`; 
-  
+    inner.style.animationDelay = `-${Math.random() * 2}s`;
+
     inner.onpointerdown = (e) => {
-       e.stopPropagation(); e.preventDefault(); vibrar(15);
-       inner.style.animation = 'none'; inner.style.transform = 'scale(0)'; inner.style.opacity = '0'; inner.style.transition = 'all 0.2s ease';
-       setTimeout(() => wrapper.remove(), 200); 
+      e.stopPropagation(); e.preventDefault(); vibrar(15);
+      inner.style.animation = 'none'; inner.style.transform = 'scale(0)'; inner.style.opacity = '0'; inner.style.transition = 'all 0.2s ease';
+      setTimeout(() => wrapper.remove(), 200);
     };
     wrapper.appendChild(inner); container.appendChild(wrapper);
   }

@@ -1,11 +1,11 @@
 /*
   MÓDULO: themeModule.js
-  THEME ENGINE V2
+  THEME ENGINE V3
 
   RESPONSABILIDAD:
   - Catálogo accesible de fondos y acentos.
   - Adaptar el tono del acento a fondos claros/oscuros.
-  - Aplicar y persistir tema localmente.
+  - Aplicar y persistir tema y animación decorativa localmente.
   - Renderizar selector, vista previa y restablecimiento.
 */
 
@@ -45,34 +45,59 @@ export function createThemeModule(app) {
     { id: 'accent-emerald', name: 'Esmeralda', light: '#047857', dark: '#34d399' },
     { id: 'accent-green', name: 'Verde', light: '#15803d', dark: '#4ade80' },
     { id: 'accent-lime', name: 'Lima', light: '#4d7c0f', dark: '#a3e635' },
-    { id: 'accent-gold', name: 'Oro', light: '#a16207', dark: '#facc15' },
+
+    { id: 'accent-gold', name: 'Oro', light: '#8a6100', dark: '#ffd700', metallic: 'gold' },
+    { id: 'accent-silver', name: 'Plata', light: '#475569', dark: '#d1d5db', metallic: 'silver' },
+    { id: 'accent-bronze', name: 'Bronce', light: '#7c3f12', dark: '#d08a3e', metallic: 'bronze' },
+    { id: 'accent-copper', name: 'Cobre', light: '#8f3f12', dark: '#f28c52', metallic: 'copper' },
     { id: 'accent-amber', name: 'Ámbar', light: '#b45309', dark: '#fbbf24' },
     { id: 'accent-orange', name: 'Naranja', light: '#c2410c', dark: '#fb923c' },
-    { id: 'accent-red', name: 'Rojo', light: '#b91c1c', dark: '#f87171' },
-    { id: 'accent-pure-red', name: 'Rubí', light: '#991b1b', dark: '#fca5a5' },
+
+    { id: 'accent-red', name: 'Rojo', light: '#b91c1c', dark: '#ff5252' },
+    { id: 'accent-pure-red', name: 'Rojo puro', light: '#a80000', dark: '#ff2d2d' },
+    { id: 'accent-scarlet', name: 'Escarlata', light: '#c1121f', dark: '#ff375f' },
     { id: 'accent-crimson', name: 'Carmesí', light: '#be123c', dark: '#fb7185' },
     { id: 'accent-pink', name: 'Rosa', light: '#be185d', dark: '#f472b6' },
     { id: 'accent-fuchsia', name: 'Fucsia', light: '#a21caf', dark: '#e879f9' },
     { id: 'accent-purple', name: 'Púrpura', light: '#7e22ce', dark: '#c084fc' },
     { id: 'accent-violet', name: 'Violeta', light: '#6d28d9', dark: '#a78bfa' },
-    { id: 'accent-indigo', name: 'Índigo', light: '#4338ca', dark: '#818cf8' },
-    { id: 'accent-slate', name: 'Plata', light: '#334155', dark: '#cbd5e1' }
+    { id: 'accent-indigo', name: 'Índigo', light: '#4338ca', dark: '#818cf8' }
+  ];
+
+  const effects = [
+    { id: 'effect-waves', name: 'Olas', icon: 'waves' },
+    { id: 'effect-aurora', name: 'Aurora', icon: 'blur_on' },
+    { id: 'effect-grid', name: 'Rejilla', icon: 'grid_4x4' },
+    { id: 'effect-radar', name: 'Radar', icon: 'radar' },
+    { id: 'effect-particles', name: 'Partículas', icon: 'grain' },
+    { id: 'effect-pulse', name: 'Pulso', icon: 'track_changes' },
+    { id: 'effect-scan', name: 'Escáner', icon: 'document_scanner' },
+    { id: 'effect-nebula', name: 'Nebulosa', icon: 'blur_circular' },
+    { id: 'effect-none', name: 'Ninguna', icon: 'motion_photos_off' }
   ];
 
   const DEFAULT_BASE = 'base-dark';
   const DEFAULT_ACCENT = 'accent-blue';
+  const DEFAULT_EFFECT = 'effect-waves';
   const baseIds = new Set(bases.map(item => item.id));
   const accentIds = new Set(accents.map(item => item.id));
+  const effectIds = new Set(effects.map(item => item.id));
 
-  function ensureThemeStylesheet() {
-    if (document.getElementById('censo-theme-v2-styles')) return;
+  function ensureStylesheet(id, filename) {
+    if (document.getElementById(id)) return;
     const link = document.createElement('link');
-    link.id = 'censo-theme-v2-styles';
+    link.id = id;
     link.rel = 'stylesheet';
-    const url = new URL('./themePaletteV2.css', import.meta.url);
+    const url = new URL(`./${filename}`, import.meta.url);
     url.searchParams.set('v', String(window.CensoBuild?.version || Date.now()));
     link.href = url.href;
     document.head.appendChild(link);
+  }
+
+  function ensureThemeStylesheets() {
+    ensureStylesheet('censo-theme-v2-styles', 'themePaletteV2.css');
+    ensureStylesheet('censo-theme-v3-effects', 'themeEffectsV3.css');
+    ensureStylesheet('censo-theme-v3-layout-effects', 'themeEffectsV4.css');
   }
 
   function validBase(value) {
@@ -80,13 +105,19 @@ export function createThemeModule(app) {
   }
 
   function validAccent(value) {
+    if (value === 'accent-slate') return 'accent-silver';
     return accentIds.has(value) ? value : DEFAULT_ACCENT;
+  }
+
+  function validEffect(value) {
+    return effectIds.has(value) ? value : DEFAULT_EFFECT;
   }
 
   function getCurrentTheme() {
     return {
       base: validBase(localStorage.getItem('censo-base')),
-      accent: validAccent(localStorage.getItem('censo-accent'))
+      accent: validAccent(localStorage.getItem('censo-accent')),
+      effect: validEffect(localStorage.getItem('censo-effect'))
     };
   }
 
@@ -113,7 +144,7 @@ export function createThemeModule(app) {
         <div class="theme-picker-group__label"><span>Colores</span><span>${accents.length}</span></div>
         <div class="theme-picker-grid">
           ${accents.map(item => `
-            <button class="theme-swatch theme-swatch--accent accent-swatch" type="button" data-val="${item.id}" aria-label="Acento ${item.name}" title="${item.name} · claro ${item.light} · oscuro ${item.dark}" style="--swatch-light:${item.light};--swatch-dark:${item.dark}">
+            <button class="theme-swatch theme-swatch--accent accent-swatch ${item.metallic ? 'theme-swatch--metallic' : ''}" type="button" data-val="${item.id}" data-metal="${item.metallic || ''}" aria-label="Acento ${item.name}" title="${item.name} · claro ${item.light} · oscuro ${item.dark}" style="--swatch-light:${item.light};--swatch-dark:${item.dark}">
               <span class="theme-swatch__dot"></span>
               <span class="theme-swatch__name">${item.name}</span>
             </button>
@@ -123,7 +154,24 @@ export function createThemeModule(app) {
     `;
   }
 
-  function ensurePreview() {
+  function renderEffectPicker() {
+    return `
+      <section class="theme-effect-picker" aria-label="Animación decorativa">
+        <div class="theme-picker-group__label"><span>Animación</span><span>Escritorio</span></div>
+        <div class="theme-effect-grid">
+          ${effects.map(item => `
+            <button class="theme-effect-option" type="button" data-effect="${item.id}" aria-label="Animación ${item.name}">
+              <span class="material-symbols-outlined" aria-hidden="true">${item.icon}</span>
+              <span>${item.name}</span>
+            </button>
+          `).join('')}
+        </div>
+        <p class="theme-effect-note">Efecto decorativo. No modifica información clínica y se reduce automáticamente si el sistema solicita menos movimiento.</p>
+      </section>
+    `;
+  }
+
+  function ensureExtras() {
     if (document.getElementById('themeV2Extras')) return;
     const modalContent = document.querySelector('#themeModal .modal-content');
     if (!modalContent) return;
@@ -131,6 +179,7 @@ export function createThemeModule(app) {
     const extras = document.createElement('div');
     extras.id = 'themeV2Extras';
     extras.innerHTML = `
+      ${renderEffectPicker()}
       <section class="theme-preview" aria-label="Vista previa del tema">
         <div class="theme-preview__head">
           <span class="theme-preview__title">Vista previa</span>
@@ -148,11 +197,18 @@ export function createThemeModule(app) {
       <button id="themeResetBtn" class="theme-reset" type="button">RESTABLECER APARIENCIA</button>
     `;
     modalContent.appendChild(extras);
-    document.getElementById('themeResetBtn')?.addEventListener('click', () => applyTheme(DEFAULT_BASE, DEFAULT_ACCENT));
+
+    extras.querySelectorAll('.theme-effect-option').forEach(button => {
+      button.addEventListener('click', () => applyEffect(button.dataset.effect));
+    });
+    document.getElementById('themeResetBtn')?.addEventListener('click', () => {
+      applyTheme(DEFAULT_BASE, DEFAULT_ACCENT);
+      applyEffect(DEFAULT_EFFECT);
+    });
   }
 
   function renderThemePickers() {
-    ensureThemeStylesheet();
+    ensureThemeStylesheets();
     const baseGrid = document.getElementById('baseColorPicker');
     const accentGrid = document.getElementById('accentColorPicker');
     if (!baseGrid || !accentGrid) return;
@@ -174,12 +230,18 @@ export function createThemeModule(app) {
     if (baseLabel) baseLabel.textContent = 'FONDO';
     if (accentLabel) accentLabel.textContent = 'ACENTO';
 
-    ensurePreview();
+    ensureExtras();
   }
 
   function removeOldThemeClasses() {
     [...document.body.classList]
       .filter(className => className.startsWith('base-') || className.startsWith('accent-'))
+      .forEach(className => document.body.classList.remove(className));
+  }
+
+  function removeOldEffectClasses() {
+    [...document.body.classList]
+      .filter(className => className.startsWith('effect-'))
       .forEach(className => document.body.classList.remove(className));
   }
 
@@ -201,6 +263,14 @@ export function createThemeModule(app) {
     if (selection) selection.textContent = `${baseName} · ${accentName}`;
   }
 
+  function updateEffectPicker(effect) {
+    document.querySelectorAll('.theme-effect-option').forEach(button => {
+      const active = button.dataset.effect === effect;
+      button.classList.toggle('active', active);
+      button.setAttribute('aria-pressed', String(active));
+    });
+  }
+
   function applyTheme(newBase, newAccent) {
     const current = getCurrentTheme();
     const base = validBase(newBase || current.base);
@@ -219,6 +289,14 @@ export function createThemeModule(app) {
     }, 50);
   }
 
+  function applyEffect(newEffect) {
+    const effect = validEffect(newEffect || getCurrentTheme().effect);
+    removeOldEffectClasses();
+    document.body.classList.add(effect);
+    localStorage.setItem('censo-effect', effect);
+    updateEffectPicker(effect);
+  }
+
   function initTheme() {
     const savedView = localStorage.getItem('censo-view') || 'kanban';
     state.currentViewMode = savedView;
@@ -228,11 +306,13 @@ export function createThemeModule(app) {
     renderThemePickers();
     const current = getCurrentTheme();
     applyTheme(current.base, current.accent);
+    applyEffect(current.effect);
   }
 
   return {
     initTheme,
     applyTheme,
+    applyEffect,
     renderThemePickers
   };
 }

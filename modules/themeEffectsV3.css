@@ -1,0 +1,235 @@
+/* CENSO · Theme Engine v3 · acentos vibrantes + animaciones decorativas */
+
+/* ----------------------------------------------------------
+   ACENTOS V3
+   ---------------------------------------------------------- */
+body.accent-gold {
+  --accent-on-light: #8a6100;
+  --accent-on-dark: #ffd700;
+  --on-accent-light: #ffffff;
+  --on-accent-dark: #2b2100;
+}
+body.accent-silver {
+  --accent-on-light: #475569;
+  --accent-on-dark: #d1d5db;
+  --on-accent-light: #ffffff;
+  --on-accent-dark: #111827;
+}
+body.accent-bronze {
+  --accent-on-light: #7c3f12;
+  --accent-on-dark: #d08a3e;
+  --on-accent-light: #ffffff;
+  --on-accent-dark: #2b1406;
+}
+body.accent-copper {
+  --accent-on-light: #8f3f12;
+  --accent-on-dark: #f28c52;
+  --on-accent-light: #ffffff;
+  --on-accent-dark: #35150a;
+}
+body.accent-red {
+  --accent-on-light: #b91c1c;
+  --accent-on-dark: #ff5252;
+  --on-accent-light: #ffffff;
+  --on-accent-dark: #3b0505;
+}
+body.accent-pure-red {
+  --accent-on-light: #a80000;
+  --accent-on-dark: #ff2d2d;
+  --on-accent-light: #ffffff;
+  --on-accent-dark: #350000;
+}
+body.accent-scarlet {
+  --accent-on-light: #c1121f;
+  --accent-on-dark: #ff375f;
+  --on-accent-light: #ffffff;
+  --on-accent-dark: #3f0610;
+}
+
+/* Muestras metálicas: el UI real sigue usando tonos planos accesibles. */
+.theme-swatch--metallic[data-metal="gold"] .theme-swatch__dot {
+  background: linear-gradient(135deg, #7a5100 0%, #d4af37 34%, #fff2a8 51%, #ffd700 68%, #8a6100 100%);
+}
+.theme-swatch--metallic[data-metal="silver"] .theme-swatch__dot {
+  background: linear-gradient(135deg, #5f6b78 0%, #c0c0c0 34%, #f8fafc 50%, #aeb7c2 68%, #64748b 100%);
+}
+.theme-swatch--metallic[data-metal="bronze"] .theme-swatch__dot {
+  background: linear-gradient(135deg, #5e2f10 0%, #a8622b 34%, #e2a866 50%, #cd7f32 68%, #6b3511 100%);
+}
+.theme-swatch--metallic[data-metal="copper"] .theme-swatch__dot {
+  background: linear-gradient(135deg, #6f2f10 0%, #b85d2c 34%, #f6b089 50%, #e07a3f 68%, #7b3515 100%);
+}
+.theme-swatch--metallic .theme-swatch__dot {
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.22), 0 2px 7px rgba(0,0,0,.25);
+}
+
+/* ----------------------------------------------------------
+   SELECTOR DE EFECTOS
+   ---------------------------------------------------------- */
+.theme-effect-picker {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+.theme-effect-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 7px;
+}
+.theme-effect-option {
+  min-width: 0;
+  min-height: 58px;
+  padding: 8px 5px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--field);
+  color: var(--muted);
+  font-family: 'Fira Code', monospace;
+  font-size: .62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  transition: transform .15s ease, border-color .15s ease, color .15s ease, background .15s ease;
+}
+.theme-effect-option .material-symbols-outlined { font-size: 1.25rem; }
+.theme-effect-option:hover { transform: translateY(-1px); color: var(--text); border-color: var(--accent-border); background: var(--accent-soft); }
+.theme-effect-option:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 2px; }
+.theme-effect-option.active {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+.theme-effect-note {
+  margin: 7px 0 0;
+  color: var(--muted);
+  font-size: .58rem;
+  line-height: 1.4;
+}
+
+/* ----------------------------------------------------------
+   EFECTOS DECORATIVOS DE ESCRITORIO
+   Reutilizan el contenedor de olas existente.
+   ---------------------------------------------------------- */
+body[class*="effect-"] .desktop-waves-bg {
+  overflow: hidden;
+  isolation: isolate;
+}
+body[class*="effect-"] .desktop-waves-bg::before,
+body[class*="effect-"] .desktop-waves-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Olas: comportamiento original. */
+body.effect-waves .desktop-waves-bg .waves { display: block; }
+body.effect-waves .desktop-waves-bg::before,
+body.effect-waves .desktop-waves-bg::after { display: none; }
+
+/* Aurora: manchas suaves que se desplazan lentamente. */
+body.effect-aurora .desktop-waves-bg { height: 42vh; }
+body.effect-aurora .desktop-waves-bg .waves { display: none; }
+body.effect-aurora .desktop-waves-bg::before {
+  inset: 18% -12% -22% -12%;
+  background:
+    radial-gradient(circle at 18% 65%, color-mix(in srgb, var(--accent) 30%, transparent) 0 12%, transparent 38%),
+    radial-gradient(circle at 54% 45%, color-mix(in srgb, var(--accent) 18%, #7c3aed 12%) 0 14%, transparent 40%),
+    radial-gradient(circle at 84% 72%, color-mix(in srgb, var(--accent) 24%, #06b6d4 12%) 0 12%, transparent 38%);
+  filter: blur(24px) saturate(125%);
+  opacity: .8;
+  animation: censoAuroraFloat 16s ease-in-out infinite alternate;
+}
+body.effect-aurora .desktop-waves-bg::after {
+  inset: 42% -18% -18%;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--accent) 10%, transparent), transparent);
+  filter: blur(18px);
+  animation: censoAuroraSweep 12s ease-in-out infinite alternate;
+}
+@keyframes censoAuroraFloat {
+  0% { transform: translate3d(-3%, 5%, 0) scale(1); }
+  50% { transform: translate3d(4%, -4%, 0) scale(1.06); }
+  100% { transform: translate3d(-1%, -8%, 0) scale(1.02); }
+}
+@keyframes censoAuroraSweep {
+  from { transform: translateX(-15%) skewX(-8deg); opacity: .35; }
+  to { transform: translateX(15%) skewX(8deg); opacity: .8; }
+}
+
+/* Rejilla: perspectiva tecnológica muy tenue. */
+body.effect-grid .desktop-waves-bg { height: 38vh; perspective: 500px; }
+body.effect-grid .desktop-waves-bg .waves { display: none; }
+body.effect-grid .desktop-waves-bg::before {
+  inset: -15% -10% -60%;
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--accent) 20%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--accent) 20%, transparent) 1px, transparent 1px);
+  background-size: 42px 42px;
+  transform: rotateX(58deg) scale(1.35);
+  transform-origin: center bottom;
+  opacity: .46;
+  animation: censoGridTravel 10s linear infinite;
+  mask-image: linear-gradient(to top, rgba(0,0,0,.9), rgba(0,0,0,.12) 72%, transparent);
+}
+body.effect-grid .desktop-waves-bg::after {
+  background: radial-gradient(ellipse at 50% 100%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 62%);
+}
+@keyframes censoGridTravel {
+  from { background-position: 0 0, 0 0; }
+  to { background-position: 0 42px, 42px 42px; }
+}
+
+/* Radar: barrido circular desde el centro inferior. */
+body.effect-radar .desktop-waves-bg { height: 45vh; }
+body.effect-radar .desktop-waves-bg .waves { display: none; }
+body.effect-radar .desktop-waves-bg::before {
+  width: min(70vw, 720px);
+  aspect-ratio: 1;
+  height: auto;
+  inset: auto auto -54% 50%;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background:
+    repeating-radial-gradient(circle, color-mix(in srgb, var(--accent) 18%, transparent) 0 1px, transparent 1px 54px),
+    linear-gradient(90deg, transparent 49.8%, color-mix(in srgb, var(--accent) 18%, transparent) 50%, transparent 50.2%),
+    linear-gradient(0deg, transparent 49.8%, color-mix(in srgb, var(--accent) 18%, transparent) 50%, transparent 50.2%);
+  opacity: .64;
+}
+body.effect-radar .desktop-waves-bg::after {
+  width: min(70vw, 720px);
+  aspect-ratio: 1;
+  height: auto;
+  inset: auto auto -54% 50%;
+  transform: translateX(-50%);
+  transform-origin: 50% 50%;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, transparent 0 78%, color-mix(in srgb, var(--accent) 36%, transparent) 94%, color-mix(in srgb, var(--accent) 8%, transparent) 100%);
+  filter: blur(.4px);
+  animation: censoRadarSweep 8s linear infinite;
+}
+@keyframes censoRadarSweep {
+  from { transform: translateX(-50%) rotate(0deg); }
+  to { transform: translateX(-50%) rotate(360deg); }
+}
+
+/* Sin animación. */
+body.effect-none .desktop-waves-bg { display: none !important; }
+
+@media (max-width: 620px) {
+  .theme-effect-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.effect-aurora .desktop-waves-bg::before,
+  body.effect-aurora .desktop-waves-bg::after,
+  body.effect-grid .desktop-waves-bg::before,
+  body.effect-radar .desktop-waves-bg::after {
+    animation: none !important;
+  }
+}
