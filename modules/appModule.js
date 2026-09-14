@@ -60,6 +60,7 @@ export async function bootApp() {
   app.bindMaintenanceEvents();
   app.exposeWindowActions();
   app.initTheme();
+  app.initPrintUi();
   app.bindUiEvents();
   // Restaurar el puente que muestra noticias y avisos después de iniciar sesión.
   app.initSoundboardAuthBridge();
