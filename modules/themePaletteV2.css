@@ -1,0 +1,186 @@
+/* CENSO · Theme Engine v2 */
+
+/* Bases nuevas */
+body.base-ocean {
+  --bg: #082f49; --panel: #0b3a53; --section-head: #082f49;
+  --card: #0b3a53; --card-open: #164e63; --field: rgba(255,255,255,0.035);
+  --text: #f0f9ff; --muted: #9cc9dc; --line: rgba(255,255,255,0.10);
+  --search-bg: rgba(255,255,255,0.05); --error-bg: rgba(239,68,68,0.14); --error-border: rgba(248,113,113,0.32); --error-text: #fecaca;
+  --modal-overlay: rgba(3,22,34,0.88); --skeleton: #164e63; --skeleton-shimmer: rgba(255,255,255,0.06);
+  --theme-meta: #082f49;
+}
+body.base-teal-dark {
+  --bg: #042f2e; --panel: #073b3a; --section-head: #042f2e;
+  --card: #073b3a; --card-open: #115e59; --field: rgba(255,255,255,0.035);
+  --text: #f0fdfa; --muted: #99d8d1; --line: rgba(255,255,255,0.10);
+  --search-bg: rgba(255,255,255,0.05); --error-bg: rgba(239,68,68,0.14); --error-border: rgba(248,113,113,0.32); --error-text: #fecaca;
+  --modal-overlay: rgba(2,25,24,0.88); --skeleton: #115e59; --skeleton-shimmer: rgba(255,255,255,0.06);
+  --theme-meta: #042f2e;
+}
+body.base-burgundy {
+  --bg: #3f0a17; --panel: #2b0710; --section-head: #3f0a17;
+  --card: #2b0710; --card-open: #5c1426; --field: rgba(255,255,255,0.035);
+  --text: #fff1f2; --muted: #f5a3b2; --line: rgba(255,255,255,0.10);
+  --search-bg: rgba(255,255,255,0.05); --error-bg: rgba(248,113,113,0.14); --error-border: rgba(248,113,113,0.32); --error-text: #fecaca;
+  --modal-overlay: rgba(31,4,10,0.90); --skeleton: #5c1426; --skeleton-shimmer: rgba(255,255,255,0.06);
+  --theme-meta: #3f0a17;
+}
+body.base-ice {
+  --bg: #eff6ff; --panel: #ffffff; --section-head: #dbeafe;
+  --card: #ffffff; --card-open: #dbeafe; --field: rgba(30,64,175,0.025);
+  --text: #172554; --muted: #475569; --line: rgba(30,64,175,0.10);
+  --search-bg: rgba(30,64,175,0.035); --error-bg: #fee2e2; --error-border: #f87171; --error-text: #991b1b;
+  --modal-overlay: rgba(23,37,84,0.55); --skeleton: #bfdbfe; --skeleton-shimmer: rgba(255,255,255,0.58);
+  --theme-meta: #eff6ff;
+}
+body.base-sage {
+  --bg: #f3f7f2; --panel: #ffffff; --section-head: #e5eee2;
+  --card: #ffffff; --card-open: #d9e7d5; --field: rgba(30,70,40,0.025);
+  --text: #203529; --muted: #567060; --line: rgba(32,53,41,0.10);
+  --search-bg: rgba(32,53,41,0.035); --error-bg: #fee2e2; --error-border: #f87171; --error-text: #991b1b;
+  --modal-overlay: rgba(32,53,41,0.52); --skeleton: #d9e7d5; --skeleton-shimmer: rgba(255,255,255,0.58);
+  --theme-meta: #f3f7f2;
+}
+body.base-peach {
+  --bg: #fff7ed; --panel: #ffffff; --section-head: #ffedd5;
+  --card: #ffffff; --card-open: #fed7aa; --field: rgba(154,52,18,0.025);
+  --text: #431407; --muted: #9a3412; --line: rgba(154,52,18,0.10);
+  --search-bg: rgba(154,52,18,0.035); --error-bg: #fee2e2; --error-border: #f87171; --error-text: #991b1b;
+  --modal-overlay: rgba(67,20,7,0.52); --skeleton: #fed7aa; --skeleton-shimmer: rgba(255,255,255,0.58);
+  --theme-meta: #fff7ed;
+}
+
+/* Pares de acento. El usuario elige un nombre; el tono se adapta al fondo. */
+body.accent-blue      { --accent-on-light:#1d4ed8; --accent-on-dark:#60a5fa; --on-accent-light:#ffffff; --on-accent-dark:#0f172a; }
+body.accent-pure-blue { --accent-on-light:#1e40af; --accent-on-dark:#93c5fd; --on-accent-light:#ffffff; --on-accent-dark:#0f172a; }
+body.accent-sky       { --accent-on-light:#0369a1; --accent-on-dark:#38bdf8; --on-accent-light:#ffffff; --on-accent-dark:#082f49; }
+body.accent-cyan      { --accent-on-light:#0e7490; --accent-on-dark:#22d3ee; --on-accent-light:#ffffff; --on-accent-dark:#083344; }
+body.accent-teal      { --accent-on-light:#0f766e; --accent-on-dark:#2dd4bf; --on-accent-light:#ffffff; --on-accent-dark:#042f2e; }
+body.accent-emerald   { --accent-on-light:#047857; --accent-on-dark:#34d399; --on-accent-light:#ffffff; --on-accent-dark:#022c22; }
+body.accent-green     { --accent-on-light:#15803d; --accent-on-dark:#4ade80; --on-accent-light:#ffffff; --on-accent-dark:#052e16; }
+body.accent-lime      { --accent-on-light:#4d7c0f; --accent-on-dark:#a3e635; --on-accent-light:#ffffff; --on-accent-dark:#1a2e05; }
+body.accent-gold      { --accent-on-light:#a16207; --accent-on-dark:#facc15; --on-accent-light:#ffffff; --on-accent-dark:#422006; }
+body.accent-amber     { --accent-on-light:#b45309; --accent-on-dark:#fbbf24; --on-accent-light:#ffffff; --on-accent-dark:#451a03; }
+body.accent-orange    { --accent-on-light:#c2410c; --accent-on-dark:#fb923c; --on-accent-light:#ffffff; --on-accent-dark:#431407; }
+body.accent-red       { --accent-on-light:#b91c1c; --accent-on-dark:#f87171; --on-accent-light:#ffffff; --on-accent-dark:#450a0a; }
+body.accent-pure-red  { --accent-on-light:#991b1b; --accent-on-dark:#fca5a5; --on-accent-light:#ffffff; --on-accent-dark:#450a0a; }
+body.accent-crimson   { --accent-on-light:#be123c; --accent-on-dark:#fb7185; --on-accent-light:#ffffff; --on-accent-dark:#4c0519; }
+body.accent-pink      { --accent-on-light:#be185d; --accent-on-dark:#f472b6; --on-accent-light:#ffffff; --on-accent-dark:#500724; }
+body.accent-fuchsia   { --accent-on-light:#a21caf; --accent-on-dark:#e879f9; --on-accent-light:#ffffff; --on-accent-dark:#4a044e; }
+body.accent-purple    { --accent-on-light:#7e22ce; --accent-on-dark:#c084fc; --on-accent-light:#ffffff; --on-accent-dark:#3b0764; }
+body.accent-violet    { --accent-on-light:#6d28d9; --accent-on-dark:#a78bfa; --on-accent-light:#ffffff; --on-accent-dark:#2e1065; }
+body.accent-indigo    { --accent-on-light:#4338ca; --accent-on-dark:#818cf8; --on-accent-light:#ffffff; --on-accent-dark:#1e1b4b; }
+body.accent-slate     { --accent-on-light:#334155; --accent-on-dark:#cbd5e1; --on-accent-light:#ffffff; --on-accent-dark:#0f172a; }
+
+/* Bases oscuras: usar el tono brillante del acento. */
+body.base-dark,
+body.base-midnight,
+body.base-gray-dark,
+body.base-navy,
+body.base-ocean,
+body.base-teal-dark,
+body.base-forest,
+body.base-plum,
+body.base-burgundy,
+body.base-coffee {
+  --accent: var(--accent-on-dark, #60a5fa);
+  --on-accent: var(--on-accent-dark, #0f172a);
+  --theme-surface-mode: dark;
+}
+
+/* Bases claras: usar el tono profundo del acento. */
+body.base-light,
+body.base-pure-white,
+body.base-gray-light,
+body.base-ice,
+body.base-sage,
+body.base-sand,
+body.base-peach,
+body.base-rose,
+body.base-mint,
+body.base-lavender {
+  --accent: var(--accent-on-light, #1d4ed8);
+  --on-accent: var(--on-accent-light, #ffffff);
+  --theme-surface-mode: light;
+}
+
+/* Variables derivadas: una sola definición para todos los acentos. */
+body[class*="accent-"] {
+  --accent-soft: color-mix(in srgb, var(--accent) 13%, transparent);
+  --accent-border: color-mix(in srgb, var(--accent) 30%, transparent);
+  --chip-bg: color-mix(in srgb, var(--accent) 14%, transparent);
+  --chip-text: var(--accent);
+  --toggle-bg: color-mix(in srgb, var(--accent) 10%, transparent);
+  --toggle-icon: var(--accent);
+  --focus-ring: color-mix(in srgb, var(--accent) 28%, transparent);
+  --danger: #dc2626;
+  --danger-soft: rgba(220,38,38,.12);
+  --success: #16a34a;
+  --warning: #d97706;
+  --info: #0284c7;
+}
+
+/* Elementos que pintan todo el fondo con el acento necesitan contraste propio. */
+.fab-btn,
+.btn-guardar,
+.btn-editar-tarjeta:active,
+.censo-newsmodal__button--primary,
+.theme-preview__cta {
+  color: var(--on-accent) !important;
+}
+
+/* Los estados clínicos/operativos no heredan el color decorativo. */
+.swipe-delete { background: var(--danger) !important; }
+.swipe-edit { background: var(--success) !important; }
+.btn-table.delete { color: var(--danger) !important; }
+.btn-table.edit { color: var(--success) !important; }
+
+/* Selector v2 */
+#themeModal .modal-content { max-width: 520px !important; }
+.theme-picker-section { margin-top: 8px; }
+.theme-picker-group + .theme-picker-group { margin-top: 12px; }
+.theme-picker-group__label {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  margin-bottom: 7px; color: var(--muted); font-size: .64rem; font-weight: 700;
+  letter-spacing: .08em; text-transform: uppercase;
+}
+.theme-picker-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 8px;
+}
+.theme-swatch {
+  min-width: 0; border: 1px solid var(--line); border-radius: 10px; background: var(--field);
+  color: var(--text); padding: 7px; display: flex; align-items: center; gap: 8px;
+  cursor: pointer; font-family: 'Fira Code', monospace; transition: transform .15s ease, border-color .15s ease, background .15s ease;
+}
+.theme-swatch:hover { transform: translateY(-1px); border-color: var(--accent-border); background: var(--accent-soft); }
+.theme-swatch:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 2px; }
+.theme-swatch.active { border-color: var(--accent); background: var(--accent-soft); box-shadow: inset 0 0 0 1px var(--accent); }
+.theme-swatch__dot {
+  width: 26px; height: 26px; border-radius: 50%; flex: 0 0 26px; border: 1px solid rgba(127,127,127,.35);
+  box-shadow: 0 2px 5px rgba(0,0,0,.18);
+}
+.theme-swatch__name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .67rem; font-weight: 700; text-transform: uppercase; }
+.theme-swatch--accent .theme-swatch__dot { background: linear-gradient(135deg, var(--swatch-light) 0 49%, var(--swatch-dark) 51% 100%); }
+
+.theme-preview {
+  margin-top: 18px; padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--bg);
+}
+.theme-preview__head { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px; }
+.theme-preview__title { color:var(--text); font-family:'Space Mono', monospace; font-size:.75rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; }
+.theme-preview__selection { color:var(--muted); font-size:.62rem; text-align:right; }
+.theme-preview__card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:11px; }
+.theme-preview__patient { color:var(--text); font-weight:700; font-size:.82rem; }
+.theme-preview__meta { color:var(--muted); margin-top:3px; font-size:.66rem; }
+.theme-preview__row { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:10px; }
+.theme-preview__chip { color:var(--accent); background:var(--accent-soft); border:1px solid var(--accent-border); border-radius:7px; padding:5px 7px; font-size:.62rem; font-weight:700; }
+.theme-preview__cta { background:var(--accent); border:0; border-radius:7px; padding:6px 10px; font-family:'Fira Code', monospace; font-size:.62rem; font-weight:800; }
+.theme-reset {
+  width:100%; margin-top:10px; padding:9px 12px; border-radius:9px; border:1px solid var(--line);
+  background:transparent; color:var(--muted); font-family:'Fira Code', monospace; font-size:.68rem; font-weight:700; cursor:pointer;
+}
+.theme-reset:hover { color:var(--text); border-color:var(--accent-border); background:var(--accent-soft); }
+
+@media (max-width: 520px) {
+  .theme-picker-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  #themeModal .modal-content { padding: 16px; }
+}
