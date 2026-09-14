@@ -26,6 +26,7 @@ async function loadModules() {
     effectsModule,
     renderModule,
     patientModule,
+    bedAdminModule,
     themeModule,
     modalModule,
     maintenanceModule,
@@ -43,6 +44,7 @@ async function loadModules() {
     import(moduleUrl('effectsModule')),
     import(moduleUrl('renderModule')),
     import(moduleUrl('patientModule')),
+    import(moduleUrl('bedAdminModule')),
     import(moduleUrl('themeModule')),
     import(moduleUrl('modalModule')),
     import(moduleUrl('maintenanceModule')),
@@ -62,6 +64,7 @@ async function loadModules() {
     createEffectsModule: effectsModule.createEffectsModule,
     createRenderModule: renderModule.createRenderModule,
     createPatientModule: patientModule.createPatientModule,
+    createBedAdminModule: bedAdminModule.createBedAdminModule,
     createThemeModule: themeModule.createThemeModule,
     createModalModule: modalModule.createModalModule,
     createMaintenanceModule: maintenanceModule.createMaintenanceModule,
@@ -94,6 +97,7 @@ export async function bootApp() {
   Object.assign(app, modules.createEffectsModule(app));
   Object.assign(app, modules.createRenderModule(app));
   Object.assign(app, modules.createPatientModule(app));
+  Object.assign(app, modules.createBedAdminModule(app));
   Object.assign(app, modules.createThemeModule(app));
   Object.assign(app, modules.createModalModule(app));
   Object.assign(app, modules.createMaintenanceModule(app));
@@ -117,6 +121,8 @@ export async function bootApp() {
   app.initPrintUi();
   app.bindUiEvents();
   app.initSoundboardAuthBridge();
+  app.initBedCatalogAuthBridge();
+  app.initBedAdminUiBridge();
   app.initNewsBarAuthBridge();
 
   app.bindAuthEvents();
