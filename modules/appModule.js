@@ -4,57 +4,111 @@
   RESPONSABILIDAD:
   - Cablear módulos grandes.
   - Arrancar la aplicación en orden seguro.
-
-  NO DEBE:
-  - Contener lógica clínica detallada.
-  - Construir HTML de pacientes.
-  - Hablar con Firestore directamente.
+  - Propagar el build actual a todas las importaciones locales.
 */
 
-import * as firebase from './firebaseModule.js?v=print-censo-v1-20260914';
-import * as bed from './bedModule.js?v=print-censo-v1-20260914';
-import * as utils from './utilsModule.js?v=print-censo-v1-20260914';
-import { state } from './stateModule.js?v=print-censo-v1-20260914';
+const BUILD = String(window.CensoBuild?.version || `runtime-${Date.now()}`);
 
-import { createSoundboardModule } from './soundboardModule.js?v=print-censo-v1-20260914';
-import { createEffectsModule } from './effectsModule.js?v=print-censo-v1-20260914';
-import { createRenderModule } from './renderModule.js?v=print-censo-v1-20260914';
-import { createPatientModule } from './patientModule.js?v=print-censo-v1-20260914';
-import { createThemeModule } from './themeModule.js?v=print-censo-v1-20260914';
-import { createModalModule } from './modalModule.js?v=print-censo-v1-20260914';
-import { createMaintenanceModule } from './maintenanceModule.js?v=print-censo-v1-20260914';
-import { createInteractionModule } from './interactionModule.js?v=print-censo-v1-20260914';
-import { createNewsBarModule } from './newsBarModule.js?v=print-censo-v1-20260914';
-import { createPrintModule } from './printModule.js?v=print-censo-v1-20260914';
-import { createAuthModule } from './authModule.js?v=print-censo-v1-20260914';
+function moduleUrl(name) {
+  const url = new URL(`./${name}.js`, import.meta.url);
+  url.searchParams.set('v', BUILD);
+  return url.href;
+}
 
-const BUILD = 'print-censo-v1-20260914';
+async function loadModules() {
+  const [
+    firebase,
+    bed,
+    utils,
+    stateModule,
+    soundCatalog,
+    soundboardModule,
+    effectsModule,
+    renderModule,
+    patientModule,
+    themeModule,
+    modalModule,
+    maintenanceModule,
+    interactionModule,
+    newsBarModule,
+    printModule,
+    authModule
+  ] = await Promise.all([
+    import(moduleUrl('firebaseModule')),
+    import(moduleUrl('bedModule')),
+    import(moduleUrl('utilsModule')),
+    import(moduleUrl('stateModule')),
+    import(moduleUrl('soundCatalog')),
+    import(moduleUrl('soundboardModule')),
+    import(moduleUrl('effectsModule')),
+    import(moduleUrl('renderModule')),
+    import(moduleUrl('patientModule')),
+    import(moduleUrl('themeModule')),
+    import(moduleUrl('modalModule')),
+    import(moduleUrl('maintenanceModule')),
+    import(moduleUrl('interactionModule')),
+    import(moduleUrl('newsBarModule')),
+    import(moduleUrl('printModule')),
+    import(moduleUrl('authModule'))
+  ]);
+
+  return {
+    firebase,
+    bed,
+    utils,
+    state: stateModule.state,
+    soundCatalog,
+    createSoundboardModule: soundboardModule.createSoundboardModule,
+    createEffectsModule: effectsModule.createEffectsModule,
+    createRenderModule: renderModule.createRenderModule,
+    createPatientModule: patientModule.createPatientModule,
+    createThemeModule: themeModule.createThemeModule,
+    createModalModule: modalModule.createModalModule,
+    createMaintenanceModule: maintenanceModule.createMaintenanceModule,
+    createInteractionModule: interactionModule.createInteractionModule,
+    createNewsBarModule: newsBarModule.createNewsBarModule,
+    createPrintModule: printModule.createPrintModule,
+    createAuthModule: authModule.createAuthModule
+  };
+}
 
 export async function bootApp() {
   console.info(`[CENSO] bootApp iniciado. BUILD: ${BUILD}`);
-  window.CensoBuild = { version: BUILD, stage: 'bootApp', appModule: true };
-  const app = {
-    state,
-    firebase,
-    bed,
-    utils
+  window.CensoBuild = {
+    ...(window.CensoBuild || {}),
+    version: BUILD,
+    stage: 'loading-modules',
+    appModule: true
   };
 
-  Object.assign(app, createSoundboardModule(app));
-  Object.assign(app, createEffectsModule(app));
-  Object.assign(app, createRenderModule(app));
-  Object.assign(app, createPatientModule(app));
-  Object.assign(app, createThemeModule(app));
-  Object.assign(app, createModalModule(app));
-  Object.assign(app, createMaintenanceModule(app));
-  Object.assign(app, createInteractionModule(app));
-  Object.assign(app, createNewsBarModule(app));
-  Object.assign(app, createPrintModule(app));
-  Object.assign(app, createAuthModule(app));
+  const modules = await loadModules();
+  const app = {
+    state: modules.state,
+    firebase: modules.firebase,
+    bed: modules.bed,
+    utils: modules.utils,
+    soundCatalog: modules.soundCatalog
+  };
+
+  Object.assign(app, modules.createSoundboardModule(app));
+  Object.assign(app, modules.createEffectsModule(app));
+  Object.assign(app, modules.createRenderModule(app));
+  Object.assign(app, modules.createPatientModule(app));
+  Object.assign(app, modules.createThemeModule(app));
+  Object.assign(app, modules.createModalModule(app));
+  Object.assign(app, modules.createMaintenanceModule(app));
+  Object.assign(app, modules.createInteractionModule(app));
+  Object.assign(app, modules.createNewsBarModule(app));
+  Object.assign(app, modules.createPrintModule(app));
+  Object.assign(app, modules.createAuthModule(app));
 
   app.__build = BUILD;
   window.CensoApp = app;
-  window.CensoBuild = { ...window.CensoBuild, stage: 'modules-ready', appReady: true };
+  window.CensoBuild = {
+    ...window.CensoBuild,
+    stage: 'modules-ready',
+    appReady: true
+  };
 
   app.bindModalBaseEvents();
   app.bindMaintenanceEvents();
@@ -62,7 +116,6 @@ export async function bootApp() {
   app.initTheme();
   app.initPrintUi();
   app.bindUiEvents();
-  // Restaurar el puente que muestra noticias y avisos después de iniciar sesión.
   app.initSoundboardAuthBridge();
   app.initNewsBarAuthBridge();
 
