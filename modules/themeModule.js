@@ -69,6 +69,10 @@ export function createThemeModule(app) {
     { id: 'effect-aurora', name: 'Aurora', icon: 'blur_on' },
     { id: 'effect-grid', name: 'Rejilla', icon: 'grid_4x4' },
     { id: 'effect-radar', name: 'Radar', icon: 'radar' },
+    { id: 'effect-particles', name: 'Partículas', icon: 'grain' },
+    { id: 'effect-pulse', name: 'Pulso', icon: 'track_changes' },
+    { id: 'effect-scan', name: 'Escáner', icon: 'document_scanner' },
+    { id: 'effect-nebula', name: 'Nebulosa', icon: 'blur_circular' },
     { id: 'effect-none', name: 'Ninguna', icon: 'motion_photos_off' }
   ];
 
@@ -93,6 +97,7 @@ export function createThemeModule(app) {
   function ensureThemeStylesheets() {
     ensureStylesheet('censo-theme-v2-styles', 'themePaletteV2.css');
     ensureStylesheet('censo-theme-v3-effects', 'themeEffectsV3.css');
+    ensureStylesheet('censo-theme-v3-layout-effects', 'themeEffectsV4.css');
   }
 
   function validBase(value) {
