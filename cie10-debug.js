@@ -93,6 +93,22 @@
     }
   };
 
+  const nativeText = Response.prototype.text;
+  Response.prototype.text = async function(...args) {
+    const t0 = performance.now();
+    const url = this.url || 'Response local';
+    const short = url.split('/').pop() || url;
+    log(`BODY INICIO · ${short}`);
+    try {
+      const body = await nativeText.apply(this, args);
+      log(`BODY LISTO · ${short} · ${body.length.toLocaleString('es-MX')} chars · ${Math.round(performance.now() - t0)} ms`, 'ok');
+      return body;
+    } catch (error) {
+      log(`BODY ERROR · ${short} · ${text(error)}`, 'error');
+      throw error;
+    }
+  };
+
   const watchNode = (id, label) => {
     const node = document.getElementById(id);
     if (!node) { log(`No existe #${id}`, 'warn'); return; }
