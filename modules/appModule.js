@@ -30,8 +30,6 @@ async function loadModules() {
     themeModule,
     modalModule,
     maintenanceModule,
-    cie10LesionesModule,
-    cie10ConsultOnlyModule,
     interactionModule,
     newsBarModule,
     printModule,
@@ -50,8 +48,6 @@ async function loadModules() {
     import(moduleUrl('themeModule')),
     import(moduleUrl('modalModule')),
     import(moduleUrl('maintenanceModule')),
-    import(moduleUrl('cie10LesionesModule')),
-    import(moduleUrl('cie10ConsultOnlyModule')),
     import(moduleUrl('interactionModule')),
     import(moduleUrl('newsBarModule')),
     import(moduleUrl('printModule')),
@@ -72,8 +68,6 @@ async function loadModules() {
     createThemeModule: themeModule.createThemeModule,
     createModalModule: modalModule.createModalModule,
     createMaintenanceModule: maintenanceModule.createMaintenanceModule,
-    createCie10LesionesModule: cie10LesionesModule.createCie10LesionesModule,
-    createCie10ConsultOnlyModule: cie10ConsultOnlyModule.createCie10ConsultOnlyModule,
     createInteractionModule: interactionModule.createInteractionModule,
     createNewsBarModule: newsBarModule.createNewsBarModule,
     createPrintModule: printModule.createPrintModule,
@@ -107,8 +101,6 @@ export async function bootApp() {
   Object.assign(app, modules.createThemeModule(app));
   Object.assign(app, modules.createModalModule(app));
   Object.assign(app, modules.createMaintenanceModule(app));
-  Object.assign(app, modules.createCie10LesionesModule(app));
-  Object.assign(app, modules.createCie10ConsultOnlyModule(app));
   Object.assign(app, modules.createInteractionModule(app));
   Object.assign(app, modules.createNewsBarModule(app));
   Object.assign(app, modules.createPrintModule(app));
@@ -127,8 +119,6 @@ export async function bootApp() {
   app.exposeWindowActions();
   app.initTheme();
   app.initPrintUi();
-  app.initCie10Ui();
-  app.initCie10ConsultOnly();
   app.bindUiEvents();
   app.initSoundboardAuthBridge();
   app.initBedCatalogAuthBridge();
