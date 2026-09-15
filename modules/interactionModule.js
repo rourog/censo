@@ -14,7 +14,7 @@
   - Guardar pacientes directamente.
 */
 
-console.info('[CENSO] interactionModule.js cargado. BUILD: print-censo-v1-20260914');
+console.info('[CENSO] interactionModule.js cargado. BUILD: cie10-standalone-v1');
 
 export const MOBILE_SWIPE_THRESHOLD = 110;
 
@@ -29,6 +29,25 @@ export function createInteractionModule(app) {
   const { normalizar } = app.utils;
 
   let scrollGuiderHandler = null;
+
+  function ensureCie10PageButton() {
+    if (document.getElementById('cie10PageBtn')) return;
+    const historyBtn = document.getElementById('historyBtn');
+    if (!historyBtn) return;
+
+    const button = document.createElement('button');
+    button.id = 'cie10PageBtn';
+    button.className = 'icon-btn';
+    button.type = 'button';
+    button.setAttribute('aria-label', 'Consultar CIE-10 lesiones');
+    button.title = 'Consultar CIE-10 lesiones';
+    button.innerHTML = '<span class="material-symbols-outlined">medical_information</span>';
+    button.addEventListener('click', () => {
+      app.utils.vibrar(15);
+      window.open('cie10.html', '_blank', 'noopener,noreferrer');
+    });
+    historyBtn.insertAdjacentElement('afterend', button);
+  }
 
   function initScrollGuider() {
     const wrapper = document.getElementById('scrollTableWrapper');
@@ -263,6 +282,8 @@ export function createInteractionModule(app) {
   }
 
   function bindUiEvents() {
+    ensureCie10PageButton();
+
     const search = document.getElementById('search');
     if (search) {
       search.addEventListener('input', filtrar);

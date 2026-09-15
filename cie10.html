@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0f172a">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#eef4fb">
+  <title>CIE-10 Lesiones - Censo Urgencias</title>
+  <link rel="apple-touch-icon" href="icono.png">
+  <link rel="manifest" href="manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="modules/themePaletteV2.css">
+  <link rel="stylesheet" href="modules/themeEffectsV3.css">
+  <link rel="stylesheet" href="cie10.css">
+</head>
+<body class="base-dark accent-blue cie10-page-body">
+  <div class="cie10-page">
+    <header class="cie10-page-header">
+      <div class="cie10-heading">
+        <div class="cie10-title">CIE-10 · Certificado de lesiones</div>
+        <div class="cie10-subtitle">Consulta de referencia · Hospital Regional de Delicias</div>
+      </div>
+      <div class="cie10-header-actions">
+        <a class="icon-btn" href="index.html" aria-label="Volver al Censo" title="Volver al Censo">
+          <span class="material-symbols-outlined">arrow_back</span>
+        </a>
+      </div>
+    </header>
+
+    <section class="cie10-search-zone">
+      <div class="cie10-search-wrap">
+        <span class="material-symbols-outlined cie10-search-icon" aria-hidden="true">search</span>
+        <input id="cie10Search" class="cie10-search" type="search" autocomplete="off" placeholder="Buscar código o descripción: riña, motocicleta, perro, quemadura, X64…">
+        <button id="cie10Clear" class="cie10-clear" type="button" aria-label="Limpiar búsqueda" title="Limpiar">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <div class="cie10-status" id="cie10Status">Preparando catálogo…</div>
+    </section>
+
+    <main class="cie10-content">
+      <section id="cie10Loading" class="cie10-loading" aria-live="polite">
+        <span class="material-symbols-outlined cie10-loader-icon">progress_activity</span>
+        <div id="cie10LoadingText">Cargando catálogo CIE-10…</div>
+      </section>
+
+      <section id="cie10Error" class="cie10-error" hidden>
+        <span class="material-symbols-outlined">error</span>
+        <div>
+          <strong>No fue posible cargar el catálogo.</strong>
+          <div id="cie10ErrorText"></div>
+        </div>
+        <button id="cie10Retry" type="button">REINTENTAR</button>
+      </section>
+
+      <section id="cie10Explorer" class="cie10-explorer" hidden>
+        <div class="cie10-column" id="cie10Col1">
+          <div class="cie10-column-head"><span>1</span><strong id="cie10Title1">Grupo</strong></div>
+          <div class="cie10-list" id="cie10List1"></div>
+        </div>
+        <div class="cie10-column" id="cie10Col2">
+          <div class="cie10-column-head"><span>2</span><strong id="cie10Title2">Subtipo</strong></div>
+          <div class="cie10-list" id="cie10List2"></div>
+        </div>
+        <div class="cie10-column" id="cie10Col3">
+          <div class="cie10-column-head"><span>3</span><strong id="cie10Title3">Familia</strong></div>
+          <div class="cie10-list" id="cie10List3"></div>
+        </div>
+        <div class="cie10-column" id="cie10Col4">
+          <div class="cie10-column-head"><span>4</span><strong>Variante exacta</strong></div>
+          <div class="cie10-list" id="cie10List4"></div>
+        </div>
+      </section>
+
+      <section id="cie10SearchResults" class="cie10-search-results" hidden>
+        <div class="cie10-results-panel">
+          <div class="cie10-panel-head"><strong>Resultados</strong><span id="cie10SearchCount"></span></div>
+          <div class="cie10-results-list" id="cie10SearchList"></div>
+        </div>
+        <div class="cie10-detail-panel">
+          <div class="cie10-panel-head"><strong>Detalle</strong><span>Consulta</span></div>
+          <div class="cie10-detail" id="cie10SearchDetail">
+            <div class="cie10-empty">Selecciona un resultado.</div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="cie10-footer">
+      <div>
+        <strong id="cie10SelectedCode">Sin selección</strong>
+        <span id="cie10SelectedDesc">Selecciona una variante para consultar su código.</span>
+      </div>
+      <div class="cie10-footer-note">Solo consulta · no modifica datos del Censo</div>
+    </footer>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js"></script>
+  <script type="module" src="cie10.js"></script>
+</body>
+</html>
