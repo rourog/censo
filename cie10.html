@@ -16,13 +16,14 @@
   <link rel="stylesheet" href="modules/themePaletteV2.css">
   <link rel="stylesheet" href="modules/themeEffectsV3.css">
   <link rel="stylesheet" href="cie10.css">
+  <link rel="stylesheet" href="cie10-ui.css">
 </head>
 <body class="base-dark accent-blue cie10-page-body">
   <div class="cie10-page">
     <header class="cie10-page-header">
       <div class="cie10-heading">
         <div class="cie10-title">CIE-10 · Certificado de lesiones</div>
-        <div class="cie10-subtitle">Consulta de referencia · Hospital Regional de Delicias</div>
+        <div class="cie10-subtitle">Selecciona una opción por paso. Los niveles anteriores se contraen para mantener visible tu ruta.</div>
       </div>
       <div class="cie10-header-actions">
         <a class="icon-btn" href="index.html" aria-label="Volver al Censo" title="Volver al Censo">
@@ -99,10 +100,8 @@
     </footer>
   </div>
 
-  <!-- Diagnóstico temporal: se ejecuta antes del módulo y no depende de CDN externas. -->
-  <script src="cie10-debug.js"></script>
-  <!-- Pako se carga en segundo plano. Si el descompresor nativo falla, el script reintenta automáticamente. -->
   <script src="cie10-pako-fallback.js"></script>
   <script type="module" src="cie10.js"></script>
+  <script src="cie10-ui.js"></script>
 </body>
 </html>
