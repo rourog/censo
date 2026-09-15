@@ -24,6 +24,9 @@
   border-radius: 16px;
   box-shadow: 0 22px 70px rgba(0,0,0,.32);
 }
+/* Los estados internos del modal dependen del atributo hidden.
+   Esta regla debe prevalecer sobre display:grid/flex de sus componentes. */
+.cie10-dialog [hidden] { display: none !important; }
 .cie10-head {
   display: flex;
   align-items: center;
