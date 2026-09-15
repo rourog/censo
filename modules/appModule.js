@@ -30,6 +30,7 @@ async function loadModules() {
     themeModule,
     modalModule,
     maintenanceModule,
+    cie10LesionesModule,
     interactionModule,
     newsBarModule,
     printModule,
@@ -48,6 +49,7 @@ async function loadModules() {
     import(moduleUrl('themeModule')),
     import(moduleUrl('modalModule')),
     import(moduleUrl('maintenanceModule')),
+    import(moduleUrl('cie10LesionesModule')),
     import(moduleUrl('interactionModule')),
     import(moduleUrl('newsBarModule')),
     import(moduleUrl('printModule')),
@@ -68,6 +70,7 @@ async function loadModules() {
     createThemeModule: themeModule.createThemeModule,
     createModalModule: modalModule.createModalModule,
     createMaintenanceModule: maintenanceModule.createMaintenanceModule,
+    createCie10LesionesModule: cie10LesionesModule.createCie10LesionesModule,
     createInteractionModule: interactionModule.createInteractionModule,
     createNewsBarModule: newsBarModule.createNewsBarModule,
     createPrintModule: printModule.createPrintModule,
@@ -101,6 +104,7 @@ export async function bootApp() {
   Object.assign(app, modules.createThemeModule(app));
   Object.assign(app, modules.createModalModule(app));
   Object.assign(app, modules.createMaintenanceModule(app));
+  Object.assign(app, modules.createCie10LesionesModule(app));
   Object.assign(app, modules.createInteractionModule(app));
   Object.assign(app, modules.createNewsBarModule(app));
   Object.assign(app, modules.createPrintModule(app));
@@ -119,6 +123,7 @@ export async function bootApp() {
   app.exposeWindowActions();
   app.initTheme();
   app.initPrintUi();
+  app.initCie10Ui();
   app.bindUiEvents();
   app.initSoundboardAuthBridge();
   app.initBedCatalogAuthBridge();
