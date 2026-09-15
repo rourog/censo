@@ -86,25 +86,22 @@
     try {
       const response = await nativeFetch(...args);
       log(`FETCH RESPUESTA · ${short} · HTTP ${response.status} · ${Math.round(performance.now() - t0)} ms`, response.ok ? 'ok' : 'error');
+      const originalText = response.text.bind(response);
+      response.text = async () => {
+        const bodyStart = performance.now();
+        log(`BODY INICIO · ${short}`);
+        try {
+          const body = await originalText();
+          log(`BODY LISTO · ${short} · ${body.length.toLocaleString('es-MX')} chars · ${Math.round(performance.now() - bodyStart)} ms`, 'ok');
+          return body;
+        } catch (error) {
+          log(`BODY ERROR · ${short} · ${text(error)}`, 'error');
+          throw error;
+        }
+      };
       return response;
     } catch (error) {
       log(`FETCH ERROR · ${short} · ${Math.round(performance.now() - t0)} ms · ${text(error)}`, 'error');
-      throw error;
-    }
-  };
-
-  const nativeText = Response.prototype.text;
-  Response.prototype.text = async function(...args) {
-    const t0 = performance.now();
-    const url = this.url || 'Response local';
-    const short = url.split('/').pop() || url;
-    log(`BODY INICIO · ${short}`);
-    try {
-      const body = await nativeText.apply(this, args);
-      log(`BODY LISTO · ${short} · ${body.length.toLocaleString('es-MX')} chars · ${Math.round(performance.now() - t0)} ms`, 'ok');
-      return body;
-    } catch (error) {
-      log(`BODY ERROR · ${short} · ${text(error)}`, 'error');
       throw error;
     }
   };
