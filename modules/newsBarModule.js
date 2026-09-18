@@ -314,7 +314,7 @@ export function createNewsBarModule(app) {
           aria-labelledby="censoNewsAdminTitle"
         >
           <div class="censo-newsmodal__head">
-            <h2 id="censoNewsAdminTitle">Administración</h2>
+            <h2 id="censoNewsAdminTitle">Noticias y sonidos</h2>
             <button
               id="censoNewsAdminClose"
               class="censo-newsmodal__close"
@@ -440,8 +440,7 @@ export function createNewsBarModule(app) {
       soundsTab: document.getElementById('censoAdminSoundsTab'),
       noticesPanel: document.getElementById('censoAdminNoticesPanel'),
       soundsPanel: document.getElementById('censoAdminSoundsPanel'),
-      deleteAll: document.getElementById('censoNewsDeleteAll'),
-      settingsButton: document.getElementById('adminSettingsBtn')
+      deleteAll: document.getElementById('censoNewsDeleteAll')
     };
   }
 
@@ -506,11 +505,6 @@ export function createNewsBarModule(app) {
     });
 
     elements.deleteAll.addEventListener('click', deleteAllAnnouncements);
-
-    elements.settingsButton?.addEventListener('click', () => {
-      app.utils?.vibrar?.(15);
-      openAdmin();
-    });
 
     document.addEventListener('keydown', handleGlobalKeydown);
 

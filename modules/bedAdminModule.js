@@ -4,11 +4,10 @@
   RESPONSABILIDAD:
   - Sincronizar el catálogo de camas desde Firestore.
   - Mantener un nivel basal inmutable y administrar solo ubicaciones temporales.
-  - Integrar la administración de camas como tercera pestaña del panel de noticias.
+  - Ofrecer un panel compacto e independiente para administrar ubicaciones.
   - Impedir retirar camas ocupadas.
 */
 
-const ADMIN_SESSION = 'censo-newsbar-admin-session-v1';
 const SETTINGS_COLLECTION = 'settings';
 const SETTINGS_DOC = 'bedCatalog';
 const MAX_BEDS = 250;
@@ -139,15 +138,12 @@ export function createBedAdminModule(app) {
   let catalog = compose(temporaryBeds);
   let authUnsubscribe = null;
   let catalogUnsubscribe = null;
-  let domObserver = null;
-  let managerObserver = null;
   let currentUid = null;
   let listenerGeneration = 0;
   let initialization = null;
   let revision = 0;
   let syncState = 'loading';
   let syncError = '';
-  let unlocked = false;
   let busy = false;
   let ui = null;
 
@@ -275,7 +271,7 @@ export function createBedAdminModule(app) {
       if (user) {
         listenCatalog();
       } else {
-        unlocked = false;
+        closeBedManager();
         syncState = 'loading';
         syncError = '';
         applyCatalog(defaultTemporaryBeds, { refreshPatients: false });
@@ -283,77 +279,92 @@ export function createBedAdminModule(app) {
     });
   }
 
-  function ensureAdminUi() {
-    if (ui?.panel?.isConnected) return true;
+  function ensureStylesheet() {
+    if (document.getElementById('censo-bed-admin-styles')) return;
+    const link = document.createElement('link');
+    link.id = 'censo-bed-admin-styles';
+    link.rel = 'stylesheet';
+    const url = new URL('./bedAdmin.css', import.meta.url);
+    url.searchParams.set('v', String(window.CensoBuild?.version || Date.now()));
+    link.href = url.href;
+    document.head.appendChild(link);
+  }
 
-    const tabs = document.querySelector('.censo-admin-tabs');
-    const noticesTab = document.getElementById('censoAdminNoticesTab');
-    const soundsTab = document.getElementById('censoAdminSoundsTab');
-    const noticesPanel = document.getElementById('censoAdminNoticesPanel');
-    const soundsPanel = document.getElementById('censoAdminSoundsPanel');
-    const managerView = document.getElementById('censoNewsManagerView');
-    const lockButton = document.getElementById('censoNewsAdminLock');
+  function areaLabel(area) {
+    if (area === 'OBSERVACIÓN') return 'Observación';
+    if (area === 'TRAUMA MENOR') return 'Trauma';
+    if (area === 'PEDIATRÍA') return 'Pediatría';
+    if (area === 'EXTRAS') return 'Extras';
+    return area;
+  }
 
-    if (!tabs || !noticesTab || !soundsTab || !noticesPanel || !soundsPanel || !managerView) return false;
+  function ensureBedManagerUi() {
+    if (ui?.modal?.isConnected) return true;
+    const settingsButton = document.getElementById('adminSettingsBtn');
+    if (!settingsButton) return false;
 
-    let bedTab = document.getElementById('censoAdminBedsTab');
-    if (!bedTab) {
-      bedTab = document.createElement('button');
-      bedTab.id = 'censoAdminBedsTab';
-      bedTab.type = 'button';
-      bedTab.setAttribute('role', 'tab');
-      bedTab.setAttribute('aria-selected', 'false');
-      bedTab.setAttribute('aria-controls', 'censoAdminBedsPanel');
-      bedTab.tabIndex = -1;
-      bedTab.textContent = 'Camas';
-      tabs.insertBefore(bedTab, soundsTab);
-    }
+    ensureStylesheet();
+    settingsButton.setAttribute('aria-label', 'Configurar camas y sillas');
+    settingsButton.title = 'Configurar camas y sillas';
 
-    let panel = document.getElementById('censoAdminBedsPanel');
-    if (!panel) {
-      panel = document.createElement('section');
-      panel.id = 'censoAdminBedsPanel';
-      panel.setAttribute('role', 'tabpanel');
-      panel.setAttribute('aria-labelledby', 'censoAdminBedsTab');
-      panel.hidden = true;
-      panel.innerHTML = `
-        <p id="censoBedStatus" class="censo-newsmodal__copy" role="status"></p>
-        <button id="censoBedRetry" class="censo-newsmodal__button" type="button" hidden>Reintentar conexión</button>
-        <div class="censo-sound-heading"><strong>Camas y sillas</strong><span id="censoBedCount"></span></div>
-        <p class="censo-newsmodal__copy">El nivel basal es fijo. Solo las ubicaciones temporales pueden agregarse o quitarse.</p>
-        <div id="censoBedList" class="censo-newsadmin-list"></div>
-        <form id="censoBedForm" class="censo-sound-form">
-          <div class="censo-newsmodal__field">
-            <label for="censoBedArea">Área</label>
-            <select id="censoBedArea" required>${model.temporaryAreas.map(area => `<option value="${esc(area)}">${esc(area)}</option>`).join('')}</select>
+    const wrapper = document.createElement('div');
+    wrapper.id = 'censoBedModal';
+    wrapper.className = 'censo-bedmodal';
+    wrapper.hidden = true;
+    wrapper.innerHTML = `
+      <section class="censo-bedmodal__card" role="dialog" aria-modal="true" aria-labelledby="censoBedModalTitle">
+        <header class="censo-bedmodal__head">
+          <div>
+            <h2 id="censoBedModalTitle">Camas y sillas</h2>
+            <span id="censoBedCount"></span>
           </div>
-          <div class="censo-newsmodal__field">
-            <label for="censoBedType">Tipo</label>
-            <select id="censoBedType" required><option value="CAMA">Cama</option><option value="SILLA">Silla</option><option value="CUNA">Cuna</option></select>
+          <button id="censoBedClose" class="censo-bedmodal__close" type="button" aria-label="Cerrar">×</button>
+        </header>
+        <div class="censo-bedmodal__body">
+          <div id="censoBedStatus" class="censo-bed-status" role="status"></div>
+          <button id="censoBedRetry" class="censo-bed-retry" type="button" hidden>Reintentar conexión</button>
+
+          <div id="censoBedList" class="censo-bed-grid" aria-label="Ubicaciones activas"></div>
+
+          <div class="censo-bed-help">
+            La × aparece únicamente en ubicaciones temporales libres.
           </div>
-          <div class="censo-newsmodal__field">
-            <label for="censoBedNumber">Número</label>
-            <input id="censoBedNumber" type="number" min="1" max="999" step="1" required placeholder="Ej. 11">
-          </div>
-          <p id="censoBedMessage" class="censo-newsmodal__copy" role="status" aria-live="polite"></p>
-          <div class="censo-newsmodal__actions">
-            <button id="censoBedAdd" class="censo-newsmodal__button censo-newsmodal__button--primary" type="submit">Agregar temporal</button>
-          </div>
-        </form>`;
-      managerView.insertBefore(panel, soundsPanel);
-    }
+
+          <form id="censoBedForm" class="censo-bed-add-form">
+            <div class="censo-bed-add-title">Agregar ubicación</div>
+            <div class="censo-bed-add-row">
+              <label>
+                <span>Área</span>
+                <select id="censoBedArea" required>
+                  ${model.temporaryAreas.map(area => `<option value="${esc(area)}">${esc(areaLabel(area))}</option>`).join('')}
+                </select>
+              </label>
+              <label>
+                <span>Tipo</span>
+                <select id="censoBedType" required>
+                  <option value="CAMA">Cama</option>
+                  <option value="SILLA">Silla</option>
+                  <option value="CUNA">Cuna</option>
+                </select>
+              </label>
+              <label>
+                <span>Número</span>
+                <input id="censoBedNumber" type="number" min="1" max="999" step="1" required inputmode="numeric" placeholder="Ej. 11">
+              </label>
+              <button id="censoBedAdd" class="censo-bed-add" type="submit">Agregar</button>
+            </div>
+            <p id="censoBedMessage" class="censo-bed-message" role="status" aria-live="polite"></p>
+          </form>
+        </div>
+      </section>`;
+
+    document.body.appendChild(wrapper);
 
     const get = suffix => document.getElementById(`censoBed${suffix}`);
     ui = {
-      tabs,
-      bedTab,
-      noticesTab,
-      soundsTab,
-      noticesPanel,
-      soundsPanel,
-      managerView,
-      lockButton,
-      panel,
+      settingsButton,
+      modal: wrapper,
+      close: get('Close'),
       status: get('Status'),
       retry: get('Retry'),
       count: get('Count'),
@@ -366,39 +377,22 @@ export function createBedAdminModule(app) {
       add: get('Add')
     };
 
-    const leaveBeds = () => {
-      if (!ui?.panel) return;
-      ui.panel.hidden = true;
-      ui.bedTab.setAttribute('aria-selected', 'false');
-      ui.bedTab.tabIndex = -1;
-    };
-
-    ui.bedTab.addEventListener('click', () => {
-      app.stopSoundPreview?.();
-      ui.noticesPanel.hidden = true;
-      ui.soundsPanel.hidden = true;
-      ui.panel.hidden = false;
-      ui.noticesTab.setAttribute('aria-selected', 'false');
-      ui.soundsTab.setAttribute('aria-selected', 'false');
-      ui.bedTab.setAttribute('aria-selected', 'true');
-      ui.noticesTab.tabIndex = -1;
-      ui.soundsTab.tabIndex = -1;
-      ui.bedTab.tabIndex = 0;
-      renderAdmin();
-      setTimeout(() => ui.area?.focus(), 40);
+    ui.settingsButton.addEventListener('click', openBedManager);
+    ui.close.addEventListener('click', closeBedManager);
+    ui.modal.addEventListener('click', event => {
+      if (event.target === ui.modal) closeBedManager();
     });
-
-    ui.noticesTab.addEventListener('click', leaveBeds, true);
-    ui.soundsTab.addEventListener('click', leaveBeds, true);
 
     ui.form.addEventListener('submit', async event => {
       event.preventDefault();
       if (busy) return;
       try {
         const bed = model.fromForm(ui.area.value, ui.type.value, ui.number.value);
+        ui.message.textContent = 'Guardando…';
         await mutate({ type: 'add', bed });
         ui.number.value = '';
-        ui.message.textContent = `${bed.area} / ${bed.cama} agregada como temporal.`;
+        ui.message.textContent = `${areaLabel(bed.area)} · ${bed.cama} agregada.`;
+        ui.number.focus();
       } catch (error) {
         ui.message.textContent = saveError(error);
       }
@@ -406,63 +400,48 @@ export function createBedAdminModule(app) {
 
     ui.list.addEventListener('click', async event => {
       const button = event.target.closest('[data-bed-remove]');
-      if (!button || busy || !unlocked) return;
+      if (!button || busy) return;
       const bed = catalog.find(item => bedKey(item) === button.dataset.bedRemove);
-      if (!bed) return;
-      if (isBasal(bed)) {
-        ui.message.textContent = 'El nivel basal está protegido y no puede retirarse.';
-        return;
-      }
-      if (isOccupied(bed)) {
-        ui.message.textContent = 'No se puede retirar una cama mientras tenga un paciente asignado.';
-        return;
-      }
-      if (!confirm(`¿Retirar ${bed.cama} de ${bed.area}?`)) return;
+      if (!bed || isBasal(bed) || isOccupied(bed)) return;
+      if (!confirm(`¿Retirar ${bed.cama} de ${areaLabel(bed.area)}?`)) return;
       try {
+        ui.message.textContent = 'Quitando ubicación…';
         await mutate({ type: 'remove', key: bedKey(bed) });
-        ui.message.textContent = `${bed.area} / ${bed.cama} retirada.`;
+        ui.message.textContent = `${areaLabel(bed.area)} · ${bed.cama} retirada.`;
       } catch (error) {
         ui.message.textContent = saveError(error);
       }
     });
 
     ui.retry.addEventListener('click', listenCatalog);
-    ui.lockButton?.addEventListener('click', () => setUnlocked(false));
-
-    managerObserver?.disconnect();
-    managerObserver = new MutationObserver(() => syncAdminUnlockState());
-    managerObserver.observe(managerView, { attributes: true, attributeFilter: ['hidden'] });
-    syncAdminUnlockState();
     renderAdmin();
     return true;
   }
 
-  function initBedAdminUiBridge() {
-    if (ensureAdminUi()) return;
-    if (domObserver) return;
-
-    domObserver = new MutationObserver(() => {
-      if (!ensureAdminUi()) return;
-      domObserver.disconnect();
-      domObserver = null;
-    });
-    domObserver.observe(document.body, { childList: true, subtree: true });
-  }
-
-  function syncAdminUnlockState() {
-    const sessionUnlocked = sessionStorage.getItem(ADMIN_SESSION) === '1';
-    const managerVisible = ui?.managerView && !ui.managerView.hidden;
-    setUnlocked(Boolean(sessionUnlocked && managerVisible));
-  }
-
-  function setUnlocked(value) {
-    unlocked = Boolean(value);
+  function openBedManager() {
+    if (!ensureBedManagerUi()) return;
+    if (!auth.currentUser) return;
+    app.utils?.vibrar?.(15);
+    ui.message.textContent = '';
+    ui.modal.hidden = false;
     renderAdmin();
+    window.setTimeout(() => ui.area?.focus(), 40);
+  }
+
+  function closeBedManager() {
+    if (ui?.modal) ui.modal.hidden = true;
+  }
+
+  function initBedAdminUiBridge() {
+    if (!ensureBedManagerUi()) return;
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && ui?.modal && !ui.modal.hidden) closeBedManager();
+    });
   }
 
   async function mutate(action) {
-    if (!unlocked || !auth.currentUser || sessionStorage.getItem(ADMIN_SESSION) !== '1') {
-      throw new Error('Desbloquea la administración para modificar camas.');
+    if (!auth.currentUser) {
+      throw new Error('Inicia sesión en el Censo para modificar camas.');
     }
     if (syncState !== 'ready') throw new Error('Espera a que termine la sincronización de camas.');
 
@@ -485,8 +464,8 @@ export function createBedAdminModule(app) {
       }
       await runTransaction(db, async transaction => {
         const snapshot = await transaction.get(ref);
-        if (!unlocked || auth.currentUser?.uid !== uid || currentUid !== uid || sessionStorage.getItem(ADMIN_SESSION) !== '1') {
-          throw new Error('La administración se bloqueó. Vuelve a entrar.');
+        if (auth.currentUser?.uid !== uid || currentUid !== uid) {
+          throw new Error('La sesión cambió. Vuelve a intentarlo.');
         }
         const data = snapshot.exists() ? snapshot.data() : null;
         if (!model.isSharedDocument(data)) throw new Error('Espera a que termine la sincronización del catálogo compartido.');
@@ -529,56 +508,75 @@ export function createBedAdminModule(app) {
   function renderAdmin() {
     if (!ui) return;
 
-    ui.count.textContent = `${basalBeds.length} basales · ${temporaryBeds.length} temporales`;
+    ui.count.textContent = `${catalog.length} ubicaciones · ${temporaryBeds.length} temporales`;
+    const ready = syncState === 'ready';
+    ui.status.hidden = ready;
     ui.status.textContent = syncState === 'loading'
-      ? 'Cargando catálogo compartido…'
-      : syncState !== 'ready'
-        ? syncError
-        : `Sincronizado con Firebase · revisión ${revision}. Los cambios se comparten entre equipos.`;
+      ? 'Sincronizando camas…'
+      : syncState === 'waiting'
+        ? 'Esperando confirmación de Firebase…'
+        : syncError;
     ui.retry.hidden = !['error', 'waiting'].includes(syncState);
 
-    ui.add.disabled = busy || !unlocked || syncState !== 'ready';
-    ui.add.textContent = busy ? 'Guardando…' : 'Agregar temporal';
+    ui.add.disabled = busy || !auth.currentUser || !ready;
+    ui.add.textContent = busy ? 'Guardando…' : 'Agregar';
     ui.area.disabled = busy;
     ui.type.disabled = busy;
     ui.number.disabled = busy;
 
-    const renderSection = (title, items) => {
-      const grouped = new Map();
-      items.forEach(bed => {
-        if (!grouped.has(bed.area)) grouped.set(bed.area, []);
-        grouped.get(bed.area).push(bed);
-      });
-      return `<h3>${title} · ${items.length}</h3>` + (items.length ? [...grouped.entries()].map(([area, beds]) => `
-          <div class="censo-bed-group">
-            <div class="censo-sound-heading"><strong>${esc(area)}</strong><span>${beds.length}</span></div>
-            ${beds.map(bed => {
+    const columns = [
+      { label: 'Choque', areas: ['SALA DE CHOQUE'] },
+      { label: 'Observación', areas: ['OBSERVACIÓN'] },
+      { label: 'Trauma', areas: ['TRAUMA MENOR'] },
+      { label: 'Pediatría', areas: ['PEDIATRÍA'] },
+      { label: 'Extras', areas: ['EXTRAS', 'PEDILUVIO', "EFE'S"] }
+    ];
+
+    ui.list.innerHTML = columns.map(column => {
+      const beds = catalog.filter(bed => column.areas.includes(bed.area));
+      return `
+        <section class="censo-bed-column">
+          <h3>${esc(column.label)}</h3>
+          <div class="censo-bed-column__items">
+            ${beds.length ? beds.map(bed => {
               const occupant = occupantFor(bed);
               const occupied = Boolean(occupant);
-              const basal = isBasal(bed);
-              return `<div class="censo-newsadmin-item censo-sound-item">
-                <div>
-                  <span class="material-symbols-outlined" aria-hidden="true">${bed.cama.startsWith('SILLA') ? 'chair' : 'bed'}</span>
-                  <div><strong>${esc(bed.cama)}</strong>${bed.descripcion ? `<small style="display:block;color:var(--muted);margin-top:2px;">${esc(bed.descripcion)}</small>` : ''}${occupied ? `<small style="display:block;color:var(--accent);margin-top:2px;">OCUPADA · ${esc(occupant.nombre || 'PACIENTE')}</small>` : ''}</div>
-                </div>
-                <div class="censo-sound-actions">
-                  ${basal ? '<span title="Nivel basal protegido">🔒 Basal</span>' : `<button type="button" class="censo-newsmodal__button censo-newsmodal__button--danger" data-bed-remove="${esc(bedKey(bed))}" ${occupied || busy || !unlocked || syncState !== 'ready' ? 'disabled' : ''}>Quitar</button>`}
-                </div>
-              </div>`;
-            }).join('')}
-          </div>`).join('') : '<p class="censo-news-empty">No hay ubicaciones temporales activas.</p>');
-    };
-    const outsideCatalog = state.pacientesGlobal.filter(patient => !catalog.some(bed => bedKey(bed) === bedKey(patient)));
-    ui.list.innerHTML = `<details><summary>Nivel basal protegido · ${basalBeds.length} ubicaciones</summary>${renderSection('Nivel basal', catalog.filter(isBasal))}</details>`
-      + renderSection('Temporales activas', catalog.filter(bed => !isBasal(bed)))
-      + (!temporaryBeds.some(bed => bed.area === 'EXTRAS') ? '<div class="censo-bed-group"><div class="censo-sound-heading"><strong>EXTRAS</strong><span>0</span></div><p class="censo-news-empty">Sin camas basales. Agrega camas o sillas temporales seleccionando EXTRAS.</p></div>' : '')
-      + (outsideCatalog.length ? `<p class="censo-newsmodal__copy" role="status">${outsideCatalog.length} paciente(s) en ubicaciones fuera del catálogo activo. Permanecen en el censo hasta su traslado o egreso; esas ubicaciones no se ofrecen para nuevos ingresos.</p>` : '');
+              const temporary = !isBasal(bed);
+              const removable = temporary && !occupied;
+              const title = occupied
+                ? `${bed.cama} · ocupada${occupant?.nombre ? ` por ${occupant.nombre}` : ''}`
+                : temporary
+                  ? `${bed.cama} · temporal`
+                  : `${bed.cama} · basal`;
+              return `
+                <div class="censo-bed-row${temporary ? ' is-temporary' : ''}${occupied ? ' is-occupied' : ''}" title="${esc(title)}">
+                  <span class="censo-bed-row__name">${esc(bed.cama)}</span>
+                  ${removable ? `
+                    <button
+                      type="button"
+                      class="censo-bed-remove"
+                      data-bed-remove="${esc(bedKey(bed))}"
+                      aria-label="Quitar ${esc(bed.cama)} de ${esc(column.label)}"
+                      title="Quitar ubicación temporal"
+                      ${busy || !ready ? 'disabled' : ''}
+                    >×</button>` : ''}
+                </div>`;
+            }).join('') : '<div class="censo-bed-empty">—</div>'}
+          </div>
+        </section>`;
+    }).join('');
+
+    const outsideCatalog = state.pacientesGlobal.filter(patient =>
+      !catalog.some(bed => bedKey(bed) === bedKey(patient))
+    );
+    if (outsideCatalog.length) {
+      ui.message.textContent = `${outsideCatalog.length} paciente(s) permanecen en ubicaciones antiguas fuera del catálogo.`;
+    }
   }
 
   return {
     initBedCatalogAuthBridge,
     initBedAdminUiBridge,
-    setBedAdminUnlocked: setUnlocked,
     refreshBedAdmin: renderAdmin,
     isBedCatalogReady: () => syncState === 'ready',
     requireSharedBed,
