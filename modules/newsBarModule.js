@@ -7,7 +7,7 @@
   - Mostrar noticias externas solamente cuando no hay anuncios activos.
   - Mantener una velocidad lineal constante para ambos tipos de contenido.
   - Priorizar Delicias, Chihuahua, medicina y México con máximo 12 noticias.
-  - Administrar anuncios mediante Ctrl + Alt + N.
+  - Abrir la administración desde el encabezado o mediante Ctrl + Alt + N.
 */
 
 const MODULE_VERSION = '1.5';
@@ -440,7 +440,8 @@ export function createNewsBarModule(app) {
       soundsTab: document.getElementById('censoAdminSoundsTab'),
       noticesPanel: document.getElementById('censoAdminNoticesPanel'),
       soundsPanel: document.getElementById('censoAdminSoundsPanel'),
-      deleteAll: document.getElementById('censoNewsDeleteAll')
+      deleteAll: document.getElementById('censoNewsDeleteAll'),
+      settingsButton: document.getElementById('adminSettingsBtn')
     };
   }
 
@@ -505,6 +506,11 @@ export function createNewsBarModule(app) {
     });
 
     elements.deleteAll.addEventListener('click', deleteAllAnnouncements);
+
+    elements.settingsButton?.addEventListener('click', () => {
+      app.utils?.vibrar?.(15);
+      openAdmin();
+    });
 
     document.addEventListener('keydown', handleGlobalKeydown);
 
@@ -1000,10 +1006,12 @@ export function createNewsBarModule(app) {
   }
 
   function handleGlobalKeydown(event) {
+    // event.key puede convertirse en otro carácter cuando Ctrl + Alt actúa
+    // como AltGr en teclados en español. event.code identifica la tecla física.
     if (
       event.ctrlKey &&
       event.altKey &&
-      event.key.toLowerCase() === 'n'
+      (event.code === 'KeyN' || String(event.key || '').toLowerCase() === 'n')
     ) {
       event.preventDefault();
       openAdmin();

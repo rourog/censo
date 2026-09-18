@@ -17,11 +17,31 @@ console.info('[CENSO] modalModule.js cargado. BUILD: bulk-reset-v1-20260722');
 
 export function createModalModule(app) {
   const { state } = app;
-  const { db, collection, addDoc, doc, updateDoc, getDocs, query, where, writeBatch, serverTimestamp } = app.firebase;
+  const { db, collection, addDoc, doc, updateDoc, getDocsFromServer, writeBatch, serverTimestamp } = app.firebase;
   const { destinosGlobal, masterCamas, agruparPorArea, getDestinoTextLabel } = app.bed;
   const { escapeHtml, normalizar, vibrar } = app.utils;
   const movimientosCamaPendientes = new Set();
 
+  function catalogoDisponible() {
+    if (app.isBedCatalogReady?.() !== false) return true;
+    alert('ESPERA A QUE SE SINCRONICEN LAS CAMAS CON FIREBASE.');
+    return false;
+  }
+
+  async function comprobarCamaDisponible(area, cama, filaActual = null) {
+    await app.requireSharedBed?.(area, cama);
+    const key = app.bed.claveCama({ area, cama });
+    const sigueEnCatalogo = () => masterCamas.some(bed => app.bed.claveCama(bed) === key);
+    if (!sigueEnCatalogo()) throw new Error('ESA UBICACIÓN FUE RETIRADA. VUELVE A SELECCIONAR UNA CAMA.');
+    // Comprobación de servidor con alias históricos; no es una reserva atómica.
+    const ocupantes = await getDocsFromServer(collection(db, 'pacientes'));
+    let ocupada = false;
+    ocupantes.forEach(snapshot => {
+      if (String(snapshot.id) !== String(filaActual) && app.bed.claveCama(snapshot.data() || {}) === key) ocupada = true;
+    });
+    if (ocupada) throw new Error('LA CAMA ESTÁ OCUPADA. VUELVE A SELECCIONAR UNA CAMA LIBRE.');
+    if (!sigueEnCatalogo()) throw new Error('ESA UBICACIÓN FUE RETIRADA. VUELVE A SELECCIONAR UNA CAMA.');
+  }
 
   function renderDestinoLabelHtml(destino) {
     if (!destino) return '(SIN DESTINO)';
@@ -430,6 +450,7 @@ export function createModalModule(app) {
   // CAMBIO RÁPIDO DE CAMA DESDE TABLA O TARJETA
   // ==========================================================
   function abrirCamaFlotante(anchorEl, filaId, event) {
+    if (!catalogoDisponible()) return;
     ensureDestinoOptionStyles();
     event?.preventDefault();
     event?.stopPropagation();
@@ -556,21 +577,7 @@ export function createModalModule(app) {
       movimientosCamaPendientes.add(String(filaId));
 
       try {
-        // Relectura del servidor justo antes de escribir: reduce colisiones entre usuarios
-        // sin modificar el esquema actual de Firestore.
-        const ocupantes = await getDocs(query(collection(db, 'pacientes'), where('cama', '==', nuevaCama)));
-        let ocupadaPorOtro = false;
-        ocupantes.forEach(snapshot => {
-          const data = snapshot.data() || {};
-          if (String(snapshot.id) !== String(filaId) && normalizar(data.area) === normalizar(nuevaArea)) {
-            ocupadaPorOtro = true;
-          }
-        });
-
-        if (ocupadaPorOtro) {
-          throw new Error('LA CAMA FUE OCUPADA POR OTRO USUARIO. SE RECARGARÁ LA LISTA DISPONIBLE.');
-        }
-
+        await comprobarCamaDisponible(nuevaArea, nuevaCama, filaId);
         await updateDoc(doc(db, 'pacientes', filaId), { cama: nuevaCama, area: nuevaArea });
         const pacienteLocal = state.pacientesGlobal.find(p => String(p.fila) === String(filaId));
         if (pacienteLocal) {
@@ -765,7 +772,9 @@ export function createModalModule(app) {
 
       if (moverAFila && moverAFila !== "") {
           const nuevaCamaObj = state.camasLibresGlobal.find(c => c.fila === moverAFila);
+          if (!nuevaCamaObj) throw new Error('ESA UBICACIÓN YA NO ESTÁ DISPONIBLE. VUELVE A SELECCIONAR UNA CAMA.');
           if (nuevaCamaObj) {
+              await comprobarCamaDisponible(nuevaCamaObj.area, nuevaCamaObj.cama, filaId);
               updateData.cama = nuevaCamaObj.cama.toUpperCase();
               updateData.area = nuevaCamaObj.area.toUpperCase();
           }
@@ -846,6 +855,7 @@ export function createModalModule(app) {
   }
 
   function abrirModalAgregar() {
+    if (!catalogoDisponible()) return;
     vibrar(30); 
     const now = new Date();
     now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
@@ -899,6 +909,7 @@ export function createModalModule(app) {
       const fechaCreacion = fechaInput ? new Date(fechaInput) : new Date();
       if (Number.isNaN(fechaCreacion.getTime())) throw new Error('La fecha de ingreso no es válida.');
 
+      await comprobarCamaDisponible(areaReal, nombreCamaReal);
       await addDoc(collection(db, "pacientes"), {
           nombre: nom,
           edad: document.getElementById('addEdad').value.toUpperCase(),

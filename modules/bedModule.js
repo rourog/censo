@@ -121,23 +121,57 @@ export const destinosGlobal = [
   destinoValoracion(destinoIconos.terapiaIntensiva, "Terapia Intensiva")
 ];
 
-export const masterCamas = [
-  { area: "SALA DE CHOQUE", cama: "CHOQUE 1" }, { area: "SALA DE CHOQUE", cama: "CHOQUE 2" },
-  { area: "OBSERVACIÓN", cama: "CAMA 1" }, { area: "OBSERVACIÓN", cama: "CAMA 1-2" }, { area: "OBSERVACIÓN", cama: "SILLA 1" },
-  { area: "OBSERVACIÓN", cama: "CAMA 2" }, { area: "OBSERVACIÓN", cama: "CAMA 2-2" }, { area: "OBSERVACIÓN", cama: "SILLA 2" },
-  { area: "OBSERVACIÓN", cama: "CAMA 3" }, { area: "OBSERVACIÓN", cama: "CAMA 3-2" }, { area: "OBSERVACIÓN", cama: "SILLA 3" },
-  { area: "OBSERVACIÓN", cama: "CAMA 4" }, { area: "OBSERVACIÓN", cama: "CAMA 4-2" }, { area: "OBSERVACIÓN", cama: "SILLA 4" },
-  { area: "OBSERVACIÓN", cama: "CAMA 5" }, { area: "OBSERVACIÓN", cama: "CAMA 5-2" }, { area: "OBSERVACIÓN", cama: "SILLA 5" },
-  // Ampliación: conservar todas las ubicaciones anteriores y sumar camas 6–10.
-  ...Array.from({ length: 5 }, (_, i) => ({ area: "OBSERVACIÓN", cama: `CAMA ${i + 6}` })),
-  { area: "TRAUMA MENOR", cama: "CAMA 1" }, { area: "TRAUMA MENOR", cama: "CAMA 2" }, { area: "TRAUMA MENOR", cama: "CAMA 3" }, { area: "TRAUMA MENOR", cama: "CAMA 4" },
-  { area: "TRAUMA MENOR", cama: "SILLA 1" }, { area: "TRAUMA MENOR", cama: "SILLA 2" }, { area: "TRAUMA MENOR", cama: "SILLA 3" },
-  { area: "PEDIATRÍA", cama: "CUNA 1" }, { area: "PEDIATRÍA", cama: "CUNA 2" }, { area: "PEDIATRÍA", cama: "CUNA 3" }, 
-  { area: "PEDIATRÍA", cama: "SILLA 1" }, { area: "PEDIATRÍA", cama: "SILLA 2" },
-  { area: "EXTRAS", cama: "EXTRA 1" }, { area: "EXTRAS", cama: "EXTRA 2" }, { area: "EXTRAS", cama: "EXTRA 3" }, { area: "EXTRAS", cama: "EXTRA 4" }, { area: "EXTRAS", cama: "EXTRA 5" },
-  { area: "EXTRAS", cama: "PEDILUVIO" },
-  { area: "EXTRAS", cama: "EFE'S", descripcion: "ENFERMEDADES FEBRILES EXANTEMÁTICAS" }
-];
+// La administración nunca modifica el nivel basal. Las temporales se guardan
+// por separado; una lista temporal vacía es válida y no repone las camas 6–10.
+const freezeBeds = beds => Object.freeze(beds.map(bed => Object.freeze(bed)));
+export const basalBeds = freezeBeds([
+  { area: 'SALA DE CHOQUE', cama: 'CAMA 1' },
+  ...Array.from({ length: 5 }, (_, i) => [
+    { area: 'OBSERVACIÓN', cama: `CAMA ${i + 1}` },
+    { area: 'OBSERVACIÓN', cama: `SILLA ${i + 1}` }
+  ]).flat(),
+  { area: 'TRAUMA MENOR', cama: 'CAMA 1' }, { area: 'TRAUMA MENOR', cama: 'CAMA 2' },
+  { area: 'TRAUMA MENOR', cama: 'SILLA 1' }, { area: 'TRAUMA MENOR', cama: 'SILLA 2' },
+  { area: 'PEDIATRÍA', cama: 'CUNA 1' }, { area: 'PEDIATRÍA', cama: 'CUNA 2' }, { area: 'PEDIATRÍA', cama: 'CUNA 3' },
+  { area: 'PEDIATRÍA', cama: 'SILLA 1' }, { area: 'PEDIATRÍA', cama: 'SILLA 2' },
+  { area: 'PEDILUVIO', cama: 'PEDILUVIO' },
+  { area: "EFE'S", cama: "EFE'S", descripcion: 'ENFERMEDADES FEBRILES EXANTEMÁTICAS' }
+]);
+
+export const defaultTemporaryBeds = freezeBeds(
+  Array.from({ length: 5 }, (_, i) => ({ area: 'OBSERVACIÓN', cama: `CAMA ${i + 6}` }))
+);
+
+export const masterCamas = [...basalBeds, ...defaultTemporaryBeds].map(bed => ({ ...bed }));
+
+// Alias de lectura: no se reescriben ni se trasladan pacientes en Firestore.
+export function normalizarUbicacion(bed) {
+  let area = normalizarEspecialidad(bed.area);
+  let cama = limpiarNombreCama(bed.cama).replace(/\s+/g, ' ');
+  if (area === 'OBSERVACION') area = 'OBSERVACIÓN';
+  if (area === 'PEDIATRIA') area = 'PEDIATRÍA';
+  if (area === 'SALA DE CHOQUE' && cama === 'CHOQUE 1') cama = 'CAMA 1';
+  if (area === 'EXTRAS' && ['PEDILUVIO', "EFE'S"].includes(cama)) area = cama;
+  // Evita que SILLA6 / SILLA-6 / SILLA 06 sean ubicaciones diferentes.
+  const numbered = cama.match(/^(CAMA|SILLA|CUNA)[\s-]*(\d+)$/u);
+  if (numbered) cama = `${numbered[1]} ${Number(numbered[2])}`;
+  return { ...bed, area, cama };
+}
+
+export function claveCama(bed) {
+  const { area, cama } = normalizarUbicacion(bed);
+  return `${normalizarEspecialidad(area)}|${normalizarEspecialidad(cama)}`;
+}
+
+// Solo se excluyen durante la migración las ubicaciones que se retiraron
+// expresamente. Las ampliaciones personalizadas de otras áreas se conservan.
+export function esUbicacionRetirada(bed) {
+  const { area, cama } = normalizarUbicacion(bed);
+  return /^EXTRA(?:\s|\d|$)/u.test(cama)
+    || (area === 'SALA DE CHOQUE' && cama !== 'CAMA 1')
+    || (area === 'OBSERVACIÓN' && /^CAMA [1-5]-[1-5]$/u.test(cama))
+    || (area === 'TRAUMA MENOR' && ['CAMA 3', 'CAMA 4', 'SILLA 3'].includes(cama));
+}
 
 export const areaVisuals = {
   'SALA DE CHOQUE': { emoji: '❤️', class: 'icon-heartbeat' },
@@ -146,7 +180,9 @@ export const areaVisuals = {
   'TRAUMA MENOR': { emoji: '🦴', class: 'icon-spin' },
   'PEDIATRIA': { emoji: '🧸', class: 'icon-wiggle' },
   'PEDIATRÍA': { emoji: '🧸', class: 'icon-wiggle' },
-  'EXTRAS': { emoji: '✨', class: 'icon-twinkle' },
+  'PEDILUVIO': { emoji: '💧', class: '' },
+  "EFE'S": { emoji: '🏥', class: '' },
+  'EXTRAS': { emoji: '✨', class: 'icon-twinkle' }, // Sin basal; admite temporales.
   'SIN ÁREA ASIGNADA': { emoji: '🏥', class: '' }
 };
 
@@ -253,20 +289,8 @@ export function agruparPorArea(lista) {
 }
 
 export function calcularCamasLibres(masterCamasList, pacientes) {
-  const occupiedBeds = [];
-
-  (pacientes || []).forEach((p) => {
-    if (!p.cama) return;
-    const areaName = String(p.area || '').toUpperCase().trim();
-    const camaName = limpiarNombreCama(p.cama).toUpperCase().trim();
-    occupiedBeds.push(`${areaName}|${camaName}`);
-  });
-
+  const occupiedBeds = new Set((pacientes || []).filter(p => p.cama).map(claveCama));
   return (masterCamasList || [])
-    .filter(c => {
-      const areaName = c.area.toUpperCase().trim();
-      const camaName = c.cama.toUpperCase().trim();
-      return !occupiedBeds.includes(`${areaName}|${camaName}`);
-    })
-    .map((c, i) => ({ ...c, fila: 'cama_libre_' + i }));
+    .filter(c => !occupiedBeds.has(claveCama(c)))
+    .map(c => ({ ...c, fila: 'cama_libre_' + encodeURIComponent(claveCama(c)) }));
 }

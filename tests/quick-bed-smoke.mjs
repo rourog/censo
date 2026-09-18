@@ -13,11 +13,12 @@ async function importLocalModule(path) {
 
 const { masterCamas, calcularCamasLibres } = await importLocalModule('modules/bedModule.js');
 
-const pediluvio = masterCamas.find(cama => cama.area === 'EXTRAS' && cama.cama === 'PEDILUVIO');
-const efes = masterCamas.find(cama => cama.area === 'EXTRAS' && cama.cama === "EFE'S");
+const pediluvio = masterCamas.find(cama => cama.area === 'PEDILUVIO' && cama.cama === 'PEDILUVIO');
+const efes = masterCamas.find(cama => cama.area === "EFE'S" && cama.cama === "EFE'S");
 
-assert.ok(pediluvio, 'PEDILUVIO debe existir en el pool de EXTRAS.');
-assert.ok(efes, "EFE'S debe existir en el pool de EXTRAS.");
+assert.ok(pediluvio, 'PEDILUVIO se conserva fuera del área EXTRAS.');
+assert.ok(efes, "EFE'S se conserva fuera del área EXTRAS.");
+assert.ok(!masterCamas.some(cama => cama.area === 'EXTRAS'));
 assert.equal(efes.descripcion, 'ENFERMEDADES FEBRILES EXANTEMÁTICAS');
 
 const libres = calcularCamasLibres(masterCamas, [
@@ -38,8 +39,9 @@ assert.match(renderSource, /quick-bed-label--pediluvio/u, 'PEDILUVIO debe usar u
 assert.match(renderSource, /getCamaLabelClass\(p\.cama\)/u, 'El ajuste de PEDILUVIO debe aplicarse en las vistas renderizadas.');
 assert.match(modalSource, /function abrirCamaFlotante/u);
 assert.match(modalSource, /if \(mismaCama\) return;/u, 'Elegir la cama actual no debe escribir en Firestore.');
-assert.match(modalSource, /where\('cama', '==', nuevaCama\)/u, 'El cambio debe volver a verificar la ocupación en el servidor.');
+assert.match(modalSource, /getDocsFromServer\(collection\(db, 'pacientes'\)\)/u, 'Debe verificar ocupación en servidor incluyendo alias anteriores.');
+assert.match(modalSource, /comprobarCamaDisponible\(nuevaArea, nuevaCama, filaId\)/u);
 assert.match(modalSource, /updateDoc\(doc\(db, 'pacientes', filaId\), \{ cama: nuevaCama, area: nuevaArea \}\)/u);
 assert.match(firebaseSource, /\bwhere\b/u, 'Firebase debe exportar where para la revalidación de cama.');
 
-console.log('OK: camas extra y cambio rápido de cama verificados.');
+console.log('OK: Pediluvio, EFE’s, alias antiguos y cambio rápido de cama verificados.');

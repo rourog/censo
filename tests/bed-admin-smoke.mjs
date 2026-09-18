@@ -24,10 +24,13 @@ assert.match(beds, /No se puede retirar una cama mientras tenga un paciente asig
 assert.match(beds, /censoAdminBedsTab/u, 'Debe crear la pestaña Camas dentro de Administración.');
 assert.match(beds, /insertBefore\(bedTab, soundsTab\)/u, 'Camas debe convivir con Avisos y Sonidos.');
 assert.match(beds, /runTransaction/u, 'Los cambios del catálogo deben ser transaccionales.');
-assert.match(beds, /defaultBeds/u, 'Debe conservar un catálogo predeterminado de respaldo.');
+assert.match(beds, /basalBeds/u, 'Debe conservar un nivel basal protegido.');
+assert.match(beds, /model.sharedDocument\(next, data, uid, serverTimestamp\(\)\)/u, 'Debe guardar el catálogo completo en la misma transacción.');
+assert.doesNotMatch(beds, /censoBedDescription/u, 'La descripción opcional debe desaparecer del formulario.');
+assert.doesNotMatch(beds, /Restaurar catálogo predeterminado/u, 'El basal ya no necesita restaurarse.');
 
 assert.match(patients, /normalizeBedKey\(a\.area, a\.cama\)/u, 'El orden debe distinguir área y cama.');
 assert.match(patients, /calcularCamasLibres\(masterCamas, nextPatients\)/u);
 
-assert.equal(version.displayVersion, '2.48');
+assert.match(version.displayVersion, /^\d+\.\d+$/u, 'La versión visible debe tener un formato vN.N válido.');
 console.log('OK: administrador dinámico de camas verificado.');

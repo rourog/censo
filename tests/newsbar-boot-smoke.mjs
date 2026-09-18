@@ -34,6 +34,9 @@ let unsubscriptions = 0;
 let requests = 0;
 const body = element();
 const doc = element();
+const settingsButton = element();
+nodes.set('adminSettingsBtn', settingsButton);
+assert.match(read('index.html'), /id="adminSettingsBtn"/u, 'El encabezado debe incluir una entrada visible a Administración.');
 Object.assign(doc, {
   body, head: element(), visibilityState: 'visible',
   getElementById: id => nodes.get(id) || null,
@@ -73,29 +76,24 @@ globalThis.__newsbarBootMocks = {
   serverTimestamp() {}, signInWithEmailAndPassword() {}, runTransaction() { throw new Error('No escribir configuración en esta prueba.'); }
 };
 
-// Ejecutar el appModule real; simular servicios y los módulos ajenos a la regresión.
-const lifecycles = { createEffectsModule: [], createRenderModule: [], createPatientModule: [], createThemeModule: ['initTheme'], createModalModule: ['bindModalBaseEvents'], createMaintenanceModule: ['bindMaintenanceEvents'], createInteractionModule: ['exposeWindowActions', 'bindUiEvents'], createAuthModule: ['bindAuthEvents', 'bootAuth'] };
-let bootSource = read('modules/appModule.js');
-bootSource = bootSource.replace(/import ([^;]+?) from '([^']+)';/g, (_, clause, specifier) => {
-  let source;
-  if (specifier.includes('newsBarModule.js')) {
-    source = read('modules/newsBarModule.js').replaceAll('import.meta.url', JSON.stringify(pathToFileURL(resolve(root, 'modules/newsBarModule.js')).href));
-  } else if (specifier.includes('soundboardModule.js')) {
-    source = read('modules/soundboardModule.js').replace(/\.\/soundCatalog\.js\?v=[^']+/, dataModule(read('modules/soundCatalog.js')));
-  } else if (specifier.includes('firebaseModule.js')) {
-    source = 'export const { db, auth, collection, onSnapshot, onAuthStateChanged, addDoc, doc, deleteDoc, serverTimestamp, signInWithEmailAndPassword, runTransaction } = globalThis.__newsbarBootMocks;';
-  } else if (specifier.includes('stateModule.js')) {
-    source = 'export const state = {};';
-  } else if (clause.startsWith('*')) {
-    source = 'export const placeholder = true;';
-  } else {
-    const factory = clause.match(/\{\s*(\w+)/)[1];
-    source = `export function ${factory}() { return { ${lifecycles[factory].map(name => `${name}() {}`).join(',')} }; }`;
-  }
-  return `import ${clause} from '${dataModule(source)}';`;
-});
-const { bootApp } = await import(dataModule(bootSource));
-await bootApp();
+// Componer los dos módulos reales implicados y comprobar que appModule conserva
+// su integración. La carga dinámica versionada ya se prueba por separado.
+const newsSource = read('modules/newsBarModule.js').replaceAll(
+  'import.meta.url',
+  JSON.stringify(pathToFileURL(resolve(root, 'modules/newsBarModule.js')).href)
+);
+const [{ createNewsBarModule }, { createSoundboardModule }, soundCatalog] = await Promise.all([
+  import(dataModule(newsSource)),
+  import(dataModule(read('modules/soundboardModule.js'))),
+  import(dataModule(read('modules/soundCatalog.js')))
+]);
+assert.match(read('modules/appModule.js'), /createNewsBarModule/u, 'appModule debe integrar el módulo de noticias.');
+const app = { firebase: globalThis.__newsbarBootMocks, soundCatalog, utils: { vibrar() {} } };
+Object.assign(app, createSoundboardModule(app));
+Object.assign(app, createNewsBarModule(app));
+window.CensoApp = app;
+app.initSoundboardAuthBridge();
+app.initNewsBarAuthBridge();
 assert.equal(typeof window.CensoApp.startNewsBar, 'function', 'bootApp debe componer el módulo de noticias.');
 assert.equal(authCallbacks.length, 2, 'bootApp debe iniciar los puentes de noticias y sonidos.');
 assert.equal(window.CensoApp.getUserSounds('rodrrodriguez').length, 7);
@@ -113,9 +111,12 @@ assert.equal(nodes.get('censoNewsBar').dataset.feedMode, 'internal');
 assert.match(nodes.get('censoNewsTrack').innerHTML, /AVISO INTERNO DE PRUEBA/);
 nodes.get('censoNewsBar').dispatch('click', { target: { closest: selector => selector === '.censo-newsbar__link' ? null : {} } });
 assert.equal(nodes.get('censoNewsDrawer').hidden, false);
-doc.dispatch('keydown', { ctrlKey: true, altKey: true, key: 'n', preventDefault() {} });
+doc.dispatch('keydown', { ctrlKey: true, altKey: true, key: 'ñ', code: 'KeyN', preventDefault() {} });
 assert.equal(nodes.get('censoNewsAdminModal').hidden, false);
 assert.equal(nodes.get('censoNewsAuthView').hidden, false, 'La administración debe pedir contraseña.');
+nodes.get('censoNewsAdminModal').hidden = true;
+settingsButton.dispatch('click', {});
+assert.equal(nodes.get('censoNewsAdminModal').hidden, false, 'El botón visible debe abrir la administración.');
 sessionStorage.setItem('censo-newsbar-admin-session-v1', '1');
 doc.dispatch('keydown', { ctrlKey: true, altKey: true, key: 'n', preventDefault() {} });
 nodes.get('censoAdminSoundsTab').dispatch('click', {});

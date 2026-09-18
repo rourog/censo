@@ -691,6 +691,7 @@ export function createRenderModule(app) {
       'OBSERVACIÓN', 'OBSERVACION',
       'TRAUMA MENOR',
       'PEDIATRÍA', 'PEDIATRIA',
+      'PEDILUVIO', "EFE'S",
       'EXTRAS',
       'SIN ÁREA ASIGNADA'
     ];

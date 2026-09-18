@@ -8,13 +8,14 @@ const asModule = source => `data:text/javascript;base64,${Buffer.from(source).to
 const read = path => readFileSync(resolve(root, path), 'utf8');
 const bed = await import(asModule(read('modules/bedModule.js')));
 const constants = await import(asModule(read('modules/constants.js')));
-assert.deepEqual(constants.masterCamas, bed.masterCamas);
+const { createBedCatalogModel } = await import(asModule(read('modules/bedAdminModule.js')));
+assert.deepEqual(createBedCatalogModel(bed).readTemporaryBeds({ beds: constants.masterCamas }), bed.defaultTemporaryBeds);
 const obs = bed.masterCamas.filter(c => c.area === 'OBSERVACIÓN');
-assert.equal(obs.length, 20);
+assert.equal(obs.length, 15);
 assert.equal(new Set(bed.masterCamas.map(c => `${c.area}|${c.cama}`)).size, bed.masterCamas.length);
 for (let n = 1; n <= 10; n++) assert.ok(obs.some(c => c.cama === `CAMA ${n}`));
 for (let n = 1; n <= 5; n++) {
-  assert.ok(obs.some(c => c.cama === `CAMA ${n}-2`));
+  assert.ok(!obs.some(c => c.cama === `CAMA ${n}-2`));
   assert.ok(obs.some(c => c.cama === `SILLA ${n}`));
 }
 const patients = [{ area: 'OBSERVACIÓN', cama: 'CAMA 1-2' }, { area: 'OBSERVACIÓN', cama: 'CAMA 10' }];
@@ -53,12 +54,15 @@ globalThis.Audio = class {
   pause() { this.paused = true; }
 };
 const plexusUrl = asModule(read('modules/plexus.js'));
-const source = read('modules/effectsModule.js').replace(/\.\/plexus\.js\?v=[^']+/, plexusUrl);
+globalThis.window = { CensoBuild: { version: 'test' } };
+const source = read('modules/effectsModule.js')
+  .replaceAll('import.meta.url', JSON.stringify(new URL('../modules/effectsModule.js', import.meta.url).href))
+  .replace('import(plexusUrl.href)', `import(${JSON.stringify(plexusUrl)})`);
 const { createEffectsModule } = await import(asModule(source));
 const catalogUrl = 'data:text/javascript;base64,' + Buffer.from(read('modules/soundCatalog.js')).toString('base64');
 const soundSource = read('modules/soundboardModule.js').replace(/\.\/soundCatalog\.js\?v=[^']+/, catalogUrl);
 const { createSoundboardModule } = await import('data:text/javascript;base64,' + Buffer.from(soundSource).toString('base64'));
-const context = { utils: { vibrar() {} }, state: { pacientesGlobal: [] }, firebase: {} };
+const context = { utils: { vibrar() {} }, state: { pacientesGlobal: [] }, firebase: {}, soundCatalog: await import(catalogUrl) };
 Object.assign(context, createSoundboardModule(context));
 const app = createEffectsModule(context);
 assert.equal(app.checkEasterEggs('otro usuario'), false);
@@ -100,4 +104,4 @@ assert.equal(app.checkEasterEggs('ALFROJAS'), true);
 assert.equal(alf.style.display, 'flex');
 assert.equal(elements.get('rodrrodriguezSoundboard'), board);
 assert.equal(host.children.length, 2);
-console.log('OK: camas existentes + 6–10; activación independiente, siete botones, reproducción bajo demanda, detener y recuperación de errores.');
+console.log('OK: camas basales + temporales 6–10; activación independiente, siete botones, reproducción bajo demanda, detener y recuperación de errores.');

@@ -17,6 +17,7 @@ export function createPrintModule(app) {
     'OBSERVACIÓN', 'OBSERVACION',
     'TRAUMA MENOR',
     'PEDIATRÍA', 'PEDIATRIA',
+    'PEDILUVIO', "EFE'S",
     'EXTRAS',
     'SIN ÁREA ASIGNADA'
   ];

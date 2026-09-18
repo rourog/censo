@@ -83,7 +83,7 @@ export function createPatientModule(app) {
     }
 
     if (data.cama) data.cama = limpiarNombreCama(data.cama);
-    return data;
+    return app.bed.normalizarUbicacion ? app.bed.normalizarUbicacion(data) : data;
   }
 
   function setReloadState({ loading = false, error = null } = {}) {
@@ -147,7 +147,9 @@ export function createPatientModule(app) {
           });
 
           state.pacientesGlobal = nextPatients;
-          state.camasLibresGlobal = app.bed.calcularCamasLibres(masterCamas, nextPatients);
+          state.camasLibresGlobal = app.isBedCatalogReady?.() === false
+            ? [] : app.bed.calcularCamasLibres(masterCamas, nextPatients);
+          app.refreshBedAdmin?.();
 
           state.isFetchingData = false;
           setReloadState();
