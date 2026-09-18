@@ -75,7 +75,8 @@ const patientApp = {
   },
   bed: {
     masterCamas: [{ area: 'OBSERVACION', cama: '01' }],
-    limpiarNombreCama: (value) => String(value).padStart(2, '0')
+    limpiarNombreCama: (value) => String(value).padStart(2, '0'),
+    calcularCamasLibres: (beds, patients) => beds.filter(bed => !patients.some(patient => patient.cama === bed.cama))
   },
   utils: {
     escapeHtml: (value) => String(value)
@@ -155,8 +156,9 @@ const modalApp = {
     destinosGlobal: [],
     agruparPorArea: () => ({}),
     parseDestinoClinico: () => null,
-    getDestinoMaterialIcon: () => '',
-    getDestinoActionLabel: () => ''
+    getDestinoActionIconPath: () => '',
+    getDestinoIconPath: () => '',
+    getDestinoTextLabel: value => String(value || '')
   },
   utils: {
     escapeHtml: (value) => String(value),

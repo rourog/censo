@@ -27,7 +27,7 @@ assert(js.includes('cie10DataPart${index}.js'), 'La página no carga los fragmen
 assert(js.includes('parsed.length!==3700'), 'Falta validación exacta de 3,700 códigos');
 assert(js.includes("slice(0,100)"), 'La búsqueda debe limitar el render de resultados');
 assert(css.includes('[hidden]{display:none!important}'), 'Falta respeto explícito del atributo hidden');
-assert(version.displayVersion === '2.57', 'La preview debe ser v2.57');
-assert(version.build === '20260914-cie10-standalone', 'Build standalone incorrecto');
+assert(/^\d+\.\d+$/u.test(version.displayVersion), 'La versión visible debe conservar el formato N.N');
+assert(typeof version.build === 'string' && version.build.length > 0, 'Falta el build central');
 
-console.log('CIE-10 standalone smoke OK · Censo desacoplado · v2.57');
+console.log(`CIE-10 standalone smoke OK · Censo desacoplado · v${version.displayVersion}`);

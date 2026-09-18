@@ -12,7 +12,7 @@
   - Restaurar encima de datos nuevos escritos después de la limpieza.
 */
 
-console.info('[CENSO] maintenanceModule.js cargado. BUILD: bulk-reset-v1-20260722');
+console.info('[CENSO] maintenanceModule.js cargado. BUILD:', globalThis.window?.CensoBuild?.version || 'runtime');
 
 export const BULK_SNAPSHOT_KEY = 'censo:bulk-clear-snapshot:v1';
 export const BULK_CLEAR_TEXT_FIELDS = [

@@ -3,14 +3,22 @@
 
   RESPONSABILIDAD:
   - Generar una vista de impresión independiente del censo.
-  - Imprimir únicamente: cama, ingreso, paciente, edad, diagnóstico y pendientes.
+  - Imprimir: cama, ingreso, paciente, edad, diagnóstico, pendientes y destino.
+  - Esperar la carga de los SVG antes de abrir el diálogo de impresión.
   - No hablar con Firebase.
 */
 
 export function createPrintModule(app) {
   const { state } = app;
   const { escapeHtml } = app.utils;
-  const { agruparPorArea } = app.bed;
+  const {
+    agruparPorArea,
+    areaVisuals,
+    healthIcons,
+    getDestinoActionIconPath,
+    getDestinoIconPath,
+    getDestinoTextLabel
+  } = app.bed;
 
   const ORDEN_AREAS = [
     'SALA DE CHOQUE',
@@ -56,13 +64,45 @@ export function createPrintModule(app) {
     return texto || '-';
   }
 
+  function normalizarClave(value) {
+    return String(value || '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toUpperCase()
+      .trim();
+  }
+
+  function iconUrl(path) {
+    if (!path) return '';
+    try {
+      return new URL(path, window.location.href).href;
+    } catch {
+      return '';
+    }
+  }
+
+  function iconImg(path, className = '') {
+    const src = iconUrl(path);
+    return src ? `<img class="print-icon ${className}" src="${escapeHtml(src)}" alt="">` : '';
+  }
+
+  function renderDestino(destino) {
+    if (!destino) return '-';
+    const label = getDestinoTextLabel(destino);
+    const action = iconImg(getDestinoActionIconPath(destino), 'print-icon--action');
+    const specialty = iconImg(getDestinoIconPath(destino));
+    return `<span class="print-destination-icons">${action}${specialty}</span><span>${escapeHtml(label)}</span>`;
+  }
+
   function generarFilas(lista) {
     const grupos = agruparPorArea(lista);
     const areas = ordenarAreas(Object.keys(grupos));
     const filas = [];
 
     areas.forEach((area) => {
-      filas.push(`<tr class="area-row"><td colspan="6">${escapeHtml(area)}</td></tr>`);
+      const key = normalizarClave(area);
+      const visual = areaVisuals[key] || areaVisuals[String(area).toUpperCase()] || { icon: healthIcons.sinArea };
+      filas.push(`<tr class="area-row"><td colspan="7">${iconImg(visual.icon, 'print-area-icon')}${escapeHtml(area)}</td></tr>`);
 
       grupos[area].forEach((p) => {
         filas.push(`
@@ -73,6 +113,7 @@ export function createPrintModule(app) {
             <td class="edad">${escapeHtml(p.edad || '-')}</td>
             <td class="diagnostico">${escapeHtml(p.diagnostico || '-')}</td>
             <td class="pendientes">${escapeHtml(p.pendientes || '-')}</td>
+            <td class="destino">${renderDestino(p.destino)}</td>
           </tr>`);
       });
     });
@@ -105,12 +146,18 @@ export function createPrintModule(app) {
     th, td { border: 1px solid #777; padding: 4px 5px; vertical-align: top; overflow-wrap: anywhere; word-break: normal; white-space: normal; }
     th { background: #e7e7e7; font-size: 8pt; text-transform: uppercase; text-align: left; }
     .area-row td { background: #d6d6d6; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; padding: 3px 5px; }
-    .cama { width: 9%; text-align: center; font-weight: 700; }
-    .ingreso { width: 10%; text-align: center; font-size: 8pt; }
-    .paciente { width: 18%; font-weight: 700; }
-    .edad { width: 7%; text-align: center; }
-    .diagnostico { width: 28%; }
-    .pendientes { width: 28%; }
+    .print-icon { width: 4.2mm; height: 4.2mm; object-fit: contain; vertical-align: -1.1mm; margin-right: 1.2mm; }
+    .print-area-icon { width: 4.6mm; height: 4.6mm; vertical-align: -1.25mm; }
+    .print-destination-icons { display: inline-flex; align-items: center; gap: .5mm; margin-right: 1mm; }
+    .print-destination-icons .print-icon { margin-right: 0; }
+    .print-icon--action { width: 3.7mm; height: 3.7mm; }
+    .cama { width: 8%; text-align: center; font-weight: 700; }
+    .ingreso { width: 9%; text-align: center; font-size: 8pt; }
+    .paciente { width: 16%; font-weight: 700; }
+    .edad { width: 6%; text-align: center; }
+    .diagnostico { width: 24%; }
+    .pendientes { width: 24%; }
+    .destino { width: 13%; font-size: 7.5pt; font-weight: 600; }
     .empty { border: 1px solid #999; padding: 12mm; text-align: center; font-weight: 700; }
   </style>
 </head>
@@ -128,11 +175,27 @@ export function createPrintModule(app) {
       <th class="edad">Edad</th>
       <th class="diagnostico">Diagnóstico</th>
       <th class="pendientes">Pendientes</th>
+      <th class="destino">Destino</th>
     </tr></thead>
     <tbody>${generarFilas(lista)}</tbody>
   </table>` : '<div class="empty">NO HAY PACIENTES EN EL CENSO.</div>'}
 </body>
 </html>`;
+  }
+
+  function esperarImagenes(doc, timeoutMs = 3000) {
+    const images = [...doc.images];
+    if (!images.length) return Promise.resolve();
+
+    return Promise.all(images.map(image => {
+      if (image.complete) return Promise.resolve();
+      return new Promise(resolve => {
+        const finish = () => resolve();
+        image.addEventListener('load', finish, { once: true });
+        image.addEventListener('error', finish, { once: true });
+        setTimeout(finish, timeoutMs);
+      });
+    }));
   }
 
   function imprimirCenso() {
@@ -148,13 +211,14 @@ export function createPrintModule(app) {
     ventana.document.write(construirDocumentoImpresion(lista));
     ventana.document.close();
 
-    const lanzarImpresion = () => {
+    const lanzarImpresion = async () => {
+      await esperarImagenes(ventana.document);
       ventana.focus();
       ventana.print();
     };
 
-    if (ventana.document.readyState === 'complete') lanzarImpresion();
-    else ventana.addEventListener('load', lanzarImpresion, { once: true });
+    if (ventana.document.readyState === 'complete') void lanzarImpresion();
+    else ventana.addEventListener('load', () => void lanzarImpresion(), { once: true });
   }
 
   return {

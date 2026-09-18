@@ -73,7 +73,7 @@ const firebase = {
     }
   }
 };
-const module = createSoundboardModule({ firebase });
+const module = createSoundboardModule({ firebase, soundCatalog: catalog });
 module.initSoundboardAuthBridge();
 module.mountSoundAdmin(element());
 const field = name => nodes.get(`censoSound${name}`);
@@ -117,7 +117,7 @@ assert.equal(records.get('iharo').sounds.length, 1);
 assert.match(field('Message').textContent, /ya está agregado/);
 await remove(records.get('iharo').sounds[0].id);
 assert.deepEqual(records.get('iharo').sounds, []);
-const secondDevice = createSoundboardModule({ firebase });
+const secondDevice = createSoundboardModule({ firebase, soundCatalog: catalog });
 secondDevice.initSoundboardAuthBridge();
 assert.equal(secondDevice.getUserSounds('alfrojas').length, 7);
 assert.deepEqual(secondDevice.getUserSounds('iharo'), [], 'Una lista vacía guardada debe seguir vacía en otro equipo.');

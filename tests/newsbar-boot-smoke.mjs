@@ -116,7 +116,7 @@ assert.equal(nodes.get('censoNewsAdminModal').hidden, false);
 assert.equal(nodes.get('censoNewsAuthView').hidden, false, 'La administración debe pedir contraseña.');
 nodes.get('censoNewsAdminModal').hidden = true;
 settingsButton.dispatch('click', {});
-assert.equal(nodes.get('censoNewsAdminModal').hidden, false, 'El botón visible debe abrir la administración.');
+assert.equal(nodes.get('censoNewsAdminModal').hidden, true, 'El engrane queda reservado para Camas y sillas; Noticias/Sonidos usa Ctrl+Alt+N.');
 sessionStorage.setItem('censo-newsbar-admin-session-v1', '1');
 doc.dispatch('keydown', { ctrlKey: true, altKey: true, key: 'n', preventDefault() {} });
 nodes.get('censoAdminSoundsTab').dispatch('click', {});

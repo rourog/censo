@@ -5,7 +5,7 @@ const theme = fs.readFileSync(new URL('../modules/themeModule.js', import.meta.u
 const css = fs.readFileSync(new URL('../modules/themePaletteV2.css', import.meta.url), 'utf8');
 const version = JSON.parse(fs.readFileSync(new URL('../version.json', import.meta.url), 'utf8'));
 
-assert.match(theme, /20 fondos|Theme Engine v2|THEME ENGINE V2/i);
+assert.match(theme, /THEME ENGINE V3/i);
 assert.match(theme, /base-ocean/);
 assert.match(theme, /base-teal-dark/);
 assert.match(theme, /base-burgundy/);
@@ -31,7 +31,7 @@ assert.match(css, /--success:/);
 assert.match(css, /theme-picker-grid/);
 assert.match(css, /theme-preview/);
 
-assert.equal(version.build, '20260914-theme-v2');
-assert.equal(version.displayVersion, '2.49');
+assert.match(version.build, /health-icons-v2\.66/u);
+assert.equal(version.displayVersion, '2.66');
 
 console.log('Theme Engine v2 smoke test: OK');

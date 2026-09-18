@@ -13,12 +13,19 @@
   - Definir camas maestras.
 */
 
-console.info('[CENSO] modalModule.js cargado. BUILD: bulk-reset-v1-20260722');
+console.info('[CENSO] modalModule.js cargado. BUILD:', globalThis.window?.CensoBuild?.version || 'runtime');
 
 export function createModalModule(app) {
   const { state } = app;
   const { db, collection, addDoc, doc, updateDoc, getDocsFromServer, writeBatch, serverTimestamp } = app.firebase;
-  const { destinosGlobal, masterCamas, agruparPorArea, getDestinoTextLabel } = app.bed;
+  const {
+    destinosGlobal,
+    masterCamas,
+    agruparPorArea,
+    getDestinoActionIconPath,
+    getDestinoIconPath,
+    getDestinoTextLabel
+  } = app.bed;
   const { escapeHtml, normalizar, vibrar } = app.utils;
   const movimientosCamaPendientes = new Set();
 
@@ -46,7 +53,12 @@ export function createModalModule(app) {
   function renderDestinoLabelHtml(destino) {
     if (!destino) return '(SIN DESTINO)';
     const textLabel = getDestinoTextLabel(destino);
-    return `<span class="destino-option-label" title="${escapeHtml(textLabel)}">${escapeHtml(textLabel)}</span>`;
+    const actionIcon = getDestinoActionIconPath(destino);
+    const specialtyIcon = getDestinoIconPath(destino);
+    const icon = path => path
+      ? `<span class="health-icon destino-option-icon" style="--health-icon:url('${escapeHtml(path)}')" aria-hidden="true"></span>`
+      : '';
+    return `<span class="destino-option-label" title="${escapeHtml(textLabel)}"><span class="destino-option-icons">${icon(actionIcon)}${icon(specialtyIcon)}</span><span class="destino-option-text">${escapeHtml(textLabel)}</span></span>`;
   }
 
   function renderDestinoOptionHtml(destino, selectedClass = '') {
@@ -88,8 +100,23 @@ export function createModalModule(app) {
       .custom-select-display .destino-option-label,
       .custom-select-option .destino-option-label,
       .inline-destino-option .destino-option-label {
-        display: block;
+        display: flex;
+        align-items: center;
+        gap: 8px;
         max-width: 100%;
+        min-width: 0;
+      }
+
+      .destino-option-icons {
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        flex: 0 0 auto;
+        color: var(--accent);
+      }
+
+      .destino-option-icon { width: 1.1rem; height: 1.1rem; }
+      .destino-option-text {
         min-width: 0;
         overflow: hidden;
         text-overflow: ellipsis;

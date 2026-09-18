@@ -14,7 +14,7 @@
   - Guardar pacientes directamente.
 */
 
-console.info('[CENSO] interactionModule.js cargado. BUILD: cie10-standalone-v1');
+console.info('[CENSO] interactionModule.js cargado. BUILD:', globalThis.window?.CensoBuild?.version || 'runtime');
 
 export const MOBILE_SWIPE_THRESHOLD = 110;
 
