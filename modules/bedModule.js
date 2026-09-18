@@ -15,6 +15,39 @@
 
 const ICONO_INGRESO = "INGRESO";
 const ICONO_VALORACION = "VALORACIÓN";
+const HEALTH_ICON_ROOT = './assets/icons/healthicons/';
+
+// SVG locales de Health Icons. Los emojis se conservan únicamente para leer
+// registros históricos de Firestore; la interfaz nunca depende de ellos.
+export const healthIcons = Object.freeze({
+  observacion: `${HEALTH_ICON_ROOT}observation.svg`,
+  altaDomicilio: `${HEALTH_ICON_ROOT}home.svg`,
+  altaVoluntaria: `${HEALTH_ICON_ROOT}discharge.svg`,
+  defuncion: `${HEALTH_ICON_ROOT}death.svg`,
+  medicinaInterna: `${HEALTH_ICON_ROOT}internal-medicine.svg`,
+  cirugiaGeneral: `${HEALTH_ICON_ROOT}general-surgery.svg`,
+  cirugiaPlastica: `${HEALTH_ICON_ROOT}plastic-surgery.svg`,
+  ginecologia: `${HEALTH_ICON_ROOT}gynecology.svg`,
+  cardiologia: `${HEALTH_ICON_ROOT}cardiology.svg`,
+  pediatria: `${HEALTH_ICON_ROOT}pediatrics.svg`,
+  traumatologia: `${HEALTH_ICON_ROOT}orthopaedics.svg`,
+  psiquiatria: `${HEALTH_ICON_ROOT}psychiatry.svg`,
+  psicologia: `${HEALTH_ICON_ROOT}psychology.svg`,
+  tococirugia: `${HEALTH_ICON_ROOT}obstetrics.svg`,
+  urologia: `${HEALTH_ICON_ROOT}urology.svg`,
+  oftalmologia: `${HEALTH_ICON_ROOT}ophthalmology.svg`,
+  gastroenterologia: `${HEALTH_ICON_ROOT}gastroenterology.svg`,
+  terapiaIntensiva: `${HEALTH_ICON_ROOT}intensive-care.svg`,
+  ingreso: `${HEALTH_ICON_ROOT}admission.svg`,
+  valoracion: `${HEALTH_ICON_ROOT}assessment.svg`,
+  salaChoque: `${HEALTH_ICON_ROOT}shock-room.svg`,
+  traumaMenor: `${HEALTH_ICON_ROOT}minor-trauma.svg`,
+  areaPediatria: `${HEALTH_ICON_ROOT}pediatric-area.svg`,
+  pediluvio: `${HEALTH_ICON_ROOT}pediluvio.svg`,
+  efe: `${HEALTH_ICON_ROOT}efe.svg`,
+  extras: `${HEALTH_ICON_ROOT}extras.svg`,
+  sinArea: `${HEALTH_ICON_ROOT}unassigned.svg`
+});
 
 export const destinoIconos = {
   observacion: "👀",
@@ -63,6 +96,27 @@ function getIconoEspecialidad(especialidad) {
   if (key.includes('OFTALMOLOGIA')) return destinoIconos.oftalmologia;
   if (key.includes('GASTROENTEROLOGIA')) return destinoIconos.gastroenterologia;
   if (key.includes('TERAPIA INTENSIVA')) return destinoIconos.terapiaIntensiva;
+
+  return '';
+}
+
+function getHealthIconEspecialidad(especialidad) {
+  const key = normalizarEspecialidad(especialidad);
+
+  if (key.includes('MEDICINA INTERNA')) return healthIcons.medicinaInterna;
+  if (key.includes('CIRUGIA PLASTICA')) return healthIcons.cirugiaPlastica;
+  if (key.includes('CIRUGIA GENERAL')) return healthIcons.cirugiaGeneral;
+  if (key.includes('GINECOLOGIA')) return healthIcons.ginecologia;
+  if (key.includes('CARDIOLOGIA')) return healthIcons.cardiologia;
+  if (key.includes('PEDIATRIA')) return healthIcons.pediatria;
+  if (key.includes('TRAUMATOLOGIA') || key.includes('ORTOPEDIA')) return healthIcons.traumatologia;
+  if (key.includes('PSIQUIATRIA')) return healthIcons.psiquiatria;
+  if (key.includes('PSICOLOGIA')) return healthIcons.psicologia;
+  if (key.includes('TOCOCIRUGIA') || key.includes('OBSTETRICIA')) return healthIcons.tococirugia;
+  if (key.includes('UROLOGIA')) return healthIcons.urologia;
+  if (key.includes('OFTALMOLOGIA')) return healthIcons.oftalmologia;
+  if (key.includes('GASTROENTEROLOGIA')) return healthIcons.gastroenterologia;
+  if (key.includes('TERAPIA INTENSIVA') || key.includes('CUIDADOS INTENSIVOS')) return healthIcons.terapiaIntensiva;
 
   return '';
 }
@@ -174,16 +228,16 @@ export function esUbicacionRetirada(bed) {
 }
 
 export const areaVisuals = {
-  'SALA DE CHOQUE': { emoji: '❤️', class: 'icon-heartbeat' },
-  'OBSERVACION': { emoji: '👀', class: 'icon-look' },
-  'OBSERVACIÓN': { emoji: '👀', class: 'icon-look' },
-  'TRAUMA MENOR': { emoji: '🦴', class: 'icon-spin' },
-  'PEDIATRIA': { emoji: '🧸', class: 'icon-wiggle' },
-  'PEDIATRÍA': { emoji: '🧸', class: 'icon-wiggle' },
-  'PEDILUVIO': { emoji: '💧', class: '' },
-  "EFE'S": { emoji: '🏥', class: '' },
-  'EXTRAS': { emoji: '✨', class: 'icon-twinkle' }, // Sin basal; admite temporales.
-  'SIN ÁREA ASIGNADA': { emoji: '🏥', class: '' }
+  'SALA DE CHOQUE': { icon: healthIcons.salaChoque, emoji: '❤️', class: 'icon-heartbeat' },
+  'OBSERVACION': { icon: healthIcons.observacion, emoji: '👀', class: 'icon-look' },
+  'OBSERVACIÓN': { icon: healthIcons.observacion, emoji: '👀', class: 'icon-look' },
+  'TRAUMA MENOR': { icon: healthIcons.traumaMenor, emoji: '🦴', class: 'icon-spin' },
+  'PEDIATRIA': { icon: healthIcons.areaPediatria, emoji: '🧸', class: 'icon-wiggle' },
+  'PEDIATRÍA': { icon: healthIcons.areaPediatria, emoji: '🧸', class: 'icon-wiggle' },
+  'PEDILUVIO': { icon: healthIcons.pediluvio, emoji: '💧', class: '' },
+  "EFE'S": { icon: healthIcons.efe, emoji: '🏥', class: '' },
+  'EXTRAS': { icon: healthIcons.extras, emoji: '✨', class: 'icon-twinkle' }, // Sin basal; admite temporales.
+  'SIN ÁREA ASIGNADA': { icon: healthIcons.sinArea, emoji: '🏥', class: '' }
 };
 
 export const chipPalette = [
@@ -220,8 +274,9 @@ export function parseDestinoClinico(texto) {
   const emojiOriginal = partes[1] || '';
   const especialidad = partes.slice(2).join(' ').trim();
   const emojiActual = getIconoEspecialidad(especialidad) || emojiOriginal;
+  const icon = getHealthIconEspecialidad(especialidad) || healthIcons.sinArea;
 
-  return { tipo, emoji: emojiActual, especialidad, raw, emojiOriginal };
+  return { tipo, emoji: emojiActual, icon, especialidad, raw, emojiOriginal };
 }
 
 export function getDestinoMaterialIcon(texto) {
@@ -234,6 +289,30 @@ export function getDestinoActionLabel(texto) {
   const parsed = parseDestinoClinico(texto);
   if (!parsed) return '';
   return parsed.tipo === 'ingreso' ? 'Ingreso' : 'Valoración';
+}
+
+export function getDestinoActionIconPath(texto) {
+  const parsed = parseDestinoClinico(texto);
+  if (parsed) return parsed.tipo === 'ingreso' ? healthIcons.ingreso : healthIcons.valoracion;
+
+  const key = normalizarEspecialidad(texto);
+  if (key.includes('INGRESO')) return healthIcons.ingreso;
+  if (key.includes('VALORACION') || key.includes('INTERCONSULTA')) return healthIcons.valoracion;
+  return '';
+}
+
+export function getDestinoIconPath(texto) {
+  if (!texto) return '';
+  const parsed = parseDestinoClinico(texto);
+  if (parsed) return parsed.icon;
+
+  const key = normalizarEspecialidad(texto);
+  if (key.includes('OBSERVACION')) return healthIcons.observacion;
+  if (key.includes('ALTA A DOMICILIO')) return healthIcons.altaDomicilio;
+  if (key.includes('ALTA VOLUNTARIA')) return healthIcons.altaVoluntaria;
+  if (key.includes('DEFUNCION')) return healthIcons.defuncion;
+
+  return getHealthIconEspecialidad(key) || healthIcons.sinArea;
 }
 
 export function getDestinoTextLabel(texto) {

@@ -82,14 +82,13 @@ for (const htmlFile of files.filter((file) => extname(file) === '.html')) {
 
 const mainSource = readFileSync(resolve(root, 'main.js'), 'utf8');
 const appSource = readFileSync(resolve(root, 'modules/appModule.js'), 'utf8');
-const mainBuild = mainSource.match(/const BUILD = ['"]([^'"]+)['"]/u)?.[1];
-const appBuild = appSource.match(/const BUILD = ['"]([^'"]+)['"]/u)?.[1];
+const version = JSON.parse(readFileSync(resolve(root, 'version.json'), 'utf8'));
 
-if (!mainBuild || !appBuild) {
-  errors.push('main.js y appModule.js deben declarar su identificador BUILD.');
-} else if (mainBuild !== appBuild) {
-  errors.push(`BUILD desalineado: main.js=${mainBuild}, appModule.js=${appBuild}`);
-}
+if (!version.build || !version.displayVersion) errors.push('version.json debe declarar build y displayVersion.');
+if (!/window\.CensoBuild\?\.version/u.test(mainSource)) errors.push('main.js debe usar el BUILD inyectado por index.html.');
+if (!/window\.CensoBuild\?\.version/u.test(appSource)) errors.push('appModule.js debe propagar el BUILD actual.');
+if (!/searchParams\.set\('v', BUILD\)/u.test(mainSource)) errors.push('main.js debe versionar los estilos locales.');
+if (!/searchParams\.set\('v', BUILD\)/u.test(appSource)) errors.push('appModule.js debe versionar los módulos locales.');
 
 if (errors.length > 0) {
   console.error(`\nFallaron ${errors.length} verificaciones:\n`);

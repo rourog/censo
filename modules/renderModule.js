@@ -12,12 +12,25 @@
   - Calcular reglas de camas fuera de lo necesario para mostrar.
 */
 
-console.info('[CENSO] renderModule.js cargado. BUILD: camas-sonidos-v2-20260902');
+console.info('[CENSO] renderModule.js cargado. BUILD:', globalThis.window?.CensoBuild?.version || 'runtime');
 
 export function createRenderModule(app) {
   const { state } = app;
-  const { areaVisuals, getEmojiOnly, agruparPorArea, parseDestinoClinico, getDestinoMaterialIcon, getDestinoTextLabel } = app.bed;
+  const {
+    areaVisuals,
+    healthIcons,
+    agruparPorArea,
+    parseDestinoClinico,
+    getDestinoActionIconPath,
+    getDestinoIconPath,
+    getDestinoTextLabel
+  } = app.bed;
   const { escapeHtml } = app.utils;
+
+  function healthIconHtml(path, className = '') {
+    if (!path) return '';
+    return `<span class="health-icon ${className}" style="--health-icon:url('${escapeHtml(path)}')" aria-hidden="true"></span>`;
+  }
 
   function renderDestinoHtml(destino, mode = 'chip') {
     if (!destino) return '';
@@ -26,23 +39,18 @@ export function createRenderModule(app) {
     const textLabel = getDestinoTextLabel(destino);
 
     if (parsed) {
-      const icon = getDestinoMaterialIcon(destino);
       const especialidad = parsed.especialidad || '';
       return `<div class="${modeClass}" title="${escapeHtml(textLabel)}" aria-label="${escapeHtml(textLabel)}">
-        <span class="material-symbols-outlined destino-action-icon" aria-hidden="true">${escapeHtml(icon)}</span>
-        <span class="destino-specialty-emoji" aria-hidden="true">${escapeHtml(parsed.emoji)}</span>
+        ${healthIconHtml(getDestinoActionIconPath(destino), 'destino-action-icon')}
+        ${healthIconHtml(getDestinoIconPath(destino), 'destino-specialty-icon')}
         ${mode === 'compact' ? '' : `<span class="destino-specialty-text">${escapeHtml(especialidad)}</span>`}
       </div>`;
     }
 
-    if (mode === 'compact') {
-      const icono = getEmojiOnly(destino);
-      return `<div class="${modeClass}" title="${escapeHtml(textLabel)}" aria-label="${escapeHtml(textLabel)}">
-        <span class="destino-specialty-emoji" aria-hidden="true">${escapeHtml(icono)}</span>
-      </div>`;
-    }
-
-    return `<div class="${modeClass}" title="${escapeHtml(textLabel)}">${escapeHtml(destino)}</div>`;
+    return `<div class="${modeClass}" title="${escapeHtml(textLabel)}" aria-label="${escapeHtml(textLabel)}">
+      ${healthIconHtml(getDestinoIconPath(destino), 'destino-specialty-icon')}
+      ${mode === 'compact' ? '' : `<span class="destino-specialty-text">${escapeHtml(textLabel)}</span>`}
+    </div>`;
   }
 
   function getColorfulChipHtml(destino) {
@@ -52,6 +60,11 @@ export function createRenderModule(app) {
   function crearCampo(label, value, extraClass = '') {
     if (!value || !String(value).trim()) return '';
     return `<div class="field field-fade-in ${extraClass}"><span class="label">${label}</span><div class="value">${escapeHtml(value)}</div></div>`;
+  }
+
+  function crearDestinoCampo(destino) {
+    if (!destino || !String(destino).trim()) return '';
+    return `<div class="field field-fade-in"><span class="label">DESTINO</span><div class="value">${renderDestinoHtml(destino, 'detail')}</div></div>`;
   }
 
   function getObservacion(p) {
@@ -168,14 +181,15 @@ export function createRenderModule(app) {
       }
 
       .destino-chip .destino-action-icon {
-        font-size: 1rem !important;
-        line-height: 1 !important;
+        width: 1rem !important;
+        height: 1rem !important;
         color: var(--accent) !important;
-        font-variation-settings: 'FILL' 0, 'wght' 650, 'GRAD' 0, 'opsz' 24;
         flex-shrink: 0;
       }
 
-      .destino-chip .destino-specialty-emoji {
+      .destino-chip .destino-specialty-icon {
+        width: 1.1rem !important;
+        height: 1.1rem !important;
         flex-shrink: 0;
       }
 
@@ -193,7 +207,8 @@ export function createRenderModule(app) {
       }
 
       .destino-chip-compact .destino-action-icon {
-        font-size: 0.96rem !important;
+        width: 0.96rem !important;
+        height: 0.96rem !important;
       }
 
       .quick-bed-trigger {
@@ -725,9 +740,9 @@ export function createRenderModule(app) {
 
       areas.forEach((area) => {
         const areaNormalizada = String(area).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().trim();
-        const visual = areaVisuals[areaNormalizada] || areaVisuals[area.toUpperCase()] || { emoji: '🏥', class: '' };
+        const visual = areaVisuals[areaNormalizada] || areaVisuals[area.toUpperCase()] || { icon: healthIcons.sinArea, class: '' };
 
-        htmlArr.push(`<tr style="background: rgba(128, 128, 128, 0.15);"><td colspan="8" style="padding: 6px 10px; font-weight: 800; font-size: 0.85rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--line);"><span class="area-icon ${visual.class}">${visual.emoji}</span> ${escapeHtml(area)}</td></tr>`);
+        htmlArr.push(`<tr style="background: rgba(128, 128, 128, 0.15);"><td colspan="8" style="padding: 6px 10px; font-weight: 800; font-size: 0.85rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--line);">${healthIconHtml(visual.icon, `area-icon ${visual.class}`)} ${escapeHtml(area)}</td></tr>`);
 
         grupos[area].forEach((p) => {
           const destinoChip = getColorfulChipHtml(p.destino);
@@ -778,13 +793,13 @@ export function createRenderModule(app) {
       const pacientes = grupos[area];
       const delayBase = indexArea * 150;
       const areaNormalizada = String(area).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().trim();
-      const visual = areaVisuals[areaNormalizada] || areaVisuals[area.toUpperCase()] || { emoji: '🏥', class: '' };
+      const visual = areaVisuals[areaNormalizada] || areaVisuals[area.toUpperCase()] || { icon: healthIcons.sinArea, class: '' };
 
       return `
         <section class="section animate-in" style="animation-delay: ${delayBase}ms;">
           <div class="section-header">
             <div class="section-title">
-              <span class="area-icon ${visual.class}">${visual.emoji}</span> ${escapeHtml(area)}
+              ${healthIconHtml(visual.icon, `area-icon ${visual.class}`)} ${escapeHtml(area)}
             </div>
           </div>
           <div class="patient-list">
@@ -802,7 +817,7 @@ export function createRenderModule(app) {
                 crearCampo('DIAGNÓSTICO', p.diagnostico),
                 crearCampo('PENDIENTES', p.pendientes),
                 crearCampo('OBSERVACIÓN', observacion, 'patient-observation-field'),
-                crearCampo('DESTINO', p.destino)
+                crearDestinoCampo(p.destino)
               ].filter(Boolean).join('');
 
               const delayPatient = delayBase + (indexPatient * 50);

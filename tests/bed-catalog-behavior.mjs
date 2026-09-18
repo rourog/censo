@@ -2,10 +2,15 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
 const read = file => readFileSync(new URL(`../${file}`, import.meta.url), 'utf8');
-const moduleUrl = file => `data:text/javascript;base64,${Buffer.from(read(file)).toString('base64')}`;
+const sourceUrl = source => `data:text/javascript;base64,${Buffer.from(source).toString('base64')}`;
+const moduleUrl = file => sourceUrl(read(file));
 const bed = await import(moduleUrl('modules/bedModule.js'));
 const legacy = await import(moduleUrl('modules/constants.js'));
-const { createBedCatalogModel, createBedAdminModule } = await import(moduleUrl('modules/bedAdminModule.js'));
+const bedAdminSource = read('modules/bedAdminModule.js').replaceAll(
+  'import.meta.url',
+  JSON.stringify(new URL('../modules/bedAdminModule.js', import.meta.url).href)
+);
+const { createBedCatalogModel, createBedAdminModule } = await import(sourceUrl(bedAdminSource));
 const model = createBedCatalogModel(bed);
 const key = bed.claveCama;
 const location = (area, cama) => ({ area, cama });
@@ -54,18 +59,25 @@ function element() {
   let html = '';
   const listeners = new Map();
   return {
-    isConnected: true, hidden: false, value: '', disabled: false, dataset: {}, style: {}, textContent: '',
+    isConnected: true, hidden: false, value: '', disabled: false, dataset: {}, style: {}, textContent: '', id: '',
     set innerHTML(value) { html = value; for (const match of value.matchAll(/id="([^"]+)"/g)) if (!nodes.has(match[1])) nodes.set(match[1], element()); },
     get innerHTML() { return html; },
     setAttribute() {}, focus() {},
     insertBefore(child) { nodes.set(child.id, child); },
+    appendChild(child) { child.isConnected = true; if (child.id) nodes.set(child.id, child); },
     addEventListener(type, fn) { if (!listeners.has(type)) listeners.set(type, []); listeners.get(type).push(fn); },
     async fire(type, event = {}) { for (const fn of listeners.get(type) || []) await fn({ preventDefault() {}, ...event }); }
   };
 }
-for (const id of ['censoAdminNoticesTab', 'censoAdminSoundsTab', 'censoAdminNoticesPanel', 'censoAdminSoundsPanel', 'censoNewsManagerView', 'censoNewsAdminLock']) nodes.set(id, element());
-const tabs = element();
-globalThis.document = { getElementById: id => nodes.get(id) || null, createElement: element, querySelector: selector => selector === '.censo-admin-tabs' ? tabs : null };
+const settingsButton = element(); settingsButton.id = 'adminSettingsBtn'; nodes.set(settingsButton.id, settingsButton);
+globalThis.document = {
+  body: element(), head: element(),
+  getElementById: id => nodes.get(id) || null,
+  createElement: element,
+  querySelector: () => null,
+  addEventListener() {}
+};
+globalThis.window = { CensoBuild: { version: 'test' }, setTimeout: fn => fn() };
 globalThis.MutationObserver = class { observe() {} disconnect() {} };
 globalThis.confirm = () => true;
 const storage = new Map([['censo-newsbar-admin-session-v1', '1']]);
@@ -123,8 +135,8 @@ assert.ok(model.isSharedDocument(data));
 assert.ok(!field('Description'));
 assert.equal(appBed.masterCamas, sharedReference);
 assert.equal(admin.getBedCatalog().length, 28);
-assert.match(field('Count').textContent, /22 basales · 6 temporales/);
-assert.match(field('List').innerHTML, /fuera del catálogo activo/);
+assert.match(field('Count').textContent, /28 ubicaciones · 6 temporales/);
+assert.match(field('Message').textContent, /fuera del catálogo/);
 assert.doesNotMatch(field('List').innerHTML, /data-bed-remove="OBSERVACION\|CAMA 1"/);
 assert.match(field('List').innerHTML, /data-bed-remove="OBSERVACION\|CAMA 6"/);
 
@@ -147,10 +159,10 @@ assert.equal(writes, ++expectedWrites);
 assert.ok(data.beds.some(b => b.area === 'EXTRAS' && b.cama === 'CAMA 11'));
 await remove(obs('CAMA 1'));
 assert.equal(writes, expectedWrites);
-assert.match(field('Message').textContent, /basal está protegido/);
+assert.doesNotMatch(field('List').innerHTML, /data-bed-remove="OBSERVACION\|CAMA 1"/u);
 await remove(obs('CAMA 10'));
 assert.equal(writes, expectedWrites);
-assert.match(field('Message').textContent, /paciente asignado/);
+assert.doesNotMatch(field('List').innerHTML, /data-bed-remove="OBSERVACION\|CAMA 10"/u);
 remotePatients = [obs('CAMA 11')];
 await remove(obs('CAMA 11'));
 assert.equal(writes, expectedWrites);
@@ -171,12 +183,12 @@ await add('SILLA', '7');
 assert.ok(data.temporaryBeds.some(b => b.cama === 'SILLA 8'));
 assert.ok(data.temporaryBeds.some(b => b.cama === 'SILLA 7'));
 const beforeLock = writes;
-onGet = () => admin.setBedAdminUnlocked(false);
+onGet = () => { auth.currentUser = null; };
 await add('SILLA', '9');
 assert.equal(writes, beforeLock);
-assert.match(field('Message').textContent, /bloqueó/);
+assert.match(field('Message').textContent, /sesión cambió/i);
 onGet = null;
-admin.setBedAdminUnlocked(true);
+auth.currentUser = { uid: 'test' };
 
 // Todos los pacientes permanecen intactos; las retiradas ocupadas siguen visibles.
 assert.deepEqual(state.pacientesGlobal, beforePatients);

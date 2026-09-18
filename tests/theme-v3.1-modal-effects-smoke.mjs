@@ -30,6 +30,6 @@ if (!css.includes('body.effect-pulse')) throw new Error('Falta efecto Pulso');
 if (!css.includes('body.effect-scan')) throw new Error('Falta efecto Escáner');
 if (!css.includes('body.effect-nebula')) throw new Error('Falta efecto Nebulosa');
 if (!css.includes('prefers-reduced-motion')) throw new Error('Los efectos no respetan reducir movimiento');
-if (version.displayVersion !== '2.51') throw new Error('La preview debe indicar versión 2.51');
+if (version.displayVersion !== '2.66') throw new Error('La versión publicada debe indicar 2.66');
 
 console.log('theme v3.1 modal/effects smoke: OK');

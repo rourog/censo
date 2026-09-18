@@ -237,7 +237,22 @@
     .section-title { font-size: 0.9rem; font-weight: 700; line-height: 1.12; color: var(--accent); text-transform: uppercase; letter-spacing: 0.08em; display: flex; align-items: center; gap: 6px; }
     
     /* ANIMACIONES EMOJIS (Clínicos) */
-    .area-icon { display: inline-block; font-size: 1.2rem; will-change: transform; transition: transform 0.2s ease; }
+    .health-icon {
+      display: inline-block;
+      width: 1em;
+      height: 1em;
+      background-color: currentColor;
+      -webkit-mask-image: var(--health-icon);
+      mask-image: var(--health-icon);
+      -webkit-mask-position: center;
+      mask-position: center;
+      -webkit-mask-repeat: no-repeat;
+      mask-repeat: no-repeat;
+      -webkit-mask-size: contain;
+      mask-size: contain;
+      vertical-align: -0.14em;
+    }
+    .area-icon { width: 1.2rem; height: 1.2rem; will-change: transform; transition: transform 0.2s ease; }
     @keyframes heartbeat { 0%, 100% { transform: scale(1); } 15% { transform: scale(1.25); } 30% { transform: scale(1); } 45% { transform: scale(1.15); } 60% { transform: scale(1); } }
     @keyframes lookAround { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-3px); } 75% { transform: translateX(3px); } }
     @keyframes spinSlow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
