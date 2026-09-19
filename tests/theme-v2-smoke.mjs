@@ -31,7 +31,7 @@ assert.match(css, /--success:/);
 assert.match(css, /theme-picker-grid/);
 assert.match(css, /theme-preview/);
 
-assert.match(version.build, /health-icons-v2\.66/u);
-assert.equal(version.displayVersion, '2.66');
+assert.match(version.displayVersion, /^\d+\.\d+$/u);
+assert.ok(version.build.endsWith(`v${version.displayVersion}`), 'El build debe corresponder con displayVersion.');
 
 console.log('Theme Engine v2 smoke test: OK');
