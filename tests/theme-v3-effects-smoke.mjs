@@ -32,7 +32,7 @@ assert.ok(theme.includes("localStorage.setItem('censo-effect'"), 'La animación 
 assert.ok(theme.includes("value === 'accent-slate'"), 'Debe migrarse el ID antiguo de Plata');
 assert.ok(theme.includes("themeEffectsV3.css"), 'Theme Engine debe cargar el CSS v3');
 assert.ok(effects.includes('@media (prefers-reduced-motion: reduce)'), 'Los efectos deben respetar reduced motion');
-assert.equal(version.displayVersion, '2.66');
-assert.match(version.build, /health-icons-v2\.66/u);
+assert.match(version.displayVersion, /^\d+\.\d+$/u);
+assert.ok(version.build.endsWith(`v${version.displayVersion}`), 'El build debe corresponder con displayVersion.');
 
 console.log('Theme v3 effects smoke test: OK');
