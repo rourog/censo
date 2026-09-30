@@ -8,11 +8,36 @@
   - Calcular camas libres usando bedModule.
 */
 
+
+export function createConfirmedRemovalTracker() {
+  let confirmedIds = null;
+  return {
+    reset() { confirmedIds = null; },
+    observe(snapshot) {
+      const metadata = snapshot.metadata || {};
+      if (metadata.fromCache) {
+        // A reconnect establishes a fresh baseline; do not replay old removals.
+        if (!metadata.hasPendingWrites) confirmedIds = null;
+        return [];
+      }
+      if (metadata.hasPendingWrites) return [];
+      const nextIds = new Set();
+      snapshot.forEach(item => nextIds.add(item.id));
+      if (confirmedIds === null) { confirmedIds = nextIds; return []; }
+      const removed = [...confirmedIds].filter(id => !nextIds.has(id));
+      confirmedIds = nextIds;
+      return removed;
+    }
+  };
+}
+
 export function createPatientModule(app) {
   const { state } = app;
   const { db, collection, onSnapshot } = app.firebase;
   const { masterCamas, limpiarNombreCama } = app.bed;
   const { escapeHtml } = app.utils;
+
+  const removalTracker = createConfirmedRemovalTracker();
 
   const PATIENT_TEXT_FIELDS = [
     'nombre',
@@ -110,6 +135,7 @@ export function createPatientModule(app) {
   }
 
   function initFirebaseListener() {
+    removalTracker.reset();
     if (state.unsubscribe) {
       state.unsubscribe();
       state.unsubscribe = null;
@@ -119,8 +145,16 @@ export function createPatientModule(app) {
     setReloadState({ loading: true });
 
     try {
-      state.unsubscribe = onSnapshot(collection(db, 'pacientes'), (snapshot) => {
+      state.unsubscribe = onSnapshot(collection(db, 'pacientes'), { includeMetadataChanges: true }, (snapshot) => {
         try {
+          const removedIds = removalTracker.observe(snapshot);
+          if (removedIds.length > 0) {
+            // One visual burst per confirmed batch, including the deleting screen.
+            window.setTimeout(() => app.launchSeasonalConfetti?.({
+              particleCount: 150, spread: 80, origin: { y: 0.6 },
+              colors: ['#ef4444', '#10b981', '#3b82f6', '#fbbf24']
+            }), 0);
+          }
           const nextPatients = [];
 
           snapshot.forEach((docSnapshot) => {
