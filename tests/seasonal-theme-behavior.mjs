@@ -21,9 +21,9 @@ console.log('OK: seasonal dates, manual selection and confetti fallback.');
 // Exercise the actual ambient controller with a minimal DOM and deterministic RAF.
 const { createSeasonalAmbient } = await import('../modules/seasonalAmbient.js');
 const { SEASONAL_PROFILES } = await import('../modules/seasonalTheme.js');
-let nextFrame, appendedLayer;
+let nextFrame, appendedLayer, groundLayer;
 function makeElement() {
-  return { style: {}, children: [], appendChild(child) { this.children.push(child); },
+  return { style: {}, children: [], appendChild(child) { this.children.push(child); child.parentElement = this; },
     setAttribute(key, value) { this[key] = value; }, remove() { this.removed = true; } };
 }
 let floorTop = 700, newsVisible = true;
@@ -31,8 +31,11 @@ const newsBar = { getClientRects: () => newsVisible ? [1] : [], getBoundingClien
 const footer = { getClientRects: () => [1], getBoundingClientRect: () => ({ top: 760 }) };
 const events = {};
 const fab = { getClientRects: () => [1], getBoundingClientRect: () => ({ bottom: floorTop - 108 }) };
-const appElement = { getClientRects: () => [1], querySelector: () => footer, appendChild(layer) { appendedLayer = layer; } };
-globalThis.document = { body: { style: {setProperty(){},removeProperty(){}} }, hidden: false, createElement: makeElement, getElementById: id => id === 'censoNewsBar' ? newsBar : id === 'mainFabBtn' ? fab : appElement, addEventListener: (type, fn) => { events[type] = fn; }, removeEventListener: type => { delete events[type]; } };
+let tableMode = false, tableBottom = 280;
+const table = { getClientRects: () => [1], getBoundingClientRect: () => ({ bottom: tableBottom }) };
+const header = { getBoundingClientRect: () => ({ bottom: 80 }) };
+const appElement = { classList: {contains: () => tableMode}, getClientRects: () => [1], querySelector: selector => selector === '.header' ? header : footer, appendChild(layer) { if (layer.className === 'seasonal-bats') appendedLayer = layer; else groundLayer = layer; } };
+globalThis.document = { body: { style: {setProperty(){},removeProperty(){}} }, hidden: false, createElement: makeElement, getElementById: id => id === 'censoNewsBar' ? newsBar : id === 'mainFabBtn' ? fab : id === 'scrollTableWrapper' ? table : appElement, addEventListener: (type, fn) => { events[type] = fn; }, removeEventListener: type => { delete events[type]; } };
 globalThis.innerWidth = 1000; globalThis.innerHeight = 800;
 globalThis.matchMedia = () => ({ matches: false, addEventListener() {} });
 globalThis.requestAnimationFrame = fn => { nextFrame = fn; return 1; };
@@ -52,14 +55,15 @@ events.pointerdown({target: {closest: selector => selector === '#mainAppContaine
 assert.equal(bat.disabled, undefined, 'Clinical content must not trigger bat interactions');
 bat.onclick();
 for (let i = 1; i <= 5; i++) nextFrame(1000 + i * 50);
-assert.notEqual(sprite.style.backgroundPosition, '-64px -48px', 'The impact frame must not appear during descent');
+if (Number(bat.style.transform.match(/,([^p]+)px/)[1]) + parseFloat(bat.style.height) < floorTop - 4) assert.notEqual(sprite.style.backgroundPosition, '-64px -48px', 'The impact frame must not appear during descent');
 for (let i = 6; i <= 35; i++) nextFrame(1000 + i * 50);
 assert.equal(sprite.style.backgroundPosition, '-64px -48px', 'The impact frame appears on the ground');
 const height = parseFloat(bat.style.height);
 const landedY = Number(bat.style.transform.match(/,([^p]+)px/)[1]);
-assert.equal(landedY + height, floorTop, 'The visible news bar is the floor');
+assert.equal(landedY + height, floorTop - 4, 'The visible news bar is the floor');
+assert.equal(bat.parentElement, groundLayer, 'The landed bat must be above the patient content');
 newsVisible = false; nextFrame(2800);
-assert.equal(Number(bat.style.transform.match(/,([^p]+)px/)[1]) + height, 760, 'The footer becomes the floor when news is hidden');
+assert.equal(Number(bat.style.transform.match(/,([^p]+)px/)[1]) + height, 756, 'The footer becomes the floor when news is hidden');
 for (let i = 36; i <= 120; i++) nextFrame(1000 + i * 50);
 assert.equal(bat.removed, true, 'The fallen bat disappears');
 ambient.stop();
@@ -72,3 +76,21 @@ const ctx = {save(){},restore(){},translate(){},fillRect(){},beginPath(){},ellip
 for (const color of ['#ef4444','#eab308','#fb923c','#10b981','#3b82f6']) drawPlexusPumpkin(ctx, 10, 10, 7, color);
 for (const color of ['#ef4444','#eab308','#fb923c','#10b981','#3b82f6']) assert.ok(colors.includes(color));
 console.log('OK: pumpkin markers preserve distinct area colors.');
+
+// Desktop table: use the empty region and react to added rows and viewport geometry.
+newsVisible = true; tableMode = true; tableBottom = 280;
+ambient.sync(SEASONAL_PROFILES.halloween, 'effect-halloween'); nextFrame(10000);
+for (const item of appendedLayer.children) {
+  const y = Number(item.style.transform.match(/,([^p]+)px/)[1]);
+  assert.ok(y >= 288 && y + parseFloat(item.style.height) <= floorTop - 8);
+  assert.notEqual(item.style.visibility, 'hidden');
+}
+tableBottom = 660; nextFrame(10050);
+assert.ok(appendedLayer.children.every(item => item.style.visibility === 'hidden'), 'No full sprite fits below a crowded table');
+tableBottom = 400; nextFrame(10100);
+for (const item of appendedLayer.children) {
+  assert.notEqual(item.style.visibility, 'hidden');
+  assert.ok(Number(item.style.transform.match(/,([^p]+)px/)[1]) >= 408);
+}
+ambient.stop();
+console.log('OK: table flight adapts to patient occupancy and restores bats when space opens.');
