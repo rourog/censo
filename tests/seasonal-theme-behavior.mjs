@@ -6,6 +6,7 @@ assert.equal(resolveSeasonalProfile('auto', new Date('2026-11-01T06:00:00Z')), n
 assert.equal(resolveSeasonalProfile('off'), null);
 assert.equal(resolveSeasonalProfile('halloween', new Date('2026-01-01')).id, 'halloween');
 let mode = 'halloween', received;
+registerSeasonalConfetti('bats', options => { received = options; });
 globalThis.localStorage = { getItem: () => mode };
 globalThis.window = { confetti: options => { received = options; } };
 launchSeasonalConfetti({ particleCount: 150, colors: ['original'] });
@@ -30,7 +31,7 @@ let floorTop = 700, newsVisible = true;
 const newsBar = { getClientRects: () => newsVisible ? [1] : [], getBoundingClientRect: () => ({ top: floorTop }) };
 const footer = { getClientRects: () => [1], getBoundingClientRect: () => ({ top: 760 }) };
 const events = {};
-const fab = { getClientRects: () => [1], getBoundingClientRect: () => ({ bottom: floorTop - 108 }) };
+const fab = { getClientRects: () => [1], getBoundingClientRect: () => ({ bottom: floorTop - 120 }) };
 let tableMode = false, tableBottom = 280;
 const table = { getClientRects: () => [1], getBoundingClientRect: () => ({ bottom: tableBottom }) };
 const header = { getBoundingClientRect: () => ({ bottom: 80 }) };

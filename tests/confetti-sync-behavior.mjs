@@ -1,0 +1,14 @@
+import assert from 'node:assert/strict';
+import { createConfirmedRemovalTracker } from '../modules/patientModule.js';
+const snapshot=(ids,metadata={})=>({metadata,forEach:fn=>ids.forEach(id=>fn({id}))});
+const tracker=createConfirmedRemovalTracker();
+assert.deepEqual(tracker.observe(snapshot(['a','b'])),[]);
+assert.deepEqual(tracker.observe(snapshot(['a'],{hasPendingWrites:true})),[]);
+assert.deepEqual(tracker.observe(snapshot(['a'])),['b']);
+assert.deepEqual(tracker.observe(snapshot(['a'])),[]);
+assert.deepEqual(tracker.observe(snapshot([],{fromCache:true})),[]);
+assert.deepEqual(tracker.observe(snapshot([])),[]);
+tracker.reset();
+assert.deepEqual(tracker.observe(snapshot(['a','b','c'])),[]);
+assert.deepEqual(tracker.observe(snapshot(['c'])),['a','b']);
+console.log('OK: confirmed removals, deduplication, reconnect and batches.');

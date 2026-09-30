@@ -67,7 +67,7 @@ const patientApp = {
   firebase: {
     db: {},
     collection: () => ({}),
-    onSnapshot: (_query, next, error) => {
+    onSnapshot: (_query, _options, next, error) => {
       snapshotHandler = next;
       snapshotErrorHandler = error;
       return () => { unsubscribeCalls += 1; };

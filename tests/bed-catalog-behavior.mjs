@@ -227,7 +227,7 @@ const liveState = { pacientesGlobal: [], camasLibresGlobal: [] };
 const liveApp = {
   state: liveState, bed: { ...bed, masterCamas: defaults },
   utils: { escapeHtml: value => String(value) },
-  firebase: { db: {}, collection: () => 'pacientes', onSnapshot(_, fn) { patientListener = fn; return () => {}; } },
+  firebase: { db: {}, collection: () => 'pacientes', onSnapshot(_, options, fn) { patientListener = fn; return () => {}; } },
   filtrar() { displayedPatients = liveState.pacientesGlobal; },
   mostrarError(error) { throw error; }
 };
