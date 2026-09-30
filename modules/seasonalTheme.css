@@ -1,0 +1,41 @@
+@font-face {
+  font-family: 'Creepster';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('https://fonts.gstatic.com/s/creepster/v13/AlZy_zVUqJz4yMrniH4hdQ.ttf') format('truetype');
+}
+/* The banner keeps its seasonal palette independently from patient cards. */
+body[data-season] .header {
+  background: var(--season-banner-bg);
+  color: var(--season-banner-text);
+  --text: var(--season-banner-text);
+  --muted: #ddc7e9;
+  --accent: var(--season-banner-accent);
+  --accent-border: #805398;
+  --toggle-bg: #38204b;
+  --line: #805398;
+}
+body[data-season] .title-censo {
+  font-family: var(--season-title-font);
+  font-weight: 400;
+  font-size: 1.7rem;
+  letter-spacing: .06em;
+  text-shadow: 0 2px 6px #180620;
+  color: var(--season-banner-accent);
+  background-image: none;
+  animation: none;
+}
+.season-picker { grid-column: 1 / -1; margin-top: 16px; }
+.season-picker select { width: 100%; padding: 10px; color: var(--text); background: var(--panel); border: 1px solid var(--line); border-radius: 8px; font: inherit; }
+.seasonal-bats { position: fixed; inset: 0; z-index: 55; pointer-events: none; overflow: hidden; }
+.seasonal-bat { position: absolute; padding: 0; border: 0; background: transparent; pointer-events: auto; cursor: pointer; }
+.seasonal-bat:focus-visible { outline: 2px solid #fb923c; outline-offset: 3px; }
+.seasonal-bat-sprite { display: block; width: 16px; height: 24px; image-rendering: pixelated; transform-origin: top left; }
+body.effect-halloween .desktop-waves-bg .waves { filter: blur(18px); opacity: .4; }
+body.effect-halloween .desktop-waves-bg { overflow: visible; opacity: .65; mask-image: linear-gradient(to top, #000, transparent); }
+@media (prefers-reduced-motion: reduce) {
+  .seasonal-bats { display: none; }
+  body.effect-halloween .desktop-waves-bg .parallax > use { animation: none !important; }
+}
+@media print { .seasonal-bats, .desktop-waves-bg { display: none !important; } }

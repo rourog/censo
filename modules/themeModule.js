@@ -9,8 +9,16 @@
   - Renderizar selector, vista previa y restablecimiento.
 */
 
+const seasonUrl = new URL('./seasonalTheme.js', import.meta.url);
+seasonUrl.searchParams.set('v', String(window.CensoBuild?.version || Date.now()));
+const { getSeasonalProfile, SEASONAL_PROFILES } = await import(seasonUrl.href);
+const ambientUrl = new URL('./seasonalAmbient.js', import.meta.url);
+ambientUrl.searchParams.set('v', String(window.CensoBuild?.version || Date.now()));
+const { createSeasonalAmbient } = await import(ambientUrl.href);
+
 export function createThemeModule(app) {
   const { state } = app;
+  const ambient = createSeasonalAmbient();
 
   const bases = [
     { id: 'base-dark', name: 'Slate', color: '#0f172a', mode: 'dark' },
@@ -65,6 +73,7 @@ export function createThemeModule(app) {
   ];
 
   const effects = [
+    { id: 'effect-halloween', name: 'Murciélagos y niebla', icon: 'dark_mode' },
     { id: 'effect-waves', name: 'Olas', icon: 'waves' },
     { id: 'effect-aurora', name: 'Aurora', icon: 'blur_on' },
     { id: 'effect-grid', name: 'Rejilla', icon: 'grid_4x4' },
@@ -95,6 +104,7 @@ export function createThemeModule(app) {
   }
 
   function ensureThemeStylesheets() {
+    ensureStylesheet('censo-seasonal-styles', 'seasonalTheme.css');
     ensureStylesheet('censo-theme-v2-styles', 'themePaletteV2.css');
     ensureStylesheet('censo-theme-v3-effects', 'themeEffectsV3.css');
     ensureStylesheet('censo-theme-v3-layout-effects', 'themeEffectsV4.css');
@@ -113,12 +123,37 @@ export function createThemeModule(app) {
     return effectIds.has(value) ? value : DEFAULT_EFFECT;
   }
 
+  function preferenceKey(part) {
+    const profile = getSeasonalProfile();
+    return profile ? `censo-season-${profile.id}-${part}` : `censo-${part}`;
+  }
   function getCurrentTheme() {
+    const defaults = getSeasonalProfile()?.defaults || { base: DEFAULT_BASE, accent: DEFAULT_ACCENT, effect: DEFAULT_EFFECT };
     return {
-      base: validBase(localStorage.getItem('censo-base')),
-      accent: validAccent(localStorage.getItem('censo-accent')),
-      effect: validEffect(localStorage.getItem('censo-effect'))
+      base: validBase(localStorage.getItem(preferenceKey('base')) || defaults.base),
+      accent: validAccent(localStorage.getItem(preferenceKey('accent')) || defaults.accent),
+      effect: validEffect(localStorage.getItem(preferenceKey('effect')) || defaults.effect)
     };
+  }
+  function applySeasonalBanner() {
+    const profile = getSeasonalProfile(), body = document.body;
+    const props = { '--season-banner-bg': 'background', '--season-banner-text': 'text', '--season-banner-accent': 'accent', '--season-title-font': 'titleFont' };
+    if (profile) body.dataset.season = profile.id;
+    else delete body.dataset.season;
+    for (const [css, key] of Object.entries(props)) {
+      if (profile?.banner[key]) body.style.setProperty(css, profile.banner[key]);
+      else body.style.removeProperty(css);
+    }
+    if (profile?.banner.nodeGlyph) body.dataset.seasonNodeGlyph = profile.banner.nodeGlyph;
+    else delete body.dataset.seasonNodeGlyph;
+    const select = document.getElementById('seasonPicker');
+    if (select) select.value = localStorage.getItem('censo-season') || 'auto';
+  }
+  function refreshSeason() {
+    applySeasonalBanner();
+    const theme = getCurrentTheme();
+    applyTheme(theme.base, theme.accent, false);
+    applyEffect(theme.effect, false);
   }
 
   function renderBaseGroup(mode, title) {
@@ -179,6 +214,14 @@ export function createThemeModule(app) {
     const extras = document.createElement('div');
     extras.id = 'themeV2Extras';
     extras.innerHTML = `
+      <section class="season-picker">
+        <label for="seasonPicker">Temporada</label>
+        <select id="seasonPicker">
+          <option value="auto">Automática según la fecha</option>
+          <option value="off">Sin temporada</option>
+          ${Object.values(SEASONAL_PROFILES).map(profile => `<option value="${profile.id}">${profile.name}</option>`).join('')}
+        </select>
+      </section>
       ${renderEffectPicker()}
       <section class="theme-preview" aria-label="Vista previa del tema">
         <div class="theme-preview__head">
@@ -198,12 +241,17 @@ export function createThemeModule(app) {
     `;
     modalContent.appendChild(extras);
 
+    document.getElementById('seasonPicker').addEventListener('change', (event) => {
+      localStorage.setItem('censo-season', event.target.value);
+      refreshSeason();
+    });
+
     extras.querySelectorAll('.theme-effect-option').forEach(button => {
       button.addEventListener('click', () => applyEffect(button.dataset.effect));
     });
     document.getElementById('themeResetBtn')?.addEventListener('click', () => {
-      applyTheme(DEFAULT_BASE, DEFAULT_ACCENT);
-      applyEffect(DEFAULT_EFFECT);
+      for (const part of ['base', 'accent', 'effect']) localStorage.removeItem(preferenceKey(part));
+      refreshSeason();
     });
   }
 
@@ -271,15 +319,17 @@ export function createThemeModule(app) {
     });
   }
 
-  function applyTheme(newBase, newAccent) {
+  function applyTheme(newBase, newAccent, persist = true) {
     const current = getCurrentTheme();
     const base = validBase(newBase || current.base);
     const accent = validAccent(newAccent || current.accent);
 
     removeOldThemeClasses();
     document.body.classList.add(base, accent);
-    localStorage.setItem('censo-base', base);
-    localStorage.setItem('censo-accent', accent);
+    if (persist) {
+      localStorage.setItem(preferenceKey('base'), base);
+      localStorage.setItem(preferenceKey('accent'), accent);
+    }
     updatePickerState(base, accent);
 
     window.setTimeout(() => {
@@ -289,11 +339,12 @@ export function createThemeModule(app) {
     }, 50);
   }
 
-  function applyEffect(newEffect) {
+  function applyEffect(newEffect, persist = true) {
     const effect = validEffect(newEffect || getCurrentTheme().effect);
     removeOldEffectClasses();
     document.body.classList.add(effect);
-    localStorage.setItem('censo-effect', effect);
+    if (persist) localStorage.setItem(preferenceKey('effect'), effect);
+    ambient.sync(getSeasonalProfile() || (effect === 'effect-halloween' ? SEASONAL_PROFILES.halloween : null), effect);
     updateEffectPicker(effect);
   }
 
@@ -304,9 +355,17 @@ export function createThemeModule(app) {
     if (viewIcon) viewIcon.textContent = state.currentViewMode === 'kanban' ? 'table_rows' : 'grid_view';
 
     renderThemePickers();
-    const current = getCurrentTheme();
-    applyTheme(current.base, current.accent);
-    applyEffect(current.effect);
+    refreshSeason();
+    let lastSeason = getSeasonalProfile()?.id || '';
+    const checkDate = () => {
+      const id = getSeasonalProfile()?.id || '';
+      if (id !== lastSeason) { lastSeason = id; refreshSeason(); }
+    };
+    window.setInterval(checkDate, 60000);
+    document.addEventListener('visibilitychange', checkDate);
+    window.addEventListener('storage', (event) => {
+      if (!event.key || event.key.startsWith('censo-')) refreshSeason();
+    });
   }
 
   return {

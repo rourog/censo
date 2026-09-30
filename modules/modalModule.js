@@ -871,7 +871,7 @@ export function createModalModule(app) {
       await batch.commit();
       vibrar([30, 50, 30]); 
       cerrarModalBorrado(); 
-      if (typeof confetti === 'function') { confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, colors: ['#ef4444', '#10b981', '#3b82f6', '#fbbf24'] }); }
+      app.launchSeasonalConfetti?.({ particleCount: 150, spread: 80, origin: { y: 0.6 }, colors: ['#ef4444', '#10b981', '#3b82f6', '#fbbf24'] });
     } catch (error) {
       vibrar([100, 50, 100]); 
       alert('ERROR AL BORRAR: ' + error.message); 

@@ -717,6 +717,16 @@ export function createPlexusController(canvas, options = {}) {
 
   function drawNode(node, now) {
     if (node.alpha <= 0.005) return;
+    const seasonalGlyph = document.body.dataset.seasonNodeGlyph;
+    if (seasonalGlyph) {
+      ctx.save();
+      ctx.globalAlpha = node.alpha;
+      ctx.font = `${Math.max(12, node.baseRadius * node.scale * 3)}px sans-serif`;
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(seasonalGlyph, node.x, node.y);
+      ctx.restore();
+      return;
+    }
     const radius = (node.baseRadius + (node.area.name === 'SALA DE CHOQUE' ? 0.30 : 0)) * node.scale;
     const sparkle = sparkleEnvelope(node, now);
     const idleShimmer = reducedMotion ? 0.12 : 0.10 + Math.sin(now * 0.0011 + node.shapeSeed) * 0.035;

@@ -15,6 +15,10 @@ const plexusUrl = new URL('./plexus.js', import.meta.url);
 plexusUrl.searchParams.set('v', PLEXUS_BUILD);
 const { createPlexusController } = await import(plexusUrl.href);
 
+const seasonalUrl = new URL('./seasonalTheme.js', import.meta.url);
+seasonalUrl.searchParams.set('v', PLEXUS_BUILD);
+const { launchSeasonalConfetti } = await import(seasonalUrl.href);
+
 export function createEffectsModule(app) {
   const { vibrar } = app.utils;
 
@@ -96,6 +100,7 @@ export function createEffectsModule(app) {
   }
 
   return {
+    launchSeasonalConfetti,
     initPlexus,
     syncPlexusPatients,
     checkEasterEggs

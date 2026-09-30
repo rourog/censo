@@ -19,8 +19,8 @@ assert.match(theme, /accent-slate/);
 assert.match(theme, /RESTABLECER APARIENCIA/);
 assert.match(theme, /themeSelectionLabel/);
 assert.match(theme, /aria-pressed/);
-assert.match(theme, /localStorage\.setItem\('censo-base'/);
-assert.match(theme, /localStorage\.setItem\('censo-accent'/);
+assert.match(theme, /localStorage\.setItem\(preferenceKey\('base'/);
+assert.match(theme, /localStorage\.setItem\(preferenceKey\('accent'/);
 
 assert.match(css, /--accent-on-light/);
 assert.match(css, /--accent-on-dark/);
