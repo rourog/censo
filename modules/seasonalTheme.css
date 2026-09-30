@@ -44,3 +44,8 @@ body.effect-halloween .wave-layer-4 { fill: #d3bedf; opacity: .24; animation-dur
   body.effect-halloween .desktop-waves-bg .parallax > use { animation: none !important; }
 }
 @media print { .seasonal-bats, .desktop-waves-bg { display: none !important; } }
+
+/* Reserve a lower flight corridor while the Halloween ambient effect is active. */
+body.effect-halloween #mainFabBtn {
+  bottom: calc(var(--season-floor-offset, 34px) + 108px) !important;
+}

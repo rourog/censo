@@ -2,7 +2,7 @@
 export function createSeasonalAmbient() {
   let layer = null, frame = 0, previous = 0, time = 0, bats = [], config = null;
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-  function stop() { document.removeEventListener('pointerdown', clickBackground); cancelAnimationFrame(frame); frame = 0; layer?.remove(); layer = null; bats = []; }
+  function stop() { document.removeEventListener('pointerdown', clickBackground); cancelAnimationFrame(frame); frame = 0; layer?.remove(); layer = null; bats = []; document.body.style.removeProperty('--season-floor-offset'); }
   function floorY() {
     const app = document.getElementById('mainAppContainer');
     const bars = [document.getElementById('censoNewsBar'), app?.querySelector?.('.footer')];
@@ -12,6 +12,11 @@ export function createSeasonalAmbient() {
       if (Number.isFinite(top) && top > 0 && top <= innerHeight) return top;
     }
     return innerHeight;
+  }
+  function flightBand(floor) {
+    const button = document.getElementById('mainFabBtn');
+    const bottom = button?.getClientRects?.().length ? button.getBoundingClientRect?.().bottom : null;
+    return { top: Number.isFinite(bottom) ? bottom + 6 : floor - 102, bottom: floor - 4 };
   }
   function fall(bat) {
     if (bat.state !== 'fly') return;
@@ -34,7 +39,7 @@ export function createSeasonalAmbient() {
     button.appendChild(sprite); layer.appendChild(button);
     const mix = Math.random(), size = config.minSize + (config.maxSize - config.minSize) * mix;
     const bat = { button, sprite, red: index === 0, size, speed: config.speed * (1.25 - .5 * mix) * (.85 + Math.random() * .3), flap: .9 + Math.random() * .2,
-      x: initial ? Math.random() * innerWidth : -size, y: Math.max(80, floorY() * (.15 + Math.random() * .55)), phase: Math.random() * 5, dir: initial && Math.random() < .5 ? -1 : 1, state: 'fly' };
+      x: initial ? Math.random() * innerWidth : -size, altitude: Math.random(), phase: Math.random() * 5, dir: initial && Math.random() < .5 ? -1 : 1, state: 'fly' };
     button.style.width = `${size}px`; button.style.height = `${size * 1.5}px`;
     button.onclick = () => fall(bat);
     return bat;
@@ -45,9 +50,12 @@ export function createSeasonalAmbient() {
     if (document.hidden || !document.getElementById('mainAppContainer')?.getClientRects().length) return;
     time += dt;
     const floor = floorY();
+    document.body.style.setProperty('--season-floor-offset', `${Math.max(0, innerHeight - floor)}px`);
+    const band = flightBand(floor);
     layer.style.clipPath = `inset(0 0 ${Math.max(0, innerHeight - floor)}px 0)`;
     bats.forEach((bat, index) => {
-      const height = bat.size * 1.5; let y = Math.min(floor - height, bat.y + Math.sin(time * 1.6 + bat.phase) * 10), row = bat.red ? 0 : 1;
+      const height = bat.size * 1.5; const top = Math.min(band.top, band.bottom - height), travel = Math.max(0, band.bottom - height - top);
+      let y = top + travel * (.5 + .5 * Math.sin(time * .8 + bat.phase + bat.altitude * Math.PI)), row = bat.red ? 0 : 1;
       let cell = Math.floor(time * config.flapFps * bat.flap + bat.phase) % 5;
       if (bat.state === 'fly') {
         bat.x += bat.speed * bat.dir * dt;
