@@ -7,8 +7,8 @@ export const SEASONAL_PROFILES = Object.freeze({
       titleFont: '"Creepster", Georgia, serif', nodeGlyph: '🎃' },
     ambient: { sprite: '../assets/seasonal/bats.png', count: 6, minSize: 35, maxSize: 55,
       flapFps: 12, speed: 100, fallFps: 12, groundSeconds: 3 },
-    // Set an effect ID only once the alternate celebration has been selected.
-    confetti: { effect: null, colors: ['#ff6500', '#fb923c', '#a855f7', '#6d28d9'] }
+    // Halloween replaces the usual celebration for this season.
+    confetti: { effect: 'bats', duration: 3, colors: ['#ff6500', '#fb923c', '#a855f7', '#6d28d9'] }
   }
 });
 export function resolveSeasonalProfile(mode = 'auto', date = new Date()) {
@@ -26,11 +26,34 @@ export function registerSeasonalConfetti(id, renderer) {
   confettiRenderers.set(id, renderer);
   return () => confettiRenderers.delete(id);
 }
-export function launchSeasonalConfetti(options) {
+let celebrationModule;
+export function getCelebrationChoice() {
+  const saved = localStorage.getItem('censo-celebration');
+  return ['confetti', 'fireworks', 'balloons'].includes(saved) ? saved : 'confetti';
+}
+function loadCelebrations() {
+  const url = new URL('./celebrationEffects.js', import.meta.url);
+  url.searchParams.set('v', String(window.CensoBuild?.version || '2.74'));
+  return celebrationModule ||= import(url.href);
+}
+export async function initCelebrationAudio() {
+  (await loadCelebrations()).initCelebrationAudio();
+}
+export async function unlockCelebrationAudio() {
+  (await loadCelebrations()).unlockCelebrationAudio();
+}
+export function launchSeasonalConfetti(options = {}) {
+  if (typeof document !== 'undefined' && document.hidden) return;
   const profile = getSeasonalProfile();
   const configured = profile?.confetti;
-  const renderer = confettiRenderers.get(configured?.effect);
+  const effect = configured?.effect || getCelebrationChoice();
+  const renderer = confettiRenderers.get(effect);
   const settings = { ...options, ...(configured?.colors ? { colors: configured.colors } : {}), disableForReducedMotion: true };
   if (renderer) renderer(settings);
-  else if (typeof window.confetti === 'function') window.confetti(settings);
+  else if (effect !== 'confetti') {
+    return loadCelebrations().then(module => module.launchCelebration(effect, settings)).catch(error => {
+      console.warn('[CENSO] No se pudo cargar la celebración:', error);
+      window.confetti?.(settings);
+    });
+  } else if (typeof window.confetti === 'function') window.confetti(settings);
 }

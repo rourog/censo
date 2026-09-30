@@ -11,7 +11,7 @@
 
 const seasonUrl = new URL('./seasonalTheme.js', import.meta.url);
 seasonUrl.searchParams.set('v', String(window.CensoBuild?.version || Date.now()));
-const { getSeasonalProfile, SEASONAL_PROFILES } = await import(seasonUrl.href);
+const { getSeasonalProfile, SEASONAL_PROFILES, getCelebrationChoice, launchSeasonalConfetti, initCelebrationAudio, unlockCelebrationAudio } = await import(seasonUrl.href);
 const ambientUrl = new URL('./seasonalAmbient.js', import.meta.url);
 ambientUrl.searchParams.set('v', String(window.CensoBuild?.version || Date.now()));
 const { createSeasonalAmbient } = await import(ambientUrl.href);
@@ -148,6 +148,10 @@ export function createThemeModule(app) {
     else delete body.dataset.seasonNodeGlyph;
     const select = document.getElementById('seasonPicker');
     if (select) select.value = localStorage.getItem('censo-season') || 'auto';
+    const celebration = document.getElementById('celebrationPicker');
+    if (celebration) celebration.value = getCelebrationChoice();
+    const note = document.getElementById('celebrationSeasonNote');
+    if (note) note.textContent = profile?.id === 'halloween' ? 'Halloween: murciélagos durante 3 segundos.' : 'Se reproduce al borrar un paciente.';
   }
   function refreshSeason() {
     applySeasonalBanner();
@@ -222,6 +226,13 @@ export function createThemeModule(app) {
           ${Object.values(SEASONAL_PROFILES).map(profile => `<option value="${profile.id}">${profile.name}</option>`).join('')}
         </select>
       </section>
+      <section class="season-picker" aria-label="Celebración al borrar">
+        <label for="celebrationPicker">Celebración habitual</label>
+        <select id="celebrationPicker"><option value="confetti">Confeti</option><option value="fireworks">Fuegos artificiales · 5 segundos</option><option value="balloons">Globos · 5 segundos</option></select>
+        <p id="celebrationSeasonNote" class="theme-effect-note"></p>
+        <label><input id="celebrationSound" type="checkbox"> Sonido de murciélagos</label>
+        <button id="celebrationPreview" type="button" class="theme-reset">PROBAR CELEBRACIÓN</button>
+      </section>
       ${renderEffectPicker()}
       <section class="theme-preview" aria-label="Vista previa del tema">
         <div class="theme-preview__head">
@@ -240,6 +251,20 @@ export function createThemeModule(app) {
       <button id="themeResetBtn" class="theme-reset" type="button">RESTABLECER APARIENCIA</button>
     `;
     modalContent.appendChild(extras);
+    document.getElementById('celebrationPicker').value = getCelebrationChoice();
+    document.getElementById('celebrationPicker').addEventListener('change', event => localStorage.setItem('censo-celebration', event.target.value));
+    const sound = document.getElementById('celebrationSound');
+    sound.checked = localStorage.getItem('censo-celebration-sound') === 'on';
+    sound.addEventListener('change', () => {
+      localStorage.setItem('censo-celebration-sound', sound.checked ? 'on' : 'off');
+      if (sound.checked) unlockCelebrationAudio();
+    });
+    document.getElementById('celebrationPreview').addEventListener('click', async () => {
+      app.cerrarModal?.('themeModal');
+      await unlockCelebrationAudio();
+      launchSeasonalConfetti({particleCount:150, spread:80, origin:{y:.6}});
+    });
+    initCelebrationAudio().catch(error => console.warn('[CENSO] Audio decorativo no disponible:', error));
 
     document.getElementById('seasonPicker').addEventListener('change', (event) => {
       localStorage.setItem('censo-season', event.target.value);
