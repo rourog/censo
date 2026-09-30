@@ -28,12 +28,17 @@ body[data-season] .title-censo {
 }
 .season-picker { grid-column: 1 / -1; margin-top: 16px; }
 .season-picker select { width: 100%; padding: 10px; color: var(--text); background: var(--panel); border: 1px solid var(--line); border-radius: 8px; font: inherit; }
-.seasonal-bats { position: fixed; inset: 0; z-index: 55; pointer-events: none; overflow: hidden; }
+.seasonal-bats { position: fixed; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
 .seasonal-bat { position: absolute; padding: 0; border: 0; background: transparent; pointer-events: auto; cursor: pointer; }
 .seasonal-bat:focus-visible { outline: 2px solid #fb923c; outline-offset: 3px; }
 .seasonal-bat-sprite { display: block; width: 16px; height: 24px; image-rendering: pixelated; transform-origin: top left; }
-body.effect-halloween .desktop-waves-bg .waves { filter: blur(18px); opacity: .4; }
-body.effect-halloween .desktop-waves-bg { overflow: visible; opacity: .65; mask-image: linear-gradient(to top, #000, transparent); }
+body.effect-halloween #content { position: relative; z-index: 10; }
+body.effect-halloween .desktop-waves-bg .waves { filter: blur(6px); opacity: .95; }
+body.effect-halloween .desktop-waves-bg { overflow: visible; opacity: .9; mask-image: linear-gradient(to top, #000 0%, #000 55%, transparent 100%); }
+body.effect-halloween .wave-layer-1 { fill: #e9ddf5; opacity: .10; animation-duration: 38s; }
+body.effect-halloween .wave-layer-2 { fill: #c8abd9; opacity: .15; animation-duration: 29s; }
+body.effect-halloween .wave-layer-3 { fill: #ede2f6; opacity: .18; animation-duration: 22s; }
+body.effect-halloween .wave-layer-4 { fill: #d3bedf; opacity: .24; animation-duration: 16s; }
 @media (prefers-reduced-motion: reduce) {
   .seasonal-bats { display: none; }
   body.effect-halloween .desktop-waves-bg .parallax > use { animation: none !important; }

@@ -2,7 +2,29 @@
 export function createSeasonalAmbient() {
   let layer = null, frame = 0, previous = 0, time = 0, bats = [], config = null;
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-  function stop() { cancelAnimationFrame(frame); frame = 0; layer?.remove(); layer = null; bats = []; }
+  function stop() { document.removeEventListener('pointerdown', clickBackground); cancelAnimationFrame(frame); frame = 0; layer?.remove(); layer = null; bats = []; }
+  function floorY() {
+    const app = document.getElementById('mainAppContainer');
+    const bars = [document.getElementById('censoNewsBar'), app?.querySelector?.('.footer')];
+    for (const bar of bars) {
+      if (!bar?.getClientRects?.().length) continue;
+      const top = bar.getBoundingClientRect?.().top;
+      if (Number.isFinite(top) && top > 0 && top <= innerHeight) return top;
+    }
+    return innerHeight;
+  }
+  function fall(bat) {
+    if (bat.state !== 'fly') return;
+    bat.state = 'fall'; bat.start = time; bat.dropY = bat.drawY;
+    bat.button.disabled = true;
+  }
+  function clickBackground(event) {
+    // Content stays above decoration; only clicks on empty background reach a bat.
+    const target = event.target;
+    if (!target?.closest?.('#mainAppContainer') || target.closest('button, a, input, select, textarea, [contenteditable], .card, .section, .censo-table, .modal-overlay, .header, .footer, .censo-newsbar')) return;
+    const bat = [...bats].reverse().find(bat => bat.state === 'fly' && event.clientX >= bat.x && event.clientX <= bat.x + bat.size && event.clientY >= bat.drawY && event.clientY <= bat.drawY + bat.size * 1.5);
+    if (bat) fall(bat);
+  }
   function makeBat(index, initial) {
     const button = document.createElement('button');
     button.type = 'button'; button.className = 'seasonal-bat';
@@ -12,9 +34,9 @@ export function createSeasonalAmbient() {
     button.appendChild(sprite); layer.appendChild(button);
     const mix = Math.random(), size = config.minSize + (config.maxSize - config.minSize) * mix;
     const bat = { button, sprite, red: index === 0, size, speed: config.speed * (1.25 - .5 * mix) * (.85 + Math.random() * .3), flap: .9 + Math.random() * .2,
-      x: initial ? Math.random() * innerWidth : -size, y: innerHeight * (.15 + Math.random() * .55), phase: Math.random() * 5, dir: initial && Math.random() < .5 ? -1 : 1, state: 'fly' };
+      x: initial ? Math.random() * innerWidth : -size, y: Math.max(80, floorY() * (.15 + Math.random() * .55)), phase: Math.random() * 5, dir: initial && Math.random() < .5 ? -1 : 1, state: 'fly' };
     button.style.width = `${size}px`; button.style.height = `${size * 1.5}px`;
-    button.onclick = () => { if (bat.state !== 'fly') return; bat.state = 'fall'; bat.start = time; bat.dropY = bat.drawY; button.disabled = true; };
+    button.onclick = () => fall(bat);
     return bat;
   }
   function tick(now) {
@@ -22,15 +44,17 @@ export function createSeasonalAmbient() {
     const dt = previous ? Math.min((now - previous) / 1000, .05) : 0; previous = now;
     if (document.hidden || !document.getElementById('mainAppContainer')?.getClientRects().length) return;
     time += dt;
+    const floor = floorY();
+    layer.style.clipPath = `inset(0 0 ${Math.max(0, innerHeight - floor)}px 0)`;
     bats.forEach((bat, index) => {
-      const height = bat.size * 1.5; let y = bat.y + Math.sin(time * 1.6 + bat.phase) * 10, row = bat.red ? 0 : 1;
+      const height = bat.size * 1.5; let y = Math.min(floor - height, bat.y + Math.sin(time * 1.6 + bat.phase) * 10), row = bat.red ? 0 : 1;
       let cell = Math.floor(time * config.flapFps * bat.flap + bat.phase) % 5;
       if (bat.state === 'fly') {
         bat.x += bat.speed * bat.dir * dt;
         if (bat.x > innerWidth + bat.size) bat.x = -bat.size;
         if (bat.x < -bat.size) bat.x = innerWidth + bat.size;
       } else {
-        const elapsed = time - bat.start, ground = innerHeight - height;
+        const elapsed = time - bat.start, ground = floor - height;
         y = Math.min(ground, bat.dropY + 210 * elapsed * elapsed);
         row = 2; cell = Math.min(3, Math.floor(elapsed * config.fallFps));
         if (y >= ground) {
@@ -51,6 +75,7 @@ export function createSeasonalAmbient() {
     if (!config || effect !== 'effect-halloween' || reduced.matches) return;
     const app = document.getElementById('mainAppContainer'); if (!app) return;
     layer = document.createElement('div'); layer.className = 'seasonal-bats'; app.appendChild(layer);
+    document.addEventListener('pointerdown', clickBackground);
     time = 0; previous = 0; bats = Array.from({ length: config.count }, (_, index) => makeBat(index, true));
     frame = requestAnimationFrame(tick);
   }

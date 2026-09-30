@@ -50,6 +50,31 @@ export function getPlexusPatientId(patient, index = 0) {
     : String(explicitId);
 }
 
+// Colored pumpkin markers retain the original area palette and node identities.
+export function drawPlexusPumpkin(ctx, x, y, radius, color) {
+  ctx.save(); ctx.translate(x, y);
+  ctx.fillStyle = '#72552d'; ctx.fillRect(-radius * .12, -radius * .92, radius * .24, radius * .36);
+  ctx.fillStyle = color;
+  for (const offset of [-.32, .32, 0]) {
+    ctx.beginPath(); ctx.ellipse(radius * offset, 0, radius * .64, radius * .75, 0, 0, Math.PI * 2); ctx.fill();
+  }
+  ctx.strokeStyle = 'rgba(0,0,0,.22)'; ctx.lineWidth = .6;
+  for (const offset of [-.25, .25]) {
+    ctx.beginPath(); ctx.ellipse(radius * offset, 0, radius * .27, radius * .69, 0, -.9, .9); ctx.stroke();
+  }
+  ctx.fillStyle = '#201025';
+  for (const offset of [-.36, .36]) {
+    ctx.beginPath(); ctx.moveTo(radius * offset, -radius * .35);
+    ctx.lineTo(radius * (offset - .17), -radius * .04);
+    ctx.lineTo(radius * (offset + .17), -radius * .04); ctx.closePath(); ctx.fill();
+  }
+  ctx.beginPath(); ctx.moveTo(-radius * .46, radius * .22);
+  ctx.lineTo(-radius * .18, radius * .4); ctx.lineTo(0, radius * .25);
+  ctx.lineTo(radius * .18, radius * .4); ctx.lineTo(radius * .46, radius * .22);
+  ctx.lineTo(radius * .32, radius * .52); ctx.lineTo(-radius * .32, radius * .52); ctx.closePath(); ctx.fill();
+  ctx.restore();
+}
+
 export function createPlexusController(canvas, options = {}) {
   if (!canvas) return null;
   const ctx = canvas.getContext('2d', { alpha: true });
@@ -721,9 +746,13 @@ export function createPlexusController(canvas, options = {}) {
     if (seasonalGlyph) {
       ctx.save();
       ctx.globalAlpha = node.alpha;
-      ctx.font = `${Math.max(12, node.baseRadius * node.scale * 3)}px sans-serif`;
-      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.fillText(seasonalGlyph, node.x, node.y);
+      if (seasonalGlyph === '🎃') {
+        drawPlexusPumpkin(ctx, node.x, node.y, Math.max(7, node.baseRadius * node.scale * 1.5), node.area.name === 'SIN AREA' ? '#fb923c' : node.area.solid);
+      } else {
+        ctx.font = `${Math.max(12, node.baseRadius * node.scale * 3)}px sans-serif`;
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText(seasonalGlyph, node.x, node.y);
+      }
       ctx.restore();
       return;
     }
