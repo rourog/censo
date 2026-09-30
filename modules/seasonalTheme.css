@@ -1,3 +1,10 @@
+@font-face {
+  font-family: 'Creepster';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('https://fonts.gstatic.com/s/creepster/v13/AlZy_zVUqJz4yMrniH4hdQ.ttf') format('truetype');
+}
 /* The banner keeps its seasonal palette independently from patient cards. */
 body[data-season] .header {
   background: var(--season-banner-bg);
@@ -11,6 +18,10 @@ body[data-season] .header {
 }
 body[data-season] .title-censo {
   font-family: var(--season-title-font);
+  font-weight: 400;
+  font-size: 1.7rem;
+  letter-spacing: .06em;
+  text-shadow: 0 2px 6px #180620;
   color: var(--season-banner-accent);
   background-image: none;
   animation: none;

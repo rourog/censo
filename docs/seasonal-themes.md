@@ -16,7 +16,7 @@ Halloween usa seis murciélagos de 35–55 px: uno rojo y cinco blancos. Los peq
 
 La niebla reutiliza las olas SVG existentes con blur y máscara gradual. El plexus conserva la relación entre pacientes y nodos; únicamente sustituye su representación por un símbolo configurable.
 
-La fuente serif de Halloween y el símbolo de calabaza son provisionales y reemplazables. Para una fuente propia, añadir su archivo y `@font-face` a `seasonalTheme.css`, y actualizar `banner.titleFont`. No hay fuente remota nueva.
+Halloween utiliza Creepster de Google Fonts únicamente para el título. Su @font-face incluye font-display: swap y una fuente serif de respaldo si la descarga no está disponible. El banner combina naranja intenso en los extremos y morado central. El confetti utiliza exclusivamente tonos morados y naranjas. El símbolo de calabaza sigue siendo reemplazable desde banner.nodeGlyph.
 
 `confetti.effect: null` conserva canvas-confetti con la paleta estacional. Una futura animación se registra mediante `registerSeasonalConfetti(id, renderer)`; al no encontrarla se utiliza canvas-confetti. Este cambio no sustituye las animaciones de eliminación de pacientes.
 

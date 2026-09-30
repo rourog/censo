@@ -9,7 +9,7 @@ let mode = 'halloween', received;
 globalThis.localStorage = { getItem: () => mode };
 globalThis.window = { confetti: options => { received = options; } };
 launchSeasonalConfetti({ particleCount: 150, colors: ['original'] });
-assert.deepEqual(received.colors, ['#fb923c', '#a855f7', '#f3e8ff']);
+assert.deepEqual(received.colors, ['#ff6500', '#fb923c', '#a855f7', '#6d28d9']);
 assert.equal(received.particleCount, 150);
 mode = 'off';
 launchSeasonalConfetti({ colors: ['original'] });
@@ -17,3 +17,34 @@ assert.deepEqual(received.colors, ['original']);
 const dispose = registerSeasonalConfetti('future', () => {});
 assert.equal(typeof dispose, 'function'); dispose();
 console.log('OK: seasonal dates, manual selection and confetti fallback.');
+
+// Exercise the actual ambient controller with a minimal DOM and deterministic RAF.
+const { createSeasonalAmbient } = await import('../modules/seasonalAmbient.js');
+const { SEASONAL_PROFILES } = await import('../modules/seasonalTheme.js');
+let nextFrame, appendedLayer;
+function makeElement() {
+  return { style: {}, children: [], appendChild(child) { this.children.push(child); },
+    setAttribute(key, value) { this[key] = value; }, remove() { this.removed = true; } };
+}
+const appElement = { getClientRects: () => [1], appendChild(layer) { appendedLayer = layer; } };
+globalThis.document = { hidden: false, createElement: makeElement, getElementById: () => appElement };
+globalThis.innerWidth = 1000; globalThis.innerHeight = 800;
+globalThis.matchMedia = () => ({ matches: false, addEventListener() {} });
+globalThis.requestAnimationFrame = fn => { nextFrame = fn; return 1; };
+globalThis.cancelAnimationFrame = () => {};
+const ambient = createSeasonalAmbient();
+ambient.sync(SEASONAL_PROFILES.halloween, 'effect-halloween');
+assert.equal(appendedLayer.children.length, 6);
+assert.equal(appendedLayer.children.filter(b => b['aria-label'].includes('rojos')).length, 1);
+nextFrame(1000);
+const bat = appendedLayer.children[0], sprite = bat.children[0];
+bat.onclick();
+for (let i = 1; i <= 5; i++) nextFrame(1000 + i * 50);
+assert.notEqual(sprite.style.backgroundPosition, '-64px -48px', 'The impact frame must not appear during descent');
+for (let i = 6; i <= 35; i++) nextFrame(1000 + i * 50);
+assert.equal(sprite.style.backgroundPosition, '-64px -48px', 'The impact frame appears on the ground');
+for (let i = 36; i <= 120; i++) nextFrame(1000 + i * 50);
+assert.equal(bat.removed, true, 'The fallen bat disappears');
+ambient.stop();
+assert.equal(appendedLayer.removed, true);
+console.log('OK: six bats, one red, delayed impact frame and disappearance.');

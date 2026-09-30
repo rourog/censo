@@ -3,12 +3,12 @@ export const SEASONAL_PROFILES = Object.freeze({
   halloween: {
     id: 'halloween', name: 'Halloween', months: [10],
     defaults: { base: 'base-plum', accent: 'accent-orange', effect: 'effect-halloween' },
-    banner: { background: '#29113e', text: '#fff1df', accent: '#fb923c',
-      titleFont: 'Georgia, "Times New Roman", serif', nodeGlyph: '🎃' },
+    banner: { background: 'linear-gradient(90deg, #ff6500 0%, #d94d09 16%, #4a145f 36%, #29113e 50%, #4a145f 64%, #d94d09 84%, #ff6500 100%)', text: '#fff1df', accent: '#fb923c',
+      titleFont: '"Creepster", Georgia, serif', nodeGlyph: '🎃' },
     ambient: { sprite: '../assets/seasonal/bats.png', count: 6, minSize: 35, maxSize: 55,
       flapFps: 12, speed: 100, fallFps: 12, groundSeconds: 3 },
     // Set an effect ID only once the alternate celebration has been selected.
-    confetti: { effect: null, colors: ['#fb923c', '#a855f7', '#f3e8ff'] }
+    confetti: { effect: null, colors: ['#ff6500', '#fb923c', '#a855f7', '#6d28d9'] }
   }
 });
 export function resolveSeasonalProfile(mode = 'auto', date = new Date()) {
