@@ -28,7 +28,7 @@ for (const effect of [
   assert.ok(effects.includes(effect), `Falta CSS para ${effect}`);
 }
 
-assert.ok(theme.includes("localStorage.setItem('censo-effect'"), 'La animación debe persistirse localmente');
+assert.ok(theme.includes("localStorage.setItem(preferenceKey('effect')"), 'La animación debe persistirse localmente');
 assert.ok(theme.includes("value === 'accent-slate'"), 'Debe migrarse el ID antiguo de Plata');
 assert.ok(theme.includes("themeEffectsV3.css"), 'Theme Engine debe cargar el CSS v3');
 assert.ok(effects.includes('@media (prefers-reduced-motion: reduce)'), 'Los efectos deben respetar reduced motion');

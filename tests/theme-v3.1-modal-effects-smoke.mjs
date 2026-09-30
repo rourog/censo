@@ -21,7 +21,7 @@ for (const effect of expectedEffects) {
 }
 
 if (!theme.includes("themeEffectsV4.css")) throw new Error('themeModule.js no carga themeEffectsV4.css');
-if (!theme.includes("localStorage.setItem('censo-effect'")) throw new Error('No se persiste la animación');
+if (!theme.includes("localStorage.setItem(preferenceKey('effect')")) throw new Error('No se persiste la animación');
 if (!css.includes('max-width: 920px !important')) throw new Error('El modal no tiene ancho de escritorio ampliado');
 if (!css.includes('position: sticky')) throw new Error('La cabecera del modal no permanece fija');
 if (!css.includes('#baseColorPicker.theme-picker-section')) throw new Error('No existe layout paralelo de fondos');
