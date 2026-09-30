@@ -1,4 +1,5 @@
 /* Click targets are limited to each bat, never a screen-wide overlay. */
+const LANDING_MARGIN = 20;
 export function createSeasonalAmbient() {
   let layer = null, groundLayer = null, frame = 0, previous = 0, time = 0, bats = [], config = null;
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
@@ -60,6 +61,7 @@ export function createSeasonalAmbient() {
     const floor = floorY();
     document.body.style.setProperty('--season-floor-offset', `${Math.max(0, innerHeight - floor)}px`);
     const band = flightBand(floor);
+    band.bottom = Math.min(band.bottom, floor - LANDING_MARGIN);
     groundLayer.style.clipPath = layer.style.clipPath = `inset(0 0 ${Math.max(0, innerHeight - floor)}px 0)`;
     bats.forEach((bat, index) => {
       const height = bat.size * 1.5;
@@ -82,7 +84,7 @@ export function createSeasonalAmbient() {
         if (bat.x > innerWidth + bat.size) bat.x = -bat.size;
         if (bat.x < -bat.size) bat.x = innerWidth + bat.size;
       } else {
-        const elapsed = time - bat.start, ground = floor - height - 4;
+        const elapsed = time - bat.start, ground = floor - height - LANDING_MARGIN;
         y = Math.min(ground, bat.dropY + 210 * elapsed * elapsed);
         row = 2; cell = Math.min(3, Math.floor(elapsed * config.fallFps));
         if (y >= ground) {

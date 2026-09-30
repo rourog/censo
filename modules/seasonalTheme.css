@@ -19,7 +19,7 @@ body[data-season] .header {
 body[data-season] .title-censo {
   font-family: var(--season-title-font);
   font-weight: 400;
-  font-size: 1.7rem;
+  font-size: clamp(1.9rem, 4vw, 2.4rem);
   letter-spacing: .06em;
   text-shadow: 0 2px 6px #180620;
   color: var(--season-banner-accent);
