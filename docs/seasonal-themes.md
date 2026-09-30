@@ -21,3 +21,5 @@ Halloween utiliza Creepster de Google Fonts únicamente para el título. Su @fon
 `confetti.effect: null` conserva canvas-confetti con la paleta estacional. Una futura animación se registra mediante `registerSeasonalConfetti(id, renderer)`; al no encontrarla se utiliza canvas-confetti. Este cambio no sustituye las animaciones de eliminación de pacientes.
 
 Añadir un perfil al catálogo lo incorpora al selector. Animaciones ambientales nuevas requieren un controlador en `seasonalAmbient.js` y su ID en el catálogo de efectos de `themeModule.js`; las seis responsabilidades permanecen separadas.
+
+El vuelo se limita a una franja inferior entre Nuevo ingreso y el piso. Durante effect-halloween el botón se sitúa a 108 px sobre el piso para reservar espacio a los sprites de 35–55 px; las alturas se recalculan al cambiar el tamaño de pantalla o la barra inferior.

@@ -30,8 +30,9 @@ let floorTop = 700, newsVisible = true;
 const newsBar = { getClientRects: () => newsVisible ? [1] : [], getBoundingClientRect: () => ({ top: floorTop }) };
 const footer = { getClientRects: () => [1], getBoundingClientRect: () => ({ top: 760 }) };
 const events = {};
+const fab = { getClientRects: () => [1], getBoundingClientRect: () => ({ bottom: floorTop - 108 }) };
 const appElement = { getClientRects: () => [1], querySelector: () => footer, appendChild(layer) { appendedLayer = layer; } };
-globalThis.document = { hidden: false, createElement: makeElement, getElementById: id => id === 'censoNewsBar' ? newsBar : appElement, addEventListener: (type, fn) => { events[type] = fn; }, removeEventListener: type => { delete events[type]; } };
+globalThis.document = { body: { style: {setProperty(){},removeProperty(){}} }, hidden: false, createElement: makeElement, getElementById: id => id === 'censoNewsBar' ? newsBar : id === 'mainFabBtn' ? fab : appElement, addEventListener: (type, fn) => { events[type] = fn; }, removeEventListener: type => { delete events[type]; } };
 globalThis.innerWidth = 1000; globalThis.innerHeight = 800;
 globalThis.matchMedia = () => ({ matches: false, addEventListener() {} });
 globalThis.requestAnimationFrame = fn => { nextFrame = fn; return 1; };
@@ -41,6 +42,11 @@ ambient.sync(SEASONAL_PROFILES.halloween, 'effect-halloween');
 assert.equal(appendedLayer.children.length, 6);
 assert.equal(appendedLayer.children.filter(b => b['aria-label'].includes('rojos')).length, 1);
 nextFrame(1000);
+for (const item of appendedLayer.children) {
+  const y = Number(item.style.transform.match(/,([^p]+)px/)[1]);
+  assert.ok(y >= fab.getBoundingClientRect().bottom + 6);
+  assert.ok(y + parseFloat(item.style.height) <= floorTop - 4);
+}
 const bat = appendedLayer.children[0], sprite = bat.children[0];
 events.pointerdown({target: {closest: selector => selector === '#mainAppContainer' ? appElement : true}, clientX: 0, clientY: 0});
 assert.equal(bat.disabled, undefined, 'Clinical content must not trigger bat interactions');
