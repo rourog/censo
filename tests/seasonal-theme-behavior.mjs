@@ -48,22 +48,22 @@ nextFrame(1000);
 for (const item of appendedLayer.children) {
   const y = Number(item.style.transform.match(/,([^p]+)px/)[1]);
   assert.ok(y >= fab.getBoundingClientRect().bottom + 6);
-  assert.ok(y + parseFloat(item.style.height) <= floorTop - 4);
+  assert.ok(y + parseFloat(item.style.height) <= floorTop - 20);
 }
 const bat = appendedLayer.children[0], sprite = bat.children[0];
 events.pointerdown({target: {closest: selector => selector === '#mainAppContainer' ? appElement : true}, clientX: 0, clientY: 0});
 assert.equal(bat.disabled, undefined, 'Clinical content must not trigger bat interactions');
 bat.onclick();
 for (let i = 1; i <= 5; i++) nextFrame(1000 + i * 50);
-if (Number(bat.style.transform.match(/,([^p]+)px/)[1]) + parseFloat(bat.style.height) < floorTop - 4) assert.notEqual(sprite.style.backgroundPosition, '-64px -48px', 'The impact frame must not appear during descent');
+if (Number(bat.style.transform.match(/,([^p]+)px/)[1]) + parseFloat(bat.style.height) < floorTop - 20) assert.notEqual(sprite.style.backgroundPosition, '-64px -48px', 'The impact frame must not appear during descent');
 for (let i = 6; i <= 35; i++) nextFrame(1000 + i * 50);
 assert.equal(sprite.style.backgroundPosition, '-64px -48px', 'The impact frame appears on the ground');
 const height = parseFloat(bat.style.height);
 const landedY = Number(bat.style.transform.match(/,([^p]+)px/)[1]);
-assert.equal(landedY + height, floorTop - 4, 'The visible news bar is the floor');
+assert.equal(landedY + height, floorTop - 20, 'The visible news bar is the floor');
 assert.equal(bat.parentElement, groundLayer, 'The landed bat must be above the patient content');
 newsVisible = false; nextFrame(2800);
-assert.equal(Number(bat.style.transform.match(/,([^p]+)px/)[1]) + height, 756, 'The footer becomes the floor when news is hidden');
+assert.equal(Number(bat.style.transform.match(/,([^p]+)px/)[1]) + height, 740, 'The footer becomes the floor when news is hidden');
 for (let i = 36; i <= 120; i++) nextFrame(1000 + i * 50);
 assert.equal(bat.removed, true, 'The fallen bat disappears');
 ambient.stop();
