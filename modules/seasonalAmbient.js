@@ -1,8 +1,8 @@
 /* Click targets are limited to each bat, never a screen-wide overlay. */
 export function createSeasonalAmbient() {
-  let layer = null, frame = 0, previous = 0, time = 0, bats = [], config = null;
+  let layer = null, groundLayer = null, frame = 0, previous = 0, time = 0, bats = [], config = null;
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-  function stop() { document.removeEventListener('pointerdown', clickBackground); cancelAnimationFrame(frame); frame = 0; layer?.remove(); layer = null; bats = []; document.body.style.removeProperty('--season-floor-offset'); }
+  function stop() { document.removeEventListener('pointerdown', clickBackground); cancelAnimationFrame(frame); frame = 0; layer?.remove(); groundLayer?.remove(); layer = null; groundLayer = null; bats = []; document.body.style.removeProperty('--season-floor-offset'); }
   function floorY() {
     const app = document.getElementById('mainAppContainer');
     const bars = [document.getElementById('censoNewsBar'), app?.querySelector?.('.footer')];
@@ -14,6 +14,14 @@ export function createSeasonalAmbient() {
     return innerHeight;
   }
   function flightBand(floor) {
+    const app = document.getElementById('mainAppContainer');
+    if (innerWidth > 768 && app?.classList?.contains('table-is-active')) {
+      const table = document.getElementById('scrollTableWrapper');
+      const header = app.querySelector?.('.header');
+      const headerBottom = header?.getBoundingClientRect?.().bottom || 80;
+      const tableBottom = table?.getClientRects?.().length ? table.getBoundingClientRect().bottom : headerBottom;
+      return { top: Math.max(headerBottom, tableBottom) + 8, bottom: floor - 8, dynamic: true };
+    }
     const button = document.getElementById('mainFabBtn');
     const bottom = button?.getClientRects?.().length ? button.getBoundingClientRect?.().bottom : null;
     return { top: Number.isFinite(bottom) ? bottom + 6 : floor - 102, bottom: floor - 4 };
@@ -27,7 +35,7 @@ export function createSeasonalAmbient() {
     // Content stays above decoration; only clicks on empty background reach a bat.
     const target = event.target;
     if (!target?.closest?.('#mainAppContainer') || target.closest('button, a, input, select, textarea, [contenteditable], .card, .section, .censo-table, .modal-overlay, .header, .footer, .censo-newsbar')) return;
-    const bat = [...bats].reverse().find(bat => bat.state === 'fly' && event.clientX >= bat.x && event.clientX <= bat.x + bat.size && event.clientY >= bat.drawY && event.clientY <= bat.drawY + bat.size * 1.5);
+    const bat = [...bats].reverse().find(bat => bat.state === 'fly' && bat.button.style.visibility !== 'hidden' && event.clientX >= bat.x && event.clientX <= bat.x + bat.size && event.clientY >= bat.drawY && event.clientY <= bat.drawY + bat.size * 1.5);
     if (bat) fall(bat);
   }
   function makeBat(index, initial) {
@@ -52,21 +60,36 @@ export function createSeasonalAmbient() {
     const floor = floorY();
     document.body.style.setProperty('--season-floor-offset', `${Math.max(0, innerHeight - floor)}px`);
     const band = flightBand(floor);
-    layer.style.clipPath = `inset(0 0 ${Math.max(0, innerHeight - floor)}px 0)`;
+    groundLayer.style.clipPath = layer.style.clipPath = `inset(0 0 ${Math.max(0, innerHeight - floor)}px 0)`;
     bats.forEach((bat, index) => {
-      const height = bat.size * 1.5; const top = Math.min(band.top, band.bottom - height), travel = Math.max(0, band.bottom - height - top);
+      const height = bat.size * 1.5;
+      const fits = band.bottom - band.top >= height;
+      const top = band.dynamic ? band.top : Math.min(band.top, band.bottom - height);
+      const travel = Math.max(0, band.bottom - height - top);
       let y = top + travel * (.5 + .5 * Math.sin(time * .8 + bat.phase + bat.altitude * Math.PI)), row = bat.red ? 0 : 1;
       let cell = Math.floor(time * config.flapFps * bat.flap + bat.phase) % 5;
       if (bat.state === 'fly') {
+        const hidden = band.dynamic && !fits;
+        bat.button.style.visibility = hidden ? 'hidden' : '';
+        bat.button.tabIndex = hidden ? -1 : 0;
+        bat.button.setAttribute('aria-hidden', String(hidden));
+        if (band.dynamic && !hidden) {
+          const previousY = bat.flightY ?? y;
+          y = Math.max(top, Math.min(band.bottom - height, previousY + (y - previousY) * Math.min(1, dt * 4)));
+        }
+        bat.flightY = y;
         bat.x += bat.speed * bat.dir * dt;
         if (bat.x > innerWidth + bat.size) bat.x = -bat.size;
         if (bat.x < -bat.size) bat.x = innerWidth + bat.size;
       } else {
-        const elapsed = time - bat.start, ground = floor - height;
+        const elapsed = time - bat.start, ground = floor - height - 4;
         y = Math.min(ground, bat.dropY + 210 * elapsed * elapsed);
         row = 2; cell = Math.min(3, Math.floor(elapsed * config.fallFps));
         if (y >= ground) {
           cell = 4; bat.groundAt ??= time;
+          // Only the landed sprite rises above content; flying bats remain behind cards.
+          if (!bat.onGroundLayer) { groundLayer.appendChild(bat.button); bat.onGroundLayer = true; }
+          bat.button.style.visibility = '';
           const rest = time - bat.groundAt;
           bat.button.style.opacity = String(Math.min(1, Math.max(0, (config.groundSeconds - rest) / .6)));
           if (rest > config.groundSeconds + 1) { bat.button.remove(); bats[index] = makeBat(index, false); return; }
@@ -83,6 +106,7 @@ export function createSeasonalAmbient() {
     if (!config || effect !== 'effect-halloween' || reduced.matches) return;
     const app = document.getElementById('mainAppContainer'); if (!app) return;
     layer = document.createElement('div'); layer.className = 'seasonal-bats'; app.appendChild(layer);
+    groundLayer = document.createElement('div'); groundLayer.className = 'seasonal-bats-ground'; app.appendChild(groundLayer);
     document.addEventListener('pointerdown', clickBackground);
     time = 0; previous = 0; bats = Array.from({ length: config.count }, (_, index) => makeBat(index, true));
     frame = requestAnimationFrame(tick);
