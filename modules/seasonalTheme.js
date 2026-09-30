@@ -33,7 +33,7 @@ export function getCelebrationChoice() {
 }
 function loadCelebrations() {
   const url = new URL('./celebrationEffects.js', import.meta.url);
-  url.searchParams.set('v', String(window.CensoBuild?.version || '2.74'));
+  url.searchParams.set('v', String(window.CensoBuild?.version || '2.75'));
   return celebrationModule ||= import(url.href);
 }
 export async function initCelebrationAudio() {
@@ -46,7 +46,10 @@ export function launchSeasonalConfetti(options = {}) {
   if (typeof document !== 'undefined' && document.hidden) return;
   const profile = getSeasonalProfile();
   const configured = profile?.confetti;
-  const effect = configured?.effect || getCelebrationChoice();
+  const choices = ['confetti', 'fireworks', 'balloons', ...(configured?.effect ? [configured.effect] : [])];
+  const effect = localStorage.getItem('censo-celebration-mode') === 'all'
+    ? choices[Math.floor(Math.random() * choices.length)]
+    : configured?.effect || getCelebrationChoice();
   const renderer = confettiRenderers.get(effect);
   const settings = { ...options, ...(configured?.colors ? { colors: configured.colors } : {}), disableForReducedMotion: true };
   if (renderer) renderer(settings);

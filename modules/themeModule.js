@@ -146,12 +146,28 @@ export function createThemeModule(app) {
     }
     if (profile?.banner.nodeGlyph) body.dataset.seasonNodeGlyph = profile.banner.nodeGlyph;
     else delete body.dataset.seasonNodeGlyph;
-    const select = document.getElementById('seasonPicker');
-    if (select) select.value = localStorage.getItem('censo-season') || 'auto';
+    updateToggles();
     const celebration = document.getElementById('celebrationPicker');
     if (celebration) celebration.value = getCelebrationChoice();
-    const note = document.getElementById('celebrationSeasonNote');
-    if (note) note.textContent = profile?.id === 'halloween' ? 'Halloween: murciélagos durante 3 segundos.' : 'Se reproduce al borrar un paciente.';
+  }
+  function updateToggles() {
+    const values = {
+      season: localStorage.getItem('censo-season') === 'off' ? 'off' : 'on',
+      celebrations: localStorage.getItem('censo-celebration-mode') === 'all' ? 'all' : 'seasonal',
+      sound: localStorage.getItem('censo-celebration-sound') === 'on' ? 'on' : 'off'
+    };
+    document.querySelectorAll('[data-theme-toggle]').forEach(button => {
+      const active = values[button.dataset.themeToggle] === button.dataset.value;
+      button.setAttribute('aria-pressed', String(active));
+    });
+    const picker = document.getElementById('celebrationPicker');
+    if (picker) picker.parentElement.hidden = values.celebrations === 'all' || !!getSeasonalProfile();
+  }
+  function toggleGroup(id, label, choices) {
+    return `<section class="theme-toggle-section"><div class="theme-picker-group__label">${label}</div>
+      <div class="theme-toggle-group" role="group" aria-label="${label}">
+        ${choices.map(([value, text]) => `<button type="button" data-theme-toggle="${id}" data-value="${value}" aria-pressed="false">${text}</button>`).join('')}
+      </div></section>`;
   }
   function refreshSeason() {
     applySeasonalBanner();
@@ -183,7 +199,7 @@ export function createThemeModule(app) {
         <div class="theme-picker-group__label"><span>Colores</span><span>${accents.length}</span></div>
         <div class="theme-picker-grid">
           ${accents.map(item => `
-            <button class="theme-swatch theme-swatch--accent accent-swatch ${item.metallic ? 'theme-swatch--metallic' : ''}" type="button" data-val="${item.id}" data-metal="${item.metallic || ''}" aria-label="Acento ${item.name}" title="${item.name} · claro ${item.light} · oscuro ${item.dark}" style="--swatch-light:${item.light};--swatch-dark:${item.dark}">
+            <button class="theme-swatch theme-swatch--accent accent-swatch ${item.metallic ? 'theme-swatch--metallic' : ''}" type="button" data-val="${item.id}" data-metal="${item.metallic || ''}" aria-label="Acento ${item.name}" title="${item.name}" style="--swatch-light:${item.light};--swatch-dark:${item.dark}">
               <span class="theme-swatch__dot"></span>
               <span class="theme-swatch__name">${item.name}</span>
             </button>
@@ -205,7 +221,6 @@ export function createThemeModule(app) {
             </button>
           `).join('')}
         </div>
-        <p class="theme-effect-note">Efecto decorativo. No modifica información clínica y se reduce automáticamente si el sistema solicita menos movimiento.</p>
       </section>
     `;
   }
@@ -218,19 +233,12 @@ export function createThemeModule(app) {
     const extras = document.createElement('div');
     extras.id = 'themeV2Extras';
     extras.innerHTML = `
-      <section class="season-picker">
-        <label for="seasonPicker">Temporada</label>
-        <select id="seasonPicker">
-          <option value="auto">Automática según la fecha</option>
-          <option value="off">Sin temporada</option>
-          ${Object.values(SEASONAL_PROFILES).map(profile => `<option value="${profile.id}">${profile.name}</option>`).join('')}
-        </select>
-      </section>
-      <section class="season-picker" aria-label="Celebración al borrar">
-        <label for="celebrationPicker">Celebración habitual</label>
-        <select id="celebrationPicker"><option value="confetti">Confeti</option><option value="fireworks">Fuegos artificiales · 5 segundos</option><option value="balloons">Globos · 5 segundos</option></select>
-        <p id="celebrationSeasonNote" class="theme-effect-note"></p>
-        <label><input id="celebrationSound" type="checkbox"> Sonido de murciélagos</label>
+      ${toggleGroup('season', 'Tema', [['on', 'Tema estacional'], ['off', 'Tema normal']])}
+      ${toggleGroup('celebrations', 'Celebraciones', [['all', 'Todas las animaciones'], ['seasonal', 'Animación estacional']])}
+      ${toggleGroup('sound', 'Sonidos', [['on', 'ON'], ['off', 'OFF']])}
+      <section class="season-picker" aria-label="Celebración">
+        <div><label for="celebrationPicker">Celebración</label>
+        <select id="celebrationPicker"><option value="confetti">Confeti</option><option value="fireworks">Fuegos artificiales</option><option value="balloons">Globos</option></select></div>
         <button id="celebrationPreview" type="button" class="theme-reset">PROBAR CELEBRACIÓN</button>
       </section>
       ${renderEffectPicker()}
@@ -253,23 +261,34 @@ export function createThemeModule(app) {
     modalContent.appendChild(extras);
     document.getElementById('celebrationPicker').value = getCelebrationChoice();
     document.getElementById('celebrationPicker').addEventListener('change', event => localStorage.setItem('censo-celebration', event.target.value));
-    const sound = document.getElementById('celebrationSound');
-    sound.checked = localStorage.getItem('censo-celebration-sound') === 'on';
-    sound.addEventListener('change', () => {
-      localStorage.setItem('censo-celebration-sound', sound.checked ? 'on' : 'off');
-      if (sound.checked) unlockCelebrationAudio();
+    extras.querySelectorAll('[data-theme-toggle]').forEach(button => {
+      button.addEventListener('click', () => {
+        const {themeToggle, value} = button.dataset;
+        if (themeToggle === 'season') {
+          if (value === 'off') {
+            localStorage.setItem('censo-season-last', localStorage.getItem('censo-season') || 'auto');
+            localStorage.setItem('censo-season', 'off');
+          } else {
+            localStorage.setItem('censo-season', localStorage.getItem('censo-season-last') || 'auto');
+          }
+          refreshSeason();
+        } else if (themeToggle === 'celebrations') {
+          localStorage.setItem('censo-celebration-mode', value);
+          updateToggles();
+        } else {
+          localStorage.setItem('censo-celebration-sound', value);
+          if (value === 'on') unlockCelebrationAudio();
+          updateToggles();
+        }
+      });
     });
+    updateToggles();
     document.getElementById('celebrationPreview').addEventListener('click', async () => {
       app.cerrarModal?.('themeModal');
       await unlockCelebrationAudio();
       launchSeasonalConfetti({particleCount:150, spread:80, origin:{y:.6}});
     });
     initCelebrationAudio().catch(error => console.warn('[CENSO] Audio decorativo no disponible:', error));
-
-    document.getElementById('seasonPicker').addEventListener('change', (event) => {
-      localStorage.setItem('censo-season', event.target.value);
-      refreshSeason();
-    });
 
     extras.querySelectorAll('.theme-effect-option').forEach(button => {
       button.addEventListener('click', () => applyEffect(button.dataset.effect));

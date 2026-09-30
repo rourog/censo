@@ -1,9 +1,37 @@
 /* Decorative celebrations only. No patient data or Firestore access. */
 let current=null,generation=0,audio=null;
-const soundNodes=new Set(),root=new URL('../assets/celebrations/',import.meta.url),build=String(window.CensoBuild?.version||'2.74');
+const soundNodes=new Set(),root=new URL('../assets/celebrations/',import.meta.url),build=String(window.CensoBuild?.version||'2.75');
 function versioned(path){const url=new URL(path,root);url.searchParams.set('v',build);return url.href;}
 export async function unlockCelebrationAudio(){if(localStorage.getItem('censo-celebration-sound')!=='on')return;try{audio ||= new (window.AudioContext||window.webkitAudioContext)();if(audio.state==='suspended')await audio.resume();}catch{}}
-export function initCelebrationAudio(){if(initCelebrationAudio.installed)return;initCelebrationAudio.installed=true;document.addEventListener('pointerdown',unlockCelebrationAudio,{passive:true});document.addEventListener('keydown',unlockCelebrationAudio);document.addEventListener('visibilitychange',()=>{if(document.hidden)stopCelebration();});window.addEventListener('pagehide',stopCelebration);}
+export async function playInterfaceSound(kind='click') {
+ if(document.hidden||localStorage.getItem('censo-celebration-sound')!=='on')return;
+ if(kind==='click')await unlockCelebrationAudio();
+ if(audio?.state!=='running'||localStorage.getItem('censo-celebration-sound')!=='on')return;
+ try {
+  const osc=audio.createOscillator(),gain=audio.createGain(),now=audio.currentTime,hover=kind==='hover',duration=hover?.045:.12;
+  osc.type='sine';osc.frequency.setValueAtTime(hover?520:620,now);
+  osc.frequency.exponentialRampToValueAtTime(hover?310:930,now+duration);
+  gain.gain.setValueAtTime(.0001,now);gain.gain.exponentialRampToValueAtTime(hover?.012:.028,now+.006);
+  gain.gain.exponentialRampToValueAtTime(.0001,now+duration);
+  osc.connect(gain);gain.connect(audio.destination);
+  osc.onended=()=>{osc.disconnect();gain.disconnect();};osc.start(now);osc.stop(now+duration);
+ }catch{}
+}
+export function initCelebrationAudio(){
+ if(initCelebrationAudio.installed)return;initCelebrationAudio.installed=true;
+ document.addEventListener('pointerdown',unlockCelebrationAudio,{passive:true});
+ document.addEventListener('keydown',unlockCelebrationAudio);
+ const buttonFor=target=>{const button=target?.closest?.('button, [role="button"], input[type="button"], input[type="submit"]');return button&&!button.disabled&&button.getAttribute('aria-disabled')!=='true'?button:null;};
+ document.addEventListener('click',event=>{if(buttonFor(event.target))playInterfaceSound('click');},true);
+ let lastHover=-Infinity;
+ document.addEventListener('pointerover',event=>{
+  if(event.pointerType!=='mouse')return;
+  const button=buttonFor(event.target);
+  if(!button||button.contains(event.relatedTarget))return;
+  const now=performance.now();if(now-lastHover<100)return;lastHover=now;playInterfaceSound('hover');
+ });
+ document.addEventListener('visibilitychange',()=>{if(document.hidden)stopCelebration();});window.addEventListener('pagehide',stopCelebration);
+}
 function batSound(){if(localStorage.getItem('censo-celebration-sound')!=='on'||audio?.state!=='running')return;const now=audio.currentTime;for(let i=0;i<18;i++){const osc=audio.createOscillator(),gain=audio.createGain(),start=now+i*.15;osc.type=i%3===0?'triangle':'sine';const freq=i%3===0?120:1800+Math.random()*1700;osc.frequency.setValueAtTime(freq,start);osc.frequency.exponentialRampToValueAtTime(freq*.55,start+.09);gain.gain.setValueAtTime(0,start);gain.gain.linearRampToValueAtTime(i%3===0?.035:.018,start+.008);gain.gain.exponentialRampToValueAtTime(.0001,start+.11);osc.connect(gain);gain.connect(audio.destination);soundNodes.add(osc);osc.onended=()=>{soundNodes.delete(osc);osc.disconnect();gain.disconnect();};osc.start(start);osc.stop(start+.12);}}
 export function stopCelebration(){generation++;if(current){clearTimeout(current.timer);cancelAnimationFrame(current.raf);for(const a of current.animations||[])a.cancel();current.layer.remove();current=null;}for(const n of soundNodes){try{n.stop();}catch{}}soundNodes.clear();}
 function layer(){const el=document.createElement('div');el.setAttribute('aria-hidden','true');Object.assign(el.style,{position:'fixed',inset:'0',zIndex:'95',pointerEvents:'none',overflow:'hidden'});document.body.appendChild(el);current={layer:el,animations:[]};return current;}
