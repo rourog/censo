@@ -7,7 +7,7 @@ export const SEASONAL_PROFILES = Object.freeze({
       titleFont: '"Creepster", Georgia, serif', nodeGlyph: '🎃' },
     ambient: { sprite: '../assets/seasonal/bats.png', count: 6, minSize: 35, maxSize: 55,
       flapFps: 12, speed: 100, fallFps: 12, groundSeconds: 3,
-      ghosts: { sprite: '../assets/seasonal/ghost.png', batsPerGhost: 10, fps: 12, speed: 65, minSize: 28, maxSize: 40 } },
+      ghosts: { sprite: '../assets/seasonal/ghost.png', batsPerGhost: 10, fps: 12, speed: 115, minSize: 27, maxSize: 33 } },
     // Halloween replaces the usual celebration for this season.
     confetti: { effect: 'bats', duration: 3, colors: ['#ff6500', '#fb923c', '#a855f7', '#6d28d9'] }
   }

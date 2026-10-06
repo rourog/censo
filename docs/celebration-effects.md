@@ -20,6 +20,6 @@ Sonidos ON/OFF usa la preferencia existente `censo-celebration-sound` para murci
 
 ## Fantasmas ambientales de Halloween
 
-El vuelo ambiental conserva seis criaturas simultáneas. Cada diez apariciones de murciélagos se programa un fantasma; el puesto de ojos rojos permanece reservado a un murciélago, por lo que puede demorar una aparición adicional. Los fantasmas usan el sheet original del usuario de 256×256, celdas de 32×32, a 12 FPS; vuelan más despacio y se disuelven en el mismo punto al hacer clic.
+El vuelo ambiental conserva seis criaturas simultáneas. Cada diez apariciones de murciélagos se programa un fantasma; el puesto de ojos rojos permanece reservado a un murciélago, por lo que puede demorar una aparición adicional. Los fantasmas usan el sheet original del usuario de 256×256, celdas de 32×32, a 12 FPS; vuelan con velocidad base de 115 px/s y tamaños de 27–33 px, con la misma variabilidad de velocidad por tamaño que los murciélagos, y se disuelven en el mismo punto al hacer clic.
 
 Apariencia → Fantasmas permite azules, rosas o ambos (`censo-ghost-color`, local). Se mantiene la banda dinámica debajo de pacientes y el límite del banner. Esta incorporación afecta al ambiente, sin cambiar las celebraciones al borrar.
