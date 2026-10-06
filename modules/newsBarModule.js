@@ -204,6 +204,10 @@ export function createNewsBarModule(app) {
     onAuthStateChanged
   } = app.firebase;
 
+  app.halloweenCounter?.subscribe(() => {
+    window.setTimeout(() => render(), 350);
+  });
+
   let initialized = false;
   let visible = false;
   let announcementUnsubscribe = null;
@@ -588,20 +592,22 @@ export function createNewsBarModule(app) {
 
   function getDisplayState() {
     const internal = getActiveAnnouncements();
+    const seasonal = app.halloweenCounter?.headline();
+    const extras = seasonal ? [seasonal] : [];
 
     if (internal.length) {
       return {
         mode: 'internal',
-        items: internal.map((item) => ({
+        items: [...internal.map((item) => ({
           ...item,
           kind: 'internal'
-        }))
+        })), ...extras]
       };
     }
 
     return {
       mode: 'external',
-      items: getTodayExternalNews()
+      items: [...extras, ...getTodayExternalNews()]
     };
   }
 

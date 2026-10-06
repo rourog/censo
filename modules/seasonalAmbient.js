@@ -1,6 +1,6 @@
 /* Decorative creatures share the free flight band behind patient content. */
 const LANDING_MARGIN = 20;
-export function createSeasonalAmbient() {
+export function createSeasonalAmbient({ onHit = () => {} } = {}) {
   let layer = null, groundLayer = null, frame = 0, previous = 0, time = 0, bats = [], config = null, batAppearances = 0;
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   function stop() { document.removeEventListener('pointerdown', clickBackground); cancelAnimationFrame(frame); frame = 0; layer?.remove(); groundLayer?.remove(); layer = null; groundLayer = null; bats = []; document.body.style.removeProperty('--season-floor-offset'); }
@@ -31,6 +31,16 @@ export function createSeasonalAmbient() {
     if (bat.state !== 'fly') return;
     bat.state = bat.ghost ? 'vanish' : 'fall'; bat.start = time; bat.dropY = bat.drawY;
     bat.button.disabled = true;
+    const point = document.createElement('span');
+    point.className = 'seasonal-hit-point'; point.textContent = '+1';
+    point.setAttribute('aria-hidden', 'true');
+    point.style.left = `${bat.x + bat.size / 2}px`;
+    point.style.top = `${bat.drawY}px`;
+    groundLayer.appendChild(point);
+    point.addEventListener('animationend', () => point.remove(), { once: true });
+    // Detached from the moving sprite so falling/vanishing never cuts it short.
+    setTimeout(() => point.remove(), 1400);
+    onHit(bat.ghost ? 'ghosts' : 'bats');
   }
   function clickBackground(event) {
     // Content stays above decoration; only clicks on empty background reach a bat.
