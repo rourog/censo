@@ -190,6 +190,27 @@ function selectPrioritizedExternalNews(items) {
 }
 
 
+const HALLOWEEN_MESSAGES = Object.freeze([
+  { prefix: '', suffix: ' han sido eliminados por los usuarios de urgencias.' },
+  { prefix: '', suffix: ' ya no están entre nosotros.' },
+  { prefix: '', suffix: ' han pasado a mejor vida... Otra vez.' },
+  { prefix: '', suffix: ' han concluido su estancia en Urgencias.' },
+  { prefix: 'Se han egresado ', suffix: '' }
+]);
+
+export function selectHalloweenMessage(storage = localStorage, random = Math.random) {
+  const key = 'censo-halloween-last-message-v1';
+  let previous = -1;
+  try {
+    const saved = storage.getItem(key);
+    if (saved !== null && /^[0-4]$/.test(saved)) previous = Number(saved);
+  } catch {}
+  const choices = HALLOWEEN_MESSAGES.map((_, index) => index).filter(index => index !== previous);
+  const index = choices[Math.floor(random() * choices.length)];
+  try { storage.setItem(key, String(index)); } catch {}
+  return HALLOWEEN_MESSAGES[index];
+}
+
 export function createNewsBarModule(app) {
   const {
     db,
@@ -204,6 +225,7 @@ export function createNewsBarModule(app) {
     onAuthStateChanged
   } = app.firebase;
 
+  let halloweenMessage = null;
   let counterTotals = null;
   let displayedTotals = null;
   let counterRenderTimer = null;
@@ -614,13 +636,14 @@ export function createNewsBarModule(app) {
     stopTickerAnimation();
     currentTickerItemHtml = ''; currentTickerItemCount = 0;
     const confirmed = counterTotals;
+    if (confirmed && !halloweenMessage) halloweenMessage = selectHalloweenMessage();
     const number = (kind, label, emoji) => {
       const pulse = displayedTotals && displayedTotals.year === confirmed.year && displayedTotals[kind] !== confirmed[kind];
       return `<span class="censo-halloween-species">${emoji} <strong class="censo-halloween-number${pulse ? ' censo-halloween-number--pulse' : ''}">${escapeHtml(confirmed[kind].toLocaleString('es-MX'))}</strong> ${label}</span>`;
     };
     const year = confirmed?.year || Number(new Intl.DateTimeFormat('en', { timeZone: 'America/Mexico_City', year: 'numeric' }).format(new Date()));
     elements.track.innerHTML = confirmed
-      ? `<div class="censo-halloween-message"><strong>🎃 Halloween ${year}</strong><span class="censo-halloween-separator"> · </span><span>Los usuarios de Urgencias han aniquilado ${number('bats', 'murciélagos', '🦇')} y ${number('ghosts', 'fantasmas', '👻')}</span></div>`
+      ? `<div class="censo-halloween-message"><strong>🎃 Halloween ${year}</strong><span class="censo-halloween-separator"> · </span><span>${escapeHtml(halloweenMessage.prefix)}${number('bats', 'murciélagos', '🦇')} y ${number('ghosts', 'fantasmas', '👻')}${escapeHtml(halloweenMessage.suffix)}</span></div>`
       : `<div class="censo-halloween-message"><strong>🎃 Halloween ${year}</strong><span> · Sincronizando contador…</span></div>`;
     displayedTotals = confirmed ? { ...confirmed } : null;
     const notices = state.notices;
