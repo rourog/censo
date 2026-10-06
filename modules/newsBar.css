@@ -510,3 +510,41 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Halloween: one stationary message instead of the external news ticker. */
+.censo-newsbar[data-feed-mode="seasonal"] {
+  background: #29113e;
+  color: #fff1df;
+  border-top-color: #ff923f;
+}
+.censo-newsbar[data-feed-mode="seasonal"] .censo-newsbar__viewport {
+  justify-content: center; cursor: default;
+}
+.censo-newsbar[data-feed-mode="seasonal"] .censo-newsbar__viewport::before,
+.censo-newsbar[data-feed-mode="seasonal"] .censo-newsbar__viewport::after { display: none; }
+.censo-newsbar[data-feed-mode="seasonal"] .censo-newsbar__track {
+  width: 100%; justify-content: center; will-change: auto;
+}
+.censo-newsbar[data-feed-mode="seasonal"] .censo-newsbar__icon:disabled {
+  cursor: default; background: transparent; color: #ffad70;
+}
+.censo-halloween-message {
+  padding: 2px 10px; text-align: center;
+  font: 12px/1.2 system-ui, sans-serif; color: #fff1df;
+}
+.censo-halloween-message > strong { font-weight: 800; }
+.censo-halloween-species { white-space: nowrap; }
+.censo-halloween-number { display: inline-block; color: #ffad70;
+  font-weight: 800; font-variant-numeric: tabular-nums; }
+.censo-halloween-number--pulse { animation: censoHalloweenCountPulse .55s ease-out; }
+@keyframes censoHalloweenCountPulse {
+  0%, 100% { transform: scale(1); }
+  35% { transform: scale(1.13); text-shadow: 0 0 8px #ff923f80; }
+}
+@media (min-width: 769px) and (max-width: 1000px) {
+  .censo-halloween-message { font-size: 11px; }
+  .censo-newsbar[data-feed-mode="seasonal"] .censo-newsbar__signature { padding: 0 5px; font-size: 8px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .censo-halloween-number--pulse { animation: none; }
+}

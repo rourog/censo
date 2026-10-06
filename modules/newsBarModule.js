@@ -11,7 +11,7 @@
 */
 
 const MODULE_VERSION = '1.5';
-const NEWSBAR_BUILD = 'admin-sonidos-v4-20260903';
+const NEWSBAR_BUILD = 'halloween-counter-v280-20261006';
 const ANNOUNCEMENTS_COLLECTION = 'announcements';
 const AUTH_EMAIL_INTERNO = 'interno@hrd.censo';
 const DESKTOP_MEDIA = window.matchMedia('(min-width: 769px)');
@@ -204,9 +204,16 @@ export function createNewsBarModule(app) {
     onAuthStateChanged
   } = app.firebase;
 
-  app.halloweenCounter?.subscribe(() => {
-    window.setTimeout(() => render(), 350);
+  let counterTotals = null;
+  let displayedTotals = null;
+  let counterRenderTimer = null;
+  app.halloweenCounter?.subscribe(totals => {
+    counterTotals = totals;
+    if (counterRenderTimer) window.clearTimeout?.(counterRenderTimer);
+    counterRenderTimer = window.setTimeout(() => { counterRenderTimer = null; render(); }, 350);
   });
+
+  const halloweenActive = () => document.body.dataset.season === 'halloween';
 
   let initialized = false;
   let visible = false;
@@ -459,6 +466,7 @@ export function createNewsBarModule(app) {
   }
 
   function bindEvents() {
+    document.addEventListener('censo:seasonchange', render);
     app.mountSoundAdmin(elements.soundsPanel);
     elements.noticesTab.addEventListener('click', () => selectAdminTab(false));
     elements.soundsTab.addEventListener('click', () => selectAdminTab(true));
@@ -473,7 +481,7 @@ export function createNewsBarModule(app) {
     });
     elements.bar.addEventListener('click', (event) => {
       if (event.target.closest('.censo-newsbar__link')) return;
-      if (elements.bar.dataset.feedMode !== 'internal') return;
+      if (elements.bar.dataset.feedMode !== 'internal' && !(elements.bar.dataset.feedMode === 'seasonal' && getActiveAnnouncements().length)) return;
 
       if (
         event.target.closest(
@@ -592,23 +600,36 @@ export function createNewsBarModule(app) {
 
   function getDisplayState() {
     const internal = getActiveAnnouncements();
-    const seasonal = app.halloweenCounter?.headline();
-    const extras = seasonal ? [seasonal] : [];
-
-    if (internal.length) {
-      return {
-        mode: 'internal',
-        items: [...internal.map((item) => ({
-          ...item,
-          kind: 'internal'
-        })), ...extras]
-      };
+    if (halloweenActive()) {
+      const headline = app.halloweenCounter?.headline();
+      return { mode: 'seasonal', items: headline ? [headline] : [], notices: internal };
     }
+    if (internal.length) {
+      return { mode: 'internal', items: internal.map(item => ({ ...item, kind: 'internal' })) };
+    }
+    return { mode: 'external', items: getTodayExternalNews() };
+  }
 
-    return {
-      mode: 'external',
-      items: [...extras, ...getTodayExternalNews()]
+  function renderSeasonal(state) {
+    stopTickerAnimation();
+    currentTickerItemHtml = ''; currentTickerItemCount = 0;
+    const confirmed = counterTotals;
+    const number = (kind, label, emoji) => {
+      const pulse = displayedTotals && displayedTotals.year === confirmed.year && displayedTotals[kind] !== confirmed[kind];
+      return `<span class="censo-halloween-species">${emoji} <strong class="censo-halloween-number${pulse ? ' censo-halloween-number--pulse' : ''}">${escapeHtml(confirmed[kind].toLocaleString('es-MX'))}</strong> ${label}</span>`;
     };
+    const year = confirmed?.year || Number(new Intl.DateTimeFormat('en', { timeZone: 'America/Mexico_City', year: 'numeric' }).format(new Date()));
+    elements.track.innerHTML = confirmed
+      ? `<div class="censo-halloween-message"><strong>🎃 Halloween ${year}</strong><span class="censo-halloween-separator"> · </span><span>Los usuarios de Urgencias han aniquilado ${number('bats', 'murciélagos', '🦇')} y ${number('ghosts', 'fantasmas', '👻')}</span></div>`
+      : `<div class="censo-halloween-message"><strong>🎃 Halloween ${year}</strong><span> · Sincronizando contador…</span></div>`;
+    displayedTotals = confirmed ? { ...confirmed } : null;
+    const notices = state.notices;
+    elements.icon.disabled = !notices.length;
+    elements.icon.setAttribute('aria-label', notices.length ? `Avisos: ${notices.length}` : 'Sin avisos activos');
+    elements.drawerStatus.textContent = `${notices.length} aviso${notices.length === 1 ? '' : 's'} activo${notices.length === 1 ? '' : 's'}`;
+    elements.drawerList.innerHTML = notices.map(item => `<article class="censo-newsdrawer__item"><time>${escapeHtml(item.displayTime)}</time><p>${escapeHtml(item.text)}</p></article>`).join('') || '<div class="censo-news-empty">No hay avisos activos.</div>';
+    if (!notices.length) closeDrawer();
+    renderAdminList();
   }
 
   function createTickerSignature(state) {
@@ -644,6 +665,14 @@ export function createNewsBarModule(app) {
 
     const state = getDisplayState();
     elements.bar.dataset.feedMode = state.mode;
+
+    if (state.mode === 'seasonal') {
+      const signature = JSON.stringify([state.items, state.notices, counterTotals]);
+      if (signature !== lastTickerSignature) { lastTickerSignature = signature; renderSeasonal(state); }
+      return;
+    }
+    displayedTotals = null;
+    elements.icon.disabled = false;
 
     if (state.mode === 'external') {
       closeDrawer();
@@ -869,7 +898,7 @@ export function createNewsBarModule(app) {
   }
 
   async function ensureExternalFeed(force = false) {
-    if (getActiveAnnouncements().length || externalLoading) return;
+    if (halloweenActive() || getActiveAnnouncements().length || externalLoading) return;
 
     const now = Date.now();
     const cacheBelongsToToday =
@@ -1025,7 +1054,7 @@ export function createNewsBarModule(app) {
   }
 
   function openDrawer() {
-    if (elements.bar.dataset.feedMode !== 'internal') return;
+    if (elements.bar.dataset.feedMode !== 'internal' && !(elements.bar.dataset.feedMode === 'seasonal' && getActiveAnnouncements().length)) return;
     elements.drawer.hidden = false;
   }
 
