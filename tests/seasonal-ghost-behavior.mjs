@@ -35,5 +35,29 @@ Math.random=()=>.5;
 const before=created.length;ambient.sync(SEASONAL_PROFILES.halloween,'effect-halloween');
 for(let i=0;i<500;i++)raf(now+=50);
 assert.ok(created.slice(before).some(item=>item.className==='seasonal-bat seasonal-ghost'),'Six live slots eventually introduce a rare ghost on re-entry');
+// Kill every live creature, including ghosts. Every respawn can use either edge.
+for (const sample of [.25, .75]) {
+ Math.random=()=>sample; ambient.sync(profile,'effect-halloween'); raf(now+=50);
+ const originals=[...layer.children]; for(const creature of originals)creature.onclick();
+ const baseline=created.length; let checkedBat=false,checkedGhost=false;
+ for(let step=0;step<180;step++){
+  raf(now+=50);
+  for(const replacement of created.slice(baseline).filter(el=>['seasonal-bat','seasonal-bat seasonal-ghost'].includes(el.className)&&el.style.transform&&!el.checkedEntry)){
+   replacement.checkedEntry=true;
+   const x=Number(replacement.style.transform.match(/translate\(([^p]+)px/)[1]);
+   if(sample<.5){assert.ok(x>innerWidth,'A respawn enters from the right');assert.match(replacement.children[0].style.transform,/scale\(-/);}
+   else {assert.ok(x<0,'A respawn enters from the left');assert.doesNotMatch(replacement.children[0].style.transform,/scale\(-/);}
+   if(replacement.className.includes('seasonal-ghost'))checkedGhost=true;else checkedBat=true;
+  }
+ }
+ assert.ok(checkedBat&&checkedGhost,'Both species respawn after clearing all creatures');
+}
+// Leaving the screen must choose a fresh edge, rather than inherit the last direction.
+Math.random=()=>.25;ambient.sync(SEASONAL_PROFILES.halloween,'effect-halloween');raf(now+=50);
+const exitBaseline=created.length;Math.random=()=>.75;let newEntry;
+for(let step=0;step<350&&!newEntry;step++){
+ raf(now+=50);newEntry=created.slice(exitBaseline).find(el=>el.className==='seasonal-bat'&&el.style.transform);
+}
+assert.ok(newEntry);assert.ok(Number(newEntry.style.transform.match(/translate\(([^p]+)px/)[1])<0,'A left-facing creature can next enter from the left');
 const old=layer;ambient.sync(profile,'effect-none');assert.equal(old.removed,true);Math.random=random;
 console.log('OK: 1 ghost per 10 bat appearances, pink/blue preference, free-space limits, dissolve-in-place, full cleanup and disabled effects.');

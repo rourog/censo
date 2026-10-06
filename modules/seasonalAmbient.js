@@ -49,7 +49,7 @@ export function createSeasonalAmbient({ onHit = () => {} } = {}) {
     const bat = [...bats].reverse().find(bat => bat.state === 'fly' && bat.button.style.visibility !== 'hidden' && event.clientX >= bat.x && event.clientX <= bat.x + bat.size && event.clientY >= bat.drawY && event.clientY <= bat.drawY + bat.size * (bat.ghost ? 19 / 12 : 1.5));
     if (bat) fall(bat);
   }
-  function makeBat(index, initial, direction) {
+  function makeBat(index, initial) {
     // A single ghost follows ten bat appearances. The red-eyed slot stays a bat.
     const ghost = !!config.ghosts && index !== 0 && batAppearances >= config.ghosts.batsPerGhost;
     if (ghost) batAppearances = 0; else batAppearances++;
@@ -66,7 +66,8 @@ export function createSeasonalAmbient({ onHit = () => {} } = {}) {
     sprite.style.backgroundImage = `url("${url.href}")`;
     button.appendChild(sprite); layer.appendChild(button);
     const mix = Math.random(), size = settings.minSize + (settings.maxSize - settings.minSize) * mix;
-    const dir = direction ?? (initial && Math.random() < .5 ? -1 : 1);
+    // Every new appearance independently chooses its entry edge.
+    const dir = Math.random() < .5 ? -1 : 1;
     const bat = { button, sprite, ghost, color, red: index === 0, size, speed: settings.speed * (1.25 - .5 * mix) * (.85 + Math.random() * .3), flap: .9 + Math.random() * .2,
       x: initial ? Math.random() * innerWidth : dir === 1 ? -size : innerWidth + size, altitude: Math.random(), phase: Math.random() * 5, dir, state: 'fly' };
     button.style.width = `${size}px`; button.style.height = `${size * (ghost ? 19 / 12 : 1.5)}px`;
@@ -102,12 +103,12 @@ export function createSeasonalAmbient({ onHit = () => {} } = {}) {
         bat.flightY = y;
         bat.x += bat.speed * bat.dir * dt;
         if (bat.x > innerWidth + bat.size || bat.x < -bat.size) {
-          bat.button.remove(); bats[index] = makeBat(index, false, bat.dir); return;
+          bat.button.remove(); bats[index] = makeBat(index, false); return;
         }
       } else if (bat.state === 'vanish') {
         y = bat.dropY;
         if ((time - bat.start) * config.ghosts.fps >= 13) {
-          bat.button.remove(); bats[index] = makeBat(index, false, bat.dir); return;
+          bat.button.remove(); bats[index] = makeBat(index, false); return;
         }
       } else {
         const elapsed = time - bat.start, ground = floor - height - LANDING_MARGIN;
