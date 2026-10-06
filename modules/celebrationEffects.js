@@ -21,7 +21,7 @@ export function initCelebrationAudio(){
  if(initCelebrationAudio.installed)return;initCelebrationAudio.installed=true;
  document.addEventListener('pointerdown',unlockCelebrationAudio,{passive:true});
  document.addEventListener('keydown',unlockCelebrationAudio);
- const buttonFor=target=>{const button=target?.closest?.('button, [role="button"], input[type="button"], input[type="submit"]');return button&&!button.disabled&&button.getAttribute('aria-disabled')!=='true'?button:null;};
+ const buttonFor=target=>{const button=target?.closest?.('button, [role="button"], input[type="button"], input[type="submit"]');return button&&!button.classList?.contains('seasonal-bat')&&!button.disabled&&button.getAttribute('aria-disabled')!=='true'?button:null;};
  document.addEventListener('click',event=>{if(buttonFor(event.target))playInterfaceSound('click');},true);
  let lastHover=-Infinity;
  document.addEventListener('pointerover',event=>{

@@ -20,6 +20,6 @@ listeners.pointerover({target,pointerType:'touch'});assert.equal(tones,1);
 listeners.pointerover({target,pointerType:'mouse'});assert.equal(tones,2);
 clock+=200;listeners.pointerover({target,pointerType:'mouse',relatedTarget:'child'});assert.equal(tones,2);
 button.disabled=true;listeners.click({target});await Promise.resolve();assert.equal(tones,2);
-button.disabled=false;prefs.set('censo-celebration-sound','off');await playInterfaceSound();assert.equal(tones,2);
+button.disabled=false;button.classList={contains:()=>true};listeners.click({target});await Promise.resolve();assert.equal(tones,2,'Creature hit does not also play the generic button tone');button.classList={contains:()=>false};prefs.set('censo-celebration-sound','off');await playInterfaceSound();assert.equal(tones,2);
 prefs.set('censo-celebration-sound','on');document.hidden=true;await playInterfaceSound();assert.equal(tones,2);
 console.log('OK: UI audio respects OFF, gesture unlock, touch, disabled buttons, child transitions and hidden pages.');
