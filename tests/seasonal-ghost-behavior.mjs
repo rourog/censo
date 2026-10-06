@@ -23,6 +23,14 @@ for(let i=0;i<16;i++){now+=50;raf(now);}assert.equal(ghost.removed,true);
 for(const color of ['cyan','pink']){preference=color;ambient.sync(profile,'effect-halloween');raf(now+=50);const items=layer.children.filter(b=>b.className.includes('seasonal-ghost'));assert.equal(items.length,3);for(const g of items)assert.match(g['aria-label'],color==='pink'?/rosa/:/azul/);}
 tableBottom=690;raf(now+=50);for(const g of layer.children)assert.equal(g.style.visibility,'hidden');
 tableBottom=250;raf(now+=50);for(const g of layer.children)assert.equal(g.style.visibility,'');
+// Deterministic left-facing flight verifies mirroring during flight and dissolve.
+Math.random=()=>.25;ambient.sync(profile,'effect-halloween');raf(now+=50);
+const leftGhost=layer.children.find(item=>item.className.includes('seasonal-ghost'));
+assert.match(leftGhost.children[0].style.transform,/scale\(-[0-9.]+,[0-9.]+\)/);
+const position=leftGhost.style.transform;leftGhost.onclick();raf(now+=50);
+assert.match(leftGhost.children[0].style.transform,/scale\(-[0-9.]+,[0-9.]+\)/);
+assert.equal(leftGhost.style.transform,position,'Mirroring keeps the hit box stationary during dissolution');
+Math.random=()=>.5;
 const before=created.length;ambient.sync(SEASONAL_PROFILES.halloween,'effect-halloween');
 for(let i=0;i<500;i++)raf(now+=50);
 assert.ok(created.slice(before).some(item=>item.className==='seasonal-bat seasonal-ghost'),'Six live slots eventually introduce a rare ghost on re-entry');
