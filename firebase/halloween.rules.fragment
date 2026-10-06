@@ -1,0 +1,38 @@
+// Insert these matches INSIDE the existing match /databases/{database}/documents.
+// Preserve existing patient, authentication and announcement rules.
+match /seasonalStats/{campaign} {
+  function signedIn() { return request.auth != null; }
+  function validCampaign() { return campaign.matches('halloween-20[2-9][0-9]'); }
+  function eventPath() { return /databases/$(database)/documents/seasonalStats/$(campaign)/clicks/$(request.resource.data.lastEvent); }
+  function validTotal() {
+    let next = request.resource.data;
+    return next.keys().hasOnly(['bats', 'ghosts', 'lastEvent', 'updatedAt'])
+      && next.keys().hasAll(['bats', 'ghosts', 'lastEvent', 'updatedAt'])
+      && next.bats is int && next.ghosts is int
+      && next.bats >= 0 && next.ghosts >= 0
+      && next.lastEvent is string && next.lastEvent.matches('[a-zA-Z0-9-]{10,80}')
+      && next.updatedAt == request.time
+      && !exists(eventPath()) && existsAfter(eventPath());
+  }
+  function batDelta() { return getAfter(eventPath()).data.kind == 'bats' ? 1 : 0; }
+  function ghostDelta() { return getAfter(eventPath()).data.kind == 'ghosts' ? 1 : 0; }
+  allow read: if signedIn() && validCampaign();
+  allow create: if signedIn() && validCampaign() && validTotal()
+    && request.resource.data.bats == batDelta()
+    && request.resource.data.ghosts == ghostDelta();
+  allow update: if signedIn() && validCampaign() && validTotal()
+    && request.resource.data.bats == resource.data.bats + batDelta()
+    && request.resource.data.ghosts == resource.data.ghosts + ghostDelta();
+  allow delete: if false;
+  match /clicks/{eventId} {
+    allow read: if request.auth != null && campaign.matches('halloween-20[2-9][0-9]');
+    allow create: if request.auth != null && campaign.matches('halloween-20[2-9][0-9]')
+      && eventId.matches('[a-zA-Z0-9-]{10,80}')
+      && request.resource.data.keys().hasOnly(['kind', 'createdAt'])
+      && request.resource.data.keys().hasAll(['kind', 'createdAt'])
+      && request.resource.data.kind in ['bats', 'ghosts']
+      && request.resource.data.createdAt == request.time
+      && getAfter(/databases/$(database)/documents/seasonalStats/$(campaign)).data.lastEvent == eventId;
+    allow update, delete: if false;
+  }
+}

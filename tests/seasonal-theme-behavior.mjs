@@ -24,7 +24,7 @@ const { createSeasonalAmbient } = await import('../modules/seasonalAmbient.js');
 const { SEASONAL_PROFILES } = await import('../modules/seasonalTheme.js');
 let nextFrame, appendedLayer, groundLayer;
 function makeElement() {
-  return { style: {}, children: [], appendChild(child) { this.children.push(child); child.parentElement = this; },
+  return { style: {}, addEventListener() {}, children: [], appendChild(child) { this.children.push(child); child.parentElement = this; },
     setAttribute(key, value) { this[key] = value; }, remove() { this.removed = true; } };
 }
 let floorTop = 700, newsVisible = true;
@@ -41,7 +41,8 @@ globalThis.innerWidth = 1000; globalThis.innerHeight = 800;
 globalThis.matchMedia = () => ({ matches: false, addEventListener() {} });
 globalThis.requestAnimationFrame = fn => { nextFrame = fn; return 1; };
 globalThis.cancelAnimationFrame = () => {};
-const ambient = createSeasonalAmbient();
+const hits = [];
+const ambient = createSeasonalAmbient({ onHit: kind => hits.push(kind) });
 ambient.sync(SEASONAL_PROFILES.halloween, 'effect-halloween');
 assert.equal(appendedLayer.children.length, 6);
 assert.equal(appendedLayer.children.filter(b => b['aria-label'].includes('rojos')).length, 1);
@@ -54,7 +55,7 @@ for (const item of appendedLayer.children) {
 const bat = appendedLayer.children[0], sprite = bat.children[0];
 events.pointerdown({target: {closest: selector => selector === '#mainAppContainer' ? appElement : true}, clientX: 0, clientY: 0});
 assert.equal(bat.disabled, undefined, 'Clinical content must not trigger bat interactions');
-bat.onclick();
+bat.onclick(); bat.onclick(); assert.deepEqual(hits, ['bats']);
 for (let i = 1; i <= 5; i++) nextFrame(1000 + i * 50);
 if (Number(bat.style.transform.match(/,([^p]+)px/)[1]) + parseFloat(bat.style.height) < floorTop - 20) assert.notEqual(sprite.style.backgroundPosition, '-64px -48px', 'The impact frame must not appear during descent');
 for (let i = 6; i <= 35; i++) nextFrame(1000 + i * 50);

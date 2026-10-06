@@ -58,3 +58,13 @@ body.effect-halloween #mainFabBtn {
 
 .seasonal-ghost-sprite { width: 32px; height: 32px; }
 .seasonal-ghost { overflow: visible; }
+
+.seasonal-hit-point { position: absolute; pointer-events: none; color: #fff3a7;
+  font: 800 20px/1 system-ui, sans-serif; text-shadow: 0 2px 3px #190829, 0 0 8px #f97316;
+  animation: seasonal-hit-point 1.2s ease-out forwards; }
+@keyframes seasonal-hit-point {
+  0% { opacity: 0; transform: translate(-50%, -5px) scale(.8); }
+  15% { opacity: 1; transform: translate(-50%, -12px) scale(1.08); }
+  45% { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, -55px) scale(1); }
+}

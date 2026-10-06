@@ -1,0 +1,30 @@
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+const source = readFileSync(new URL('../modules/halloweenCounter.js', import.meta.url), 'utf8');
+const { createHalloweenCounter } = await import(`data:text/javascript;base64,${Buffer.from(source).toString('base64')}`);
+const documents = new Map(), storage = new Map(), callbacks = [], authCallbacks = [];
+let id = 0, offline = false;
+const env = { crypto: { randomUUID: () => `event-0000-${++id}` }, localStorage: { get length() { return storage.size; }, key: i => [...storage.keys()][i], getItem: k => storage.get(k), setItem: (k,v) => storage.set(k,v), removeItem: k => storage.delete(k) }, setTimeout: () => 1, setInterval() {}, addEventListener() {} };
+const snapshot = key => ({ exists: () => documents.has(key), data: () => documents.get(key), metadata: { fromCache: false, hasPendingWrites: false } });
+let chain = Promise.resolve();
+const firebase = { db: {}, auth: { currentUser: {} }, doc: (_, ...path) => path.join('/'), serverTimestamp: () => 'server-time', onAuthStateChanged: (_,fn) => { authCallbacks.push(fn); fn(); }, onSnapshot: (path,options,fn) => { callbacks.push({path,fn}); fn(snapshot(path)); return () => {}; }, runTransaction: (_,fn) => {
+  const result = chain.then(async () => { if (offline) throw new Error('offline'); const writes = []; await fn({ get: async key => snapshot(key), set: (key,value) => writes.push([key,value]) }); for (const [key,value] of writes) documents.set(key,value); for (const {path,fn} of callbacks) fn(snapshot(path)); }); chain = result.catch(() => {}); return result;
+} };
+const tick = async () => { for (let i=0; i<20; i++) await Promise.resolve(); await chain; };
+const first = createHalloweenCounter(firebase, env); first.start();
+assert.match(first.headline().text, /0 murciélagos y 0 fantasmas/);
+first.record('bats'); first.record('ghosts'); first.record('unknown'); await tick();
+assert.match(first.headline().text, /1 murciélagos y 1 fantasmas/);
+// A second tab replays the SAME pending ID while the first is processing it.
+first.record('bats'); const second = createHalloweenCounter(firebase, env); second.start(); await tick();
+assert.match(first.headline().text, /2 murciélagos y 1 fantasmas/);
+assert.equal(first.headline().text, second.headline().text);
+assert.equal(storage.size, 0);
+offline = true; first.record('ghosts'); await tick(); assert.equal(storage.size, 1);
+offline = false; const restored = createHalloweenCounter(firebase, env); restored.start(); await tick();
+assert.equal(storage.size, 0); assert.match(restored.headline().text, /2 murciélagos y 2 fantasmas/);
+const {path,fn} = callbacks.at(-1); fn({ ...snapshot(path), metadata: { fromCache: true } });
+assert.match(restored.headline().text, /2 murciélagos y 2 fantasmas/);
+firebase.auth.currentUser = null; authCallbacks.forEach(fn => fn()); first.record('bats');
+assert.equal(first.headline(), null); assert.equal(storage.size, 0);
+console.log('Halloween: synchronized totals, exactly-once retries, offline recovery and sign-out passed.');

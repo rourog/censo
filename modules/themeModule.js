@@ -18,7 +18,7 @@ const { createSeasonalAmbient } = await import(ambientUrl.href);
 
 export function createThemeModule(app) {
   const { state } = app;
-  const ambient = createSeasonalAmbient();
+  const ambient = createSeasonalAmbient({ onHit: kind => app.halloweenCounter?.record(kind) });
 
   const bases = [
     { id: 'base-dark', name: 'Slate', color: '#0f172a', mode: 'dark' },
