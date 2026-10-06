@@ -176,6 +176,7 @@ export function createThemeModule(app) {
     const theme = getCurrentTheme();
     applyTheme(theme.base, theme.accent, false);
     applyEffect(theme.effect, false);
+    document.dispatchEvent?.(new Event('censo:seasonchange'));
   }
 
   function renderBaseGroup(mode, title) {
