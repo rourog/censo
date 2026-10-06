@@ -17,3 +17,9 @@ Créditos y licencias en assets/celebrations/vendor/NOTICE.md. Laboratorio indep
 El tema se controla con botones Estacional/Normal. Estacional conserva el calendario automático (o la selección manual anterior). Celebraciones permite todas las animaciones, elegidas al azar entre confeti, fuegos artificiales y globos, añadiendo murciélagos si hay temporada activa; el modo estacional conserva la celebración habitual fuera de temporada.
 
 Sonidos ON/OFF usa la preferencia existente `censo-celebration-sound` para murciélagos y respuesta de botones. El clic dura 120 ms y el pop al pasar el cursor 45 ms; el hover requiere audio previamente desbloqueado por un gesto. No hay pop en pantallas táctiles ni botones deshabilitados.
+
+## Fantasmas ambientales de Halloween
+
+El vuelo ambiental conserva seis criaturas simultáneas. Cada diez apariciones de murciélagos se programa un fantasma; el puesto de ojos rojos permanece reservado a un murciélago, por lo que puede demorar una aparición adicional. Los fantasmas usan el sheet original del usuario de 256×256, celdas de 32×32, a 12 FPS; vuelan más despacio y se disuelven en el mismo punto al hacer clic.
+
+Apariencia → Fantasmas permite azules, rosas o ambos (`censo-ghost-color`, local). Se mantiene la banda dinámica debajo de pacientes y el límite del banner. Esta incorporación afecta al ambiente, sin cambiar las celebraciones al borrar.

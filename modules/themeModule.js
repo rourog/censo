@@ -147,6 +147,8 @@ export function createThemeModule(app) {
     if (profile?.banner.nodeGlyph) body.dataset.seasonNodeGlyph = profile.banner.nodeGlyph;
     else delete body.dataset.seasonNodeGlyph;
     updateToggles();
+    const ghostColor = document.getElementById('ghostColorPicker');
+    if (ghostColor) ghostColor.value = localStorage.getItem('censo-ghost-color') || 'mixed';
     const celebration = document.getElementById('celebrationPicker');
     if (celebration) celebration.value = getCelebrationChoice();
   }
@@ -241,6 +243,7 @@ export function createThemeModule(app) {
         <select id="celebrationPicker"><option value="confetti">Confeti</option><option value="fireworks">Fuegos artificiales</option><option value="balloons">Globos</option></select></div>
         <button id="celebrationPreview" type="button" class="theme-reset">PROBAR CELEBRACIÓN</button>
       </section>
+      <section class="season-picker"><label for="ghostColorPicker">Fantasmas</label><select id="ghostColorPicker"><option value="mixed">Azules y rosas</option><option value="cyan">Azules</option><option value="pink">Rosas</option></select></section>
       ${renderEffectPicker()}
       <section class="theme-preview" aria-label="Vista previa del tema">
         <div class="theme-preview__head">
@@ -282,6 +285,9 @@ export function createThemeModule(app) {
         }
       });
     });
+    const ghostColorPicker = document.getElementById('ghostColorPicker');
+    ghostColorPicker.value = localStorage.getItem('censo-ghost-color') || 'mixed';
+    ghostColorPicker.addEventListener('change', event => { localStorage.setItem('censo-ghost-color', event.target.value); refreshSeason(); });
     updateToggles();
     document.getElementById('celebrationPreview').addEventListener('click', async () => {
       app.cerrarModal?.('themeModal');
