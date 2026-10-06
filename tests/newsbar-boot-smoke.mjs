@@ -82,11 +82,18 @@ const newsSource = read('modules/newsBarModule.js').replaceAll(
   'import.meta.url',
   JSON.stringify(pathToFileURL(resolve(root, 'modules/newsBarModule.js')).href)
 );
-const [{ createNewsBarModule }, { createSoundboardModule }, soundCatalog] = await Promise.all([
+const [{ createNewsBarModule, selectHalloweenMessage }, { createSoundboardModule }, soundCatalog] = await Promise.all([
   import(dataModule(newsSource)),
   import(dataModule(read('modules/soundboardModule.js'))),
   import(dataModule(read('modules/soundCatalog.js')))
 ]);
+// Reloads avoid the last phrase; unavailable browser storage is harmless.
+const phraseStorage = storage();
+const firstPhrase = selectHalloweenMessage(phraseStorage, () => 0);
+assert.notDeepEqual(selectHalloweenMessage(phraseStorage, () => 0), firstPhrase);
+assert.deepEqual(selectHalloweenMessage({ getItem() { throw Error('blocked'); }, setItem() { throw Error('blocked'); } }, () => 0), firstPhrase);
+const variants = new Set(Array.from({ length: 5 }, (_, i) => JSON.stringify(selectHalloweenMessage(storage(), () => (i + .1) / 5))));
+assert.equal(variants.size, 5, 'All five approved messages are selectable');
 assert.match(read('modules/appModule.js'), /createNewsBarModule/u, 'appModule debe integrar el módulo de noticias.');
 let counterTotals = null, counterListener;
 const halloweenCounter = { subscribe(fn) { counterListener = fn; fn(counterTotals); }, headline() { return counterTotals ? { id: 'halloween-2026', text: JSON.stringify(counterTotals) } : null; } };
@@ -124,9 +131,13 @@ assert.match(nodes.get('censoNewsTrack').innerHTML, /🦇/);
 assert.match(nodes.get('censoNewsTrack').innerHTML, /👻/);
 assert.match(nodes.get('censoNewsTrack').innerHTML, /1,248/);
 assert.doesNotMatch(nodes.get('censoNewsTrack').innerHTML, /number--pulse/);
+const selectedMessage = localStorage.getItem('censo-halloween-last-message-v1');
+const firstMessageWords = nodes.get('censoNewsTrack').innerHTML.replace(/<[^>]*>/g, '').replace(/[0-9,]+/g, '');
 counterTotals = { ...counterTotals, bats: 1249 }; counterListener(counterTotals);
 while (pendingAuth.length) pendingAuth.shift()();
 assert.equal((nodes.get('censoNewsTrack').innerHTML.match(/number--pulse/g) || []).length, 1);
+assert.equal(localStorage.getItem('censo-halloween-last-message-v1'), selectedMessage);
+assert.equal(nodes.get('censoNewsTrack').innerHTML.replace(/<[^>]*>/g, '').replace(/[0-9,]+/g, ''), firstMessageWords, 'Clicks update totals without changing the phrase');
 const previousCounterHtml = nodes.get('censoNewsTrack').innerHTML;
 counterListener(counterTotals); while (pendingAuth.length) pendingAuth.shift()();
 assert.equal(nodes.get('censoNewsTrack').innerHTML, previousCounterHtml, 'Unchanged totals do not restart the pulse');
