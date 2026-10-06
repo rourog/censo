@@ -55,3 +55,6 @@ body.effect-halloween #mainFabBtn {
 .seasonal-bats-ground .seasonal-bat { pointer-events: none; }
 @media (prefers-reduced-motion: reduce) { .seasonal-bats-ground { display: none; } }
 @media print { .seasonal-bats-ground { display: none !important; } }
+
+.seasonal-ghost-sprite { width: 32px; height: 32px; }
+.seasonal-ghost { overflow: visible; }

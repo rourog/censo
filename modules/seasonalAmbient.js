@@ -1,7 +1,7 @@
-/* Click targets are limited to each bat, never a screen-wide overlay. */
+/* Decorative creatures share the free flight band behind patient content. */
 const LANDING_MARGIN = 20;
 export function createSeasonalAmbient() {
-  let layer = null, groundLayer = null, frame = 0, previous = 0, time = 0, bats = [], config = null;
+  let layer = null, groundLayer = null, frame = 0, previous = 0, time = 0, bats = [], config = null, batAppearances = 0;
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   function stop() { document.removeEventListener('pointerdown', clickBackground); cancelAnimationFrame(frame); frame = 0; layer?.remove(); groundLayer?.remove(); layer = null; groundLayer = null; bats = []; document.body.style.removeProperty('--season-floor-offset'); }
   function floorY() {
@@ -29,27 +29,37 @@ export function createSeasonalAmbient() {
   }
   function fall(bat) {
     if (bat.state !== 'fly') return;
-    bat.state = 'fall'; bat.start = time; bat.dropY = bat.drawY;
+    bat.state = bat.ghost ? 'vanish' : 'fall'; bat.start = time; bat.dropY = bat.drawY;
     bat.button.disabled = true;
   }
   function clickBackground(event) {
     // Content stays above decoration; only clicks on empty background reach a bat.
     const target = event.target;
     if (!target?.closest?.('#mainAppContainer') || target.closest('button, a, input, select, textarea, [contenteditable], .card, .section, .censo-table, .modal-overlay, .header, .footer, .censo-newsbar')) return;
-    const bat = [...bats].reverse().find(bat => bat.state === 'fly' && bat.button.style.visibility !== 'hidden' && event.clientX >= bat.x && event.clientX <= bat.x + bat.size && event.clientY >= bat.drawY && event.clientY <= bat.drawY + bat.size * 1.5);
+    const bat = [...bats].reverse().find(bat => bat.state === 'fly' && bat.button.style.visibility !== 'hidden' && event.clientX >= bat.x && event.clientX <= bat.x + bat.size && event.clientY >= bat.drawY && event.clientY <= bat.drawY + bat.size * (bat.ghost ? 19 / 12 : 1.5));
     if (bat) fall(bat);
   }
-  function makeBat(index, initial) {
+  function makeBat(index, initial, direction) {
+    // A single ghost follows ten bat appearances. The red-eyed slot stays a bat.
+    const ghost = !!config.ghosts && index !== 0 && batAppearances >= config.ghosts.batsPerGhost;
+    if (ghost) batAppearances = 0; else batAppearances++;
+    const settings = ghost ? config.ghosts : config;
+    const colorPreference = localStorage.getItem('censo-ghost-color');
+    const color = ghost ? (['cyan', 'pink'].includes(colorPreference) ? colorPreference : Math.random() < .5 ? 'cyan' : 'pink') : null;
     const button = document.createElement('button');
-    button.type = 'button'; button.className = 'seasonal-bat';
-    button.setAttribute('aria-label', index === 0 ? 'Hacer caer el murciélago de ojos rojos' : 'Hacer caer un murciélago');
-    const sprite = document.createElement('span'); sprite.className = 'seasonal-bat-sprite';
-    sprite.style.backgroundImage = `url("${new URL(config.sprite, import.meta.url).href}")`;
+    button.style.visibility = 'hidden'; button.tabIndex = -1;
+    button.type = 'button'; button.className = ghost ? 'seasonal-bat seasonal-ghost' : 'seasonal-bat';
+    button.setAttribute('aria-label', ghost ? `Hacer desaparecer el fantasma ${color === 'pink' ? 'rosa' : 'azul'}` : index === 0 ? 'Hacer caer el murciélago de ojos rojos' : 'Hacer caer un murciélago');
+    const sprite = document.createElement('span'); sprite.className = ghost ? 'seasonal-bat-sprite seasonal-ghost-sprite' : 'seasonal-bat-sprite';
+    const url = new URL(settings.sprite, import.meta.url);
+    url.searchParams.set('v', String(window.CensoBuild?.version || '2.76'));
+    sprite.style.backgroundImage = `url("${url.href}")`;
     button.appendChild(sprite); layer.appendChild(button);
-    const mix = Math.random(), size = config.minSize + (config.maxSize - config.minSize) * mix;
-    const bat = { button, sprite, red: index === 0, size, speed: config.speed * (1.25 - .5 * mix) * (.85 + Math.random() * .3), flap: .9 + Math.random() * .2,
-      x: initial ? Math.random() * innerWidth : -size, altitude: Math.random(), phase: Math.random() * 5, dir: initial && Math.random() < .5 ? -1 : 1, state: 'fly' };
-    button.style.width = `${size}px`; button.style.height = `${size * 1.5}px`;
+    const mix = Math.random(), size = settings.minSize + (settings.maxSize - settings.minSize) * mix;
+    const dir = direction ?? (initial && Math.random() < .5 ? -1 : 1);
+    const bat = { button, sprite, ghost, color, red: index === 0, size, speed: settings.speed * (1.25 - .5 * mix) * (.85 + Math.random() * .3), flap: .9 + Math.random() * .2,
+      x: initial ? Math.random() * innerWidth : dir === 1 ? -size : innerWidth + size, altitude: Math.random(), phase: Math.random() * 5, dir, state: 'fly' };
+    button.style.width = `${size}px`; button.style.height = `${size * (ghost ? 19 / 12 : 1.5)}px`;
     button.onclick = () => fall(bat);
     return bat;
   }
@@ -64,7 +74,7 @@ export function createSeasonalAmbient() {
     band.bottom = Math.min(band.bottom, floor - LANDING_MARGIN);
     groundLayer.style.clipPath = layer.style.clipPath = `inset(0 0 ${Math.max(0, innerHeight - floor)}px 0)`;
     bats.forEach((bat, index) => {
-      const height = bat.size * 1.5;
+      const height = bat.size * (bat.ghost ? 19 / 12 : 1.5);
       const fits = band.bottom - band.top >= height;
       const top = band.dynamic ? band.top : Math.min(band.top, band.bottom - height);
       const travel = Math.max(0, band.bottom - height - top);
@@ -81,8 +91,14 @@ export function createSeasonalAmbient() {
         }
         bat.flightY = y;
         bat.x += bat.speed * bat.dir * dt;
-        if (bat.x > innerWidth + bat.size) bat.x = -bat.size;
-        if (bat.x < -bat.size) bat.x = innerWidth + bat.size;
+        if (bat.x > innerWidth + bat.size || bat.x < -bat.size) {
+          bat.button.remove(); bats[index] = makeBat(index, false, bat.dir); return;
+        }
+      } else if (bat.state === 'vanish') {
+        y = bat.dropY;
+        if ((time - bat.start) * config.ghosts.fps >= 13) {
+          bat.button.remove(); bats[index] = makeBat(index, false, bat.dir); return;
+        }
       } else {
         const elapsed = time - bat.start, ground = floor - height - LANDING_MARGIN;
         y = Math.min(ground, bat.dropY + 210 * elapsed * elapsed);
@@ -99,8 +115,18 @@ export function createSeasonalAmbient() {
       }
       bat.drawY = y;
       bat.button.style.transform = `translate(${bat.x}px,${y}px)`;
-      bat.sprite.style.backgroundPosition = `${-cell * 16}px ${-row * 24}px`;
-      bat.sprite.style.transform = bat.dir < 0 ? `translateX(${bat.size}px) scale(${-bat.size / 16},${bat.size / 16})` : `scale(${bat.size / 16})`;
+      if (bat.ghost) {
+        const index = bat.state === 'vanish' ? Math.floor((time - bat.start) * config.ghosts.fps) : Math.floor(time * config.ghosts.fps + bat.phase) % 8;
+        const baseColumn = bat.color === 'pink' ? 5 : 2;
+        const column = baseColumn + (bat.state === 'vanish' ? index < 8 ? 1 : 2 : 0);
+        const spriteRow = bat.state === 'vanish' && index >= 8 ? index - 8 : index;
+        bat.sprite.style.backgroundPosition = `${-column * 32}px ${-spriteRow * 32}px`;
+        const scale = bat.size / 12;
+        bat.sprite.style.transform = `translate(${-10 * scale}px,${-8 * scale}px) scale(${scale})`;
+      } else {
+        bat.sprite.style.backgroundPosition = `${-cell * 16}px ${-row * 24}px`;
+        bat.sprite.style.transform = bat.dir < 0 ? `translateX(${bat.size}px) scale(${-bat.size / 16},${bat.size / 16})` : `scale(${bat.size / 16})`;
+      }
     });
   }
   function sync(profile, effect) {
@@ -110,7 +136,7 @@ export function createSeasonalAmbient() {
     layer = document.createElement('div'); layer.className = 'seasonal-bats'; app.appendChild(layer);
     groundLayer = document.createElement('div'); groundLayer.className = 'seasonal-bats-ground'; app.appendChild(groundLayer);
     document.addEventListener('pointerdown', clickBackground);
-    time = 0; previous = 0; bats = Array.from({ length: config.count }, (_, index) => makeBat(index, true));
+    time = 0; previous = 0; batAppearances = 0; bats = Array.from({ length: config.count }, (_, index) => makeBat(index, true));
     frame = requestAnimationFrame(tick);
   }
   let currentProfile = null, currentEffect = null;
