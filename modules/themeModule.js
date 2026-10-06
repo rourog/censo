@@ -18,7 +18,10 @@ const { createSeasonalAmbient } = await import(ambientUrl.href);
 
 export function createThemeModule(app) {
   const { state } = app;
-  const ambient = createSeasonalAmbient({ onHit: kind => app.halloweenCounter?.record(kind) });
+  const ambient = createSeasonalAmbient({ onHit: kind => {
+    app.halloweenCounter?.record(kind);
+    app.creatureHitAudio?.play(kind);
+  } });
 
   const bases = [
     { id: 'base-dark', name: 'Slate', color: '#0f172a', mode: 'dark' },
@@ -281,7 +284,8 @@ export function createThemeModule(app) {
           updateToggles();
         } else {
           localStorage.setItem('censo-celebration-sound', value);
-          if (value === 'on') unlockCelebrationAudio();
+          if (value === 'on') { unlockCelebrationAudio(); app.creatureHitAudio?.prepare(); }
+          else app.creatureHitAudio?.stop();
           updateToggles();
         }
       });
