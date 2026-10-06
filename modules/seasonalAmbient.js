@@ -52,7 +52,7 @@ export function createSeasonalAmbient() {
     button.setAttribute('aria-label', ghost ? `Hacer desaparecer el fantasma ${color === 'pink' ? 'rosa' : 'azul'}` : index === 0 ? 'Hacer caer el murciélago de ojos rojos' : 'Hacer caer un murciélago');
     const sprite = document.createElement('span'); sprite.className = ghost ? 'seasonal-bat-sprite seasonal-ghost-sprite' : 'seasonal-bat-sprite';
     const url = new URL(settings.sprite, import.meta.url);
-    url.searchParams.set('v', String(window.CensoBuild?.version || '2.76'));
+    url.searchParams.set('v', String(window.CensoBuild?.version || '2.77'));
     sprite.style.backgroundImage = `url("${url.href}")`;
     button.appendChild(sprite); layer.appendChild(button);
     const mix = Math.random(), size = settings.minSize + (settings.maxSize - settings.minSize) * mix;
@@ -122,7 +122,9 @@ export function createSeasonalAmbient() {
         const spriteRow = bat.state === 'vanish' && index >= 8 ? index - 8 : index;
         bat.sprite.style.backgroundPosition = `${-column * 32}px ${-spriteRow * 32}px`;
         const scale = bat.size / 12;
-        bat.sprite.style.transform = `translate(${-10 * scale}px,${-8 * scale}px) scale(${scale})`;
+        // Mirror around the visible body center without moving the click target.
+        const mirror = bat.dir < 0;
+        bat.sprite.style.transform = `translate(${(mirror ? 22 : -10) * scale}px,${-8 * scale}px) scale(${mirror ? -scale : scale},${scale})`;
       } else {
         bat.sprite.style.backgroundPosition = `${-cell * 16}px ${-row * 24}px`;
         bat.sprite.style.transform = bat.dir < 0 ? `translateX(${bat.size}px) scale(${-bat.size / 16},${bat.size / 16})` : `scale(${bat.size / 16})`;
