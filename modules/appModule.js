@@ -33,6 +33,7 @@ async function loadModules() {
     interactionModule,
     newsBarModule,
     printModule,
+    subrogadaModule,
     authModule
   ] = await Promise.all([
     import(moduleUrl('firebaseModule')),
@@ -51,6 +52,7 @@ async function loadModules() {
     import(moduleUrl('interactionModule')),
     import(moduleUrl('newsBarModule')),
     import(moduleUrl('printModule')),
+    import(moduleUrl('subrogadaModule')),
     import(moduleUrl('authModule'))
   ]);
 
@@ -71,6 +73,7 @@ async function loadModules() {
     createInteractionModule: interactionModule.createInteractionModule,
     createNewsBarModule: newsBarModule.createNewsBarModule,
     createPrintModule: printModule.createPrintModule,
+    createSubrogadaModule: subrogadaModule.createSubrogadaModule,
     createAuthModule: authModule.createAuthModule
   };
 }
@@ -108,6 +111,7 @@ export async function bootApp() {
   Object.assign(app, modules.createInteractionModule(app));
   Object.assign(app, modules.createNewsBarModule(app));
   Object.assign(app, modules.createPrintModule(app));
+  Object.assign(app, modules.createSubrogadaModule(app));
   Object.assign(app, modules.createAuthModule(app));
 
   app.__build = BUILD;
@@ -123,6 +127,7 @@ export async function bootApp() {
   app.exposeWindowActions();
   app.initTheme();
   app.initPrintUi();
+  app.initSubrogadaUi();
   app.bindUiEvents();
   app.initSoundboardAuthBridge();
   app.initBedCatalogAuthBridge();

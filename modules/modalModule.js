@@ -189,6 +189,13 @@ export function createModalModule(app) {
     const fila = btn.dataset.fila;
     if (!fila) return;
 
+    if (action === 'subrogar') {
+      e.preventDefault();
+      e.stopPropagation();
+      app.abrirSubrogada(fila, btn);
+      return;
+    }
+
     if (action === 'toggle-alerta') {
       e.preventDefault();
       e.stopPropagation();

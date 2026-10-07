@@ -625,6 +625,9 @@ export function createRenderModule(app) {
     return `
       <td class="row-action-cell">
         <div class="row-action-grid">
+          <button class="btn-table" type="button" data-censo-action="subrogar" data-fila="${escapeHtml(p.fila)}" title="Solicitud subrogada" aria-label="Solicitud subrogada de ${escapeHtml(p.nombre)}">
+            <span class="material-symbols-outlined" aria-hidden="true">description</span>
+          </button>
           <button class="btn-table ${alertBtnClass}" type="button" data-censo-action="toggle-alerta" data-fila="${escapeHtml(p.fila)}" onclick="event.stopPropagation(); toggleAlertaPaciente(this.dataset.fila, event);" title="${escapeHtml(alertBtnTitle)}" aria-label="${escapeHtml(alertBtnTitle)}">
             <span class="material-symbols-outlined" style="${alertIconFill}">star</span>
           </button>
@@ -649,6 +652,9 @@ export function createRenderModule(app) {
 
     return `
       <div class="card-action-grid">
+        <button class="btn-editar-tarjeta subrogada-card-action" type="button" data-censo-action="subrogar" data-fila="${escapeHtml(p.fila)}" title="Solicitud subrogada" aria-label="Solicitud subrogada de ${escapeHtml(p.nombre)}">
+          <span class="material-symbols-outlined" aria-hidden="true">description</span> SUBROGAR
+        </button>
         <button class="btn-editar-tarjeta ${alertBtnClass}" type="button" data-censo-action="toggle-alerta" data-fila="${escapeHtml(p.fila)}" onclick="event.stopPropagation(); toggleAlertaPaciente(this.dataset.fila, event);" title="${escapeHtml(alertBtnTitle)}" aria-label="${escapeHtml(alertBtnTitle)}">
           <span class="material-symbols-outlined" style="${getAlertIconFill(alertaActiva)}">star</span> ${alertaActiva ? 'DESTACADO' : 'DESTACAR'}
         </button>
@@ -735,7 +741,7 @@ export function createRenderModule(app) {
           <th style="width: 23%;">DIAGNÓSTICO</th>
           <th style="width: 21.5%;">PENDIENTES</th>
           <th style="width: 9%; text-align: center;">DESTINO</th>
-          <th style="width: 10%; text-align: center;"><span class="material-symbols-outlined" style="font-size: 1.2rem;">settings</span></th>
+          <th style="width: 9rem; text-align: center;"><span class="material-symbols-outlined" style="font-size: 1.2rem;">settings</span></th>
         </tr></thead><tbody>`);
 
       areas.forEach((area) => {
