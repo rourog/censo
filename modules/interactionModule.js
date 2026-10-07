@@ -108,6 +108,7 @@ export function createInteractionModule(app) {
   }
 
   document.addEventListener('keydown', (e) => {
+    if (document.querySelector('dialog[open]') || e.target.closest?.('input, textarea, select, [contenteditable="true"]')) return;
     if (state.currentViewMode !== 'table' || window.innerWidth < 768 || window.isInlineEditing) return;
 
     const elements = Array.from(document.querySelectorAll('.patient-row, .btn-add-table'));
