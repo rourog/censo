@@ -20,3 +20,9 @@ La hoja usa tamaño carta y Arial Narrow si está instalada; Nimbus Sans Narrow 
 `node tests/subrogada-behavior.mjs` comprueba edades, escape de texto, catálogos y estructura imprimible.
 
 `node tests/subrogada-browser.mjs` necesita Playwright y Chromium. Puede indicarse `CHROMIUM_EXECUTABLE` para usar un ejecutable existente. Prueba tabla/tarjetas, teclado, móvil, ventanas bloqueadas, dos impresiones sin cierre y aislamiento entre pacientes. Las capturas y PDFs de prueba se escriben en `/tmp/censo-subrogada-qa` o en `SUBROGADA_QA_DIR`.
+
+## Formato desde v2.85
+
+Al abrir el modal, el nombre se capitaliza respetando partículas como «de la» y el diagnóstico pasa a formato de oración, conservando las siglas del catálogo local. Ambos siguen siendo editables y sus correcciones manuales se respetan al imprimir. El censo original no se modifica.
+
+Las firmas se imprimen en el pie de cada hoja, con un margen inferior reservado para evitar superposición con el contenido. El encabezado del modal muestra únicamente la cama y se elimina el aviso de éxito posterior a imprimir.

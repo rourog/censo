@@ -24,12 +24,12 @@ const browser=await chromium.launch({headless:true,...(process.env.CHROMIUM_EXEC
 try {
  const page=await browser.newPage({viewport:{width:1365,height:1000}});const errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.goto(`http://127.0.0.1:${server.address().port}`);await page.locator('[data-censo-action="subrogar"]').first().waitFor();
- await page.click('[data-censo-action="subrogar"][data-fila="p1"]');const modal=page.locator('#subrogadaModal');await modal.waitFor({state:'visible'});
- assert.equal(await modal.locator('[name=patient]').inputValue(),'JUAN PÉREZ GARCÍA');
+ await page.click('[data-censo-action="subrogar"][data-fila="p1"]');const modal=page.locator('#subrogadaModal');await modal.waitFor({state:'visible'});assert.equal(await modal.locator('#subrogadaPatient').innerText(),'CAMA 4');
+ assert.equal(await modal.locator('[name=patient]').inputValue(),'Juan Pérez García');
  await modal.locator('[name=diagnosis]').fill('Dolor abdominal en estudio\nPendiente de imagen');await page.keyboard.press('ArrowDown');assert.equal(await page.evaluate(()=>window.openEditCount),0);
  await modal.locator('[name=type]').selectOption('Tomografía');await modal.locator('[name=service]').selectOption('Tomografía de abdomen con contraste');await modal.locator('[name=doctor]').selectOption('Dr. Rodrigo Ulises Rodriguez Garcia');
  await page.screenshot({path:output+'/modal-desktop.png'});
- let popupPromise=page.waitForEvent('popup');await modal.locator('[type=submit]').click();const first=await popupPromise;await first.waitForFunction(()=>window.printCount===1);assert.equal(await modal.isVisible(),true);
+ let popupPromise=page.waitForEvent('popup');await modal.locator('[type=submit]').click();const first=await popupPromise;await first.waitForFunction(()=>window.printCount===1);assert.equal(await modal.isVisible(),true);assert.equal(await modal.locator('[role=status]').innerText(),'');
  await first.pdf({path:output+'/solicitud.pdf',preferCSSPageSize:true,printBackground:true});assert.equal(await first.locator('img').count(),2);
  await modal.locator('[name=type]').selectOption('Ambulancia');await modal.locator('[name=service]').selectOption('Ambulancia de traslado con médico');await modal.locator('[name=details]').fill('Unidad receptora de prueba');
  popupPromise=page.waitForEvent('popup');await modal.locator('[type=submit]').click();const second=await popupPromise;await second.waitForFunction(()=>window.printCount===1);
