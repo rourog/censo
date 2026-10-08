@@ -10,10 +10,12 @@ h1{text-align:center;font-size:15pt;margin:0 0 8mm;font-weight:bold}
 table.fields{border-collapse:collapse;width:100%;table-layout:fixed}table.fields td{border:0.5pt solid #777;padding:2mm;vertical-align:top;overflow-wrap:anywhere}td.label{width:35mm;font-weight:bold}tr{break-inside:avoid}table.fields .name{width:auto}.fields .age{width:34mm}.fields .date{text-align:right}.fields .service{min-height:10mm}.fields p{margin:0}.fields .details{margin-top:2mm}
 .legal{margin-top:9mm;font-size:8pt;text-align:justify;line-height:1.12}.legal h2{font-size:8pt;margin:0 0 4mm}.legal p{margin:0 0 2mm}.legal p:first-of-type{font-weight:bold}.signatures{margin-top:9mm;border-top:0.7pt solid black;break-inside:avoid;display:table;width:100%;table-layout:fixed;text-align:center}.signature{display:table-cell;vertical-align:top;padding:2mm 1mm 0;font-size:10pt}.signature strong{display:block;font-size:10pt}.signature small{display:block;font-size:8pt;min-height:7mm}.signature .person{padding-top:9mm;overflow-wrap:anywhere}p{orphans:3;widows:3}
 @media screen{body{max-width:216mm;margin:0 auto;padding:13mm 25mm 18mm}.print-actions{font-family:Arial,sans-serif;padding:12px 0 24px;display:flex;gap:12px}.print-actions button{padding:10px 16px}.print-actions span{font-size:12px}}
-@media print{.print-actions{display:none}}
+.print-flow{width:100%;border-collapse:collapse}.print-flow>tbody>tr{break-inside:auto}.print-content{padding:0}.print-flow>tfoot{display:table-footer-group}.footer-space{height:40mm;padding:0}
+@media print{.print-actions{display:none}.signatures{display:flex;position:fixed;bottom:0;left:0;right:0;height:30mm;margin:0}.signature{display:block;position:relative;width:33.333%;height:30mm}.signature .person{padding-top:0;position:absolute;bottom:0;left:0;width:100%;padding-left:1mm;padding-right:1mm}}
+
 `;
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])).replace(/\n/g,'<br>');
-function sheet(data){return `<header><div class="left"><img src="${logos.left}" alt="Gobierno del Estado de Chihuahua"></div><div class="hospital"><strong>INSTITUTO CHIHUAHUENSE DE LA SALUD</strong>HOSPITAL REGIONAL DE DELICIAS</div><div class="right"><img src="${logos.right}" alt="ICHISAL"></div></header>
+function sheet(data){return `<table class="print-flow"><tbody><tr><td class="print-content"><header><div class="left"><img src="${logos.left}" alt="Gobierno del Estado de Chihuahua"></div><div class="hospital"><strong>INSTITUTO CHIHUAHUENSE DE LA SALUD</strong>HOSPITAL REGIONAL DE DELICIAS</div><div class="right"><img src="${logos.right}" alt="ICHISAL"></div></header>
 <h1>SOLICITUD DE SERVICIO SUBROGADO</h1>
 <table class="fields"><colgroup><col style="width:35mm"><col><col style="width:34mm"></colgroup><tbody>
 <tr><td class="label">Fecha:</td><td colspan="2" class="date">${esc(data.date)}</td></tr>
@@ -23,7 +25,7 @@ function sheet(data){return `<header><div class="left"><img src="${logos.left}" 
 <tr><td class="label">Pronóstico con el servicio subrogado:</td><td colspan="2">${esc(data.prognosis)}</td></tr>
 <tr><td class="label">Justificación:</td><td colspan="2">${esc(data.reason)}</td></tr></tbody></table>
 <section class="legal"><h2>FUNDAMENTACIÓN:</h2>${legal.map(p=>'<p>'+esc(p)+'</p>').join('')}</section>
-<div class="signatures"><div class="signature"><strong>MÉDICO TRATANTE</strong><small>&nbsp;</small><div class="person">${esc(data.doctor)}</div></div><div class="signature"><strong>ADMINISTRADOR</strong><small>HOSPITAL REGIONAL DE DELICIAS</small><div class="person">Ing. Carlos Antonio Lara hidalgo</div></div><div class="signature"><strong>DIRECTOR MÉDICO</strong><small>HOSPITAL REGIONAL DE DELICIAS</small><div class="person">Dr. Luis Chávez Guaderrama</div></div></div>`}
+</td></tr></tbody><tfoot><tr><td class="footer-space"></td></tr></tfoot></table><div class="signatures"><div class="signature"><strong>MÉDICO TRATANTE</strong><small>&nbsp;</small><div class="person">${esc(data.doctor)}</div></div><div class="signature"><strong>ADMINISTRADOR</strong><small>HOSPITAL REGIONAL DE DELICIAS</small><div class="person">Ing. Carlos Antonio Lara hidalgo</div></div><div class="signature"><strong>DIRECTOR MÉDICO</strong><small>HOSPITAL REGIONAL DE DELICIAS</small><div class="person">Dr. Luis Chávez Guaderrama</div></div></div>`}
 
 export function construirSolicitudSubrogada(data) {
   return `<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Solicitud de servicio subrogado</title><style>${printCSS}</style></head><body><div class="print-actions"><button id="imprimirSolicitud" type="button">Imprimir</button><span id="printStatus" role="status">Preparando impresión…</span></div>${sheet(data)}</body></html>`;
@@ -45,6 +47,26 @@ export function justificacionSubrogada(grupo) {
   return `${BASE_REASON} Se solicita estudio de imagen debido a la necesidad de una evaluación diagnóstica precisa que no puede obtenerse con estudios convencionales, lo cual permitirá orientar el manejo adecuado y oportuno del paciente.`;
 }
 
+// Se normaliza la copia inicial; las correcciones manuales del médico se respetan al imprimir.
+export function capitalizarNombreSubrogada(value) {
+  const particles = new Set(['de', 'del', 'la', 'las', 'los', 'y', 'da', 'das', 'do', 'dos', 'van', 'von']);
+  return String(value ?? '').trim().toLocaleLowerCase('es-MX').split(/\s+/).map((word, index) => {
+    if (index > 0 && particles.has(word)) return word;
+    return word.replace(/(^|[-'’])(\p{L})/gu, (_, prefix, letter) => prefix + letter.toLocaleUpperCase('es-MX'));
+  }).join(' ');
+}
+
+const SIGLAS_DIAGNOSTICO = new Map([
+  ...'DM DM1 DM2 HAS HTA EVC ACV AIT ERC IRA LRA IRC EPOC VIH SIDA SICA SCA IAM IAMCEST IAMSEST TCE IVU ITU CAD EHH SIRS STDA STDB TVP TEP TSV FA FV TV IC ICC IVAS NAC NAV SDRA SAOS LLA LMA LMC LES AR TB PCR VSR COVID COVID-19 SARS-COV-2 KDIGO NYHA GOLD CIE-10 I II III IV V VI VII VIII IX X'.split(' ').map(word => [word.toLowerCase(), word]),
+  ['hba1c', 'HbA1c'], ['spo2', 'SpO2'], ['pao2', 'PaO2'], ['paco2', 'PaCO2'], ['ph', 'pH']
+]);
+export function formatoOracionSubrogada(value) {
+  let text = String(value ?? '').trim().toLocaleLowerCase('es-MX');
+  text = text.replace(/(^|[.!?]\s+|\n\s*)([^\p{L}\p{N}]*)(\p{L})/gu,
+    (_, prefix, punctuation, letter) => prefix + punctuation + letter.toLocaleUpperCase('es-MX'));
+  return text.replace(/[\p{L}\p{N}]+(?:[-][\p{L}\p{N}]+)*/gu, word => SIGLAS_DIAGNOSTICO.get(word.toLowerCase()) || word);
+}
+
 export function separarEdadSubrogada(value) {
   const raw = String(value ?? '').trim();
   const match = raw.match(/^(\d+(?:[.,]\d+)?)\s*(a(?:ños|nos)?|mes(?:es)?|m|d(?:ías|ias)?)?$/i);
@@ -54,7 +76,7 @@ export function separarEdadSubrogada(value) {
 }
 
 export function createSubrogadaModule(app) {
-  let dialog, form, status, origin, activePatientId, lastReason = BASE_REASON;
+  let dialog, form, status, origin, lastReason = BASE_REASON;
   const fields = () => form.elements;
 
   function cerrarSubrogada() {
@@ -129,7 +151,6 @@ export function createSubrogadaModule(app) {
     dialog.addEventListener('close', () => {
       // No conservar datos de pacientes fuera de una solicitud abierta.
       form.reset();
-      activePatientId = null;
       status.textContent = '';
       dialog.querySelector('#subrogadaPatient').textContent = '';
       if (origin?.isConnected) origin.focus();
@@ -149,13 +170,12 @@ export function createSubrogadaModule(app) {
     if (!patient) { window.alert('Este paciente ya no está disponible en el censo. Actualiza la lista.'); return; }
     initSubrogadaUi();
     origin = trigger;
-    activePatientId = String(fila);
     form.reset();
     const f = fields(), edad = separarEdadSubrogada(patient.edad);
-    f.patient.value = patient.nombre || '';
+    f.patient.value = capitalizarNombreSubrogada(patient.nombre);
     f.age.value = edad.age;
     f.unit.value = edad.unit;
-    f.diagnosis.value = patient.diagnostico || '';
+    f.diagnosis.value = formatoOracionSubrogada(patient.diagnostico);
     f.reason.value = BASE_REASON;
     lastReason = BASE_REASON;
     status.textContent = '';
@@ -168,7 +188,7 @@ export function createSubrogadaModule(app) {
       }
     } catch { /* El bloqueo de almacenamiento no impide crear una solicitud. */ }
     actualizarServicios();
-    dialog.querySelector('#subrogadaPatient').textContent = `${patient.cama || 'Sin cama'} · ${patient.nombre || 'Paciente'}`;
+    dialog.querySelector('#subrogadaPatient').textContent = patient.cama || 'Sin cama';
     if (!dialog.open) dialog.showModal();
     f.patient.focus();
   }
@@ -185,7 +205,6 @@ export function createSubrogadaModule(app) {
     data.service = data.type === 'Otro' || data.service === 'Otro' ? data.otherService : data.service;
     data.doctor = data.doctor === 'Otro' ? data.otherDoctor : data.doctor;
     data.date = new Intl.DateTimeFormat('es-MX', { dateStyle: 'short', timeStyle: 'short', timeZone: 'America/Chihuahua' }).format(new Date());
-    const solicitudId = activePatientId;
     // Abrir dentro del gesto del usuario evita el bloqueo de ventanas emergentes.
     const printWindow = window.open('', '_blank');
     if (!printWindow) {
@@ -218,7 +237,7 @@ export function createSubrogadaModule(app) {
     };
     printButton.addEventListener('click', print);
     void print();
-    if (dialog.open && activePatientId === solicitudId) status.textContent = 'Hoja preparada. Cambia el servicio para imprimir otra solicitud; los datos del paciente se conservan.';
+    status.textContent = '';
     // Ni cerrar, ni resetear el formulario: ambulancia y estudio se imprimen por separado.
   }
 
