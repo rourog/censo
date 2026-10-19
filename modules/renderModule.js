@@ -40,17 +40,18 @@ export function createRenderModule(app) {
     const estado = getDestinoEstadoVisual(destino);
     const estadoClass = estado ? ` destino-state-${estado}` : '';
     const textLabel = getDestinoTextLabel(destino);
+    const observationClass = textLabel === 'OBSERVACIÓN / REVALORACIÓN' ? ' destino-state-observation' : '';
 
     if (parsed) {
       const especialidad = parsed.especialidad || '';
-      return `<div class="${modeClass}${estadoClass}" title="${escapeHtml(textLabel)}" aria-label="${escapeHtml(textLabel)}">
+      return `<div class="${modeClass}${estadoClass}${observationClass}" title="${escapeHtml(textLabel)}" aria-label="${escapeHtml(textLabel)}">
         ${healthIconHtml(getDestinoActionIconPath(destino), 'destino-action-icon')}
         ${healthIconHtml(getDestinoIconPath(destino), 'destino-specialty-icon')}
         ${mode === 'compact' ? '' : `<span class="destino-specialty-text">${escapeHtml(especialidad)}</span>`}
       </div>`;
     }
 
-    return `<div class="${modeClass}${estadoClass}" title="${escapeHtml(textLabel)}" aria-label="${escapeHtml(textLabel)}">
+    return `<div class="${modeClass}${estadoClass}${observationClass}" title="${escapeHtml(textLabel)}" aria-label="${escapeHtml(textLabel)}">
       ${healthIconHtml(getDestinoActionIconPath(destino), 'destino-action-icon')}
       ${healthIconHtml(getDestinoIconPath(destino), 'destino-specialty-icon')}
       ${mode === 'compact' ? '' : `<span class="destino-specialty-text">${escapeHtml(textLabel)}</span>`}
@@ -79,6 +80,15 @@ export function createRenderModule(app) {
     return String(cama || '').trim().toUpperCase() === 'PEDILUVIO'
       ? ' quick-bed-label--pediluvio'
       : '';
+  }
+
+  // Estilo estable por paciente: desfases, offsets y brillo sin escrituras remotas.
+  function getGlitterStyle(p) {
+    const id = String(p?.fila || p?.nombre || '');
+    let hash = 2166136261;
+    for (let i = 0; i < id.length; i++) hash = Math.imul(hash ^ id.charCodeAt(i), 16777619);
+    hash >>>= 0;
+    return `--dust-x:${hash % 113}px;--dust-y:${(hash >>> 8) % 87}px;--dust-delay:-${((hash >>> 4) % 139) / 10}s;--twinkle-delay:-${((hash >>> 13) % 37) / 10}s;--shine-delay:-${((hash >>> 21) % 83) / 10}s;`;
   }
 
   function getAlertIconFill(isActive) {
@@ -545,6 +555,75 @@ export function createRenderModule(app) {
         .patient-row.patient-alert { animation: none !important; }
         .card.patient-alert .card-content-wrapper::after { display: none; }
       }
+
+      /* Glitter individual: puntos diminutos ascendentes y destello por opacidad. */
+      @property --censo-sparkle-opacity {
+        syntax: '<percentage>';
+        inherits: false;
+        initial-value: 50%;
+      }
+      @keyframes censoSparkleBlink {
+        0%, 100% { --censo-sparkle-opacity: 7%; }
+        23% { --censo-sparkle-opacity: 80%; }
+        49% { --censo-sparkle-opacity: 11%; }
+        76% { --censo-sparkle-opacity: 94%; }
+      }
+      @keyframes censoSparkleRise {
+        from { background-position:
+          var(--dust-x,0px) var(--dust-y,0px),
+          var(--dust-x,0px) var(--dust-y,0px),
+          var(--dust-x,0px) var(--dust-y,0px); }
+        to { background-position:
+          var(--dust-x,0px) calc(var(--dust-y,0px) - 164px),
+          var(--dust-x,0px) calc(var(--dust-y,0px) - 266px),
+          var(--dust-x,0px) calc(var(--dust-y,0px) - 171px); }
+      }
+      @keyframes censoSparkleRowRise {
+        from { background-position:
+          var(--dust-x,0px) var(--dust-y,0px),
+          var(--dust-x,0px) var(--dust-y,0px),
+          var(--dust-x,0px) var(--dust-y,0px), 220% 0; }
+        to { background-position:
+          var(--dust-x,0px) calc(var(--dust-y,0px) - 164px),
+          var(--dust-x,0px) calc(var(--dust-y,0px) - 266px),
+          var(--dust-x,0px) calc(var(--dust-y,0px) - 171px), -150% 0; }
+      }
+      .card.patient-alert .card-content-wrapper::before {
+        background-image:
+          radial-gradient(ellipse .55px 1.4px at 18px 19px,
+            color-mix(in srgb, color-mix(in srgb, var(--accent) 55%, white) var(--censo-sparkle-opacity,50%), transparent) 0 65%, transparent 100%),
+          radial-gradient(ellipse 1.4px .55px at 64px 55px,
+            color-mix(in srgb, color-mix(in srgb, var(--accent) 55%, white) var(--censo-sparkle-opacity,50%), transparent) 0 65%, transparent 100%),
+          radial-gradient(circle at 29px 24px,
+            color-mix(in srgb, color-mix(in srgb, var(--accent) 45%, white) var(--censo-sparkle-opacity,50%), transparent) 0 .6px, transparent 1.2px);
+        background-size: 107px 82px, 173px 133px, 71px 57px;
+        animation: censoSparkleRise 14s linear infinite, censoSparkleBlink 3.7s ease-in-out infinite;
+        animation-delay: var(--dust-delay,0s), var(--twinkle-delay,0s);
+      }
+      .card.patient-alert .card-content-wrapper::after {
+        animation-delay: var(--shine-delay,0s);
+      }
+      .patient-row.patient-alert {
+        background-image:
+          radial-gradient(ellipse .55px 1.4px at 18px 19px,
+            color-mix(in srgb, color-mix(in srgb, var(--accent) 55%, white) var(--censo-sparkle-opacity,50%), transparent) 0 65%, transparent 100%),
+          radial-gradient(ellipse 1.4px .55px at 64px 55px,
+            color-mix(in srgb, color-mix(in srgb, var(--accent) 55%, white) var(--censo-sparkle-opacity,50%), transparent) 0 65%, transparent 100%),
+          radial-gradient(circle at 29px 24px,
+            color-mix(in srgb, color-mix(in srgb, var(--accent) 45%, white) var(--censo-sparkle-opacity,50%), transparent) 0 .6px, transparent 1.2px),
+          linear-gradient(105deg, transparent 30%,
+            color-mix(in srgb, var(--accent) 6%, transparent) 46%,
+            color-mix(in srgb, var(--accent) 15%, transparent) 50%,
+            color-mix(in srgb, var(--accent) 6%, transparent) 54%, transparent 70%) !important;
+        background-size: 107px 82px, 173px 133px, 71px 57px, 240% 100% !important;
+        background-repeat: repeat, repeat, repeat, no-repeat !important;
+        animation: censoSparkleRowRise 14s linear infinite, censoSparkleBlink 3.7s ease-in-out infinite;
+        animation-delay: var(--dust-delay,0s), var(--twinkle-delay,0s);
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .card.patient-alert .card-content-wrapper::before,
+        .patient-row.patient-alert { animation: none !important; }
+      }
     `;
 
     document.head.appendChild(style);
@@ -711,7 +790,7 @@ export function createRenderModule(app) {
           const destinoChip = getColorfulChipHtml(p.destino);
           const alertaActiva = Boolean(p.alerta);
           const observacion = getObservacion(p);
-          htmlArr.push(`<tr class="patient-row ${alertaActiva ? 'patient-alert' : ''}" data-fila="${escapeHtml(p.fila)}" data-alerta="${alertaActiva ? '1' : '0'}" onclick="toggleTableRow(this)">
+          htmlArr.push(`<tr class="patient-row ${alertaActiva ? 'patient-alert' : ''}" data-fila="${escapeHtml(p.fila)}" data-alerta="${alertaActiva ? '1' : '0'}" style="${getGlitterStyle(p)}" onclick="toggleTableRow(this)">
               <td class="quick-bed-cell">
                 <button class="quick-bed-trigger" type="button" data-fila="${escapeHtml(p.fila)}" onclick="abrirCamaFlotante(this, this.dataset.fila, event)" title="Cambiar cama: ${escapeHtml(p.cama || 'SIN CAMA')}" aria-label="Cambiar cama de ${escapeHtml(p.nombre)}. Cama actual: ${escapeHtml(p.cama || 'sin cama')}">
                   <span class="quick-bed-label${getCamaLabelClass(p.cama)}">${escapeHtml(p.cama || '-')}</span>
@@ -785,7 +864,7 @@ export function createRenderModule(app) {
 
               const delayPatient = delayBase + (indexPatient * 50);
 
-              return `<div class="card animate-in ${alertaActiva ? 'patient-alert' : ''}" data-fila="${escapeHtml(p.fila)}" data-nombre="${escapeHtml(p.nombre)}" data-alerta="${alertaActiva ? '1' : '0'}" style="animation-delay: ${delayPatient}ms;">
+              return `<div class="card animate-in ${alertaActiva ? 'patient-alert' : ''}" data-fila="${escapeHtml(p.fila)}" data-nombre="${escapeHtml(p.nombre)}" data-alerta="${alertaActiva ? '1' : '0'}" style="animation-delay: ${delayPatient}ms; ${getGlitterStyle(p)}">
                 <div class="swipe-bg" aria-hidden="true"><div class="swipe-action swipe-delete"><span class="material-symbols-outlined">delete</span><span class="swipe-action-label">BORRAR</span></div><div class="swipe-action swipe-edit"><span class="swipe-action-label">EDITAR</span><span class="material-symbols-outlined">edit</span></div></div>
                 <div class="card-content-wrapper">
                   <div class="card-header" onclick="toggleCard(this)">

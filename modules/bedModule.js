@@ -285,8 +285,11 @@ export function getDestinoEstadoVisual(texto) {
   const parsed = parseDestinoClinico(texto);
   if (parsed) return parsed.tipo === 'ingreso' ? 'green' : 'yellow';
 
-  // También reconocer destinos heredados: "🏥 Ingreso a..." / "Interconsulta a...".
+  // Clasificación visual, compatible con los registros almacenados.
   const key = normalizarEspecialidad(texto);
+  if (key.includes('OBSERVACION') || key.includes('REVALORACION')) return 'yellow';
+  if (key.includes('ALTA VOLUNTARIA')) return 'blue';
+  if (key.includes('DEFUNCION')) return 'red';
   if (key.includes('ALTA A DOMICILIO') || /(?:^|\s)INGRESO(?:\s|$)/.test(key)) return 'green';
   if (/(?:^|\s)(?:VALORACION|INTERCONSULTA)(?:\s|$)/.test(key)) return 'yellow';
   return '';
@@ -336,6 +339,9 @@ export function getDestinoTextLabel(texto) {
     const accion = parsed.tipo === 'ingreso' ? 'INGRESO A' : 'VALORACIÓN POR';
     return `${accion} ${parsed.especialidad || ''}`.replace(/\s+/g, ' ').trim().toLocaleUpperCase('es-MX');
   }
+
+  // Solo cambia el texto presentado, no el destino guardado.
+  if (normalizarEspecialidad(texto).includes('OBSERVACION')) return 'OBSERVACIÓN / REVALORACIÓN';
 
   // Los destinos simples y los registros heredados pueden comenzar con emoji.
   // La etiqueta de selección y el tooltip deben ser texto clínico, nunca pictogramas.

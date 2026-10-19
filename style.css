@@ -572,18 +572,32 @@
       .modal-body-grid .input-group { margin-bottom: 0; }
     }
 
-/* Verde y amarillo solamente dentro del badge de destino. */
+/* Semántica del destino exclusivamente dentro del badge. */
 .destino-chip.destino-state-green { --destino-tone: #22c55e; }
 .destino-chip.destino-state-yellow { --destino-tone: #eab308; }
+.destino-chip.destino-state-blue { --destino-tone: #38bdf8; }
+.destino-chip.destino-state-red { --destino-tone: #dc6b72; }
 .destino-chip.destino-state-green,
-.destino-chip.destino-state-yellow {
+.destino-chip.destino-state-yellow,
+.destino-chip.destino-state-blue,
+.destino-chip.destino-state-red {
   background: color-mix(in srgb, var(--destino-tone) 31%, var(--card)) !important;
   border-color: color-mix(in srgb, var(--destino-tone) 56%, var(--line)) !important;
   color: var(--text) !important;
 }
-.destino-chip.destino-state-green .destino-action-icon,
-.destino-chip.destino-state-yellow .destino-action-icon,
-.destino-chip.destino-state-green .destino-specialty-icon,
-.destino-chip.destino-state-yellow .destino-specialty-icon {
+.destino-chip.destino-state-green :is(.destino-action-icon, .destino-specialty-icon),
+.destino-chip.destino-state-yellow :is(.destino-action-icon, .destino-specialty-icon),
+.destino-chip.destino-state-blue :is(.destino-action-icon, .destino-specialty-icon),
+.destino-chip.destino-state-red :is(.destino-action-icon, .destino-specialty-icon) {
   color: color-mix(in srgb, var(--destino-tone) 67%, var(--text)) !important;
+}
+.destino-chip.destino-state-observation .destino-specialty-text {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  min-width: 0;
+}
+.destino-chip.destino-state-observation:not(.destino-chip-compact) {
+  white-space: normal !important;
+  text-overflow: clip !important;
 }
