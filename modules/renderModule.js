@@ -37,18 +37,20 @@ export function createRenderModule(app) {
     if (!destino) return '';
     const parsed = parseDestinoClinico(destino);
     const modeClass = mode === 'compact' ? 'destino-chip destino-chip-compact' : 'chip destino-chip';
+    const estado = getDestinoEstadoVisual(destino);
+    const estadoClass = estado ? ` destino-state-${estado}` : '';
     const textLabel = getDestinoTextLabel(destino);
 
     if (parsed) {
       const especialidad = parsed.especialidad || '';
-      return `<div class="${modeClass}" title="${escapeHtml(textLabel)}" aria-label="${escapeHtml(textLabel)}">
+      return `<div class="${modeClass}${estadoClass}" title="${escapeHtml(textLabel)}" aria-label="${escapeHtml(textLabel)}">
         ${healthIconHtml(getDestinoActionIconPath(destino), 'destino-action-icon')}
         ${healthIconHtml(getDestinoIconPath(destino), 'destino-specialty-icon')}
         ${mode === 'compact' ? '' : `<span class="destino-specialty-text">${escapeHtml(especialidad)}</span>`}
       </div>`;
     }
 
-    return `<div class="${modeClass}" title="${escapeHtml(textLabel)}" aria-label="${escapeHtml(textLabel)}">
+    return `<div class="${modeClass}${estadoClass}" title="${escapeHtml(textLabel)}" aria-label="${escapeHtml(textLabel)}">
       ${healthIconHtml(getDestinoActionIconPath(destino), 'destino-action-icon')}
       ${healthIconHtml(getDestinoIconPath(destino), 'destino-specialty-icon')}
       ${mode === 'compact' ? '' : `<span class="destino-specialty-text">${escapeHtml(textLabel)}</span>`}
@@ -150,15 +152,20 @@ export function createRenderModule(app) {
         bottom: calc(8px + env(safe-area-inset-bottom, 0px)) !important;
       }
 
-      /* Polvo de hada: partículas mínimas CSS, sin elementos ni temporizadores JS. */
+      /* Partículas ascendentes con destellos en cruz (glitter). */
       @keyframes censoAlertDust {
-        0% { background-position: 0 0, 0 0, 0 0; opacity: .75; }
-        50% { opacity: 1; }
-        100% { background-position: 0 -64px, 0 -92px, 0 -120px; opacity: .75; }
+        from { background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0; }
+        to { background-position: 0 -164px, 0 -164px, 0 -164px, 0 -266px, 0 -266px, 0 -266px, 0 -171px; }
+      }
+      @keyframes censoAlertTwinkle {
+        0%, 100% { opacity: .58; }
+        27% { opacity: .96; }
+        52% { opacity: .65; }
+        80% { opacity: 1; }
       }
       @keyframes censoAlertDustRow {
-        0% { background-position: 0 0, 0 0, 0 0, 220% 0; }
-        100% { background-position: 0 -64px, 0 -92px, 0 -120px, -150% 0; }
+        from { background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 220% 0; }
+        to { background-position: 0 -164px, 0 -164px, 0 -164px, 0 -266px, 0 -266px, 0 -266px, 0 -171px, -150% 0; }
       }
       @keyframes censoAlertShine {
         0%, 10% { transform: translateX(-12%) skewX(-14deg); opacity: 0; }
@@ -447,24 +454,20 @@ export function createRenderModule(app) {
         white-space: nowrap;
       }
 
-      /* El destacado no reemplaza los estados verde/amarillo ni el texto del tema. */
+      /* Destacado en el color del tema: 26% de acento frente al 100% original. */
       .card.patient-alert .card-content-wrapper {
         position: relative;
         overflow: hidden;
-        background: color-mix(in srgb, var(--patient-state-tone, var(--accent)) 8%, var(--card)) !important;
+        background: color-mix(in srgb, var(--accent) 26%, var(--card)) !important;
         color: var(--text);
-        border-color: color-mix(in srgb, var(--accent) 28%, var(--line)) !important;
+        border-color: color-mix(in srgb, var(--accent) 44%, var(--line)) !important;
       }
       .card.open.patient-alert .card-content-wrapper {
-        background: color-mix(in srgb, var(--patient-state-tone, var(--accent)) 8%, var(--card-open)) !important;
+        background: color-mix(in srgb, var(--accent) 26%, var(--card-open)) !important;
       }
-
-      /* Partículas y reflejo debajo del contenido; no capturan eventos. */
+      /* El contenido y las interacciones se sitúan sobre los destellos. */
       .card.patient-alert .card-content-wrapper > .card-header,
-      .card.patient-alert .card-content-wrapper > .details {
-        position: relative;
-        z-index: 2;
-      }
+      .card.patient-alert .card-content-wrapper > .details { position: relative; z-index: 2; }
       .card.patient-alert .card-content-wrapper::before {
         content: '';
         position: absolute;
@@ -472,12 +475,17 @@ export function createRenderModule(app) {
         z-index: 1;
         pointer-events: none;
         background-image:
-          radial-gradient(circle, color-mix(in srgb, var(--accent) 65%, transparent) 0 1px, transparent 1.9px),
-          radial-gradient(circle, color-mix(in srgb, var(--accent) 43%, transparent) 0 1.25px, transparent 2.2px),
-          radial-gradient(circle, color-mix(in srgb, var(--text) 25%, transparent) 0 .7px, transparent 1.55px);
-        background-size: 86px 64px, 131px 92px, 172px 120px;
+          radial-gradient(ellipse 1px 4px at 18px 19px, color-mix(in srgb, var(--accent) 60%, white) 0 68%, transparent 100%),
+          radial-gradient(ellipse 4px 1px at 18px 19px, color-mix(in srgb, var(--accent) 60%, white) 0 68%, transparent 100%),
+          radial-gradient(circle at 18px 19px, color-mix(in srgb, var(--accent) 26%, transparent) 0 5px, transparent 9px),
+          radial-gradient(ellipse 1px 3px at 64px 55px, color-mix(in srgb, var(--accent) 66%, white) 0 60%, transparent 100%),
+          radial-gradient(ellipse 3px 1px at 64px 55px, color-mix(in srgb, var(--accent) 66%, white) 0 60%, transparent 100%),
+          radial-gradient(circle at 64px 55px, color-mix(in srgb, var(--accent) 24%, transparent) 0 4px, transparent 8px),
+          radial-gradient(circle at 29px 24px, color-mix(in srgb, var(--accent) 62%, white) 0 1px, transparent 2.2px);
+        background-size: 107px 82px, 107px 82px, 107px 82px,
+                         173px 133px, 173px 133px, 173px 133px, 71px 57px;
         background-repeat: repeat;
-        animation: censoAlertDust 12s linear infinite;
+        animation: censoAlertDust 14s linear infinite, censoAlertTwinkle 3.7s ease-in-out infinite;
       }
       .card.patient-alert .card-content-wrapper::after {
         content: '';
@@ -488,42 +496,40 @@ export function createRenderModule(app) {
         width: 50%;
         z-index: 1;
         pointer-events: none;
-        background: linear-gradient(90deg,
-          transparent,
+        background: linear-gradient(90deg, transparent,
           color-mix(in srgb, var(--accent) 8%, transparent) 40%,
-          color-mix(in srgb, var(--accent) 18%, transparent) 50%,
+          color-mix(in srgb, var(--accent) 16%, transparent) 50%,
           color-mix(in srgb, var(--accent) 8%, transparent) 60%,
           transparent);
         animation: censoAlertShine 8.5s ease-in-out infinite;
       }
-
-      /* Vista tabla: capas CSS sobre la fila, sin alteraciones de márgenes. */
       .patient-row.patient-alert {
-        background-color: color-mix(in srgb, var(--patient-state-tone, var(--accent)) 8%, var(--panel)) !important;
+        background-color: color-mix(in srgb, var(--accent) 26%, var(--panel)) !important;
         background-image:
-          radial-gradient(circle, color-mix(in srgb, var(--accent) 65%, transparent) 0 1px, transparent 1.9px),
-          radial-gradient(circle, color-mix(in srgb, var(--accent) 43%, transparent) 0 1.25px, transparent 2.2px),
-          radial-gradient(circle, color-mix(in srgb, var(--text) 25%, transparent) 0 .7px, transparent 1.55px),
+          radial-gradient(ellipse 1px 4px at 18px 19px, color-mix(in srgb, var(--accent) 60%, white) 0 68%, transparent 100%),
+          radial-gradient(ellipse 4px 1px at 18px 19px, color-mix(in srgb, var(--accent) 60%, white) 0 68%, transparent 100%),
+          radial-gradient(circle at 18px 19px, color-mix(in srgb, var(--accent) 26%, transparent) 0 5px, transparent 9px),
+          radial-gradient(ellipse 1px 3px at 64px 55px, color-mix(in srgb, var(--accent) 66%, white) 0 60%, transparent 100%),
+          radial-gradient(ellipse 3px 1px at 64px 55px, color-mix(in srgb, var(--accent) 66%, white) 0 60%, transparent 100%),
+          radial-gradient(circle at 64px 55px, color-mix(in srgb, var(--accent) 24%, transparent) 0 4px, transparent 8px),
+          radial-gradient(circle at 29px 24px, color-mix(in srgb, var(--accent) 62%, white) 0 1px, transparent 2.2px),
           linear-gradient(105deg,
             transparent 30%,
             color-mix(in srgb, var(--accent) 6%, transparent) 46%,
-            color-mix(in srgb, var(--accent) 14%, transparent) 50%,
+            color-mix(in srgb, var(--accent) 15%, transparent) 50%,
             color-mix(in srgb, var(--accent) 6%, transparent) 54%,
             transparent 70%) !important;
-        background-size: 86px 64px, 131px 92px, 172px 120px, 240% 100% !important;
-        background-position: 0 0, 0 0, 0 0, 220% 0;
-        background-repeat: repeat, repeat, repeat, no-repeat !important;
-        animation: censoAlertDustRow 12s linear infinite;
+        background-size: 107px 82px, 107px 82px, 107px 82px,
+                         173px 133px, 173px 133px, 173px 133px, 71px 57px, 240% 100% !important;
+        background-repeat: repeat, repeat, repeat, repeat, repeat, repeat, repeat, no-repeat !important;
+        animation: censoAlertDustRow 14s linear infinite;
       }
-      .patient-row.patient-alert td {
-        background: transparent !important;
-      }
+      .patient-row.patient-alert td { background: transparent !important; }
       .patient-row.patient-alert td:first-child {
-        box-shadow: inset 2px 0 0 color-mix(in srgb, var(--accent) 32%, transparent) !important;
+        box-shadow: inset 3px 0 0 color-mix(in srgb, var(--accent) 55%, transparent) !important;
       }
-
       .patient-observation-row.patient-alert-observation td {
-        background: color-mix(in srgb, var(--patient-state-tone, var(--accent)) 8%, var(--panel)) !important;
+        background: color-mix(in srgb, var(--accent) 26%, var(--panel)) !important;
         padding-top: 0 !important;
       }
       .patient-observation-row.patient-alert-observation .patient-observation-line {
@@ -533,18 +539,11 @@ export function createRenderModule(app) {
         box-shadow: inset 0 1px 0 var(--accent-border);
       }
       .patient-observation-row.patient-alert-observation .patient-observation-label,
-      .patient-observation-row.patient-alert-observation .material-symbols-outlined {
-        color: var(--accent);
-      }
-
+      .patient-observation-row.patient-alert-observation .material-symbols-outlined { color: var(--accent); }
       @media (prefers-reduced-motion: reduce) {
         .card.patient-alert .card-content-wrapper::before,
-        .patient-row.patient-alert {
-          animation: none !important;
-        }
-        .card.patient-alert .card-content-wrapper::after {
-          display: none;
-        }
+        .patient-row.patient-alert { animation: none !important; }
+        .card.patient-alert .card-content-wrapper::after { display: none; }
       }
     `;
 
@@ -628,9 +627,9 @@ export function createRenderModule(app) {
       </div>`;
   }
 
-  function renderObservationRow(p, observacion, alertaActiva, claseEstado = '') {
+  function renderObservationRow(p, observacion, alertaActiva) {
     if (!observacion) return '';
-    return `<tr class="patient-observation-row ${claseEstado} ${alertaActiva ? 'patient-alert-observation' : ''}" data-fila="${escapeHtml(p.fila)}">
+    return `<tr class="patient-observation-row ${alertaActiva ? 'patient-alert-observation' : ''}" data-fila="${escapeHtml(p.fila)}">
       <td colspan="8">
         <div class="patient-observation-line" title="${escapeHtml(observacion)}">
           <span class="material-symbols-outlined">sticky_note_2</span>
@@ -710,11 +709,9 @@ export function createRenderModule(app) {
 
         grupos[area].forEach((p) => {
           const destinoChip = getColorfulChipHtml(p.destino);
-          const estadoDestino = getDestinoEstadoVisual(p.destino);
-          const claseEstado = estadoDestino ? `patient-state-${estadoDestino}` : '';
           const alertaActiva = Boolean(p.alerta);
           const observacion = getObservacion(p);
-          htmlArr.push(`<tr class="patient-row ${claseEstado} ${alertaActiva ? 'patient-alert' : ''}" data-fila="${escapeHtml(p.fila)}" data-alerta="${alertaActiva ? '1' : '0'}" onclick="toggleTableRow(this)">
+          htmlArr.push(`<tr class="patient-row ${alertaActiva ? 'patient-alert' : ''}" data-fila="${escapeHtml(p.fila)}" data-alerta="${alertaActiva ? '1' : '0'}" onclick="toggleTableRow(this)">
               <td class="quick-bed-cell">
                 <button class="quick-bed-trigger" type="button" data-fila="${escapeHtml(p.fila)}" onclick="abrirCamaFlotante(this, this.dataset.fila, event)" title="Cambiar cama: ${escapeHtml(p.cama || 'SIN CAMA')}" aria-label="Cambiar cama de ${escapeHtml(p.nombre)}. Cama actual: ${escapeHtml(p.cama || 'sin cama')}">
                   <span class="quick-bed-label${getCamaLabelClass(p.cama)}">${escapeHtml(p.cama || '-')}</span>
@@ -743,7 +740,7 @@ export function createRenderModule(app) {
               </td>
 
               ${renderTableActions(p, alertaActiva, observacion)}
-          </tr>${renderObservationRow(p, observacion, alertaActiva, claseEstado)}`);
+          </tr>${renderObservationRow(p, observacion, alertaActiva)}`);
         });
       });
 
@@ -771,8 +768,6 @@ export function createRenderModule(app) {
           <div class="patient-list">
             ${pacientes.map((p, indexPatient) => {
               const alertaActiva = Boolean(p.alerta);
-              const estadoDestino = getDestinoEstadoVisual(p.destino);
-              const claseEstado = estadoDestino ? `patient-state-${estadoDestino}` : '';
               const observacion = getObservacion(p);
               const camaHtml = p.cama ? `<button class="patient-bed quick-bed-trigger" type="button" data-fila="${escapeHtml(p.fila)}" onclick="abrirCamaFlotante(this, this.dataset.fila, event)" title="Cambiar cama: ${escapeHtml(p.cama)}" aria-label="Cambiar cama de ${escapeHtml(p.nombre)}. Cama actual: ${escapeHtml(p.cama)}"><span class="quick-bed-label${getCamaLabelClass(p.cama)}">${escapeHtml(p.cama)}</span></button>` : '';
 
@@ -790,7 +785,7 @@ export function createRenderModule(app) {
 
               const delayPatient = delayBase + (indexPatient * 50);
 
-              return `<div class="card animate-in ${claseEstado} ${alertaActiva ? 'patient-alert' : ''}" data-fila="${escapeHtml(p.fila)}" data-nombre="${escapeHtml(p.nombre)}" data-alerta="${alertaActiva ? '1' : '0'}" style="animation-delay: ${delayPatient}ms;">
+              return `<div class="card animate-in ${alertaActiva ? 'patient-alert' : ''}" data-fila="${escapeHtml(p.fila)}" data-nombre="${escapeHtml(p.nombre)}" data-alerta="${alertaActiva ? '1' : '0'}" style="animation-delay: ${delayPatient}ms;">
                 <div class="swipe-bg" aria-hidden="true"><div class="swipe-action swipe-delete"><span class="material-symbols-outlined">delete</span><span class="swipe-action-label">BORRAR</span></div><div class="swipe-action swipe-edit"><span class="swipe-action-label">EDITAR</span><span class="material-symbols-outlined">edit</span></div></div>
                 <div class="card-content-wrapper">
                   <div class="card-header" onclick="toggleCard(this)">
