@@ -38,8 +38,8 @@ export const healthIcons = Object.freeze({
   oftalmologia: `${HEALTH_ICON_ROOT}ophthalmology.svg`,
   gastroenterologia: `${HEALTH_ICON_ROOT}gastroenterology.svg`,
   terapiaIntensiva: `${HEALTH_ICON_ROOT}intensive-care.svg`,
-  ingreso: `${HEALTH_ICON_ROOT}admission.svg`,
-  valoracion: `${HEALTH_ICON_ROOT}assessment.svg`,
+  ingreso: `${HEALTH_ICON_ROOT}admission.svg?v=2.86`,
+  valoracion: `${HEALTH_ICON_ROOT}assessment.svg?v=2.86`,
   salaChoque: `${HEALTH_ICON_ROOT}shock-room.svg`,
   traumaMenor: `${HEALTH_ICON_ROOT}minor-trauma.svg`,
   areaPediatria: `${HEALTH_ICON_ROOT}pediatric-area.svg`,
@@ -277,6 +277,19 @@ export function parseDestinoClinico(texto) {
   const icon = getHealthIconEspecialidad(especialidad) || healthIcons.sinArea;
 
   return { tipo, emoji: emojiActual, icon, especialidad, raw, emojiOriginal };
+}
+
+// Estado exclusivamente visual: no cambia el destino clínico almacenado.
+export function getDestinoEstadoVisual(texto) {
+  if (!texto) return '';
+  const parsed = parseDestinoClinico(texto);
+  if (parsed) return parsed.tipo === 'ingreso' ? 'green' : 'yellow';
+
+  // También reconocer destinos heredados: "🏥 Ingreso a..." / "Interconsulta a...".
+  const key = normalizarEspecialidad(texto);
+  if (key.includes('ALTA A DOMICILIO') || /(?:^|\s)INGRESO(?:\s|$)/.test(key)) return 'green';
+  if (/(?:^|\s)(?:VALORACION|INTERCONSULTA)(?:\s|$)/.test(key)) return 'yellow';
+  return '';
 }
 
 export function getDestinoMaterialIcon(texto) {

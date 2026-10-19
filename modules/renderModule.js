@@ -23,7 +23,8 @@ export function createRenderModule(app) {
     parseDestinoClinico,
     getDestinoActionIconPath,
     getDestinoIconPath,
-    getDestinoTextLabel
+    getDestinoTextLabel,
+    getDestinoEstadoVisual
   } = app.bed;
   const { escapeHtml } = app.utils;
 
@@ -48,6 +49,7 @@ export function createRenderModule(app) {
     }
 
     return `<div class="${modeClass}" title="${escapeHtml(textLabel)}" aria-label="${escapeHtml(textLabel)}">
+      ${healthIconHtml(getDestinoActionIconPath(destino), 'destino-action-icon')}
       ${healthIconHtml(getDestinoIconPath(destino), 'destino-specialty-icon')}
       ${mode === 'compact' ? '' : `<span class="destino-specialty-text">${escapeHtml(textLabel)}</span>`}
     </div>`;
@@ -752,9 +754,11 @@ export function createRenderModule(app) {
 
         grupos[area].forEach((p) => {
           const destinoChip = getColorfulChipHtml(p.destino);
+          const estadoDestino = getDestinoEstadoVisual(p.destino);
+          const claseEstado = estadoDestino ? `patient-state-${estadoDestino}` : '';
           const alertaActiva = Boolean(p.alerta);
           const observacion = getObservacion(p);
-          htmlArr.push(`<tr class="patient-row ${alertaActiva ? 'patient-alert' : ''}" data-fila="${escapeHtml(p.fila)}" data-alerta="${alertaActiva ? '1' : '0'}" onclick="toggleTableRow(this)">
+          htmlArr.push(`<tr class="patient-row ${claseEstado} ${alertaActiva ? 'patient-alert' : ''}" data-fila="${escapeHtml(p.fila)}" data-alerta="${alertaActiva ? '1' : '0'}" onclick="toggleTableRow(this)">
               <td class="quick-bed-cell">
                 <button class="quick-bed-trigger" type="button" data-fila="${escapeHtml(p.fila)}" onclick="abrirCamaFlotante(this, this.dataset.fila, event)" title="Cambiar cama: ${escapeHtml(p.cama || 'SIN CAMA')}" aria-label="Cambiar cama de ${escapeHtml(p.nombre)}. Cama actual: ${escapeHtml(p.cama || 'sin cama')}">
                   <span class="quick-bed-label${getCamaLabelClass(p.cama)}">${escapeHtml(p.cama || '-')}</span>
@@ -811,6 +815,8 @@ export function createRenderModule(app) {
           <div class="patient-list">
             ${pacientes.map((p, indexPatient) => {
               const alertaActiva = Boolean(p.alerta);
+              const estadoDestino = getDestinoEstadoVisual(p.destino);
+              const claseEstado = estadoDestino ? `patient-state-${estadoDestino}` : '';
               const observacion = getObservacion(p);
               const camaHtml = p.cama ? `<button class="patient-bed quick-bed-trigger" type="button" data-fila="${escapeHtml(p.fila)}" onclick="abrirCamaFlotante(this, this.dataset.fila, event)" title="Cambiar cama: ${escapeHtml(p.cama)}" aria-label="Cambiar cama de ${escapeHtml(p.nombre)}. Cama actual: ${escapeHtml(p.cama)}"><span class="quick-bed-label${getCamaLabelClass(p.cama)}">${escapeHtml(p.cama)}</span></button>` : '';
 
@@ -828,7 +834,7 @@ export function createRenderModule(app) {
 
               const delayPatient = delayBase + (indexPatient * 50);
 
-              return `<div class="card animate-in ${alertaActiva ? 'patient-alert' : ''}" data-fila="${escapeHtml(p.fila)}" data-nombre="${escapeHtml(p.nombre)}" data-alerta="${alertaActiva ? '1' : '0'}" style="animation-delay: ${delayPatient}ms;">
+              return `<div class="card animate-in ${claseEstado} ${alertaActiva ? 'patient-alert' : ''}" data-fila="${escapeHtml(p.fila)}" data-nombre="${escapeHtml(p.nombre)}" data-alerta="${alertaActiva ? '1' : '0'}" style="animation-delay: ${delayPatient}ms;">
                 <div class="swipe-bg" aria-hidden="true"><div class="swipe-action swipe-delete"><span class="material-symbols-outlined">delete</span><span class="swipe-action-label">BORRAR</span></div><div class="swipe-action swipe-edit"><span class="swipe-action-label">EDITAR</span><span class="material-symbols-outlined">edit</span></div></div>
                 <div class="card-content-wrapper">
                   <div class="card-header" onclick="toggleCard(this)">

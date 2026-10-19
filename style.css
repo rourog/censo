@@ -571,3 +571,29 @@
       .span-3 { grid-column: span 3; }
       .modal-body-grid .input-group { margin-bottom: 0; }
     }
+
+/* Estado del destino: tintes suaves sobre la superficie del tema.
+   No alteran márgenes, bordes, tipografía, colores de texto ni el destacado manual. */
+#content .patient-state-green { --patient-state-tone: #22c55e; }
+#content .patient-state-yellow { --patient-state-tone: #eab308; }
+
+#content .card.patient-state-green:not(.patient-alert) .card-content-wrapper,
+#content .card.patient-state-yellow:not(.patient-alert) .card-content-wrapper {
+  background: color-mix(in srgb, var(--patient-state-tone) 12%, var(--card)) !important;
+}
+#content .card.open.patient-state-green:not(.patient-alert) .card-content-wrapper,
+#content .card.open.patient-state-yellow:not(.patient-alert) .card-content-wrapper {
+  background: color-mix(in srgb, var(--patient-state-tone) 12%, var(--card-open)) !important;
+}
+#content .patient-row.patient-state-green:not(.patient-alert):not(.selected-nav),
+#content .patient-row.patient-state-yellow:not(.patient-alert):not(.selected-nav) {
+  background: color-mix(in srgb, var(--patient-state-tone) 12%, var(--panel)) !important;
+}
+#content .patient-row.patient-state-green:not(.patient-alert):not(.selected-nav):hover,
+#content .patient-row.patient-state-yellow:not(.patient-alert):not(.selected-nav):hover {
+  background: color-mix(in srgb, var(--patient-state-tone) 18%, var(--panel)) !important;
+}
+#content .patient-row.patient-state-green:not(.patient-alert):not(.selected-nav).expanded-row,
+#content .patient-row.patient-state-yellow:not(.patient-alert):not(.selected-nav).expanded-row {
+  background: color-mix(in srgb, var(--patient-state-tone) 14%, var(--card-open)) !important;
+}
