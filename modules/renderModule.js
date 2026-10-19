@@ -92,7 +92,10 @@ export function createRenderModule(app) {
     hash >>>= 0;
     const delay = ((hash >>> 3) % 101) / 10;
     const duration = 8.5 + ((hash >>> 18) % 26) / 10;
-    return `--shine-delay:-${delay}s;--shine-duration:${duration}s;`;
+    // 30–39% del acento, fijo para cada paciente. Evita un bloque uniforme
+    // de filas resaltadas sin introducir parpadeos ni timers adicionales.
+    const strength = 30 + ((hash >>> 11) % 10);
+    return `--shine-delay:-${delay}s;--shine-duration:${duration}s;--highlight-strength:${strength}%;`;
   }
 
   function getAlertIconFill(isActive) {
@@ -466,16 +469,16 @@ export function createRenderModule(app) {
         white-space: nowrap;
       }
 
-      /* Destacado clínico: color atenuado + una franja luminosa, conservando tipografía. */
+      /* Destacado clínico: 30–39% de acento estable por paciente + reflejo desfasado. */
       .card.patient-alert .card-content-wrapper {
         position: relative;
         overflow: hidden;
-        background: color-mix(in srgb, var(--accent) 26%, var(--card)) !important;
+        background: color-mix(in srgb, var(--accent) var(--highlight-strength, 34%), var(--card)) !important;
         color: var(--text);
         border-color: color-mix(in srgb, var(--accent) 44%, var(--line)) !important;
       }
       .card.open.patient-alert .card-content-wrapper {
-        background: color-mix(in srgb, var(--accent) 26%, var(--card-open)) !important;
+        background: color-mix(in srgb, var(--accent) var(--highlight-strength, 34%), var(--card-open)) !important;
       }
       .card.patient-alert .card-content-wrapper > .card-header,
       .card.patient-alert .card-content-wrapper > .details {
@@ -502,9 +505,9 @@ export function createRenderModule(app) {
         animation-delay: var(--shine-delay, 0s);
       }
 
-      /* Tabla: un solo degradado ligero que recorre la fila completa. */
+      /* Tabla: mismo tono del paciente y un único degradado móvil. */
       .patient-row.patient-alert {
-        background-color: color-mix(in srgb, var(--accent) 26%, var(--panel)) !important;
+        background-color: color-mix(in srgb, var(--accent) var(--highlight-strength, 34%), var(--panel)) !important;
         background-image: linear-gradient(108deg,
           transparent 18%,
           color-mix(in srgb, var(--accent) 10%, transparent) 36%,
@@ -523,7 +526,7 @@ export function createRenderModule(app) {
         box-shadow: inset 3px 0 0 color-mix(in srgb, var(--accent) 55%, transparent) !important;
       }
       .patient-observation-row.patient-alert-observation td {
-        background: color-mix(in srgb, var(--accent) 26%, var(--panel)) !important;
+        background: color-mix(in srgb, var(--accent) var(--highlight-strength, 34%), var(--panel)) !important;
         padding-top: 0 !important;
       }
       .patient-observation-row.patient-alert-observation .patient-observation-line {
@@ -629,7 +632,7 @@ export function createRenderModule(app) {
 
   function renderObservationRow(p, observacion, alertaActiva) {
     if (!observacion) return '';
-    return `<tr class="patient-observation-row ${alertaActiva ? 'patient-alert-observation' : ''}" data-fila="${escapeHtml(p.fila)}">
+    return `<tr class="patient-observation-row ${alertaActiva ? 'patient-alert-observation' : ''}" data-fila="${escapeHtml(p.fila)}" style="${alertaActiva ? getHighlightStyle(p) : ''}">
       <td colspan="8">
         <div class="patient-observation-line" title="${escapeHtml(observacion)}">
           <span class="material-symbols-outlined">sticky_note_2</span>
