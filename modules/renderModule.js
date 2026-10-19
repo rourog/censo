@@ -84,13 +84,15 @@ export function createRenderModule(app) {
       : '';
   }
 
-  // Estilo estable por paciente: desfases, offsets y brillo sin escrituras remotas.
-  function getGlitterStyle(p) {
+  // Un solo desfase estable por paciente: la animación no consume JavaScript por cuadro.
+  function getHighlightStyle(p) {
     const id = String(p?.fila || p?.nombre || '');
     let hash = 2166136261;
     for (let i = 0; i < id.length; i++) hash = Math.imul(hash ^ id.charCodeAt(i), 16777619);
     hash >>>= 0;
-    return `--dust-x:${hash % 113}px;--dust-y:${(hash >>> 8) % 87}px;--dust-delay:-${((hash >>> 4) % 139) / 10}s;--twinkle-delay:-${((hash >>> 13) % 37) / 10}s;--shine-delay:-${((hash >>> 21) % 83) / 10}s;`;
+    const delay = ((hash >>> 3) % 101) / 10;
+    const duration = 8.5 + ((hash >>> 18) % 26) / 10;
+    return `--shine-delay:-${delay}s;--shine-duration:${duration}s;`;
   }
 
   function getAlertIconFill(isActive) {
@@ -164,25 +166,23 @@ export function createRenderModule(app) {
         bottom: calc(8px + env(safe-area-inset-bottom, 0px)) !important;
       }
 
-      /* Partículas ascendentes con destellos en cruz (glitter). */
-      @keyframes censoAlertDust {
-        from { background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0; }
-        to { background-position: 0 -164px, 0 -164px, 0 -164px, 0 -266px, 0 -266px, 0 -266px, 0 -171px; }
+      /* Solo un reflejo periódico. No se crean partículas ni elementos adicionales. */
+      @keyframes censoPatientCardShine {
+        0%, 17% {
+          transform: translate3d(0, 0, 0) skewX(-13deg);
+          opacity: 0;
+        }
+        28% { opacity: .9; }
+        51% { opacity: .76; }
+        62%, 100% {
+          transform: translate3d(365%, 0, 0) skewX(-13deg);
+          opacity: 0;
+        }
       }
-      @keyframes censoAlertTwinkle {
-        0%, 100% { opacity: .58; }
-        27% { opacity: .96; }
-        52% { opacity: .65; }
-        80% { opacity: 1; }
-      }
-      @keyframes censoAlertDustRow {
-        from { background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 220% 0; }
-        to { background-position: 0 -164px, 0 -164px, 0 -164px, 0 -266px, 0 -266px, 0 -266px, 0 -171px, -150% 0; }
-      }
-      @keyframes censoAlertShine {
-        0%, 10% { transform: translateX(-12%) skewX(-14deg); opacity: 0; }
-        24% { opacity: .7; }
-        56%, 100% { transform: translateX(330%) skewX(-14deg); opacity: 0; }
+
+      @keyframes censoPatientRowShine {
+        0%, 17% { background-position: 160% 0; }
+        62%, 100% { background-position: -65% 0; }
       }
 
       .destino-chip {
@@ -466,7 +466,7 @@ export function createRenderModule(app) {
         white-space: nowrap;
       }
 
-      /* Destacado en el color del tema: 26% de acento frente al 100% original. */
+      /* Destacado clínico: color atenuado + una franja luminosa, conservando tipografía. */
       .card.patient-alert .card-content-wrapper {
         position: relative;
         overflow: hidden;
@@ -477,66 +477,48 @@ export function createRenderModule(app) {
       .card.open.patient-alert .card-content-wrapper {
         background: color-mix(in srgb, var(--accent) 26%, var(--card-open)) !important;
       }
-      /* El contenido y las interacciones se sitúan sobre los destellos. */
       .card.patient-alert .card-content-wrapper > .card-header,
-      .card.patient-alert .card-content-wrapper > .details { position: relative; z-index: 2; }
-      .card.patient-alert .card-content-wrapper::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        z-index: 1;
-        pointer-events: none;
-        background-image:
-          radial-gradient(ellipse 1px 4px at 18px 19px, color-mix(in srgb, var(--accent) 60%, white) 0 68%, transparent 100%),
-          radial-gradient(ellipse 4px 1px at 18px 19px, color-mix(in srgb, var(--accent) 60%, white) 0 68%, transparent 100%),
-          radial-gradient(circle at 18px 19px, color-mix(in srgb, var(--accent) 26%, transparent) 0 5px, transparent 9px),
-          radial-gradient(ellipse 1px 3px at 64px 55px, color-mix(in srgb, var(--accent) 66%, white) 0 60%, transparent 100%),
-          radial-gradient(ellipse 3px 1px at 64px 55px, color-mix(in srgb, var(--accent) 66%, white) 0 60%, transparent 100%),
-          radial-gradient(circle at 64px 55px, color-mix(in srgb, var(--accent) 24%, transparent) 0 4px, transparent 8px),
-          radial-gradient(circle at 29px 24px, color-mix(in srgb, var(--accent) 62%, white) 0 1px, transparent 2.2px);
-        background-size: 107px 82px, 107px 82px, 107px 82px,
-                         173px 133px, 173px 133px, 173px 133px, 71px 57px;
-        background-repeat: repeat;
-        animation: censoAlertDust 14s linear infinite, censoAlertTwinkle 3.7s ease-in-out infinite;
+      .card.patient-alert .card-content-wrapper > .details {
+        position: relative;
+        z-index: 2;
       }
+      /* Kanban: solo se anima transform/opacity, sin recalcular múltiples gradientes. */
       .card.patient-alert .card-content-wrapper::after {
         content: '';
         position: absolute;
         top: 0;
         bottom: 0;
         left: -55%;
-        width: 50%;
+        width: 48%;
         z-index: 1;
         pointer-events: none;
-        background: linear-gradient(90deg, transparent,
-          color-mix(in srgb, var(--accent) 8%, transparent) 40%,
-          color-mix(in srgb, var(--accent) 16%, transparent) 50%,
-          color-mix(in srgb, var(--accent) 8%, transparent) 60%,
-          transparent);
-        animation: censoAlertShine 8.5s ease-in-out infinite;
+        background: linear-gradient(108deg,
+          transparent 5%,
+          color-mix(in srgb, var(--accent) 11%, transparent) 26%,
+          color-mix(in srgb, white 25%, transparent) 49%,
+          color-mix(in srgb, var(--accent) 13%, transparent) 68%,
+          transparent 95%);
+        animation: censoPatientCardShine var(--shine-duration, 9.2s) ease-in-out infinite;
+        animation-delay: var(--shine-delay, 0s);
       }
+
+      /* Tabla: un solo degradado ligero que recorre la fila completa. */
       .patient-row.patient-alert {
         background-color: color-mix(in srgb, var(--accent) 26%, var(--panel)) !important;
-        background-image:
-          radial-gradient(ellipse 1px 4px at 18px 19px, color-mix(in srgb, var(--accent) 60%, white) 0 68%, transparent 100%),
-          radial-gradient(ellipse 4px 1px at 18px 19px, color-mix(in srgb, var(--accent) 60%, white) 0 68%, transparent 100%),
-          radial-gradient(circle at 18px 19px, color-mix(in srgb, var(--accent) 26%, transparent) 0 5px, transparent 9px),
-          radial-gradient(ellipse 1px 3px at 64px 55px, color-mix(in srgb, var(--accent) 66%, white) 0 60%, transparent 100%),
-          radial-gradient(ellipse 3px 1px at 64px 55px, color-mix(in srgb, var(--accent) 66%, white) 0 60%, transparent 100%),
-          radial-gradient(circle at 64px 55px, color-mix(in srgb, var(--accent) 24%, transparent) 0 4px, transparent 8px),
-          radial-gradient(circle at 29px 24px, color-mix(in srgb, var(--accent) 62%, white) 0 1px, transparent 2.2px),
-          linear-gradient(105deg,
-            transparent 30%,
-            color-mix(in srgb, var(--accent) 6%, transparent) 46%,
-            color-mix(in srgb, var(--accent) 15%, transparent) 50%,
-            color-mix(in srgb, var(--accent) 6%, transparent) 54%,
-            transparent 70%) !important;
-        background-size: 107px 82px, 107px 82px, 107px 82px,
-                         173px 133px, 173px 133px, 173px 133px, 71px 57px, 240% 100% !important;
-        background-repeat: repeat, repeat, repeat, repeat, repeat, repeat, repeat, no-repeat !important;
-        animation: censoAlertDustRow 14s linear infinite;
+        background-image: linear-gradient(108deg,
+          transparent 18%,
+          color-mix(in srgb, var(--accent) 10%, transparent) 36%,
+          color-mix(in srgb, white 24%, transparent) 50%,
+          color-mix(in srgb, var(--accent) 12%, transparent) 64%,
+          transparent 82%) !important;
+        background-size: 260% 100% !important;
+        background-repeat: no-repeat !important;
+        animation: censoPatientRowShine var(--shine-duration, 9.2s) ease-in-out infinite;
+        animation-delay: var(--shine-delay, 0s);
       }
-      .patient-row.patient-alert td { background: transparent !important; }
+      .patient-row.patient-alert td {
+        background: transparent !important;
+      }
       .patient-row.patient-alert td:first-child {
         box-shadow: inset 3px 0 0 color-mix(in srgb, var(--accent) 55%, transparent) !important;
       }
@@ -551,80 +533,17 @@ export function createRenderModule(app) {
         box-shadow: inset 0 1px 0 var(--accent-border);
       }
       .patient-observation-row.patient-alert-observation .patient-observation-label,
-      .patient-observation-row.patient-alert-observation .material-symbols-outlined { color: var(--accent); }
-      @media (prefers-reduced-motion: reduce) {
-        .card.patient-alert .card-content-wrapper::before,
-        .patient-row.patient-alert { animation: none !important; }
-        .card.patient-alert .card-content-wrapper::after { display: none; }
-      }
-
-      /* Glitter individual: puntos diminutos ascendentes y destello por opacidad. */
-      @property --censo-sparkle-opacity {
-        syntax: '<percentage>';
-        inherits: false;
-        initial-value: 50%;
-      }
-      @keyframes censoSparkleBlink {
-        0%, 100% { --censo-sparkle-opacity: 7%; }
-        23% { --censo-sparkle-opacity: 80%; }
-        49% { --censo-sparkle-opacity: 11%; }
-        76% { --censo-sparkle-opacity: 94%; }
-      }
-      @keyframes censoSparkleRise {
-        from { background-position:
-          var(--dust-x,0px) var(--dust-y,0px),
-          var(--dust-x,0px) var(--dust-y,0px),
-          var(--dust-x,0px) var(--dust-y,0px); }
-        to { background-position:
-          var(--dust-x,0px) calc(var(--dust-y,0px) - 164px),
-          var(--dust-x,0px) calc(var(--dust-y,0px) - 266px),
-          var(--dust-x,0px) calc(var(--dust-y,0px) - 171px); }
-      }
-      @keyframes censoSparkleRowRise {
-        from { background-position:
-          var(--dust-x,0px) var(--dust-y,0px),
-          var(--dust-x,0px) var(--dust-y,0px),
-          var(--dust-x,0px) var(--dust-y,0px), 220% 0; }
-        to { background-position:
-          var(--dust-x,0px) calc(var(--dust-y,0px) - 164px),
-          var(--dust-x,0px) calc(var(--dust-y,0px) - 266px),
-          var(--dust-x,0px) calc(var(--dust-y,0px) - 171px), -150% 0; }
-      }
-      .card.patient-alert .card-content-wrapper::before {
-        background-image:
-          radial-gradient(ellipse .55px 1.4px at 18px 19px,
-            color-mix(in srgb, color-mix(in srgb, var(--accent) 55%, white) var(--censo-sparkle-opacity,50%), transparent) 0 65%, transparent 100%),
-          radial-gradient(ellipse 1.4px .55px at 64px 55px,
-            color-mix(in srgb, color-mix(in srgb, var(--accent) 55%, white) var(--censo-sparkle-opacity,50%), transparent) 0 65%, transparent 100%),
-          radial-gradient(circle at 29px 24px,
-            color-mix(in srgb, color-mix(in srgb, var(--accent) 45%, white) var(--censo-sparkle-opacity,50%), transparent) 0 .6px, transparent 1.2px);
-        background-size: 107px 82px, 173px 133px, 71px 57px;
-        animation: censoSparkleRise 14s linear infinite, censoSparkleBlink 3.7s ease-in-out infinite;
-        animation-delay: var(--dust-delay,0s), var(--twinkle-delay,0s);
-      }
-      .card.patient-alert .card-content-wrapper::after {
-        animation-delay: var(--shine-delay,0s);
-      }
-      .patient-row.patient-alert {
-        background-image:
-          radial-gradient(ellipse .55px 1.4px at 18px 19px,
-            color-mix(in srgb, color-mix(in srgb, var(--accent) 55%, white) var(--censo-sparkle-opacity,50%), transparent) 0 65%, transparent 100%),
-          radial-gradient(ellipse 1.4px .55px at 64px 55px,
-            color-mix(in srgb, color-mix(in srgb, var(--accent) 55%, white) var(--censo-sparkle-opacity,50%), transparent) 0 65%, transparent 100%),
-          radial-gradient(circle at 29px 24px,
-            color-mix(in srgb, color-mix(in srgb, var(--accent) 45%, white) var(--censo-sparkle-opacity,50%), transparent) 0 .6px, transparent 1.2px),
-          linear-gradient(105deg, transparent 30%,
-            color-mix(in srgb, var(--accent) 6%, transparent) 46%,
-            color-mix(in srgb, var(--accent) 15%, transparent) 50%,
-            color-mix(in srgb, var(--accent) 6%, transparent) 54%, transparent 70%) !important;
-        background-size: 107px 82px, 173px 133px, 71px 57px, 240% 100% !important;
-        background-repeat: repeat, repeat, repeat, no-repeat !important;
-        animation: censoSparkleRowRise 14s linear infinite, censoSparkleBlink 3.7s ease-in-out infinite;
-        animation-delay: var(--dust-delay,0s), var(--twinkle-delay,0s);
+      .patient-observation-row.patient-alert-observation .material-symbols-outlined {
+        color: var(--accent);
       }
       @media (prefers-reduced-motion: reduce) {
-        .card.patient-alert .card-content-wrapper::before,
-        .patient-row.patient-alert { animation: none !important; }
+        .card.patient-alert .card-content-wrapper::after {
+          display: none;
+        }
+        .patient-row.patient-alert {
+          animation: none !important;
+          background-image: none !important;
+        }
       }
     `;
 
@@ -792,7 +711,7 @@ export function createRenderModule(app) {
           const destinoChip = getColorfulChipHtml(p.destino);
           const alertaActiva = Boolean(p.alerta);
           const observacion = getObservacion(p);
-          htmlArr.push(`<tr class="patient-row ${alertaActiva ? 'patient-alert' : ''}" data-fila="${escapeHtml(p.fila)}" data-alerta="${alertaActiva ? '1' : '0'}" style="${getGlitterStyle(p)}" onclick="toggleTableRow(this)">
+          htmlArr.push(`<tr class="patient-row ${alertaActiva ? 'patient-alert' : ''}" data-fila="${escapeHtml(p.fila)}" data-alerta="${alertaActiva ? '1' : '0'}" style="${getHighlightStyle(p)}" onclick="toggleTableRow(this)">
               <td class="quick-bed-cell">
                 <button class="quick-bed-trigger" type="button" data-fila="${escapeHtml(p.fila)}" onclick="abrirCamaFlotante(this, this.dataset.fila, event)" title="Cambiar cama: ${escapeHtml(p.cama || 'SIN CAMA')}" aria-label="Cambiar cama de ${escapeHtml(p.nombre)}. Cama actual: ${escapeHtml(p.cama || 'sin cama')}">
                   <span class="quick-bed-label${getCamaLabelClass(p.cama)}">${escapeHtml(p.cama || '-')}</span>
@@ -866,7 +785,7 @@ export function createRenderModule(app) {
 
               const delayPatient = delayBase + (indexPatient * 50);
 
-              return `<div class="card animate-in ${alertaActiva ? 'patient-alert' : ''}" data-fila="${escapeHtml(p.fila)}" data-nombre="${escapeHtml(p.nombre)}" data-alerta="${alertaActiva ? '1' : '0'}" style="animation-delay: ${delayPatient}ms; ${getGlitterStyle(p)}">
+              return `<div class="card animate-in ${alertaActiva ? 'patient-alert' : ''}" data-fila="${escapeHtml(p.fila)}" data-nombre="${escapeHtml(p.nombre)}" data-alerta="${alertaActiva ? '1' : '0'}" style="animation-delay: ${delayPatient}ms; ${getHighlightStyle(p)}">
                 <div class="swipe-bg" aria-hidden="true"><div class="swipe-action swipe-delete"><span class="material-symbols-outlined">delete</span><span class="swipe-action-label">BORRAR</span></div><div class="swipe-action swipe-edit"><span class="swipe-action-label">EDITAR</span><span class="material-symbols-outlined">edit</span></div></div>
                 <div class="card-content-wrapper">
                   <div class="card-header" onclick="toggleCard(this)">
