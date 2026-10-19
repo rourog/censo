@@ -150,17 +150,20 @@ export function createRenderModule(app) {
         bottom: calc(8px + env(safe-area-inset-bottom, 0px)) !important;
       }
 
-      @keyframes censoAlertReflection {
-        0% { background-position: 220% 0; }
-        100% { background-position: -220% 0; }
+      /* Polvo de hada: partículas mínimas CSS, sin elementos ni temporizadores JS. */
+      @keyframes censoAlertDust {
+        0% { background-position: 0 0, 0 0, 0 0; opacity: .75; }
+        50% { opacity: 1; }
+        100% { background-position: 0 -64px, 0 -92px, 0 -120px; opacity: .75; }
       }
-
-
+      @keyframes censoAlertDustRow {
+        0% { background-position: 0 0, 0 0, 0 0, 220% 0; }
+        100% { background-position: 0 -64px, 0 -92px, 0 -120px, -150% 0; }
+      }
       @keyframes censoAlertShine {
-        0% { transform: translateX(-140%) skewX(-18deg); opacity: 0; }
-        18% { opacity: 0.75; }
-        45% { opacity: 0.18; }
-        100% { transform: translateX(140%) skewX(-18deg); opacity: 0; }
+        0%, 10% { transform: translateX(-12%) skewX(-14deg); opacity: 0; }
+        24% { opacity: .7; }
+        56%, 100% { transform: translateX(330%) skewX(-14deg); opacity: 0; }
       }
 
       .destino-chip {
@@ -259,7 +262,6 @@ export function createRenderModule(app) {
       }
       .patient-bed.quick-bed-trigger { margin-top: 6px; color: var(--muted); font-size: 0.8rem; font-weight: 600; }
       .patient-bed.quick-bed-trigger .quick-bed-label--pediluvio { font-size: 0.8rem; }
-      .patient-alert .quick-bed-trigger { color: #fff !important; }
 
       .alert-star-btn,
       .obs-note-btn {
@@ -276,14 +278,20 @@ export function createRenderModule(app) {
         transform: scale(0.92);
       }
 
-      .alert-star-btn.alert-active,
+      .alert-star-btn.alert-active {
+        color: var(--accent) !important;
+        background: var(--accent-soft) !important;
+        border-color: var(--accent-border) !important;
+      }
       .obs-note-btn.obs-active {
         color: #fff !important;
         background: var(--accent) !important;
         border-color: rgba(255,255,255,0.62) !important;
       }
-
-      .alert-star-btn.alert-active .material-symbols-outlined,
+      .alert-star-btn.alert-active .material-symbols-outlined {
+        color: var(--accent) !important;
+        font-variation-settings: 'FILL' 1, 'wght' 700, 'GRAD' 0, 'opsz' 24;
+      }
       .obs-note-btn.obs-active .material-symbols-outlined {
         color: #fff !important;
         font-variation-settings: 'FILL' 1, 'wght' 700, 'GRAD' 0, 'opsz' 24;
@@ -340,7 +348,11 @@ export function createRenderModule(app) {
         transform: scale(1.06);
       }
 
-      .row-action-grid .btn-table.alert-active,
+      .row-action-grid .btn-table.alert-active {
+        color: var(--accent) !important;
+        background: var(--accent-soft) !important;
+        border-color: var(--accent-border) !important;
+      }
       .row-action-grid .btn-table.obs-active {
         background: var(--accent) !important;
         border-color: var(--accent) !important;
@@ -385,16 +397,10 @@ export function createRenderModule(app) {
         font-size: 1rem !important;
       }
 
-      .card.patient-alert .card-action-grid .btn-editar-tarjeta {
-        background: rgba(255,255,255,0.16) !important;
-        border-color: rgba(255,255,255,0.42) !important;
-        color: #fff !important;
-      }
-
-      .card.patient-alert .card-action-grid .btn-editar-tarjeta.alert-active,
-      .card.patient-alert .card-action-grid .btn-editar-tarjeta.obs-active {
-        background: rgba(255,255,255,0.30) !important;
-        border-color: rgba(255,255,255,0.72) !important;
+      .card.patient-alert .card-action-grid .btn-editar-tarjeta.alert-active {
+        color: var(--accent) !important;
+        background: var(--accent-soft) !important;
+        border-color: var(--accent-border) !important;
       }
 
       .patient-observation-field .value {
@@ -441,154 +447,104 @@ export function createRenderModule(app) {
         white-space: nowrap;
       }
 
+      /* El destacado no reemplaza los estados verde/amarillo ni el texto del tema. */
       .card.patient-alert .card-content-wrapper {
         position: relative;
         overflow: hidden;
-        background: var(--accent) !important;
-        color: #fff !important;
-        box-shadow: inset 0 0 0 1px rgba(255,255,255,0.34) !important;
+        background: color-mix(in srgb, var(--patient-state-tone, var(--accent)) 8%, var(--card)) !important;
+        color: var(--text);
+        border-color: color-mix(in srgb, var(--accent) 28%, var(--line)) !important;
+      }
+      .card.open.patient-alert .card-content-wrapper {
+        background: color-mix(in srgb, var(--patient-state-tone, var(--accent)) 8%, var(--card-open)) !important;
       }
 
+      /* Partículas y reflejo debajo del contenido; no capturan eventos. */
+      .card.patient-alert .card-content-wrapper > .card-header,
+      .card.patient-alert .card-content-wrapper > .details {
+        position: relative;
+        z-index: 2;
+      }
+      .card.patient-alert .card-content-wrapper::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        pointer-events: none;
+        background-image:
+          radial-gradient(circle, color-mix(in srgb, var(--accent) 65%, transparent) 0 1px, transparent 1.9px),
+          radial-gradient(circle, color-mix(in srgb, var(--accent) 43%, transparent) 0 1.25px, transparent 2.2px),
+          radial-gradient(circle, color-mix(in srgb, var(--text) 25%, transparent) 0 .7px, transparent 1.55px);
+        background-size: 86px 64px, 131px 92px, 172px 120px;
+        background-repeat: repeat;
+        animation: censoAlertDust 12s linear infinite;
+      }
       .card.patient-alert .card-content-wrapper::after {
         content: '';
         position: absolute;
         top: 0;
         bottom: 0;
-        left: -40%;
-        width: 42%;
+        left: -55%;
+        width: 50%;
+        z-index: 1;
         pointer-events: none;
-        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.30), transparent);
-        animation: censoAlertShine 2.8s ease-in-out infinite;
-        z-index: 3;
+        background: linear-gradient(90deg,
+          transparent,
+          color-mix(in srgb, var(--accent) 8%, transparent) 40%,
+          color-mix(in srgb, var(--accent) 18%, transparent) 50%,
+          color-mix(in srgb, var(--accent) 8%, transparent) 60%,
+          transparent);
+        animation: censoAlertShine 8.5s ease-in-out infinite;
       }
 
-      .card.patient-alert .patient-name,
-      .card.patient-alert .patient-bed,
-      .card.patient-alert .label,
-      .card.patient-alert .value,
-      .card.patient-alert .caret,
-      .card.patient-alert .material-symbols-outlined {
-        color: #fff !important;
-      }
-
-      .card.patient-alert .field,
-      .card.patient-alert .patient-observation-field .value {
-        background: rgba(255,255,255,0.14) !important;
-        border-color: rgba(255,255,255,0.35) !important;
-      }
-
+      /* Vista tabla: capas CSS sobre la fila, sin alteraciones de márgenes. */
       .patient-row.patient-alert {
-        background-color: var(--accent) !important;
-        background-image: linear-gradient(
-          105deg,
-          transparent 0%,
-          transparent 42%,
-          rgba(255,255,255,0.16) 47%,
-          rgba(255,255,255,0.58) 50%,
-          rgba(255,255,255,0.16) 53%,
-          transparent 58%,
-          transparent 100%
-        ) !important;
-        background-size: 260% 100% !important;
-        background-repeat: no-repeat !important;
-        animation: censoAlertReflection 2.9s linear infinite;
-        color: #fff !important;
+        background-color: color-mix(in srgb, var(--patient-state-tone, var(--accent)) 8%, var(--panel)) !important;
+        background-image:
+          radial-gradient(circle, color-mix(in srgb, var(--accent) 65%, transparent) 0 1px, transparent 1.9px),
+          radial-gradient(circle, color-mix(in srgb, var(--accent) 43%, transparent) 0 1.25px, transparent 2.2px),
+          radial-gradient(circle, color-mix(in srgb, var(--text) 25%, transparent) 0 .7px, transparent 1.55px),
+          linear-gradient(105deg,
+            transparent 30%,
+            color-mix(in srgb, var(--accent) 6%, transparent) 46%,
+            color-mix(in srgb, var(--accent) 14%, transparent) 50%,
+            color-mix(in srgb, var(--accent) 6%, transparent) 54%,
+            transparent 70%) !important;
+        background-size: 86px 64px, 131px 92px, 172px 120px, 240% 100% !important;
+        background-position: 0 0, 0 0, 0 0, 220% 0;
+        background-repeat: repeat, repeat, repeat, no-repeat !important;
+        animation: censoAlertDustRow 12s linear infinite;
       }
-
       .patient-row.patient-alert td {
         background: transparent !important;
-        color: #fff !important;
-        border-bottom-color: rgba(255,255,255,0.18) !important;
-        box-shadow: none !important;
       }
-
       .patient-row.patient-alert td:first-child {
-        box-shadow: inset 5px 0 0 rgba(255,255,255,0.70) !important;
-      }
-
-      .patient-row.patient-alert td:last-child {
-        box-shadow: none !important;
-      }
-
-      .patient-row.patient-alert,
-      .patient-row.patient-alert * {
-        color: #fff !important;
-      }
-
-      .patient-row.patient-alert .chip,
-      .patient-row.patient-alert .chip-emoji,
-      .patient-row.patient-alert .btn-table,
-      .patient-row.patient-alert .alert-star-btn,
-      .patient-row.patient-alert .obs-note-btn {
-        background: rgba(255,255,255,0.18) !important;
-        border-color: rgba(255,255,255,0.38) !important;
-        color: #fff !important;
-      }
-
-      .patient-row.patient-alert .alert-star-btn.alert-active,
-      .patient-row.patient-alert .obs-note-btn.obs-active {
-        background: rgba(255,255,255,0.28) !important;
-      }
-
-      .editable-cell.is-editing,
-      .editable-cell[contenteditable="true"]:focus {
-        background: var(--panel) !important;
-        color: var(--text) !important;
-        -webkit-text-fill-color: var(--text) !important;
-        caret-color: var(--accent) !important;
-        outline: 2px solid var(--accent) !important;
-        outline-offset: -2px !important;
-        box-shadow: inset 0 0 0 1px var(--accent-border) !important;
-        text-shadow: none !important;
-      }
-
-      .editable-cell.is-editing *,
-      .editable-cell[contenteditable="true"]:focus * {
-        color: var(--text) !important;
-        -webkit-text-fill-color: var(--text) !important;
-        text-shadow: none !important;
-      }
-
-      .patient-row.patient-alert .editable-cell.is-editing,
-      .patient-row.patient-alert .editable-cell[contenteditable="true"]:focus {
-        background: var(--panel) !important;
-        color: var(--text) !important;
-        -webkit-text-fill-color: var(--text) !important;
-      }
-
-      .patient-row.patient-alert .editable-cell.is-editing *,
-      .patient-row.patient-alert .editable-cell[contenteditable="true"]:focus * {
-        color: var(--text) !important;
-        -webkit-text-fill-color: var(--text) !important;
+        box-shadow: inset 2px 0 0 color-mix(in srgb, var(--accent) 32%, transparent) !important;
       }
 
       .patient-observation-row.patient-alert-observation td {
-        background: var(--accent) !important;
+        background: color-mix(in srgb, var(--patient-state-tone, var(--accent)) 8%, var(--panel)) !important;
         padding-top: 0 !important;
       }
-
       .patient-observation-row.patient-alert-observation .patient-observation-line {
-        background-color: rgba(255,255,255,0.18);
-        background-image: linear-gradient(
-          105deg,
-          transparent 0%,
-          transparent 40%,
-          rgba(255,255,255,0.16) 47%,
-          rgba(255,255,255,0.42) 50%,
-          rgba(255,255,255,0.16) 53%,
-          transparent 60%,
-          transparent 100%
-        );
-        background-size: 240% 100%;
-        animation: censoAlertReflection 2.9s linear infinite;
-        border-left-color: rgba(255,255,255,0.74);
-        color: #fff;
-        box-shadow: none;
+        background: var(--accent-soft);
+        border-left-color: var(--accent);
+        color: var(--text);
+        box-shadow: inset 0 1px 0 var(--accent-border);
       }
-
       .patient-observation-row.patient-alert-observation .patient-observation-label,
       .patient-observation-row.patient-alert-observation .material-symbols-outlined {
-        color: #fff;
+        color: var(--accent);
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .card.patient-alert .card-content-wrapper::before,
+        .patient-row.patient-alert {
+          animation: none !important;
+        }
+        .card.patient-alert .card-content-wrapper::after {
+          display: none;
+        }
       }
     `;
 
@@ -672,9 +628,9 @@ export function createRenderModule(app) {
       </div>`;
   }
 
-  function renderObservationRow(p, observacion, alertaActiva) {
+  function renderObservationRow(p, observacion, alertaActiva, claseEstado = '') {
     if (!observacion) return '';
-    return `<tr class="patient-observation-row ${alertaActiva ? 'patient-alert-observation' : ''}" data-fila="${escapeHtml(p.fila)}">
+    return `<tr class="patient-observation-row ${claseEstado} ${alertaActiva ? 'patient-alert-observation' : ''}" data-fila="${escapeHtml(p.fila)}">
       <td colspan="8">
         <div class="patient-observation-line" title="${escapeHtml(observacion)}">
           <span class="material-symbols-outlined">sticky_note_2</span>
@@ -787,7 +743,7 @@ export function createRenderModule(app) {
               </td>
 
               ${renderTableActions(p, alertaActiva, observacion)}
-          </tr>${renderObservationRow(p, observacion, alertaActiva)}`);
+          </tr>${renderObservationRow(p, observacion, alertaActiva, claseEstado)}`);
         });
       });
 
