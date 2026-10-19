@@ -303,30 +303,121 @@ export function createModalModule(app) {
   // ==========================================================
   // EDICIÓN ULTRA SUTIL EN LÍNEA
   // ==========================================================
+  // Editor fuera de la tabla: puede extenderse sobre las filas inferiores
+  // sin alterar el alto de las celdas ni sufrir clipping del scroll de la tabla.
+  let editorFlotanteActivo = null;
+
   function iniciarEdicionSubtle(el) {
-    // No expandir la fila ni eliminar el contenedor original de cada campo.
+    if (!el || !el.isConnected) return;
+    if (editorFlotanteActivo?.celda === el) return;
+    if (editorFlotanteActivo) editorFlotanteActivo.editor.blur();
+
+    const campo = el.getAttribute('data-campo') || '';
+    const rectTexto = (el.querySelector('.truncate-text, .value') || el);
+    const estiloTexto = getComputedStyle(rectTexto);
+    const celdaRect = el.getBoundingClientRect();
+    const textoRect = rectTexto.getBoundingClientRect();
+    const editor = document.createElement('textarea');
+    editor.className = 'censo-inline-overlay-editor';
+    editor.setAttribute('aria-label', 'Editar ' + campo);
+    editor.setAttribute('autocomplete', 'off');
+    editor.spellcheck = false;
+    editor.value = (el.innerText.trim() === '-' ? '' : el.innerText).trim();
+    editor.style.fontFamily = estiloTexto.fontFamily;
+    editor.style.fontSize = estiloTexto.fontSize;
+    editor.style.fontWeight = estiloTexto.fontWeight;
+    editor.style.lineHeight = estiloTexto.lineHeight;
+    editor.style.letterSpacing = estiloTexto.letterSpacing;
+    editor.style.textAlign = estiloTexto.textAlign;
+    editor.style.paddingTop = Math.max(5, Math.round(textoRect.top - celdaRect.top)) + 'px';
+
+    document.body.appendChild(editor);
+    const activo = { celda: el, editor, cancelado: false };
+    editorFlotanteActivo = activo;
     window.isInlineEditing = true;
     el.classList.add('is-editing');
 
-    const texto = el.querySelector('.truncate-text, .value') || el;
-    if (texto.innerText.trim() === '-') texto.textContent = '';
+    function ajustarPosicion() {
+      if (editorFlotanteActivo !== activo) return;
+      if (!el.isConnected) {
+        cerrarEditor(true);
+        return;
+      }
+      const rect = el.getBoundingClientRect();
+      // Mantener el ancho de la celda para que el texto no cambie de escala.
+      const ancho = Math.max(46, Math.min(rect.width, window.innerWidth - 16));
+      editor.style.width = ancho + 'px';
+      editor.style.left = Math.max(8, Math.min(rect.left, window.innerWidth - ancho - 8)) + 'px';
+      editor.style.height = 'auto';
+      const espacio = Math.max(64, window.innerHeight - 16);
+      const altoDeseado = Math.max(rect.height, editor.scrollHeight + 2);
+      const alto = Math.min(altoDeseado, espacio);
+      editor.style.height = alto + 'px';
+      // Normalmente crece hacia abajo; cerca del límite inferior se recoloca
+      // hacia arriba para no quedar fuera de la ventana.
+      editor.style.top = Math.max(8, Math.min(rect.top, window.innerHeight - alto - 8)) + 'px';
+      editor.style.overflowY = altoDeseado > espacio ? 'auto' : 'hidden';
+    }
 
-    const range = document.createRange();
-    const sel = window.getSelection();
-    range.selectNodeContents(texto);
-    range.collapse(false);
-    sel.removeAllRanges();
-    sel.addRange(range);
+    function limpiarEventos() {
+      document.removeEventListener('scroll', alDesplazarse, true);
+      window.removeEventListener('resize', ajustarPosicion);
+    }
+
+    function cerrarEditor(cancelar = false) {
+      if (editorFlotanteActivo !== activo) return;
+      const valor = editor.value;
+      editorFlotanteActivo = null;
+      limpiarEventos();
+      editor.remove();
+      el.setAttribute('contenteditable', 'true');
+      if (cancelar || !el.isConnected) {
+        el.classList.remove('is-editing');
+        window.isInlineEditing = false;
+        return;
+      }
+      void finalizarEdicionSubtle(el, valor);
+    }
+
+    function alDesplazarse(evento) {
+      if (evento.target === editor) return;
+      ajustarPosicion();
+    }
+
+    editor.addEventListener('input', ajustarPosicion);
+    editor.addEventListener('blur', () => cerrarEditor(false), { once: true });
+    editor.addEventListener('keydown', (evento) => {
+      if (evento.key === 'Escape') {
+        evento.preventDefault();
+        cerrarEditor(true);
+        return;
+      }
+      if (evento.key === 'Enter' && (campo === 'nombre' || campo === 'edad')) {
+        evento.preventDefault();
+        editor.blur();
+      }
+    });
+    document.addEventListener('scroll', alDesplazarse, true);
+    window.addEventListener('resize', ajustarPosicion);
+
+    // Convertir a no editable evita dos editores simultáneos en la misma celda.
+    // El blur del TD original se ignora mientras el editor superpuesto esté activo.
+    el.setAttribute('contenteditable', 'false');
+    ajustarPosicion();
+    editor.focus({ preventScroll: true });
+    editor.setSelectionRange(editor.value.length, editor.value.length);
   }
 
-  async function finalizarEdicionSubtle(el) {
+  async function finalizarEdicionSubtle(el, textoEditado = null) {
+    if (editorFlotanteActivo?.celda === el) return;
+    if (!el || !el.isConnected) return;
     el.classList.remove('is-editing');
     window.isInlineEditing = false;
   
     const campo = el.getAttribute('data-campo');
     const filaId = el.closest('tr').getAttribute('data-fila');
     const valorOriginal = el.getAttribute('data-original').toUpperCase().trim();
-    const nuevoValorRaw = el.innerText.toUpperCase().normalize('NFC').trim();
+    const nuevoValorRaw = String(textoEditado ?? el.innerText).toUpperCase().normalize('NFC').trim();
   
     const nuevoValorFinal = nuevoValorRaw === '' ? '-' : nuevoValorRaw;
   

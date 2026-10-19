@@ -494,16 +494,8 @@
       .patient-row td.editable-cell.is-editing :is(.truncate-text, .value) {
         color: var(--accent) !important;
       }
-      /* En filas compactas, el texto largo se edita dentro de sus dos líneas,
-         con desplazamiento interno en lugar de aumentar la altura del renglón. */
-      .patient-row:not(.expanded-row) td.editable-cell.is-editing .truncate-text {
-        display: block;
-        max-height: 2.6em;
-        overflow-x: hidden;
-        overflow-y: auto;
-        -webkit-line-clamp: unset;
-        white-space: pre-wrap;
-      }
+      /* El texto visible sigue truncado; la edición completa usa el overlay
+         situado en document.body y no modifica el flujo de la tabla. */
 
       /* CONTENEDOR DE DESTINOS EN LÍNEA CON SCROLL INTERNO Y BUSCADOR */
       .inline-destino-container {
@@ -667,4 +659,29 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
+}
+
+/* Editor superpuesto para texto largo: ocupa el ancho de la celda, crece
+   hacia abajo y se dibuja por encima de las filas sin mover el censo. */
+.censo-inline-overlay-editor {
+  position: fixed !important;
+  z-index: 99999;
+  display: block;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 6px 10px;
+  background: var(--panel);
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 5px;
+  box-shadow: 0 8px 22px rgba(0,0,0,.23), 0 0 0 2px var(--accent-soft);
+  outline: none;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  text-transform: uppercase;
+  resize: none;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  font: inherit;
 }
