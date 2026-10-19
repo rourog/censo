@@ -591,13 +591,65 @@
 .destino-chip.destino-state-red :is(.destino-action-icon, .destino-specialty-icon) {
   color: color-mix(in srgb, var(--destino-tone) 67%, var(--text)) !important;
 }
-.destino-chip.destino-state-observation .destino-specialty-text {
-  white-space: normal;
-  overflow: visible;
-  text-overflow: clip;
-  min-width: 0;
+/* Misma altura en todos los badges con texto; los compactos siguen a 28px. */
+.destino-chip:not(.destino-chip-compact) {
+  box-sizing: border-box;
+  height: 28px !important;
+  min-height: 28px !important;
+  max-height: 28px !important;
+  padding-top: 3px !important;
+  padding-bottom: 3px !important;
 }
+
+/* Solamente Observación / Revaloración tiene marquesina.
+   El icono es hermano del recorte: nunca se desplaza. */
 .destino-chip.destino-state-observation:not(.destino-chip-compact) {
-  white-space: normal !important;
-  text-overflow: clip !important;
+  width: min(100%, 185px) !important;
+  min-width: 0;
+  justify-content: flex-start !important;
+  white-space: nowrap !important;
+}
+.censo-table .destino-chip.destino-state-observation:not(.destino-chip-compact) {
+  width: 100% !important;
+}
+.destino-chip.destino-state-observation .destino-specialty-icon {
+  flex: 0 0 1.1rem;
+}
+.destino-chip .destino-marquee-window {
+  display: block;
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 1.2em;
+  line-height: 1.2;
+  overflow: hidden;
+  white-space: nowrap;
+  container-type: inline-size;
+  -webkit-mask-image: linear-gradient(to right, #000 0%, #000 89%, transparent 100%);
+  mask-image: linear-gradient(to right, #000 0%, #000 89%, transparent 100%);
+}
+.destino-chip .destino-marquee-text {
+  display: block;
+  width: max-content;
+  max-width: none;
+  white-space: nowrap;
+  will-change: transform;
+  animation: censoObservationMarquee 9s ease-in-out infinite;
+}
+/* 100cqw es exactamente el ancho visible del recorte.
+   Solo se mueve lo que sobresale y se detiene en ambos extremos. */
+@keyframes censoObservationMarquee {
+  0%, 12% { transform: translateX(0); }
+  44%, 58% { transform: translateX(min(0px, calc(100cqw - 100%))); }
+  90%, 100% { transform: translateX(0); }
+}
+.destino-chip.destino-state-observation:hover .destino-marquee-text {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .destino-chip .destino-marquee-text {
+    animation: none !important;
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }

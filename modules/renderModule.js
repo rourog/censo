@@ -54,7 +54,9 @@ export function createRenderModule(app) {
     return `<div class="${modeClass}${estadoClass}${observationClass}" title="${escapeHtml(textLabel)}" aria-label="${escapeHtml(textLabel)}">
       ${healthIconHtml(getDestinoActionIconPath(destino), 'destino-action-icon')}
       ${healthIconHtml(getDestinoIconPath(destino), 'destino-specialty-icon')}
-      ${mode === 'compact' ? '' : `<span class="destino-specialty-text">${escapeHtml(textLabel)}</span>`}
+      ${mode === 'compact' ? '' : observationClass
+        ? `<span class="destino-marquee-window"><span class="destino-marquee-text">${escapeHtml(textLabel)}</span></span>`
+        : `<span class="destino-specialty-text">${escapeHtml(textLabel)}</span>`}
     </div>`;
   }
 
