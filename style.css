@@ -470,26 +470,41 @@
       }
       .patient-row.expanded-row .chip { white-space: normal; overflow: visible; display: inline-block; line-height: 1.2; }
       
-      /* SUTILEZA EXTREMA: EDICIÓN EN LÍNEA SIN BRINCO DE TAMAÑO */
-      .patient-row.expanded-row td.editable-cell { cursor: text; position: relative; }
-      .patient-row.expanded-row td.editable-cell:hover::after { content: 'edit'; font-family: 'Material Symbols Outlined'; position: absolute; top: 2px; right: 2px; font-size: 1rem; color: var(--muted); opacity: 0.5; pointer-events: none; }
-      
-      .patient-row.expanded-row td.editable-cell.is-editing { 
-        color: var(--accent) !important; 
-        outline: none; 
-        background-color: var(--accent-soft); 
+      /* Edición en línea sin cambios de tamaño ni espaciado. */
+      .patient-row td.editable-cell { cursor: text; position: relative; }
+      .patient-row.expanded-row td.editable-cell:hover::after {
+        content: 'edit';
+        font-family: 'Material Symbols Outlined';
+        position: absolute; top: 2px; right: 2px;
+        font-size: 1rem; color: var(--muted); opacity: .5; pointer-events: none;
       }
-      .patient-row.expanded-row td.editable-cell.is-editing.patient-name { 
-        color: var(--accent) !important; 
-        font-weight: 700; 
+      /* Texto exactamente a escala de lectura incluso al editar. */
+      .patient-row td.editable-cell[data-campo="diagnostico"],
+      .patient-row td.editable-cell[data-campo="pendientes"] {
+        font-size: .8rem !important;
+        line-height: 1.3 !important;
       }
-      .patient-row.expanded-row td.editable-cell.is-editing * { 
-        color: inherit !important; 
-        font-size: inherit !important; 
-        font-family: inherit !important; 
-        line-height: inherit !important; 
+      .patient-row td.editable-cell[data-campo="edad"] { font-size: .85rem !important; }
+      .patient-row td.editable-cell.is-editing,
+      .patient-row td.editable-cell:focus {
+        color: var(--accent) !important;
+        outline: 2px solid var(--accent-border);
+        outline-offset: -2px;
       }
-      
+      .patient-row td.editable-cell.is-editing :is(.truncate-text, .value) {
+        color: var(--accent) !important;
+      }
+      /* En filas compactas, el texto largo se edita dentro de sus dos líneas,
+         con desplazamiento interno en lugar de aumentar la altura del renglón. */
+      .patient-row:not(.expanded-row) td.editable-cell.is-editing .truncate-text {
+        display: block;
+        max-height: 2.6em;
+        overflow-x: hidden;
+        overflow-y: auto;
+        -webkit-line-clamp: unset;
+        white-space: pre-wrap;
+      }
+
       /* CONTENEDOR DE DESTINOS EN LÍNEA CON SCROLL INTERNO Y BUSCADOR */
       .inline-destino-container {
         background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius-sm);

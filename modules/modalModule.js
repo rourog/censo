@@ -304,19 +304,19 @@ export function createModalModule(app) {
   // EDICIÓN ULTRA SUTIL EN LÍNEA
   // ==========================================================
   function iniciarEdicionSubtle(el) {
-    const tr = el.closest('tr');
-    if (!tr.classList.contains('expanded-row')) { toggleTableRow(tr); }
-  
+    // No expandir la fila ni eliminar el contenedor original de cada campo.
     window.isInlineEditing = true;
     el.classList.add('is-editing');
-  
-    const trunc = el.querySelector('.truncate-text');
-    if (trunc) { el.innerText = trunc.innerText; }
-  
-    if (el.innerText.trim() === '-') { el.innerText = ''; }
-  
-    const range = document.createRange(); const sel = window.getSelection();
-    range.selectNodeContents(el); range.collapse(false); sel.removeAllRanges(); sel.addRange(range);
+
+    const texto = el.querySelector('.truncate-text, .value') || el;
+    if (texto.innerText.trim() === '-') texto.textContent = '';
+
+    const range = document.createRange();
+    const sel = window.getSelection();
+    range.selectNodeContents(texto);
+    range.collapse(false);
+    sel.removeAllRanges();
+    sel.addRange(range);
   }
 
   async function finalizarEdicionSubtle(el) {
@@ -330,11 +330,17 @@ export function createModalModule(app) {
   
     const nuevoValorFinal = nuevoValorRaw === '' ? '-' : nuevoValorRaw;
   
-    const campoEstilizado = (campo === 'diagnostico' || campo === 'pendientes') ? 
-      `<div class="truncate-text" style="font-size: 0.8rem; line-height: 1.3;" title="${escapeHtml(nuevoValorFinal)}">${escapeHtml(nuevoValorFinal)}</div>` : 
-      (campo === 'nombre') ? `<div class="truncate-text" title="${escapeHtml(nuevoValorFinal)}">${escapeHtml(nuevoValorFinal)}</div>` : escapeHtml(nuevoValorFinal);
-  
-    el.innerHTML = campoEstilizado;
+    const renderCampo = (valor) => {
+      const seguro = escapeHtml(valor);
+      if (campo === 'diagnostico' || campo === 'pendientes') {
+        return `<div class="truncate-text" style="font-size: 0.8rem; line-height: 1.3;" title="${seguro}">${seguro}</div>`;
+      }
+      if (campo === 'nombre') return `<div class="truncate-text" title="${seguro}">${seguro}</div>`;
+      if (campo === 'edad') return `<span class="value" style="color: var(--muted); font-size: 0.85rem;">${seguro}</span>`;
+      return seguro;
+    };
+
+    el.innerHTML = renderCampo(nuevoValorFinal);
 
     if (window.pendingSnapshotList) {
       state.pacientesGlobal = window.pendingSnapshotList;
@@ -354,14 +360,10 @@ export function createModalModule(app) {
       } catch (e) {
         alert("Error al guardar campo: " + e.message);
         el.setAttribute('data-original', valorOriginal);
-        el.innerHTML = valorOriginal;
+        el.innerHTML = renderCampo(valorOriginal);
       } finally { el.style.opacity = '1'; }
     }
-  
-    setTimeout(() => {
-      const trRestaurado = document.querySelector(`tr[data-fila="${filaId}"]`);
-      if (trRestaurado && !trRestaurado.classList.contains('expanded-row')) { trRestaurado.classList.add('expanded-row'); }
-    }, 40);
+
   }
 
   function manejarTeclasSubtle(el, event) {
@@ -372,7 +374,8 @@ export function createModalModule(app) {
       }
     } else if (event.key === 'Escape') {
       event.preventDefault();
-      el.innerText = el.getAttribute('data-original');
+      const texto = el.querySelector('.truncate-text, .value') || el;
+      texto.textContent = el.getAttribute('data-original');
       el.blur();
     }
   }
