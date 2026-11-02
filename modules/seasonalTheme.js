@@ -1,4 +1,7 @@
-/* Seasonal profiles coordinate decoration without changing clinical data. */
+/* Seasonal profiles coordinate decoration without changing clinical data.
+ * Reactivate next season by setting SEASONAL_ENABLED to true. Historical
+ * preferences, counters, sprites and testable profiles remain untouched. */
+export const SEASONAL_ENABLED = false;
 export const SEASONAL_PROFILES = Object.freeze({
   halloween: {
     id: 'halloween', name: 'Halloween', months: [10],
@@ -19,7 +22,8 @@ export function resolveSeasonalProfile(mode = 'auto', date = new Date()) {
   return Object.values(SEASONAL_PROFILES).find(profile => profile.months.includes(month)) || null;
 }
 export function getSeasonalProfile() {
-  return resolveSeasonalProfile(localStorage.getItem('censo-season') || 'auto');
+  // Temporarily retired: even old manually selected Halloween themes stay off.
+  return SEASONAL_ENABLED ? resolveSeasonalProfile(localStorage.getItem('censo-season') || 'auto') : null;
 }
 const confettiRenderers = new Map();
 export function registerSeasonalConfetti(id, renderer) {

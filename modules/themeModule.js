@@ -11,10 +11,13 @@
 
 const seasonUrl = new URL('./seasonalTheme.js', import.meta.url);
 seasonUrl.searchParams.set('v', String(window.CensoBuild?.version || Date.now()));
-const { getSeasonalProfile, SEASONAL_PROFILES, getCelebrationChoice, launchSeasonalConfetti, initCelebrationAudio, unlockCelebrationAudio } = await import(seasonUrl.href);
+const { getSeasonalProfile, SEASONAL_PROFILES, SEASONAL_ENABLED, getCelebrationChoice, launchSeasonalConfetti, initCelebrationAudio, unlockCelebrationAudio } = await import(seasonUrl.href);
 const ambientUrl = new URL('./seasonalAmbient.js', import.meta.url);
 ambientUrl.searchParams.set('v', String(window.CensoBuild?.version || Date.now()));
-const { createSeasonalAmbient } = await import(ambientUrl.href);
+// Keep the ambient implementation in Git, but avoid loading it outside the season.
+const { createSeasonalAmbient } = SEASONAL_ENABLED
+  ? await import(ambientUrl.href)
+  : { createSeasonalAmbient: () => ({ sync() {}, stop() {} }) };
 
 export function createThemeModule(app) {
   const { state } = app;
@@ -76,7 +79,7 @@ export function createThemeModule(app) {
   ];
 
   const effects = [
-    { id: 'effect-halloween', name: 'Murciélagos y niebla', icon: 'dark_mode' },
+    ...(SEASONAL_ENABLED ? [{ id: 'effect-halloween', name: 'Murciélagos y niebla', icon: 'dark_mode' }] : []),
     { id: 'effect-waves', name: 'Olas', icon: 'waves' },
     { id: 'effect-aurora', name: 'Aurora', icon: 'blur_on' },
     { id: 'effect-grid', name: 'Rejilla', icon: 'grid_4x4' },
@@ -107,7 +110,7 @@ export function createThemeModule(app) {
   }
 
   function ensureThemeStylesheets() {
-    ensureStylesheet('censo-seasonal-styles', 'seasonalTheme.css');
+    if (SEASONAL_ENABLED) ensureStylesheet('censo-seasonal-styles', 'seasonalTheme.css');
     ensureStylesheet('censo-theme-v2-styles', 'themePaletteV2.css');
     ensureStylesheet('censo-theme-v3-effects', 'themeEffectsV3.css');
     ensureStylesheet('censo-theme-v3-layout-effects', 'themeEffectsV4.css');
@@ -239,15 +242,15 @@ export function createThemeModule(app) {
     const extras = document.createElement('div');
     extras.id = 'themeV2Extras';
     extras.innerHTML = `
-      ${toggleGroup('season', 'Tema', [['on', 'Tema estacional'], ['off', 'Tema normal']])}
-      ${toggleGroup('celebrations', 'Celebraciones', [['all', 'Todas las animaciones'], ['seasonal', 'Animación estacional']])}
+      ${SEASONAL_ENABLED ? toggleGroup('season', 'Tema', [['on', 'Tema estacional'], ['off', 'Tema normal']]) : ''}
+      ${toggleGroup('celebrations', 'Celebraciones', [['all', 'Aleatoria'], ['seasonal', 'Elegida']])}
       ${toggleGroup('sound', 'Sonidos', [['on', 'ON'], ['off', 'OFF']])}
       <section class="season-picker" aria-label="Celebración">
         <div><label for="celebrationPicker">Celebración</label>
         <select id="celebrationPicker"><option value="confetti">Confeti</option><option value="fireworks">Fuegos artificiales</option><option value="balloons">Globos</option></select></div>
         <button id="celebrationPreview" type="button" class="theme-reset">PROBAR CELEBRACIÓN</button>
       </section>
-      <section class="season-picker"><label for="ghostColorPicker">Fantasmas</label><select id="ghostColorPicker"><option value="mixed">Azules y rosas</option><option value="cyan">Azules</option><option value="pink">Rosas</option></select></section>
+      ${SEASONAL_ENABLED ? '<section class="season-picker"><label for="ghostColorPicker">Fantasmas</label><select id="ghostColorPicker"><option value="mixed">Azules y rosas</option><option value="cyan">Azules</option><option value="pink">Rosas</option></select></section>' : ''}
       ${renderEffectPicker()}
       <section class="theme-preview" aria-label="Vista previa del tema">
         <div class="theme-preview__head">
@@ -291,8 +294,10 @@ export function createThemeModule(app) {
       });
     });
     const ghostColorPicker = document.getElementById('ghostColorPicker');
-    ghostColorPicker.value = localStorage.getItem('censo-ghost-color') || 'mixed';
-    ghostColorPicker.addEventListener('change', event => { localStorage.setItem('censo-ghost-color', event.target.value); refreshSeason(); });
+    if (ghostColorPicker) {
+      ghostColorPicker.value = localStorage.getItem('censo-ghost-color') || 'mixed';
+      ghostColorPicker.addEventListener('change', event => { localStorage.setItem('censo-ghost-color', event.target.value); refreshSeason(); });
+    }
     updateToggles();
     document.getElementById('celebrationPreview').addEventListener('click', async () => {
       app.cerrarModal?.('themeModal');

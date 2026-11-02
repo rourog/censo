@@ -1,5 +1,18 @@
 # Temas estacionales
 
+**Pausado desde la versión 2.95 (1 de noviembre de 2026).** El interruptor
+`SEASONAL_ENABLED = false` en `modules/seasonalTheme.js` desactiva Halloween
+para todos los usuarios, incluso si tenían la temporada activada manualmente.
+El selector, los sprites, los sonidos y el contador no se cargan en producción.
+Se mantienen archivos, pruebas y preferencias antiguas para volver a habilitar
+la temporada sin reconstruirla. La barra de noticias recupera avisos y noticias
+habituales. Las celebraciones generales (confeti, globos, fuegos artificiales)
+siguen disponibles.
+
+Para reactivar Halloween, cambiar `SEASONAL_ENABLED` a `true` y actualizar
+`version.json`; con ello reaparecen el selector estacional y el ambientador
+original. Los datos históricos del contador no se borran.
+
 `modules/seasonalTheme.js` contiene el catálogo. Cada perfil define:
 
 - `months`: meses de activación automática, calculados en America/Mexico_City.

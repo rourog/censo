@@ -96,10 +96,14 @@ export async function bootApp() {
     soundCatalog: modules.soundCatalog
   };
 
-  const { createHalloweenCounter } = await import(moduleUrl('halloweenCounter'));
-  app.halloweenCounter = createHalloweenCounter(app.firebase);
-  const { createCreatureHitAudio } = await import(moduleUrl('creatureHitAudio'));
-  app.creatureHitAudio = createCreatureHitAudio();
+  // Seasonal modules remain versioned/available, but are not initialized off-season.
+  const { SEASONAL_ENABLED } = await import(moduleUrl('seasonalTheme'));
+  if (SEASONAL_ENABLED) {
+    const { createHalloweenCounter } = await import(moduleUrl('halloweenCounter'));
+    app.halloweenCounter = createHalloweenCounter(app.firebase);
+    const { createCreatureHitAudio } = await import(moduleUrl('creatureHitAudio'));
+    app.creatureHitAudio = createCreatureHitAudio();
+  }
   Object.assign(app, modules.createSoundboardModule(app));
   Object.assign(app, modules.createEffectsModule(app));
   Object.assign(app, modules.createRenderModule(app));
@@ -133,7 +137,7 @@ export async function bootApp() {
   app.initBedCatalogAuthBridge();
   app.initBedAdminUiBridge();
   app.initNewsBarAuthBridge();
-  app.halloweenCounter.start();
+  app.halloweenCounter?.start();
 
   app.bindAuthEvents();
   await app.bootAuth();

@@ -685,3 +685,11 @@
   overflow-y: hidden;
   font: inherit;
 }
+
+/* General celebration picker styling remains available while seasonal CSS is unloaded. */
+.season-picker { grid-column: 1 / -1; margin-top: 16px; }
+.season-picker select {
+  width: 100%; padding: 10px; color: var(--text);
+  background: var(--panel); border: 1px solid var(--line);
+  border-radius: 8px; font: inherit;
+}
