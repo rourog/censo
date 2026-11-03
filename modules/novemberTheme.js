@@ -18,8 +18,25 @@ const currentInChihuahua = () => {
 };
 function styleOnce() {
   if (document.getElementById('november-theme-css')) return;
+  if (!document.getElementById('november-rye-font')) {
+    const link=document.createElement('link');
+    link.id='november-rye-font';link.rel='stylesheet';
+    link.href='https://fonts.googleapis.com/css2?family=Rye&display=swap';
+    document.head.appendChild(link);
+  }
   const css = document.createElement('style'); css.id='november-theme-css';
   css.textContent = `
+    body.november-theme .header .title-censo {
+      font-family:'Rye', Georgia, serif !important;
+      font-size:1.54rem !important;
+      font-weight:400 !important;
+      letter-spacing:.035em !important;
+      line-height:1.18 !important;
+      white-space:nowrap;
+    }
+    @media(max-width:767px) {
+      body.november-theme .header .title-censo {font-size:1.30rem !important;}
+    }
     body.november-theme .header::before { display:none !important; }
     body.november-theme #plexusCanvas { display:none !important; }
     .november-background { position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden; }
@@ -162,8 +179,8 @@ export function initNovemberTheme(app) {
     if(now-start<5000 && !hidden) raf=requestAnimationFrame(animate);
     else {active=false;particles=[];ctx.clearRect(0,0,innerWidth,innerHeight);}
   }
-  function salute() {
-    if(hidden||active||!ctx||document.body.classList.contains('effect-none')||matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  function salute({force=false}={}) {
+    if(hidden||active||!ctx||(!force&&document.body.classList.contains('effect-none'))||matchMedia('(prefers-reduced-motion: reduce)').matches)return;
     if(!document.getElementById('mainAppContainer') || getComputedStyle(document.getElementById('mainAppContainer')).display==='none')return;
     resizeCanvas();
     const colors=['#079b4c','#ffffff','#dc2836'];
@@ -180,6 +197,10 @@ export function initNovemberTheme(app) {
   }
   document.addEventListener('visibilitychange',()=>{hidden=document.hidden;if(hidden){active=false;cancelAnimationFrame(raf);particles=[];ctx?.clearRect(0,0,innerWidth,innerHeight);}});
   const ro=new ResizeObserver(()=>updateLayout());ro.observe(header);
+  // El ancho cambia cuando termina de cargar la fuente decorativa.
+  const observedTitle=header.querySelector('.main-title');
+  if(observedTitle)ro.observe(observedTitle);
+  document.fonts?.ready?.then(()=>updateLayout()).catch(()=>{});
   if(header.querySelector('.header-left'))ro.observe(header.querySelector('.header-left'));
   if(header.querySelector('.header-right'))ro.observe(header.querySelector('.header-right'));
   app.syncNovemberPatients=syncPatients;
