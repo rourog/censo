@@ -54,7 +54,7 @@ export function createNovemberPetalField() {
     canvas.height=Math.max(1,Math.ceil(height*dpr));
     canvas.style.width=width+'px';canvas.style.height=height+'px';
     ctx.setTransform(dpr,0,0,dpr,0,0);
-    // Densidad alta: de ~145 pétalos en 768 px a ~350 en 1920 px.
+    // Densidad alta: ~220 pétalos a 768 px, ~550 a 1920 px,\n    // pero solo cuatro capas de imagen requieren redibujado por fotograma.
     const unit=width/1000;
     still=makeTile(Math.round(36*unit),5,9,.12,.28);
     layers=[
