@@ -54,16 +54,22 @@ function styleOnce() {
       word-break:normal !important;
       overflow-wrap:normal !important;
     }
-    body.november-theme .desktop-waves-bg {isolation:isolate;overflow:hidden;}
+    /* Fondo propio: el contenedor era transparente y la textura al 30%
+       quedaba casi invisible sobre el fondo general. No afecta tarjetas. */
+    body.november-theme .desktop-waves-bg {
+      isolation:isolate;overflow:hidden;
+      background-color:#192b28;
+      background-image:linear-gradient(90deg,rgba(6,65,37,.23),rgba(27,32,25,.12) 50%,rgba(81,19,19,.22));
+    }
     body.november-theme .desktop-waves-bg::before {
       content:'';position:absolute;inset:0;z-index:0;pointer-events:none;
-      background-image:url("${STONE_TILE}");background-size:140px 140px;background-repeat:repeat;
-      opacity:.30;filter:saturate(.50) contrast(1.09) brightness(.73);
+      background-image:url("${STONE_TILE}");
+      background-size:140px 140px;background-repeat:repeat;
+      opacity:.78;filter:saturate(.65) contrast(1.20) brightness(.94);
     }
     body.november-theme .desktop-waves-bg::after {
       content:'';position:absolute;inset:0;z-index:0;pointer-events:none;
-      background:linear-gradient(90deg,rgba(0,120,64,.12),rgba(255,193,72,.09) 50%,rgba(178,48,46,.12));
-      opacity:.20;
+      background:linear-gradient(180deg,rgba(10,20,21,.12),transparent 35%,rgba(13,20,20,.08));
     }
     .november-petal-field {position:absolute;inset:0;z-index:1;pointer-events:none;width:100%;height:100%;opacity:.94;}
 
