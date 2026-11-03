@@ -72,26 +72,35 @@ export function initNovemberTheme(app) {
   let count=0, positions=[], paletteIndex=-1, active=false, raf=0, particles=[], shells=0, start=0;
   let hidden=document.hidden, lastFired=0;
   function capacity() {
-    const title=header.querySelector('.main-title'),left=header.querySelector('.header-left'),right=header.querySelector('.header-right');
-    if (!title || !left || !right) return [];
-    const head=header.getBoundingClientRect(), t=title.getBoundingClientRect(),l=left.getBoundingClientRect(),r=right.getBoundingClientRect();
-    const safe=13, stride=FLAGS.size+FLAGS.gap;
-    const L0=Math.max(12,l.right-head.left+safe), L1=t.left-head.left-safe;
-    const R0=t.right-head.left+safe, R1=r.left-head.left-safe;
+    const title=header.querySelector('.main-title');
+    const left=header.querySelector('.header-left');
+    const right=header.querySelector('.header-right');
+    if(!title||!left||!right) return [];
+    const head=header.getBoundingClientRect(),t=title.getBoundingClientRect();
+    if(head.width<320 || t.width<40) return [];
+    const bounds=(section) => Array.from(section.querySelectorAll('button, [role="button"]'))
+      .filter(el=>el.getClientRects().length && getComputedStyle(el).visibility!=='hidden')
+      .map(el=>el.getBoundingClientRect());
+    const leftButtons=bounds(left),rightButtons=bounds(right);
+    const lastLeft=leftButtons.length?Math.max(...leftButtons.map(b=>b.right)):head.left+16;
+    const firstRight=rightButtons.length?Math.min(...rightButtons.map(b=>b.left)):head.right-16;
+    // 8px para inclinacion y balanceo y 6px de margen de seguridad
+    const safe=14,stride=FLAGS.size+FLAGS.gap;
+    const L0=Math.max(10,lastLeft-head.left+safe),L1=t.left-head.left-safe;
+    const R0=t.right-head.left+safe,R1=firstRight-head.left-safe;
     const leftPos=[],rightPos=[];
-    // Desde el título hacia los extremos, sin invadir los botones (incluido el vaivén).
-    for(let x=L1-FLAGS.size; x>=L0; x-=stride) leftPos.push(x);
-    for(let x=R0; x+FLAGS.size<=R1; x+=stride) rightPos.push(x);
-    const positions=[];
-    while(leftPos.length||rightPos.length) {
-      if(leftPos.length)positions.push(leftPos.shift());
-      if(rightPos.length)positions.push(rightPos.shift());
+    for(let x=L1-FLAGS.size;x>=L0;x-=stride)leftPos.push(x);
+    for(let x=R0;x+FLAGS.size<=R1;x+=stride)rightPos.push(x);
+    const available=[];
+    while(leftPos.length||rightPos.length){
+      if(leftPos.length)available.push(leftPos.shift());
+      if(rightPos.length)available.push(rightPos.shift());
     }
-    return positions;
+    return available;
   }
   function updateLayout() {
     positions=capacity();
-    const desired=Math.ceil(count/3);
+    const desired=count;
     const visible=Math.max(0,Math.min(desired,positions.length));
     if (flags.childElementCount!==visible) {
       flags.replaceChildren();
@@ -176,10 +185,13 @@ export function initNovemberTheme(app) {
   app.syncNovemberPatients=syncPatients;
   syncPatients(app.state.pacientesGlobal);
   updateLayout();shuffleFlags();
+  // Medimos de nuevo al mostrar la app tras el login, incluso si el
+  // navegador no emite un ResizeObserver por los elementos ocultos.
+  const firstLayoutCheck=setInterval(()=>{if(header.getBoundingClientRect().width>320){updateLayout();clearInterval(firstLayoutCheck);}},300);
   const shuffleTimer=setInterval(()=>{if(!document.hidden)shuffleFlags();},FLAGS.shuffle);
   const showTimer=setInterval(()=>{if(!document.hidden && Date.now()-lastFired>130000)salute();},30000);
   // La primera salva ocurre solo después de que el censo real esté visible.
   lastFired=Date.now()-110000;
-  window.__novemberThemeController={syncPatients,shuffleFlags,salute,dispose(){clearInterval(shuffleTimer);clearInterval(showTimer);ro.disconnect();cancelAnimationFrame(raf);background.remove();flags.remove();canvas.remove();document.body.classList.remove('november-theme');}};
+  window.__novemberThemeController={syncPatients,shuffleFlags,salute,getStatus(){return {patients:count,availablePositions:positions.length,visibleFlags:flags.childElementCount,headerWidth:header.getBoundingClientRect().width};},dispose(){clearInterval(firstLayoutCheck);clearInterval(shuffleTimer);clearInterval(showTimer);ro.disconnect();cancelAnimationFrame(raf);background.remove();flags.remove();canvas.remove();document.body.classList.remove('november-theme');}};
   return window.__novemberThemeController;
 }
