@@ -250,7 +250,8 @@ export function initNovemberTheme(app) {
     lastFired=Date.now();
     return true;
   }
-  document.addEventListener('visibilitychange',()=>{hidden=document.hidden;if(hidden){active=false;cancelAnimationFrame(raf);particles=[];ctx?.clearRect(0,0,innerWidth,innerHeight);}});
+  const onVisibilityChange=()=>{hidden=document.hidden;if(hidden){active=false;cancelAnimationFrame(raf);particles=[];ctx?.clearRect(0,0,innerWidth,innerHeight);}};
+  document.addEventListener('visibilitychange',onVisibilityChange);
   const ro=new ResizeObserver(()=>updateLayout());ro.observe(header);
   // El ancho cambia cuando termina de cargar la fuente decorativa.
   const observedTitle=header.querySelector('.main-title');
@@ -287,7 +288,7 @@ export function initNovemberTheme(app) {
   window.__novemberThemeController={syncPatients,shuffleFlags,salute,getStatus(){return {patients:count,byArea:Object.fromEntries(Object.keys(FAMILIES).map(k=>[k,patientFamilies.filter(p=>p===k).length])),availablePositions:positions.length,visibleFlags:flags.childElementCount,headerWidth:header.getBoundingClientRect().width,fireworksActive:active,fireworksZIndex:getComputedStyle(canvas).zIndex,lastFireworkAt:lastFired?new Date(lastFired).toISOString():null};},dispose(){
     clearInterval(firstLayoutCheck);clearInterval(firstSaluteCheck);clearTimeout(firstSaluteTimer);
     clearInterval(shuffleTimer);clearInterval(showTimer);clearInterval(seasonTimer);
-    ro.disconnect();cancelAnimationFrame(raf);petals.dispose();
+    ro.disconnect();cancelAnimationFrame(raf);document.removeEventListener('visibilitychange',onVisibilityChange);petals.dispose();
     document.querySelectorAll('.november-area-guide').forEach(el=>el.remove());
     background.remove();flags.remove();canvas.remove();document.body.classList.remove('november-theme');
     delete window.__novemberThemeController;
