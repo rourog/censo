@@ -54,7 +54,18 @@ function styleOnce() {
       word-break:normal !important;
       overflow-wrap:normal !important;
     }
-    .november-petal-field {position:absolute;inset:0;pointer-events:none;width:100%;height:100%;opacity:.88;}
+    body.november-theme .desktop-waves-bg {isolation:isolate;overflow:hidden;}
+    body.november-theme .desktop-waves-bg::before {
+      content:'';position:absolute;inset:0;z-index:0;pointer-events:none;
+      background-image:url("${STONE_TILE}");background-size:140px 140px;background-repeat:repeat;
+      opacity:.30;filter:saturate(.50) contrast(1.09) brightness(.73);
+    }
+    body.november-theme .desktop-waves-bg::after {
+      content:'';position:absolute;inset:0;z-index:0;pointer-events:none;
+      background:linear-gradient(90deg,rgba(0,120,64,.12),rgba(255,193,72,.09) 50%,rgba(178,48,46,.12));
+      opacity:.20;
+    }
+    .november-petal-field {position:absolute;inset:0;z-index:1;pointer-events:none;width:100%;height:100%;opacity:.94;}
 
     .november-background { position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden; }
     .november-stone { position:absolute;inset:0;opacity:.30;background-image:url("${STONE_TILE}");background-repeat:repeat;background-size:140px 140px;filter:saturate(.5) contrast(1.09) brightness(.73);mix-blend-mode:soft-light; }
@@ -273,28 +284,14 @@ export function initNovemberTheme(app) {
   // navegador no emite un ResizeObserver por los elementos ocultos.
   const firstLayoutCheck=setInterval(()=>{if(header.getBoundingClientRect().width>320){updateLayout();clearInterval(firstLayoutCheck);}},300);
   const shuffleTimer=setInterval(()=>{if(!document.hidden)shuffleFlags();},FLAGS.shuffle);
-  // La primera celebración se dispara unos segundos después del acceso.
-  // Después hay una salva ocasional; el efecto elegido y las preferencias
-  // de movimiento reducido siguen teniendo prioridad.
-  let firstSaluteTimer=null, firstSaluteDone=false;
-  const firstSaluteCheck=setInterval(()=>{
-    if(firstSaluteDone || !appVisible() || document.hidden)return;
-    firstSaluteDone=true;
-    clearInterval(firstSaluteCheck);
-    firstSaluteTimer=setTimeout(()=>{
-      if(!document.hidden && !document.body.classList.contains('effect-none')) salute();
-    },4000);
-  },1000);
-  const showTimer=setInterval(()=>{
-    if(!document.hidden && appVisible() && Date.now()-lastFired>=90000) salute();
-  },10000);
-  lastFired=Date.now();
+  // Las celebraciones solo se ejecutan desde borrado confirmado de pacientes
+  // o botón de prueba manual. Ningún lanzamiento temporizado.
   const seasonTimer=setInterval(()=>{
     if(!currentInChihuahua())window.__novemberThemeController?.dispose();
   },60000);
   window.__novemberThemeController={syncPatients,shuffleFlags,salute,getStatus(){return {patients:count,byArea:Object.fromEntries(Object.keys(FAMILIES).map(k=>[k,patientFamilies.filter(p=>p===k).length])),availablePositions:positions.length,visibleFlags:flags.childElementCount,headerWidth:header.getBoundingClientRect().width,fireworksActive:active,fireworksZIndex:getComputedStyle(canvas).zIndex,lastFireworkAt:lastFired?new Date(lastFired).toISOString():null};},dispose(){
-    clearInterval(firstLayoutCheck);clearInterval(firstSaluteCheck);clearTimeout(firstSaluteTimer);
-    clearInterval(shuffleTimer);clearInterval(showTimer);clearInterval(seasonTimer);
+    clearInterval(firstLayoutCheck);
+    clearInterval(shuffleTimer);clearInterval(seasonTimer);
     ro.disconnect();cancelAnimationFrame(raf);document.removeEventListener('visibilitychange',onVisibilityChange);petals.dispose();
     for(const [icon,oldColor] of tintedIcons)icon.style.color=oldColor;
     tintedIcons.clear();
