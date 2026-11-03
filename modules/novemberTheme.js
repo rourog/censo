@@ -28,14 +28,14 @@ function styleOnce() {
   css.textContent = `
     body.november-theme .header .title-censo {
       font-family:'Rye', Georgia, serif !important;
-      font-size:1.54rem !important;
+      font-size:1.76rem !important;
       font-weight:400 !important;
       letter-spacing:.035em !important;
       line-height:1.18 !important;
       white-space:nowrap;
     }
     @media(max-width:767px) {
-      body.november-theme .header .title-censo {font-size:1.30rem !important;}
+      body.november-theme .header .title-censo {font-size:1.46rem !important;}
     }
     body.november-theme .header::before { display:none !important; }
     body.november-theme #plexusCanvas { display:none !important; }
@@ -59,7 +59,7 @@ function styleOnce() {
       0%,100% {transform:rotate(calc(var(--nov-tilt) - 7.5deg));}
       50% {transform:rotate(calc(var(--nov-tilt) + 7.5deg));}
     }
-    .november-fireworks {position:fixed;inset:0;width:100vw;height:100vh;z-index:5;pointer-events:none;opacity:.70;}
+    .november-fireworks {position:fixed;inset:0;width:100vw;height:100vh;z-index:80;pointer-events:none;opacity:.92;}
     @media print { .november-flags,.november-background,.november-fireworks {display:none !important;} }
     @media (max-width:767px) { .november-flags {display:none !important;} }
     body.effect-none .november-flag {animation:none !important;transform:rotate(var(--nov-tilt));}
@@ -88,6 +88,7 @@ export function initNovemberTheme(app) {
   const ctx=canvas.getContext('2d',{alpha:true});
   let count=0, positions=[], paletteIndex=-1, active=false, raf=0, particles=[], shells=0, start=0;
   let hidden=document.hidden, lastFired=0;
+  const appVisible = () => { const root=document.getElementById('mainAppContainer'); return !!root && getComputedStyle(root).display!=='none' && root.getClientRects().length>0; };
   function capacity() {
     const title=header.querySelector('.main-title');
     const left=header.querySelector('.header-left');
@@ -181,7 +182,7 @@ export function initNovemberTheme(app) {
   }
   function salute({force=false}={}) {
     if(hidden||active||!ctx||(!force&&document.body.classList.contains('effect-none'))||matchMedia('(prefers-reduced-motion: reduce)').matches)return;
-    if(!document.getElementById('mainAppContainer') || getComputedStyle(document.getElementById('mainAppContainer')).display==='none')return;
+    if(!appVisible())return false;
     resizeCanvas();
     const colors=['#079b4c','#ffffff','#dc2836'];
     // Tres estallidos sincronizados distribuidos sobre la franja superior.
@@ -194,6 +195,7 @@ export function initNovemberTheme(app) {
     }
     active=true;start=performance.now();raf=requestAnimationFrame(animate);
     lastFired=Date.now();
+    return true;
   }
   document.addEventListener('visibilitychange',()=>{hidden=document.hidden;if(hidden){active=false;cancelAnimationFrame(raf);particles=[];ctx?.clearRect(0,0,innerWidth,innerHeight);}});
   const ro=new ResizeObserver(()=>updateLayout());ro.observe(header);
@@ -210,9 +212,22 @@ export function initNovemberTheme(app) {
   // navegador no emite un ResizeObserver por los elementos ocultos.
   const firstLayoutCheck=setInterval(()=>{if(header.getBoundingClientRect().width>320){updateLayout();clearInterval(firstLayoutCheck);}},300);
   const shuffleTimer=setInterval(()=>{if(!document.hidden)shuffleFlags();},FLAGS.shuffle);
-  const showTimer=setInterval(()=>{if(!document.hidden && Date.now()-lastFired>130000)salute();},30000);
-  // La primera salva ocurre solo después de que el censo real esté visible.
-  lastFired=Date.now()-110000;
-  window.__novemberThemeController={syncPatients,shuffleFlags,salute,getStatus(){return {patients:count,availablePositions:positions.length,visibleFlags:flags.childElementCount,headerWidth:header.getBoundingClientRect().width};},dispose(){clearInterval(firstLayoutCheck);clearInterval(shuffleTimer);clearInterval(showTimer);ro.disconnect();cancelAnimationFrame(raf);background.remove();flags.remove();canvas.remove();document.body.classList.remove('november-theme');}};
+  // La primera celebración se dispara unos segundos después del acceso.
+  // Después hay una salva ocasional; el efecto elegido y las preferencias
+  // de movimiento reducido siguen teniendo prioridad.
+  let firstSaluteTimer=null, firstSaluteDone=false;
+  const firstSaluteCheck=setInterval(()=>{
+    if(firstSaluteDone || !appVisible() || document.hidden)return;
+    firstSaluteDone=true;
+    clearInterval(firstSaluteCheck);
+    firstSaluteTimer=setTimeout(()=>{
+      if(!document.hidden && !document.body.classList.contains('effect-none')) salute();
+    },4000);
+  },1000);
+  const showTimer=setInterval(()=>{
+    if(!document.hidden && appVisible() && Date.now()-lastFired>=90000) salute();
+  },10000);
+  lastFired=Date.now();
+  window.__novemberThemeController={syncPatients,shuffleFlags,salute,getStatus(){return {patients:count,availablePositions:positions.length,visibleFlags:flags.childElementCount,headerWidth:header.getBoundingClientRect().width,fireworksActive:active,fireworksZIndex:getComputedStyle(canvas).zIndex,lastFireworkAt:lastFired?new Date(lastFired).toISOString():null};},dispose(){clearInterval(firstLayoutCheck);clearInterval(firstSaluteCheck);clearTimeout(firstSaluteTimer);clearInterval(shuffleTimer);clearInterval(showTimer);ro.disconnect();cancelAnimationFrame(raf);background.remove();flags.remove();canvas.remove();document.body.classList.remove('november-theme');}};
   return window.__novemberThemeController;
 }
