@@ -47,10 +47,6 @@ function styleOnce() {
     body.november-theme #plexusCanvas { display:none !important; }
     body.november-theme .desktop-waves-bg .waves {display:none !important;}
     .november-petal-field {position:absolute;inset:0;pointer-events:none;width:100%;height:100%;opacity:.88;}
-    .november-area-guide {display:inline-flex;vertical-align:middle;margin-left:7px;width:12px;height:12px;
-      color:var(--november-family-color,#facc15);pointer-events:none;animation:november-guide-sway 2.5s ease-in-out infinite;}
-    .november-area-guide svg {width:100%;height:100%;fill:currentColor;}
-    @keyframes november-guide-sway {0%,100%{transform:rotate(-10deg)}50%{transform:rotate(12deg)}}
 
     .november-background { position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden; }
     .november-stone { position:absolute;inset:0;opacity:.30;background-image:url("${STONE_TILE}");background-repeat:repeat;background-size:140px 140px;filter:saturate(.5) contrast(1.09) brightness(.73);mix-blend-mode:soft-light; }
@@ -73,11 +69,11 @@ function styleOnce() {
       50% {transform:rotate(calc(var(--nov-tilt) + 7.5deg));}
     }
     .november-fireworks {position:fixed;inset:0;width:100vw;height:100vh;z-index:80;pointer-events:none;opacity:.92;}
-    @media print { .november-flags,.november-background,.november-fireworks,.november-petal-field,.november-area-guide {display:none !important;} }
+    @media print { .november-flags,.november-background,.november-fireworks,.november-petal-field {display:none !important;} }
     @media (max-width:767px) { .november-flags {display:none !important;} }
-    body.effect-none .november-flag, body.effect-none .november-area-guide {animation:none !important;transform:rotate(var(--nov-tilt,0deg));}
+    body.effect-none .november-flag {animation:none !important;transform:rotate(var(--nov-tilt,0deg));}
     body.effect-none .november-petal-field {display:none !important;}
-    @media (prefers-reduced-motion:reduce) {.november-flag,.november-area-guide {animation:none !important;transform:none !important;} .november-fireworks,.november-petal-field {display:none !important;}}
+    @media (prefers-reduced-motion:reduce) {.november-flag {animation:none !important;transform:none !important;} .november-fireworks,.november-petal-field {display:none !important;}}
   `;
   document.head.appendChild(css);
 }
@@ -171,24 +167,27 @@ export function initNovemberTheme(app) {
       slot.title=area;
     });
   }
+  // Únicamente recolorea el icono existente; no inserta elementos en
+  // el encabezado, la tabla ni las tarjetas del censo.
+  const tintedIcons=new Map();
   function updateAreaGuides() {
     const content=document.getElementById('content');
     if(!content)return;
+    const current=new Set();
     content.querySelectorAll('.section-title').forEach(title=>{
       const area=normalizePlexusArea(title.textContent);
-      const current=title.querySelector('.november-area-guide');
-      if(!Object.hasOwn(FAMILIES,area)) {current?.remove();return;}
-      const color=FAMILIES[area][0];
-      let guide=current;
-      if(!guide){
-        guide=document.createElement('span');
-        guide.className='november-area-guide';
-        guide.setAttribute('aria-hidden','true');
-        guide.innerHTML='<svg viewBox="0 0 20 20"><path d="M3 11C4 4 11 1 17 3c2 7-3 13-10 14C5 16 3 14 3 11z"/></svg>';
-        title.appendChild(guide);
-      }
-      guide.style.setProperty('--november-family-color',color);
+      const icon=title.querySelector('.area-icon');
+      if(!icon||!Object.hasOwn(FAMILIES,area))return;
+      current.add(icon);
+      if(!tintedIcons.has(icon))tintedIcons.set(icon,icon.style.color);
+      icon.style.color=FAMILIES[area][0];
     });
+    for(const [icon,oldColor] of tintedIcons){
+      if(!current.has(icon)){
+        icon.style.color=oldColor;
+        tintedIcons.delete(icon);
+      }
+    }
   }
   function syncPatients(patients) {
     const incoming=Array.isArray(patients)?patients:[];
@@ -289,7 +288,8 @@ export function initNovemberTheme(app) {
     clearInterval(firstLayoutCheck);clearInterval(firstSaluteCheck);clearTimeout(firstSaluteTimer);
     clearInterval(shuffleTimer);clearInterval(showTimer);clearInterval(seasonTimer);
     ro.disconnect();cancelAnimationFrame(raf);document.removeEventListener('visibilitychange',onVisibilityChange);petals.dispose();
-    document.querySelectorAll('.november-area-guide').forEach(el=>el.remove());
+    for(const [icon,oldColor] of tintedIcons)icon.style.color=oldColor;
+    tintedIcons.clear();
     background.remove();flags.remove();canvas.remove();document.body.classList.remove('november-theme');
     delete window.__novemberThemeController;
     if(typeof app.initPlexus==='function')app.initPlexus();
