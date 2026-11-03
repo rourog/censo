@@ -32,9 +32,20 @@ export function registerSeasonalConfetti(id, renderer) {
   return () => confettiRenderers.delete(id);
 }
 let celebrationModule;
+// Noviembre usa su propia celebración predeterminada sin alterar la
+// preferencia que el usuario tenga guardada para el resto del año.
+function novemberActive() {
+  return typeof document !== 'undefined' && document.body.classList.contains('november-theme');
+}
+export function setCelebrationChoice(choice) {
+  if (!['confetti', 'fireworks', 'balloons'].includes(choice)) return;
+  localStorage.setItem(novemberActive() ? 'censo-november-celebration' : 'censo-celebration', choice);
+}
 export function getCelebrationChoice() {
-  const saved = localStorage.getItem('censo-celebration');
-  return ['confetti', 'fireworks', 'balloons'].includes(saved) ? saved : 'confetti';
+  const saved = novemberActive()
+    ? localStorage.getItem('censo-november-celebration')
+    : localStorage.getItem('censo-celebration');
+  return ['confetti', 'fireworks', 'balloons'].includes(saved) ? saved : (novemberActive() ? 'fireworks' : 'confetti');
 }
 function loadCelebrations() {
   const url = new URL('./celebrationEffects.js', import.meta.url);
@@ -55,6 +66,13 @@ export function launchSeasonalConfetti(options = {}) {
   const effect = localStorage.getItem('censo-celebration-mode') === 'all'
     ? choices[Math.floor(Math.random() * choices.length)]
     : configured?.effect || getCelebrationChoice();
+  // La salva tricolor aprobada en el laboratorio sustituye al
+  // motor genérico de fuegos artificiales solo durante noviembre.
+  // Si no está inicializado, se mantiene el motor existente.
+  if (novemberActive() && effect === 'fireworks') {
+    const controller = window.__novemberThemeController;
+    if (controller?.salute) return controller.salute({ force: true });
+  }
   const renderer = confettiRenderers.get(effect);
   const settings = { ...options, ...(configured?.colors ? { colors: configured.colors } : {}), disableForReducedMotion: true };
   if (renderer) renderer(settings);
