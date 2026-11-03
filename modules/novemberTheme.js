@@ -1,15 +1,21 @@
 /* Tema Noviembre 2026: decorativo, sin escrituras ni lecturas adicionales a Firestore. */
 import { PAPER_ATLAS } from './novemberPaperAtlas.js';
 import { STONE_TILE } from './novemberStoneTile.js';
+import { normalizePlexusArea } from './plexus.js';
+import { createNovemberPetalField } from './novemberPetals.js';
 
-const COLORS = [
-  ['#ff4da6','#7c8cff','#59d35d','#83d7ff','#ffe13b','#ff9d42','#8d92ff','#ef4fb5','#76d66d'],
-  ['#f43f5e','#fb7185','#f59e0b','#facc15','#22c55e','#14b8a6','#60a5fa','#818cf8','#ec4899'],
-  ['#0f8a42','#34d399','#f8f4e9','#ffffff','#ef4444','#b91c1c'],
-  ['#3aa665','#b8f0d0','#f1efe5','#ffffff','#ff8d8d','#d45252'],
-  ['#ff9b2f','#ffc94a','#ffe08a','#2fbf71','#1f9d67','#1d7f5a'],
-  ['#ff5ca8','#ff7a59','#facc15','#3ddc97','#38bdf8','#8b5cf6']
-];
+const FAMILIES = Object.freeze({
+  'SALA DE CHOQUE': ['#dc2626','#ef4444','#f97316','#fb923c'],
+  'OBSERVACION': ['#ec4899','#f472b6','#fb7185','#f9a8d4'],
+  'TRAUMA MENOR': ['#16a34a','#22c55e','#4ade80','#86efac'],
+  'PEDIATRIA': ['#0ea5e9','#38bdf8','#22d3ee','#60a5fa'],
+  'EXTRAS': ['#facc15','#fde047','#f59e0b','#ffe08a'],
+  'SIN AREA': ['#facc15','#fde68a','#fef3c7','#f59e0b']
+});
+const normalizeFamily = patient => {
+  const area=normalizePlexusArea(patient?.area);
+  return Object.hasOwn(FAMILIES,area) ? area : 'SIN AREA';
+};
 const FLAGS = { size:50, gap:2, tilt:5, sway:15, period:2.5, shuffle:20000 };
 const currentInChihuahua = () => {
   const parts = new Intl.DateTimeFormat('en-US', { timeZone:'America/Chihuahua',year:'numeric',month:'numeric' }).formatToParts(new Date());
@@ -39,6 +45,13 @@ function styleOnce() {
     }
     body.november-theme .header::before { display:none !important; }
     body.november-theme #plexusCanvas { display:none !important; }
+    body.november-theme .desktop-waves-bg .waves {display:none !important;}
+    .november-petal-field {position:absolute;inset:0;pointer-events:none;width:100%;height:100%;opacity:.88;}
+    .november-area-guide {display:inline-flex;vertical-align:middle;margin-left:7px;width:12px;height:12px;
+      color:var(--november-family-color,#facc15);pointer-events:none;animation:november-guide-sway 2.5s ease-in-out infinite;}
+    .november-area-guide svg {width:100%;height:100%;fill:currentColor;}
+    @keyframes november-guide-sway {0%,100%{transform:rotate(-10deg)}50%{transform:rotate(12deg)}}
+
     .november-background { position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden; }
     .november-stone { position:absolute;inset:0;opacity:.30;background-image:url("${STONE_TILE}");background-repeat:repeat;background-size:140px 140px;filter:saturate(.5) contrast(1.09) brightness(.73);mix-blend-mode:soft-light; }
     .november-light { position:absolute;inset:0;background:
@@ -60,10 +73,11 @@ function styleOnce() {
       50% {transform:rotate(calc(var(--nov-tilt) + 7.5deg));}
     }
     .november-fireworks {position:fixed;inset:0;width:100vw;height:100vh;z-index:80;pointer-events:none;opacity:.92;}
-    @media print { .november-flags,.november-background,.november-fireworks {display:none !important;} }
+    @media print { .november-flags,.november-background,.november-fireworks,.november-petal-field,.november-area-guide {display:none !important;} }
     @media (max-width:767px) { .november-flags {display:none !important;} }
-    body.effect-none .november-flag {animation:none !important;transform:rotate(var(--nov-tilt));}
-    @media (prefers-reduced-motion:reduce) {.november-flag {animation:none !important;transform:rotate(var(--nov-tilt));} .november-fireworks {display:none;}}
+    body.effect-none .november-flag, body.effect-none .november-area-guide {animation:none !important;transform:rotate(var(--nov-tilt,0deg));}
+    body.effect-none .november-petal-field {display:none !important;}
+    @media (prefers-reduced-motion:reduce) {.november-flag,.november-area-guide {animation:none !important;transform:none !important;} .november-fireworks,.november-petal-field {display:none !important;}}
   `;
   document.head.appendChild(css);
 }
@@ -86,6 +100,8 @@ export function initNovemberTheme(app) {
   const canvas=document.createElement('canvas');canvas.className='november-fireworks';canvas.setAttribute('aria-hidden','true');
   document.body.appendChild(canvas);
   const ctx=canvas.getContext('2d',{alpha:true});
+  const petals=createNovemberPetalField();
+  let patientFamilies=[];
   let count=0, positions=[], paletteIndex=-1, active=false, raf=0, particles=[], shells=0, start=0;
   let hidden=document.hidden, lastFired=0;
   const appVisible = () => { const root=document.getElementById('mainAppContainer'); return !!root && getComputedStyle(root).display!=='none' && root.getClientRects().length>0; };
@@ -133,22 +149,59 @@ export function initNovemberTheme(app) {
     Array.from(flags.children).forEach((el,i)=>el.style.left=positions[i]+'px');
   }
   function shuffleFlags() {
-    const palette=COLORS[Math.floor(Math.random()*COLORS.length)];
-    const order=shuffled(9);
     const slots=Array.from(flags.children);
-    const hues=shuffled(slots.length).map(i=>palette[i%palette.length]);
+    // Una ficha por paciente real, mezclada de forma local.
+    // Si hay más pacientes que espacio, el muestreo sigue siendo aleatorio.
+    const familyOrder=patientFamilies.slice();
+    for(let i=familyOrder.length-1;i>0;i--){
+      const j=Math.floor(Math.random()*(i+1));
+      [familyOrder[i],familyOrder[j]]=[familyOrder[j],familyOrder[i]];
+    }
+    const artwork=shuffled(9);
     slots.forEach((slot,i)=>{
-      const art=order[i%9], col=Math.floor(art/3), row=art%3;
+      const area=familyOrder[i] || 'SIN AREA';
+      const tones=FAMILIES[area];
+      const color=tones[Math.floor(Math.random()*tones.length)];
+      const art=artwork[i%9],col=Math.floor(art/3),row=art%3;
       const inner=slot.firstElementChild;
       inner.style.webkitMaskPosition=(row*50)+'% '+(col*50)+'%';
       inner.style.maskPosition=(row*50)+'% '+(col*50)+'%';
-      inner.style.color=hues[i%hues.length];
+      inner.style.color=color;
+      slot.dataset.family=area;
+      slot.title=area;
     });
-    paletteIndex=(paletteIndex+1)%COLORS.length;
+  }
+  function updateAreaGuides() {
+    const content=document.getElementById('content');
+    if(!content)return;
+    content.querySelectorAll('.section-title').forEach(title=>{
+      const area=normalizePlexusArea(title.textContent);
+      const current=title.querySelector('.november-area-guide');
+      if(!Object.hasOwn(FAMILIES,area)) {current?.remove();return;}
+      const color=FAMILIES[area][0];
+      let guide=current;
+      if(!guide){
+        guide=document.createElement('span');
+        guide.className='november-area-guide';
+        guide.setAttribute('aria-hidden','true');
+        guide.innerHTML='<svg viewBox="0 0 20 20"><path d="M3 11C4 4 11 1 17 3c2 7-3 13-10 14C5 16 3 14 3 11z"/></svg>';
+        title.appendChild(guide);
+      }
+      guide.style.setProperty('--november-family-color',color);
+    });
   }
   function syncPatients(patients) {
-    const next=Array.isArray(patients)?patients.length:0;
-    if (next!==count){ count=next;updateLayout(); }
+    const incoming=Array.isArray(patients)?patients:[];
+    const families=incoming.map(normalizeFamily);
+    const changed=families.length!==patientFamilies.length ||
+      families.some((area,i)=>area!==patientFamilies[i]);
+    if(changed) {
+      patientFamilies=families;
+      count=incoming.length;
+      updateLayout();
+      shuffleFlags();
+    }
+    updateAreaGuides();
   }
   // Fuegos: salvas tricolores (90 partículas), anillos ocasionales;
   // tamaño 140, estelas .80, duración máxima de 5s y frecuencia baja.
@@ -228,6 +281,17 @@ export function initNovemberTheme(app) {
     if(!document.hidden && appVisible() && Date.now()-lastFired>=90000) salute();
   },10000);
   lastFired=Date.now();
-  window.__novemberThemeController={syncPatients,shuffleFlags,salute,getStatus(){return {patients:count,availablePositions:positions.length,visibleFlags:flags.childElementCount,headerWidth:header.getBoundingClientRect().width,fireworksActive:active,fireworksZIndex:getComputedStyle(canvas).zIndex,lastFireworkAt:lastFired?new Date(lastFired).toISOString():null};},dispose(){clearInterval(firstLayoutCheck);clearInterval(firstSaluteCheck);clearTimeout(firstSaluteTimer);clearInterval(shuffleTimer);clearInterval(showTimer);ro.disconnect();cancelAnimationFrame(raf);background.remove();flags.remove();canvas.remove();document.body.classList.remove('november-theme');}};
+  const seasonTimer=setInterval(()=>{
+    if(!currentInChihuahua())window.__novemberThemeController?.dispose();
+  },60000);
+  window.__novemberThemeController={syncPatients,shuffleFlags,salute,getStatus(){return {patients:count,byArea:Object.fromEntries(Object.keys(FAMILIES).map(k=>[k,patientFamilies.filter(p=>p===k).length])),availablePositions:positions.length,visibleFlags:flags.childElementCount,headerWidth:header.getBoundingClientRect().width,fireworksActive:active,fireworksZIndex:getComputedStyle(canvas).zIndex,lastFireworkAt:lastFired?new Date(lastFired).toISOString():null};},dispose(){
+    clearInterval(firstLayoutCheck);clearInterval(firstSaluteCheck);clearTimeout(firstSaluteTimer);
+    clearInterval(shuffleTimer);clearInterval(showTimer);clearInterval(seasonTimer);
+    ro.disconnect();cancelAnimationFrame(raf);petals.dispose();
+    document.querySelectorAll('.november-area-guide').forEach(el=>el.remove());
+    background.remove();flags.remove();canvas.remove();document.body.classList.remove('november-theme');
+    delete window.__novemberThemeController;
+    if(typeof app.initPlexus==='function')app.initPlexus();
+  }};
   return window.__novemberThemeController;
 }
