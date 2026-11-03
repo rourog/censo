@@ -46,6 +46,14 @@ function styleOnce() {
     body.november-theme .header::before { display:none !important; }
     body.november-theme #plexusCanvas { display:none !important; }
     body.november-theme .desktop-waves-bg .waves {display:none !important;}
+    /* Solo evita ruptura vertical de edad en la tabla; no altera anchos
+       de las tarjetas ni introduce columnas o contenedores adicionales. */
+    body.november-theme .censo-table td[data-campo="edad"],
+    body.november-theme .censo-table td[data-campo="edad"] .value {
+      white-space:nowrap !important;
+      word-break:normal !important;
+      overflow-wrap:normal !important;
+    }
     .november-petal-field {position:absolute;inset:0;pointer-events:none;width:100%;height:100%;opacity:.88;}
 
     .november-background { position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden; }
