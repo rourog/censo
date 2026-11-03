@@ -54,7 +54,7 @@ export function createNovemberPetalField() {
   function tick(now) {
     if(!running)return;
     raf=requestAnimationFrame(tick);
-    if(document.hidden||reduced.matches||!document.body.classList.contains('november-theme'))return;
+    if(document.hidden||reduced.matches||document.body.classList.contains('effect-none')||!document.body.classList.contains('november-theme'))return;
     if(now-last<32)return; // ~30 fps con pocas partículas.
     const dt=Math.min(.055,last?(now-last)/1000:.033);last=now;
     ctx.clearRect(0,0,width,height);
