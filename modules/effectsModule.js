@@ -26,6 +26,7 @@ export function createEffectsModule(app) {
   let pendingPlexusPatients = null;
 
   function initPlexus() {
+    if (document.body.classList.contains('november-theme')) return;
     if (plexusController) return;
     const canvas = document.getElementById('plexusCanvas');
     if (!canvas) return;
@@ -43,6 +44,7 @@ export function createEffectsModule(app) {
 
   function syncPlexusPatients(listaPacientes = []) {
     pendingPlexusPatients = Array.isArray(listaPacientes) ? listaPacientes : [];
+    app.syncNovemberPatients?.(pendingPlexusPatients);
     if (!plexusController) return;
     if (app.state.isFetchingData && pendingPlexusPatients.length === 0) return;
     plexusController.syncPatients(pendingPlexusPatients);
