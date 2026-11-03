@@ -11,7 +11,7 @@
 
 const seasonUrl = new URL('./seasonalTheme.js', import.meta.url);
 seasonUrl.searchParams.set('v', String(window.CensoBuild?.version || Date.now()));
-const { getSeasonalProfile, SEASONAL_PROFILES, SEASONAL_ENABLED, getCelebrationChoice, launchSeasonalConfetti, initCelebrationAudio, unlockCelebrationAudio } = await import(seasonUrl.href);
+const { getSeasonalProfile, SEASONAL_PROFILES, SEASONAL_ENABLED, getCelebrationChoice, setCelebrationChoice, launchSeasonalConfetti, initCelebrationAudio, unlockCelebrationAudio } = await import(seasonUrl.href);
 const ambientUrl = new URL('./seasonalAmbient.js', import.meta.url);
 ambientUrl.searchParams.set('v', String(window.CensoBuild?.version || Date.now()));
 // Keep the ambient implementation in Git, but avoid loading it outside the season.
@@ -270,7 +270,7 @@ export function createThemeModule(app) {
     `;
     modalContent.appendChild(extras);
     document.getElementById('celebrationPicker').value = getCelebrationChoice();
-    document.getElementById('celebrationPicker').addEventListener('change', event => localStorage.setItem('censo-celebration', event.target.value));
+    document.getElementById('celebrationPicker').addEventListener('change', event => setCelebrationChoice(event.target.value));
     extras.querySelectorAll('[data-theme-toggle]').forEach(button => {
       button.addEventListener('click', () => {
         const {themeToggle, value} = button.dataset;
