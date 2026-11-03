@@ -130,6 +130,9 @@ export async function bootApp() {
   app.bindMaintenanceEvents();
   app.exposeWindowActions();
   app.initTheme();
+  // Decoración de noviembre aislada del flujo clínico.
+  const { initNovemberTheme } = await import(moduleUrl('novemberTheme'));
+  initNovemberTheme(app);
   app.initPrintUi();
   app.initSubrogadaUi();
   app.bindUiEvents();
