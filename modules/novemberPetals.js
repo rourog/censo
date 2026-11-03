@@ -1,5 +1,5 @@
 /* Noviembre 2026 — flujo infinito de pétalos de cempasúchil.
- * Cuatro planos cacheados: uno inmóvil y tres bandas que se desplazan
+ * Cinco planos cacheados: uno inmóvil y cuatro bandas que se desplazan
  * horizontalmente en bucle, con vaivén vertical. Un solo canvas visible,
  * sin partículas DOM ni lecturas/escrituras de pacientes.
  */
@@ -28,7 +28,7 @@ export function createNovemberPetalField() {
     g.fill();
     g.restore();
   }
-  function makeTile(count,sizeMin,sizeMax,alphaMin,alphaMax){
+  function makeTile(count,sizeMin,sizeMax,alphaMin,alphaMax,bandCenter=.55,bandSpread=.43){
     const tile=document.createElement('canvas');
     tile.width=Math.max(1,Math.ceil(width*dpr));
     tile.height=Math.max(1,Math.ceil(height*dpr));
@@ -36,7 +36,7 @@ export function createNovemberPetalField() {
     if(!g)return tile;
     g.setTransform(dpr,0,0,dpr,0,0);
     for(let i=0;i<count;i++){
-      const x=random(0,width),y=random(-4,height+4),s=random(sizeMin,sizeMax);
+      const x=random(0,width),y=Math.max(2,Math.min(height-2,height*(bandCenter+random(-bandSpread,bandSpread)))),s=random(sizeMin,sizeMax);
       const color=shade(),alpha=random(alphaMin,alphaMax),angle=random(-Math.PI,Math.PI);
       petal(g,x,y,s,color,alpha,angle);
       // La misma figura aparece al otro extremo cuando toca el borde,
@@ -54,21 +54,25 @@ export function createNovemberPetalField() {
     canvas.height=Math.max(1,Math.ceil(height*dpr));
     canvas.style.width=width+'px';canvas.style.height=height+'px';
     ctx.setTransform(dpr,0,0,dpr,0,0);
-    // Densidad alta: ~220 pétalos a 768 px, ~550 a 1920 px,\n    // pero solo cuatro capas de imagen requieren redibujado por fotograma.
+    // Distribución ondulada, comparable a las cuatro olas originales.
+    // Densidad alta pero imágenes precalculadas: un solo Canvas.
     const unit=width/1000;
-    still=makeTile(Math.round(36*unit),5,9,.12,.28);
+    still=makeTile(Math.round(42*unit),5,9,.14,.30,.67,.32);
     layers=[
-      {tile:makeTile(Math.round(84*unit),6,12,.23,.42),speed:15,offset:0,vertical:3,rate:.40},
-      {tile:makeTile(Math.round(104*unit),8,15,.32,.58),speed:-24,offset:width*.34,vertical:5,rate:.65},
-      {tile:makeTile(Math.round(62*unit),10,18,.48,.74),speed:38,offset:width*.72,vertical:8,rate:.82}
+      {tile:makeTile(Math.round(75*unit),6,11,.22,.42,.24,.19),speed:12,offset:0,vertical:4,rate:.32},
+      {tile:makeTile(Math.round(100*unit),7,13,.28,.52,.42,.22),speed:20,offset:width*.24,vertical:6,rate:.46},
+      {tile:makeTile(Math.round(108*unit),8,15,.37,.63,.63,.23),speed:29,offset:width*.50,vertical:8,rate:.60},
+      {tile:makeTile(Math.round(85*unit),10,18,.49,.78,.78,.19),speed:42,offset:width*.73,vertical:10,rate:.78}
     ];
     previous=0;
   }
   function strip(tile,offset,y=0){
-    const x=((-offset%width)+width)%width;
+    // Offset creciente desplaza el mosaico a la DERECHA;
+    // repetición modular para scroll infinito sin cortes.
+    const x=((offset%width)+width)%width;
     const tileHeight=tile.height/dpr;
-    ctx.drawImage(tile,-x,y,width,tileHeight);
-    ctx.drawImage(tile,width-x,y,width,tileHeight);
+    ctx.drawImage(tile,x-width,y,width,tileHeight);
+    ctx.drawImage(tile,x,y,width,tileHeight);
   }
   function paint(now){
     if(!alive)return;
