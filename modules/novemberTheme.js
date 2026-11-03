@@ -35,7 +35,7 @@ function styleOnce() {
       animation:november-sway 2.5s ease-in-out infinite;will-change:transform;transition:opacity .35s ease;}
     .november-flag-inner {position:absolute;inset:0;display:block;background:currentColor;
       -webkit-mask-image:url("${PAPER_ATLAS}");mask-image:url("${PAPER_ATLAS}");
-      -webkit-mask-size:300% 300%;mask-size:300% 300%;
+      -webkit-mask-size:300% 300%;mask-size:300% 300%;mask-mode:luminance;
       -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;
       filter:drop-shadow(0 3px 3px rgba(0,0,0,.2));}
     @keyframes november-sway {
@@ -44,6 +44,7 @@ function styleOnce() {
     }
     .november-fireworks {position:fixed;inset:0;width:100vw;height:100vh;z-index:5;pointer-events:none;opacity:.70;}
     @media print { .november-flags,.november-background,.november-fireworks {display:none !important;} }
+    @media (max-width:767px) { .november-flags {display:none !important;} }
     @media (prefers-reduced-motion:reduce) {.november-flag {animation:none !important;transform:rotate(var(--nov-tilt));} .november-fireworks {display:none;}}
   `;
   document.head.appendChild(css);
@@ -107,7 +108,7 @@ export function initNovemberTheme(app) {
     const palette=COLORS[Math.floor(Math.random()*COLORS.length)];
     const order=shuffled(9);
     const slots=Array.from(flags.children);
-    const hues=shuffled(slots.length).map((_,i)=>palette[i%palette.length]);
+    const hues=shuffled(slots.length).map(i=>palette[i%palette.length]);
     slots.forEach((slot,i)=>{
       const art=order[i%9], col=Math.floor(art/3), row=art%3;
       const inner=slot.firstElementChild;
