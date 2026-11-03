@@ -45,6 +45,7 @@ function styleOnce() {
     .november-fireworks {position:fixed;inset:0;width:100vw;height:100vh;z-index:5;pointer-events:none;opacity:.70;}
     @media print { .november-flags,.november-background,.november-fireworks {display:none !important;} }
     @media (max-width:767px) { .november-flags {display:none !important;} }
+    body.effect-none .november-flag {animation:none !important;transform:rotate(var(--nov-tilt));}
     @media (prefers-reduced-motion:reduce) {.november-flag {animation:none !important;transform:rotate(var(--nov-tilt));} .november-fireworks {display:none;}}
   `;
   document.head.appendChild(css);
@@ -130,11 +131,11 @@ export function initNovemberTheme(app) {
     canvas.style.width=innerWidth+'px';canvas.style.height=innerHeight+'px';
     ctx.setTransform(dpr,0,0,dpr,0,0);
   }
-  function burst(x,y,color,ring=false){
+  function burst(x,y,color,ring=false,scale=1){
     const n=ring?60:90;
     for(let i=0;i<n;i++){
       const a=(i/n)*Math.PI*2+(ring?0:Math.random()*.15);
-      const v=(ring?2.1:1.25+Math.random()*1.45)*1.4;
+      const v=(ring?2.1:1.25+Math.random()*1.45)*1.4*scale;
       particles.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,life:1,color,size:1.2+Math.random()*1.4});
     }
   }
@@ -153,14 +154,18 @@ export function initNovemberTheme(app) {
     else {active=false;particles=[];ctx.clearRect(0,0,innerWidth,innerHeight);}
   }
   function salute() {
-    if(hidden||active||!ctx||matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+    if(hidden||active||!ctx||document.body.classList.contains('effect-none')||matchMedia('(prefers-reduced-motion: reduce)').matches)return;
     if(!document.getElementById('mainAppContainer') || getComputedStyle(document.getElementById('mainAppContainer')).display==='none')return;
     resizeCanvas();
     const colors=['#079b4c','#ffffff','#dc2836'];
     // Tres estallidos sincronizados distribuidos sobre la franja superior.
     const x0=innerWidth*.25,x1=innerWidth*.50,x2=innerWidth*.75,y=Math.max(100,innerHeight*.23);
     burst(x0,y,colors[0]);burst(x1,y-30,colors[1]);burst(x2,y,colors[2]);
-    if(Math.random()<.45){burst(innerWidth*.5,y+65,'#f5f5ec',true);}
+    if(Math.random()<.45){
+      burst(innerWidth*.5,y+65,colors[0],true,.64);
+      burst(innerWidth*.5,y+65,colors[1],true,.88);
+      burst(innerWidth*.5,y+65,colors[2],true,1.12);
+    }
     active=true;start=performance.now();raf=requestAnimationFrame(animate);
     lastFired=Date.now();
   }
