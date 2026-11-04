@@ -168,6 +168,7 @@ export function initNovemberTheme(app) {
     const tone=slot.firstElementChild?.style.color || '#fb923c';
     const x=slot.offsetLeft+25,y=slot.offsetTop+25;
     if(!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const pieces=[];
       const fragment=document.createDocumentFragment();
       for(let i=0;i<20;i++){
         const piece=document.createElement('span');
@@ -178,10 +179,10 @@ export function initNovemberTheme(app) {
         piece.style.setProperty('--dy',(Math.sin(i*Math.PI*2/20)*(17+Math.random()*26)+27).toFixed(1)+'px');
         piece.style.setProperty('--rot',((Math.random()-.5)*900).toFixed(0)+'deg');
         piece.style.animationDelay=(Math.random()*75).toFixed(0)+'ms';
-        fragment.appendChild(piece);
+        fragment.appendChild(piece);pieces.push(piece);
       }
       confetti.appendChild(fragment);
-      const timer=setTimeout(()=>{confetti.replaceChildren();fragmentTimers.delete(timer);},900);
+      const timer=setTimeout(()=>{pieces.forEach(piece=>piece.remove());fragmentTimers.delete(timer);},900);
       fragmentTimers.add(timer);
     }
     const timer=setTimeout(()=>{
