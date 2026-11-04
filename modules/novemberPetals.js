@@ -28,9 +28,9 @@ export function createNovemberPetalField() {
     g.fill();
     g.restore();
   }
-  // La onda es espacial: cada pétalo sigue una sinusoide real
-  // definida por su coordenada X, no una franja uniforme de altura.
-  // Tres ciclos por lienzo y distinta fase/profundidad para cada plano.
+  // El borde SUPERIOR es sinusoidal. Debajo de ese borde, cada capa
+  // contiene pétalos en toda su profundidad, hasta el pie del lienzo.
+  // Al ser un mosaico periódico, la onda avanza sin cortes.
   function makeTile(count,sizeMin,sizeMax,alphaMin,alphaMax,center=.55,amplitude=.16,waves=2,phaseOffset=0){
     const tile=document.createElement('canvas');
     tile.width=Math.max(1,Math.ceil(width*dpr));
@@ -41,8 +41,11 @@ export function createNovemberPetalField() {
     for(let i=0;i<count;i++){
       const x=random(0,width);
       const waveY=Math.sin((x/width)*Math.PI*2*waves+phaseOffset);
-      const noise=random(-.115,.115)*height;
-      const y=Math.max(2,Math.min(height-2,height*(center+amplitude*waveY)+noise));
+      const upper=Math.max(0,Math.min(height-2,height*(center+amplitude*waveY)));
+      // Distribución en todo el bloque bajo la cresta; una proporción
+      // moderada se concentra cerca del borde para dibujar la onda.
+      const depth=Math.random()<.32?Math.pow(Math.random(),2)*.24:Math.random();
+      const y=upper+(height-upper)*depth;
       const size=random(sizeMin,sizeMax);
       const color=shade(),alpha=random(alphaMin,alphaMax),angle=random(-Math.PI,Math.PI);
       petal(g,x,y,size,color,alpha,angle);
@@ -62,12 +65,12 @@ export function createNovemberPetalField() {
     // Sinusoidales periódicas: 2 ciclos enteros por mosaico para
     // repetir sin saltos; velocidad y tamaño producen parallax.
     const unit=width/1000;
-    still=makeTile(Math.round(30*unit),5,8,.09,.23,.72,.13,2,.3);
+    still=makeTile(Math.round(65*unit),5,8,.09,.23,.72,.13,2,.3);
     layers=[
-      {tile:makeTile(Math.round(96*unit),6,10,.24,.43,.37,.145,2,0),speed:40,offset:0,vertical:4,rate:.34},
-      {tile:makeTile(Math.round(126*unit),7,12,.30,.51,.49,.17,2,1.1),speed:68,offset:width*.24,vertical:6,rate:.48},
-      {tile:makeTile(Math.round(144*unit),8,15,.39,.61,.64,.20,2,2.2),speed:104,offset:width*.50,vertical:8,rate:.66},
-      {tile:makeTile(Math.round(120*unit),10,17,.50,.76,.74,.15,2,3.3),speed:144,offset:width*.73,vertical:10,rate:.86}
+      {tile:makeTile(Math.round(185*unit),6,10,.22,.41,.37,.145,2,0),speed:40,offset:0,vertical:4,rate:.34},
+      {tile:makeTile(Math.round(215*unit),7,12,.28,.49,.49,.17,2,1.1),speed:68,offset:width*.24,vertical:6,rate:.48},
+      {tile:makeTile(Math.round(220*unit),8,15,.37,.59,.64,.20,2,2.2),speed:104,offset:width*.50,vertical:8,rate:.66},
+      {tile:makeTile(Math.round(170*unit),10,17,.48,.74,.74,.15,2,3.3),speed:144,offset:width*.73,vertical:10,rate:.86}
     ];
     previous=0;
   }
@@ -99,7 +102,7 @@ export function createNovemberPetalField() {
   const onVisibility=()=>{previous=0;if(document.hidden)ctx.clearRect(0,0,width,height);};
   document.addEventListener('visibilitychange',onVisibility);
   redraw();frame=requestAnimationFrame(paint);
-  return {getStatus(){return {revision:'wind-v3.07',running:alive&&!document.hidden&&!reduced.matches&&!document.body.classList.contains('effect-none'),width,layerSpeeds:layers.map(layer=>layer.speed),layerOffsets:layers.map(layer=>Math.round(layer.offset))};},dispose(){
+  return {getStatus(){return {revision:'wind-v3.08',running:alive&&!document.hidden&&!reduced.matches&&!document.body.classList.contains('effect-none'),width,layerSpeeds:layers.map(layer=>layer.speed),layerOffsets:layers.map(layer=>Math.round(layer.offset))};},dispose(){
     alive=false;cancelAnimationFrame(frame);ro.disconnect();
     document.removeEventListener('visibilitychange',onVisibility);
     layers=[];still=null;canvas.remove();
