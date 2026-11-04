@@ -99,7 +99,7 @@ export function createNovemberPetalField() {
   const onVisibility=()=>{previous=0;if(document.hidden)ctx.clearRect(0,0,width,height);};
   document.addEventListener('visibilitychange',onVisibility);
   redraw();frame=requestAnimationFrame(paint);
-  return {dispose(){
+  return {getStatus(){return {revision:'wind-v3.06',running:alive&&!document.hidden&&!reduced.matches&&!document.body.classList.contains('effect-none'),width,layerSpeeds:layers.map(layer=>layer.speed),layerOffsets:layers.map(layer=>Math.round(layer.offset))};},dispose(){
     alive=false;cancelAnimationFrame(frame);ro.disconnect();
     document.removeEventListener('visibilitychange',onVisibility);
     layers=[];still=null;canvas.remove();
