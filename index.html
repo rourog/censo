@@ -86,6 +86,21 @@
           <button id="reloadBtn" class="icon-btn" type="button" aria-label="Recargar"><span id="reloadIcon" class="material-symbols-outlined">refresh</span></button>
           <button id="themeToggleBtn" class="icon-btn" type="button" aria-label="Tema"><span class="material-symbols-outlined">palette</span></button>
           <button id="btnLogoutBtn" class="icon-btn" type="button" aria-label="Cerrar Sesión" title="Cerrar Sesión"><span class="material-symbols-outlined">logout</span></button>
+          <div class="censo-header-menu-container">
+            <button id="censoMenuButton" class="icon-btn" type="button" aria-label="Menú del Censo" aria-haspopup="true" aria-expanded="false" aria-controls="censoHeaderMenu" title="Menú">
+              <span class="material-symbols-outlined">menu</span>
+            </button>
+            <div id="censoHeaderMenu" class="censo-header-menu" hidden role="group" aria-label="Opciones del Censo">
+              <div class="censo-header-menu__heading">AJUSTES Y ACCIONES <span>BETA</span></div>
+              <button type="button" data-menu-action="theme"><span class="material-symbols-outlined">palette</span><span>Apariencia y colores</span></button>
+              <button type="button" data-menu-action="season"><span class="material-symbols-outlined">ac_unit</span><span>Temporada y vista previa</span></button>
+              <button type="button" data-menu-action="beds"><span class="material-symbols-outlined">bed</span><span>Camas y sillas</span></button>
+              <button type="button" data-menu-action="view"><span class="material-symbols-outlined">view_agenda</span><span data-view-label>Tipo de vista</span></button>
+              <button type="button" data-menu-action="reload"><span class="material-symbols-outlined">sync</span><span>Actualizar censo</span></button>
+              <div class="censo-header-menu__separator"></div>
+              <button type="button" data-menu-action="logout" class="censo-header-menu__logout"><span class="material-symbols-outlined">logout</span><span>Cerrar sesión</span></button>
+            </div>
+          </div>
         </div>
       </div>
 
