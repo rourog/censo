@@ -3,6 +3,17 @@ export function initHeaderMenu() {
   const trigger=document.getElementById('censoMenuButton');
   const menu=document.getElementById('censoHeaderMenu');
   if(!trigger||!menu)return;
+  // El header usa overflow:hidden para sus decoraciones; el menú se
+  // monta fuera para evitar que su lista quede cortada por ese contenedor.
+  document.body.appendChild(menu);
+  function positionMenu(){
+    const rect=trigger.getBoundingClientRect();
+    const width=Math.min(268,window.innerWidth-28);
+    const left=Math.max(14,Math.min(window.innerWidth-width-14,rect.right-width));
+    menu.style.left=left+'px';
+    menu.style.top=Math.min(rect.bottom+9,window.innerHeight-20)+'px';
+    menu.style.right='auto';
+  }
   const actions={
     theme:'themeToggleBtn',
     beds:'adminSettingsBtn',
@@ -18,7 +29,7 @@ export function initHeaderMenu() {
     if(restoreFocus)trigger.focus();
   }
   function show(){
-    open=true;menu.hidden=false;
+    positionMenu();open=true;menu.hidden=false;
     trigger.setAttribute('aria-expanded','true');
     updateViewLabel();
     items[0]?.focus();
@@ -45,6 +56,8 @@ export function initHeaderMenu() {
     }
     document.getElementById(actions[action])?.click();
   });
+  window.addEventListener('resize',()=>{if(open)positionMenu();});
+  window.addEventListener('scroll',()=>{if(open)positionMenu();},true);
   document.addEventListener('pointerdown',event=>{
     if(open&&!menu.contains(event.target)&&!trigger.contains(event.target))close();
   });
