@@ -6,11 +6,12 @@ const load=async path=>{
   url.searchParams.set('v',build);
   return import(url.href);
 };
-const [{default:november},{isSeasonInRange},{getPreviewSeason,isDecorationEnabled}] = await Promise.all([
-  load('./seasons/november/config.js'),load('./calendar.js'),load('./preferences.js')
+const [{default:november},{default:christmas},{isSeasonInRange},{getPreviewSeason,isDecorationEnabled}] = await Promise.all([
+  load('./seasons/november/config.js'),load('./seasons/christmas/config.js'),
+  load('./calendar.js'),load('./preferences.js')
 ]);
 
-export const seasons=Object.freeze([november]);
+export const seasons=Object.freeze([november,christmas]);
 export const getRegisteredSeasons=()=>seasons;
 
 export function getSeasonalConfiguration(date=new Date()) {
@@ -27,6 +28,13 @@ export async function loadSeasonController(season,app) {
     url.searchParams.set('v',String(window.CensoBuild?.version || 'runtime'));
     const {initNovemberTheme}=await import(url.href);
     return initNovemberTheme(app,{managed:true});
+  }
+  if (season.load==='christmas') {
+    const [{initChristmasTheme},{createSnowfall},{createChristmasLights},{createChristmasFireworks}]=await Promise.all([
+      load('./seasons/christmas/visuals.js'),load('./effects/snowfall.js'),
+      load('./effects/christmasLights.js'),load('./effects/christmasFireworks.js')
+    ]);
+    return initChristmasTheme(app,{config:season,createSnowfall,createChristmasLights,createChristmasFireworks});
   }
   throw new Error('Season has no registered renderer: '+season.id);
 }
