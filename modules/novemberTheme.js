@@ -68,10 +68,32 @@ function styleOnce() {
       background-image:url("${STONE_TILE}") !important;
       background-position:center;background-repeat:repeat;
       background-size:140px 140px;
-      opacity:.72;
-      filter:saturate(.65) contrast(1.23);
-      -webkit-mask-image:linear-gradient(to bottom,transparent 0%,black 22%,black 100%);
-      mask-image:linear-gradient(to bottom,transparent 0%,black 22%,black 100%);
+      opacity:.66;
+      filter:saturate(.62) contrast(1.16) brightness(.93);
+      -webkit-mask-image:linear-gradient(
+        to bottom,
+        rgba(0,0,0,0) 0%,
+        rgba(0,0,0,.03) 6%,
+        rgba(0,0,0,.10) 12%,
+        rgba(0,0,0,.22) 20%,
+        rgba(0,0,0,.42) 30%,
+        rgba(0,0,0,.68) 42%,
+        rgba(0,0,0,.88) 56%,
+        #000 72%,
+        #000 100%
+      );
+      mask-image:linear-gradient(
+        to bottom,
+        rgba(0,0,0,0) 0%,
+        rgba(0,0,0,.03) 6%,
+        rgba(0,0,0,.10) 12%,
+        rgba(0,0,0,.22) 20%,
+        rgba(0,0,0,.42) 30%,
+        rgba(0,0,0,.68) 42%,
+        rgba(0,0,0,.88) 56%,
+        #000 72%,
+        #000 100%
+      );
     }
     .november-petal-field {position:absolute;inset:0;z-index:1;pointer-events:none;width:100%;height:100%;opacity:.94;}
 
