@@ -104,7 +104,8 @@ export function createChristmasLights(header){
       bulb.style.top=(14+Math.sin(index*.55)*5)+'px';
       bulb.style.setProperty('--bulb-size',layout.bulbSize+'px');
       bulb.style.setProperty('--sway-delay',(-((index*.61)%5.7))+'s');
-      bulb.style.setProperty('--glow-delay',(-((index*.53)%4.6))+'s');
+      bulb.style.setProperty('--glow-delay',(-((index*.79)%2.35))+'s');
+      bulb.style.setProperty('--pulse-delay',(-((index*1.37)%7.4))+'s');
       bulb.dataset.color=color||'#ffffff';
       if(color){
         bulb.style.setProperty('--bulb-color',color);
