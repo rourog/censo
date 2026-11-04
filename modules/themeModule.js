@@ -164,7 +164,9 @@ export function createThemeModule(app) {
     const ghostColor = document.getElementById('ghostColorPicker');
     if (ghostColor) ghostColor.value = localStorage.getItem('censo-ghost-color') || 'mixed';
     const celebration = document.getElementById('celebrationPicker');
-    if (celebration) celebration.value = getCelebrationChoice();
+    if (celebration) celebration.value = getSeasonalConfiguration()?.id==='christmas'
+      ? (localStorage.getItem('censo-christmas-celebration') || 'fireworks')
+      : getCelebrationChoice();
   }
   function updateToggles() {
     const values = {
@@ -288,8 +290,13 @@ export function createThemeModule(app) {
       <button id="themeResetBtn" class="theme-reset" type="button">RESTABLECER APARIENCIA</button>
     `;
     modalContent.appendChild(extras);
-    document.getElementById('celebrationPicker').value = getCelebrationChoice();
-    document.getElementById('celebrationPicker').addEventListener('change', event => setCelebrationChoice(event.target.value));
+    document.getElementById('celebrationPicker').value = getSeasonalConfiguration()?.id==='christmas'
+      ? (localStorage.getItem('censo-christmas-celebration') || 'fireworks')
+      : getCelebrationChoice();
+    document.getElementById('celebrationPicker').addEventListener('change', event => {
+      if(getSeasonalConfiguration()?.id==='christmas')localStorage.setItem('censo-christmas-celebration',event.target.value);
+      else setCelebrationChoice(event.target.value);
+    });
     extras.querySelectorAll('[data-theme-toggle]').forEach(button => {
       button.addEventListener('click', () => {
         const {themeToggle, value} = button.dataset;
@@ -328,7 +335,7 @@ export function createThemeModule(app) {
     document.getElementById('celebrationPreview').addEventListener('click', async () => {
       app.cerrarModal?.('themeModal');
       await unlockCelebrationAudio();
-      launchSeasonalConfetti({particleCount:150, spread:80, origin:{y:.6}});
+      app.launchSeasonalConfetti?.({particleCount:150, spread:80, origin:{y:.6}});
     });
     initCelebrationAudio().catch(error => console.warn('[CENSO] Audio decorativo no disponible:', error));
 
