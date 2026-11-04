@@ -2,7 +2,11 @@
 import { PAPER_ATLAS } from './novemberPaperAtlas.js';
 import { STONE_TILE } from './novemberStoneTile.js';
 import { normalizePlexusArea } from './plexus.js';
-import { createNovemberPetalField } from './novemberPetals.js';
+// Importación versionada: GitHub Pages puede conservar en caché módulos hijos
+// si su URL no cambia, incluso cuando el módulo de entrada se actualiza.
+const petalsUrl = new URL('./novemberPetals.js', import.meta.url);
+petalsUrl.searchParams.set('v', String(window.CensoBuild?.version || 'november-2026'));
+const { createNovemberPetalField } = await import(petalsUrl.href);
 
 const FAMILIES = Object.freeze({
   'SALA DE CHOQUE': ['#dc2626','#ef4444','#f97316','#fb923c'],
@@ -324,7 +328,7 @@ export function initNovemberTheme(app) {
   const seasonTimer=setInterval(()=>{
     if(!currentInChihuahua())window.__novemberThemeController?.dispose();
   },60000);
-  window.__novemberThemeController={syncPatients,shuffleFlags,salute,getStatus(){return {patients:count,byArea:Object.fromEntries(Object.keys(FAMILIES).map(k=>[k,patientFamilies.filter(p=>p===k).length])),availablePositions:positions.length,visibleFlags:flags.childElementCount,headerWidth:header.getBoundingClientRect().width,fireworksActive:active,fireworksZIndex:getComputedStyle(canvas).zIndex,lastFireworkAt:lastFired?new Date(lastFired).toISOString():null};},dispose(){
+  window.__novemberThemeController={syncPatients,shuffleFlags,salute,getStatus(){return {patients:count,byArea:Object.fromEntries(Object.keys(FAMILIES).map(k=>[k,patientFamilies.filter(p=>p===k).length])),availablePositions:positions.length,visibleFlags:flags.childElementCount,headerWidth:header.getBoundingClientRect().width,petalField:petals.getStatus?.() ?? null,fireworksActive:active,fireworksZIndex:getComputedStyle(canvas).zIndex,lastFireworkAt:lastFired?new Date(lastFired).toISOString():null};},dispose(){
     clearInterval(firstLayoutCheck);
     clearInterval(shuffleTimer);clearInterval(seasonTimer);
     ro.disconnect();cancelAnimationFrame(raf);document.removeEventListener('visibilitychange',onVisibilityChange);petals.dispose();waveStone.remove();
