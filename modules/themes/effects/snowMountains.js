@@ -1,32 +1,41 @@
-/* Static snow drifts: three SVG planes, no animation or DOM observers. */
-export function createSnowMountains(host) {
+/* Three stationary sinusoidal snow bands with phase offsets.
+ * Pure SVG: no per-frame animation, observers or clinical data.
+ */
+const SVG_NS='http://www.w3.org/2000/svg';
+function sinePath({width=1200,height=240,base,amplitude,cycles,phase}){
+  const points=[];
+  for(let x=0;x<=width;x+=12){
+    const y=base+Math.sin((x/width)*cycles*Math.PI*2+phase)*amplitude;
+    points.push((x===0?'M':'L')+x+' '+y.toFixed(2));
+  }
+  return points.join(' ')+' L'+width+' '+height+' L0 '+height+' Z';
+}
+export function createSnowMountains(host){
   if(!host)return {dispose(){},getStatus:()=>({layers:0})};
   const wrapper=document.createElement('div');
   wrapper.className='christmas-snow-mountains';
   wrapper.setAttribute('aria-hidden','true');
-  wrapper.innerHTML=`
-    <svg viewBox="0 0 1200 240" preserveAspectRatio="none" focusable="false" aria-hidden="true">
-      <defs>
-        <linearGradient id="christmasFarSnow" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#cadde9" stop-opacity=".30"/>
-          <stop offset="100%" stop-color="#94adbc" stop-opacity=".38"/>
-        </linearGradient>
-        <linearGradient id="christmasMidSnow" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#e4eff6" stop-opacity=".46"/>
-          <stop offset="100%" stop-color="#b8d0de" stop-opacity=".54"/>
-        </linearGradient>
-        <linearGradient id="christmasFrontSnow" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#f4faff" stop-opacity=".62"/>
-          <stop offset="100%" stop-color="#c9dce8" stop-opacity=".72"/>
-        </linearGradient>
-      </defs>
-      <path fill="url(#christmasFarSnow)" d="M0 175 Q130 151 260 168 Q375 136 500 160 Q620 130 752 165 Q875 137 970 157 Q1080 140 1200 170 L1200 240 L0 240Z"/>
-      <path fill="url(#christmasMidSnow)" d="M0 191 Q130 168 245 185 Q352 166 480 191 Q610 155 730 186 Q845 158 946 187 Q1060 164 1200 184 L1200 240 L0 240Z"/>
-      <path fill="url(#christmasFrontSnow)" d="M0 210 Q122 187 254 211 Q380 187 506 209 Q629 185 750 209 Q890 188 1000 207 Q1115 186 1200 204 L1200 240 L0 240Z"/>
-    </svg>`;
-  host.appendChild(wrapper);
+  const svg=document.createElementNS(SVG_NS,'svg');
+  svg.setAttribute('viewBox','0 0 1200 240');
+  svg.setAttribute('preserveAspectRatio','none');
+  svg.setAttribute('focusable','false');
+  svg.setAttribute('aria-hidden','true');
+  const layers=[
+    {base:176,amplitude:11,cycles:2.1,phase:0.25,fill:'#afcbdc',opacity:.30},
+    {base:196,amplitude:13,cycles:2.1,phase:1.05,fill:'#d2e5f1',opacity:.48},
+    {base:215,amplitude:10,cycles:2.1,phase:1.88,fill:'#f4faff',opacity:.70}
+  ];
+  for(const layer of layers){
+    const path=document.createElementNS(SVG_NS,'path');
+    path.setAttribute('d',sinePath(layer));
+    path.setAttribute('fill',layer.fill);
+    path.setAttribute('fill-opacity',String(layer.opacity));
+    svg.append(path);
+  }
+  wrapper.append(svg);
+  host.append(wrapper);
   return {
-    getStatus:()=>({layers:3,animated:false}),
+    getStatus:()=>({layers:layers.length,animated:false,shape:'sinusoidal'}),
     dispose(){wrapper.remove();}
   };
 }
