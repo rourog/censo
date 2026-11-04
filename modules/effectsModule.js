@@ -101,8 +101,20 @@ export function createEffectsModule(app) {
     wrapper.appendChild(inner); container.appendChild(wrapper);
   }
 
+  function launchCelebration(options={}) {
+    const engine=app.seasonalEngine;
+    if(engine?.getStatus?.().activeSeason==='christmas') {
+      const preference=localStorage.getItem('censo-christmas-celebration');
+      const mode=localStorage.getItem('censo-celebration-mode');
+      if(mode!=='all' && (!preference || preference==='fireworks')) {
+        return engine.salute({force:true});
+      }
+    }
+    return launchSeasonalConfetti(options);
+  }
+
   return {
-    launchSeasonalConfetti,
+    launchSeasonalConfetti:launchCelebration,
     initPlexus,
     syncPlexusPatients,
     checkEasterEggs
