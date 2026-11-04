@@ -12,15 +12,17 @@ const [{getSeasonalConfiguration,getRegisteredSeasons,loadSeasonController},
 ]);
 
 export function createSeasonalEngine(app,{onChange=()=>{}}={}) {
-  let active=null,controller=null,scope=null,generation=0,timer=0,started=false,disposed=false;
+  let active=null,controller=null,scope=null,pendingId=null,generation=0,timer=0,started=false,disposed=false;
   let latestPatients=Array.isArray(app.state?.pacientesGlobal)?app.state.pacientesGlobal:[];
   const emit=()=>{onChange(active);document.dispatchEvent(new CustomEvent('censo:enginechange',{detail:{season:active?.id||null}}));};
 
   async function sync() {
     if(disposed)return;
     const season=getSeasonalConfiguration();
-    if((active?.id||null)===(season?.id||null) && (!!controller === !!season))return;
+    if(pendingId && pendingId===season?.id)return;
+    if(!pendingId && (active?.id||null)===(season?.id||null) && (!!controller === !!season))return;
     const token=++generation;
+    pendingId=season?.id||null;
     if(controller){
       try{controller.dispose?.();}catch(error){console.warn('[SeasonalEngine] Cleanup failed:',error);}
       scope?.dispose();scope=null;controller=null;active=null;
@@ -31,8 +33,10 @@ export function createSeasonalEngine(app,{onChange=()=>{}}={}) {
       const next=await loadSeasonController(season,app,nextScope);
       if(disposed || token!==generation || getSeasonalConfiguration()?.id!==season.id){
         next?.dispose?.();nextScope.dispose();
+        if(token===generation)pendingId=null;
         return;
       }
+      pendingId=null;
       controller=next||null;
       scope=next?nextScope:null;
       if(!next)nextScope.dispose();
@@ -41,7 +45,7 @@ export function createSeasonalEngine(app,{onChange=()=>{}}={}) {
       emit();
     }catch(error){
       nextScope.dispose();
-      if(token===generation){active=null;controller=null;scope=null;emit();}
+      if(token===generation){pendingId=null;active=null;controller=null;scope=null;emit();}
       console.error('[SeasonalEngine] Unable to start season:',error);
     }
   }
@@ -73,7 +77,7 @@ export function createSeasonalEngine(app,{onChange=()=>{}}={}) {
   function onStorage(event){if(!event.key || event.key.startsWith('censo-seasonal-') || event.key==='censo-november-theme')void sync();}
   function stop() {
     if(disposed)return;
-    disposed=true;++generation;
+    disposed=true;++generation;pendingId=null;
     clearInterval(timer);
     document.removeEventListener('visibilitychange',onVisible);
     window.removeEventListener('focus',onVisible);
