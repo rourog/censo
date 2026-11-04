@@ -696,7 +696,7 @@
 
 /* Beta · menú unificado de acciones: los controles anteriores conservan
    sus listeners, pero ya no ocupan espacio en el encabezado. */
-#adminSettingsBtn,#viewToggleBtn,#reloadBtn,#themeToggleBtn,#btnLogoutBtn{display:none!important;}
+#searchToggleBtn,#historyBtn,#cie10PageBtn,#printBtn,#adminSettingsBtn,#viewToggleBtn,#reloadBtn,#themeToggleBtn,#btnLogoutBtn{display:none!important;}
 .censo-header-menu-container{position:relative;z-index:50;flex-shrink:0;}
 #censoMenuButton{width:34px;height:34px;border-radius:10px;border-color:var(--accent-border);}
 #censoMenuButton[aria-expanded="true"]{background:var(--accent-soft);color:var(--accent);border-color:var(--accent);}
@@ -706,6 +706,7 @@
  padding:7px;border-radius:13px;border:1px solid var(--line);
  background:var(--panel);color:var(--text);box-shadow:0 14px 40px rgba(0,0,0,.38);
  z-index:100;display:flex;flex-direction:column;gap:2px;
+ max-height:calc(100dvh - 90px);overflow-y:auto;overscroll-behavior:contain;
 }
 .censo-header-menu__heading{
  display:flex;align-items:center;justify-content:space-between;padding:9px 10px 8px;
