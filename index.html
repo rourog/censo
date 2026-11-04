@@ -321,6 +321,87 @@
       await styleReady;
       revealPage();
       await import(`./main.js?v=${encodeURIComponent(build)}`);
+
+      // Control de versión en sesiones abiertas (sin Service Worker).
+      // Un build nuevo recibe una URL nueva tanto para el HTML como para los módulos.
+      // Nunca se fuerza recarga durante edición, modal abierto o actividad reciente.
+      let lastInteraction = Date.now();
+      let updateBuild = '';
+      let updateLabel = '';
+      let checking = false;
+      const notice = document.createElement('div');
+      notice.id = 'censoUpdateNotice';
+      notice.setAttribute('role', 'status');
+      notice.style.cssText = 'display:none;position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:9999;max-width:calc(100vw - 24px);padding:11px 15px;border:1px solid #f59e0b;border-radius:12px;background:#1d2329;color:#f8fafc;font:600 13px system-ui,sans-serif;box-shadow:0 8px 28px #0007;align-items:center;gap:12px;';
+      const message = document.createElement('span');
+      const updateButton = document.createElement('button');
+      updateButton.type = 'button';
+      updateButton.textContent = 'ACTUALIZAR';
+      updateButton.style.cssText = 'cursor:pointer;border:0;border-radius:7px;padding:8px 11px;background:#fb923c;color:#171717;font-weight:800;';
+      notice.append(message,updateButton);
+      document.body.appendChild(notice);
+
+      const editingInProgress = () => {
+        const active = document.activeElement;
+        const editableFocus = active && (active.matches?.('input,textarea,select,[contenteditable="true"]') || active.isContentEditable);
+        const modalOpen = Array.from(document.querySelectorAll('.modal-overlay.active'))
+          .some(modal => modal.id !== 'loginScreen' && getComputedStyle(modal).display !== 'none');
+        const inlineEditing = !!document.querySelector(
+          '.editable-cell input,.editable-cell textarea,[contenteditable="true"]:focus,.inline-editor,.editing'
+        );
+        return !!(editableFocus || modalOpen || inlineEditing);
+      };
+      const reloadToBuild = () => {
+        if (!updateBuild) return;
+        const url = new URL(location.href);
+        url.searchParams.set('build', updateBuild);
+        location.replace(url.href);
+      };
+      updateButton.addEventListener('click',reloadToBuild);
+      for (const type of ['pointerdown','keydown','input']) {
+        document.addEventListener(type,() => { lastInteraction=Date.now(); },{passive:true});
+      }
+      const maybeAutoUpdate = () => {
+        if (!updateBuild || document.hidden || editingInProgress()) return;
+        if (Date.now()-lastInteraction >= 90000) reloadToBuild();
+      };
+      const checkLatestVersion = async () => {
+        if (checking || document.hidden) return;
+        checking=true;
+        try {
+          const url = new URL('version.json', document.baseURI);
+          url.searchParams.set('ts', String(Date.now()));
+          const response = await fetch(url.href,{cache:'no-store'});
+          if (!response.ok) throw new Error('Version HTTP '+response.status);
+          const latest = await response.json();
+          const nextBuild = String(latest?.build||'').trim();
+          if (nextBuild && nextBuild !== build) {
+            updateBuild=nextBuild;
+            updateLabel=String(latest?.displayVersion||nextBuild);
+            message.textContent='Nueva versión v'+updateLabel+' disponible.';
+            notice.style.display='flex';
+            maybeAutoUpdate();
+          }
+        } catch(error) {
+          console.warn('[CENSO] Comprobación de actualización pendiente:',error);
+        } finally {checking=false;}
+      };
+      let lastVersionCheck=Date.now();
+      setInterval(() => {
+        if (updateBuild) { maybeAutoUpdate(); return; }
+        if (Date.now()-lastVersionCheck >= 120000) {
+          lastVersionCheck=Date.now();
+          checkLatestVersion();
+        }
+      },30000);
+      const probe = checkLatestVersion;
+      const visibilityCheck = () => {
+        if (document.hidden) return;
+        if (!updateBuild) probe();
+        else maybeAutoUpdate();
+      };
+      document.addEventListener('visibilitychange',visibilityCheck);
+      window.addEventListener('focus',visibilityCheck);
     } catch (error) {
       showBootstrapError(error);
     }
