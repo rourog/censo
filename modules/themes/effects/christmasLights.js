@@ -4,12 +4,12 @@
 const PER_SIDE = 15;
 const TOTAL_BULBS = PER_SIDE * 2;
 const GROUP_COLORS = Object.freeze({
-  'SALA DE CHOQUE':'#ffd6d6',
+  'SALA DE CHOQUE':'#ff4455',
   'OBSERVACION':'#dc2626',
-  'TRAUMA MENOR':'#16a34a',
-  'PEDIATRIA':'#e9f7ff',
-  'EXTRAS':'#f87171',
-  'SIN AREA':'#f8fafc'
+  'TRAUMA MENOR':'#be123c',
+  'PEDIATRIA':'#fb7185',
+  'EXTRAS':'#f43f5e',
+  'SIN AREA':'#e11d48'
 });
 const normalizeArea = value => String(value || '').normalize('NFD')
   .replace(/[\u0300-\u036f]/g,'').trim().toUpperCase();
