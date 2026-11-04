@@ -64,10 +64,10 @@ export function createNovemberPetalField() {
     const unit=width/1000;
     still=makeTile(Math.round(24*unit),5,8,.09,.23,.72,.11,2,.3);
     layers=[
-      {tile:makeTile(Math.round(80*unit),6,10,.24,.43,.37,.12,2,0),speed:20,offset:0,vertical:3,rate:.28},
-      {tile:makeTile(Math.round(105*unit),7,12,.30,.51,.49,.14,2,1.1),speed:34,offset:width*.24,vertical:5,rate:.40},
-      {tile:makeTile(Math.round(120*unit),8,15,.39,.61,.64,.17,2,2.2),speed:52,offset:width*.50,vertical:7,rate:.56},
-      {tile:makeTile(Math.round(100*unit),10,17,.50,.76,.74,.12,2,3.3),speed:72,offset:width*.73,vertical:9,rate:.74}
+      {tile:makeTile(Math.round(80*unit),6,10,.24,.43,.37,.12,2,0),speed:40,offset:0,vertical:4,rate:.34},
+      {tile:makeTile(Math.round(105*unit),7,12,.30,.51,.49,.14,2,1.1),speed:68,offset:width*.24,vertical:6,rate:.48},
+      {tile:makeTile(Math.round(120*unit),8,15,.39,.61,.64,.17,2,2.2),speed:104,offset:width*.50,vertical:8,rate:.66},
+      {tile:makeTile(Math.round(100*unit),10,17,.50,.76,.74,.12,2,3.3),speed:144,offset:width*.73,vertical:10,rate:.86}
     ];
     previous=0;
   }
