@@ -190,3 +190,64 @@ body[class*="accent-"] {
 .theme-toggle-group button { flex: 1; min-width: 0; padding: 10px 6px; border: 0; border-radius: 7px; background: transparent; color: var(--text); font: inherit; font-size: 12px; cursor: pointer; }
 .theme-toggle-group button[aria-pressed="true"] { background: var(--accent); color: var(--on-accent, #fff); box-shadow: 0 2px 8px #0002; }
 .theme-toggle-group button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+
+/* Definición de profundidad para paletas oscuras.
+   Separar superficies por luminosidad, no por saturación extrema.
+   Solo modifica variables de color: no altera componentes ni estados clínicos. */
+body:is(.base-dark,.base-midnight,.base-gray-dark,.base-navy,.base-ocean,
+        .base-teal-dark,.base-forest,.base-plum,.base-burgundy,.base-coffee) {
+  --line: rgba(230,240,244,.16);
+  --field: rgba(238,246,250,.065);
+  --search-bg: rgba(238,246,250,.075);
+}
+
+/* Grafito: fondo oscuro neutro, paneles y tarjetas con escalones perceptibles. */
+body.base-gray-dark {
+  --bg: #17181c;
+  --panel: #22252b;
+  --section-head: #252932;
+  --card: #2c3038;
+  --card-open: #363c47;
+  --text: #f2f4f7;
+  --muted: #b9c1cd;
+  --line: rgba(226,233,244,.17);
+  --field: rgba(242,246,252,.075);
+  --search-bg: rgba(242,246,252,.085);
+  --skeleton: #363c47;
+  --theme-meta: #17181c;
+}
+
+/* Bosque: verdes profundos en el entorno, superficies menos saturadas
+   y texto secundario neutro para evitar un velo verdoso continuo. */
+body.base-forest {
+  --bg: #071d19;
+  --panel: #112c26;
+  --section-head: #15362e;
+  --card: #1b4035;
+  --card-open: #285448;
+  --text: #f0f8f4;
+  --muted: #b8d2c8;
+  --line: rgba(200,229,216,.19);
+  --field: rgba(233,247,239,.075);
+  --search-bg: rgba(233,247,239,.085);
+  --skeleton: #285448;
+  --theme-meta: #071d19;
+}
+
+/* Teal: distinta luminancia para panel/celda, sin convertir todos los
+   elementos en el mismo tono turquesa. */
+body.base-teal-dark {
+  --bg: #081e22;
+  --panel: #102e33;
+  --section-head: #153941;
+  --card: #1b4249;
+  --card-open: #27535c;
+  --text: #f0fafb;
+  --muted: #b3d0d3;
+  --line: rgba(206,233,237,.19);
+  --field: rgba(234,248,250,.075);
+  --search-bg: rgba(234,248,250,.085);
+  --skeleton: #27535c;
+  --theme-meta: #081e22;
+}
