@@ -137,8 +137,11 @@ export function createThemeModule(app) {
   }
 
   function preferenceKey(part) {
+    // Independent preferences for Seasonal Engine themes. General user
+    // preferences must not suppress Christmas defaults or be overwritten.
     const profile = getSeasonalProfile();
-    return profile ? `censo-season-${profile.id}-${part}` : `censo-${part}`;
+    const id = profile?.id || getSeasonalConfiguration()?.id;
+    return id ? `censo-season-${id}-${part}` : `censo-${part}`;
   }
   function getCurrentTheme() {
     const defaults = getSeasonalProfile()?.defaults || getSeasonalConfiguration()?.palette ||
