@@ -94,6 +94,16 @@ export function createThemeModule(app) {
   const DEFAULT_BASE = 'base-dark';
   const DEFAULT_ACCENT = 'accent-blue';
   const DEFAULT_EFFECT = 'effect-waves';
+  // Noviembre 2026: el valor por defecto es grafito/naranja.
+  // La elección manual del usuario sigue teniendo prioridad y no se
+  // persiste este valor temporal (en diciembre recupera el predeterminado).
+  function novemberPaletteDefault() {
+    const dateParts = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'America/Chihuahua', year: 'numeric', month: 'numeric'
+    }).formatToParts(new Date());
+    const value = type => Number(dateParts.find(part => part.type === type)?.value);
+    return value('year') === 2026 && value('month') === 11;
+  }
   const baseIds = new Set(bases.map(item => item.id));
   const accentIds = new Set(accents.map(item => item.id));
   const effectIds = new Set(effects.map(item => item.id));
@@ -134,7 +144,9 @@ export function createThemeModule(app) {
     return profile ? `censo-season-${profile.id}-${part}` : `censo-${part}`;
   }
   function getCurrentTheme() {
-    const defaults = getSeasonalProfile()?.defaults || { base: DEFAULT_BASE, accent: DEFAULT_ACCENT, effect: DEFAULT_EFFECT };
+    const defaults = getSeasonalProfile()?.defaults || (novemberPaletteDefault()
+      ? { base: 'base-gray-dark', accent: 'accent-orange', effect: DEFAULT_EFFECT }
+      : { base: DEFAULT_BASE, accent: DEFAULT_ACCENT, effect: DEFAULT_EFFECT });
     return {
       base: validBase(localStorage.getItem(preferenceKey('base')) || defaults.base),
       accent: validAccent(localStorage.getItem(preferenceKey('accent')) || defaults.accent),
