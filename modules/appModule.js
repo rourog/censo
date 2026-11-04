@@ -140,6 +140,9 @@ export async function bootApp() {
   app.initPrintUi();
   app.initSubrogadaUi();
   app.bindUiEvents();
+  // Menú compacto: delega en los controles ya enlazados, sin duplicar acciones.
+  const {initHeaderMenu}=await import(moduleUrl('headerMenu'));
+  initHeaderMenu();
   app.initSoundboardAuthBridge();
   app.initBedCatalogAuthBridge();
   app.initBedAdminUiBridge();
