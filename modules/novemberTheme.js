@@ -54,22 +54,24 @@ function styleOnce() {
       word-break:normal !important;
       overflow-wrap:normal !important;
     }
-    /* Fondo propio: el contenedor era transparente y la textura al 30%
-       quedaba casi invisible sobre el fondo general. No afecta tarjetas. */
+    /* La textura usa una capa REAL independiente. Nada de franja
+       opaca o degradado amarillo: conserva la apariencia del fondo base. */
     body.november-theme .desktop-waves-bg {
-      isolation:isolate;overflow:hidden;
-      background-color:#192b28;
-      background-image:linear-gradient(90deg,rgba(6,65,37,.23),rgba(27,32,25,.12) 50%,rgba(81,19,19,.22));
+      background:transparent !important;
+      isolation:isolate;
+      overflow:hidden;
     }
-    body.november-theme .desktop-waves-bg::before {
-      content:'';position:absolute;inset:0;z-index:0;pointer-events:none;
-      background-image:url("${STONE_TILE}");
-      background-size:140px 140px;background-repeat:repeat;
-      opacity:.78;filter:saturate(.65) contrast(1.20) brightness(.94);
-    }
-    body.november-theme .desktop-waves-bg::after {
-      content:'';position:absolute;inset:0;z-index:0;pointer-events:none;
-      background:linear-gradient(180deg,rgba(10,20,21,.12),transparent 35%,rgba(13,20,20,.08));
+    body.november-theme .desktop-waves-bg::before,
+    body.november-theme .desktop-waves-bg::after {content:none !important;}
+    .november-wave-stone {
+      position:absolute;inset:0;pointer-events:none;z-index:0;
+      background-image:url("${STONE_TILE}") !important;
+      background-position:center;background-repeat:repeat;
+      background-size:140px 140px;
+      opacity:.72;
+      filter:saturate(.65) contrast(1.23);
+      -webkit-mask-image:linear-gradient(to bottom,transparent 0%,black 22%,black 100%);
+      mask-image:linear-gradient(to bottom,transparent 0%,black 22%,black 100%);
     }
     .november-petal-field {position:absolute;inset:0;z-index:1;pointer-events:none;width:100%;height:100%;opacity:.94;}
 
@@ -94,7 +96,7 @@ function styleOnce() {
       50% {transform:rotate(calc(var(--nov-tilt) + 7.5deg));}
     }
     .november-fireworks {position:fixed;inset:0;width:100vw;height:100vh;z-index:80;pointer-events:none;opacity:.92;}
-    @media print { .november-flags,.november-background,.november-fireworks,.november-petal-field {display:none !important;} }
+    @media print { .november-flags,.november-background,.november-fireworks,.november-petal-field,.november-wave-stone {display:none !important;} }
     @media (max-width:767px) { .november-flags {display:none !important;} }
     body.effect-none .november-flag {animation:none !important;transform:rotate(var(--nov-tilt,0deg));}
     body.effect-none .november-petal-field {display:none !important;}
@@ -121,6 +123,11 @@ export function initNovemberTheme(app) {
   const canvas=document.createElement('canvas');canvas.className='november-fireworks';canvas.setAttribute('aria-hidden','true');
   document.body.appendChild(canvas);
   const ctx=canvas.getContext('2d',{alpha:true});
+  const waveHost=document.querySelector('.desktop-waves-bg');
+  const waveStone=document.createElement('div');
+  waveStone.className='november-wave-stone';
+  waveStone.setAttribute('aria-hidden','true');
+  if(waveHost)waveHost.prepend(waveStone);
   const petals=createNovemberPetalField();
   let patientFamilies=[];
   let count=0, positions=[], paletteIndex=-1, active=false, raf=0, particles=[], shells=0, start=0;
@@ -298,7 +305,7 @@ export function initNovemberTheme(app) {
   window.__novemberThemeController={syncPatients,shuffleFlags,salute,getStatus(){return {patients:count,byArea:Object.fromEntries(Object.keys(FAMILIES).map(k=>[k,patientFamilies.filter(p=>p===k).length])),availablePositions:positions.length,visibleFlags:flags.childElementCount,headerWidth:header.getBoundingClientRect().width,fireworksActive:active,fireworksZIndex:getComputedStyle(canvas).zIndex,lastFireworkAt:lastFired?new Date(lastFired).toISOString():null};},dispose(){
     clearInterval(firstLayoutCheck);
     clearInterval(shuffleTimer);clearInterval(seasonTimer);
-    ro.disconnect();cancelAnimationFrame(raf);document.removeEventListener('visibilitychange',onVisibilityChange);petals.dispose();
+    ro.disconnect();cancelAnimationFrame(raf);document.removeEventListener('visibilitychange',onVisibilityChange);petals.dispose();waveStone.remove();
     for(const [icon,oldColor] of tintedIcons)icon.style.color=oldColor;
     tintedIcons.clear();
     background.remove();flags.remove();canvas.remove();document.body.classList.remove('november-theme');
