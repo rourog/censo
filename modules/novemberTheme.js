@@ -111,7 +111,19 @@ function styleOnce() {
     .november-tint { position:absolute;inset:0;background:linear-gradient(90deg,rgba(38,91,58,.38),rgba(185,131,69,.30) 50%,rgba(121,48,48,.4));opacity:.20;mix-blend-mode:color; }
     .november-flags {position:absolute;inset:0;z-index:3;pointer-events:none;}
     .november-flag {position:absolute;top:18px;width:50px;height:50px;transform-origin:center top;
-      animation:november-sway 2.5s ease-in-out infinite;will-change:transform;transition:opacity .35s ease;}
+      pointer-events:auto;cursor:pointer;touch-action:manipulation;
+      animation:november-sway 2.5s ease-in-out infinite;will-change:transform;transition:opacity .18s ease;}
+    .november-flag:focus-visible {outline:2px solid currentColor;outline-offset:3px;border-radius:3px;}
+    .november-flag.november-flag--broken {opacity:0;pointer-events:none;animation-play-state:paused;}
+    .november-confetti {position:absolute;inset:0;z-index:4;pointer-events:none;overflow:hidden;}
+    .november-confetti-piece {position:absolute;width:6px;height:9px;left:0;top:0;
+      border-radius:1px;will-change:transform,opacity;
+      animation:november-confetti-burst .76s cubic-bezier(.12,.62,.35,1) forwards;}
+    @keyframes november-confetti-burst {
+      0% {opacity:1;transform:translate(-50%,-50%) rotate(0deg) scale(1);}
+      75% {opacity:1;}
+      100% {opacity:0;transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) rotate(var(--rot)) scale(.45);}
+    }
     .november-flag-inner {position:absolute;inset:0;display:block;background:currentColor;
       -webkit-mask-image:url("${PAPER_ATLAS}");mask-image:url("${PAPER_ATLAS}");
       -webkit-mask-size:300% 300%;mask-size:300% 300%;mask-mode:luminance;
@@ -122,11 +134,11 @@ function styleOnce() {
       50% {transform:rotate(calc(var(--nov-tilt) + 7.5deg));}
     }
     .november-fireworks {position:fixed;inset:0;width:100vw;height:100vh;z-index:80;pointer-events:none;opacity:.92;}
-    @media print { .november-flags,.november-background,.november-fireworks,.november-petal-field,.november-wave-stone {display:none !important;} }
-    @media (max-width:767px) { .november-flags {display:none !important;} }
+    @media print { .november-flags,.november-confetti,.november-background,.november-fireworks,.november-petal-field,.november-wave-stone {display:none !important;} }
+    @media (max-width:767px) { .november-flags,.november-confetti {display:none !important;} }
     body.effect-none .november-flag {animation:none !important;transform:rotate(var(--nov-tilt,0deg));}
     body.effect-none .november-petal-field {display:none !important;}
-    @media (prefers-reduced-motion:reduce) {.november-flag {animation:none !important;transform:none !important;} .november-fireworks,.november-petal-field {display:none !important;}}
+    @media (prefers-reduced-motion:reduce) {.november-flag {animation:none !important;transform:none !important;} .november-confetti-piece {animation:none !important;display:none !important;} .november-fireworks,.november-petal-field {display:none !important;}}
   `;
   document.head.appendChild(css);
 }
@@ -144,8 +156,51 @@ export function initNovemberTheme(app) {
   styleOnce();
   const background=document.createElement('div');background.className='november-background';background.setAttribute('aria-hidden','true');
   background.innerHTML='<div class="november-stone"></div><div class="november-light"></div><div class="november-tint"></div>';
-  const flags=document.createElement('div');flags.className='november-flags';flags.setAttribute('aria-hidden','true');
-  header.prepend(background,flags);
+  const flags=document.createElement('div');flags.className='november-flags';
+  const confetti=document.createElement('div');confetti.className='november-confetti';confetti.setAttribute('aria-hidden','true');
+  header.prepend(background,flags,confetti);
+  const respawnTimers=new Set();
+  const fragmentTimers=new Set();
+  function breakFlag(slot) {
+    if(slot.classList.contains('november-flag--broken'))return;
+    slot.classList.add('november-flag--broken');
+    slot.setAttribute('aria-disabled','true');
+    const tone=slot.firstElementChild?.style.color || '#fb923c';
+    const x=slot.offsetLeft+25,y=slot.offsetTop+25;
+    if(!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const fragment=document.createDocumentFragment();
+      for(let i=0;i<20;i++){
+        const piece=document.createElement('span');
+        piece.className='november-confetti-piece';
+        piece.style.left=x+'px';piece.style.top=y+'px';
+        piece.style.backgroundColor=tone;
+        piece.style.setProperty('--dx',(Math.cos(i*Math.PI*2/20)*(23+Math.random()*36)).toFixed(1)+'px');
+        piece.style.setProperty('--dy',(Math.sin(i*Math.PI*2/20)*(17+Math.random()*26)+27).toFixed(1)+'px');
+        piece.style.setProperty('--rot',((Math.random()-.5)*900).toFixed(0)+'deg');
+        piece.style.animationDelay=(Math.random()*75).toFixed(0)+'ms';
+        fragment.appendChild(piece);
+      }
+      confetti.appendChild(fragment);
+      const timer=setTimeout(()=>{confetti.replaceChildren();fragmentTimers.delete(timer);},900);
+      fragmentTimers.add(timer);
+    }
+    const timer=setTimeout(()=>{
+      respawnTimers.delete(timer);
+      if(!slot.isConnected)return;
+      slot.classList.remove('november-flag--broken');
+      slot.removeAttribute('aria-disabled');
+    },2000);
+    respawnTimers.add(timer);
+  }
+  flags.addEventListener('click',event=>{
+    const slot=event.target.closest('.november-flag');
+    if(slot&&flags.contains(slot))breakFlag(slot);
+  });
+  flags.addEventListener('keydown',event=>{
+    if(event.key!=='Enter'&&event.key!==' ')return;
+    const slot=event.target.closest('.november-flag');
+    if(slot&&flags.contains(slot)){event.preventDefault();breakFlag(slot);}
+  });
   const canvas=document.createElement('canvas');canvas.className='november-fireworks';canvas.setAttribute('aria-hidden','true');
   document.body.appendChild(canvas);
   const ctx=canvas.getContext('2d',{alpha:true});
@@ -194,6 +249,8 @@ export function initNovemberTheme(app) {
       flags.replaceChildren();
       for(let i=0;i<visible;i++){
         const slot=document.createElement('span');slot.className='november-flag';
+        slot.setAttribute('role','button');slot.setAttribute('tabindex','0');
+        slot.setAttribute('aria-label','Romper papel picado');
         slot.style.animationDelay=(-i*.23)+'s';
         slot.style.setProperty('--nov-tilt',(i%2?FLAGS.tilt:-FLAGS.tilt)+'deg');
         const inner=document.createElement('span');inner.className='november-flag-inner';slot.appendChild(inner);flags.appendChild(slot);
@@ -223,6 +280,7 @@ export function initNovemberTheme(app) {
       inner.style.color=color;
       slot.dataset.family=area;
       slot.title=area;
+      if(!slot.classList.contains('november-flag--broken'))slot.removeAttribute('aria-disabled');
     });
   }
   // Únicamente recolorea el icono existente; no inserta elementos en
@@ -332,9 +390,12 @@ export function initNovemberTheme(app) {
     clearInterval(firstLayoutCheck);
     clearInterval(shuffleTimer);clearInterval(seasonTimer);
     ro.disconnect();cancelAnimationFrame(raf);document.removeEventListener('visibilitychange',onVisibilityChange);petals.dispose();waveStone.remove();
+    for(const timer of respawnTimers)clearTimeout(timer);
+    for(const timer of fragmentTimers)clearTimeout(timer);
+    respawnTimers.clear();fragmentTimers.clear();
     for(const [icon,oldColor] of tintedIcons)icon.style.color=oldColor;
     tintedIcons.clear();
-    background.remove();flags.remove();canvas.remove();document.body.classList.remove('november-theme');
+    background.remove();flags.remove();confetti.remove();canvas.remove();document.body.classList.remove('november-theme');
     if(app.syncNovemberPatients===syncPatients)delete app.syncNovemberPatients;
     delete window.__novemberThemeController;
     if(typeof app.initPlexus==='function')app.initPlexus();
