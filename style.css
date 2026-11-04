@@ -693,3 +693,34 @@
   background: var(--panel); border: 1px solid var(--line);
   border-radius: 8px; font: inherit;
 }
+
+/* Beta · menú unificado de acciones: los controles anteriores conservan
+   sus listeners, pero ya no ocupan espacio en el encabezado. */
+#adminSettingsBtn,#viewToggleBtn,#reloadBtn,#themeToggleBtn,#btnLogoutBtn{display:none!important;}
+.censo-header-menu-container{position:relative;z-index:50;flex-shrink:0;}
+#censoMenuButton{width:34px;height:34px;border-radius:10px;border-color:var(--accent-border);}
+#censoMenuButton[aria-expanded="true"]{background:var(--accent-soft);color:var(--accent);border-color:var(--accent);}
+.censo-header-menu[hidden]{display:none!important;}
+.censo-header-menu{
+ position:absolute;right:0;top:calc(100% + 9px);width:min(268px,calc(100vw - 28px));
+ padding:7px;border-radius:13px;border:1px solid var(--line);
+ background:var(--panel);color:var(--text);box-shadow:0 14px 40px rgba(0,0,0,.38);
+ z-index:100;display:flex;flex-direction:column;gap:2px;
+}
+.censo-header-menu__heading{
+ display:flex;align-items:center;justify-content:space-between;padding:9px 10px 8px;
+ font-size:.64rem;letter-spacing:.09em;font-weight:800;color:var(--muted);
+}
+.censo-header-menu__heading span{font-size:.6rem;color:var(--accent);}
+.censo-header-menu button{
+ display:flex;align-items:center;gap:11px;width:100%;text-align:left;cursor:pointer;
+ color:var(--text);border:1px solid transparent;border-radius:8px;
+ background:transparent;padding:11px 10px;font:600 .76rem 'Fira Code',monospace;
+}
+.censo-header-menu button .material-symbols-outlined{font-size:19px;color:var(--accent);}
+.censo-header-menu button:hover,.censo-header-menu button:focus-visible{
+ outline:none;border-color:var(--accent-border);background:var(--accent-soft);
+}
+.censo-header-menu__separator{height:1px;margin:5px 8px;background:var(--line);}
+.censo-header-menu .censo-header-menu__logout{color:var(--error-text,#fca5a5);}
+.censo-header-menu .censo-header-menu__logout .material-symbols-outlined{color:var(--error-text,#fca5a5);}
