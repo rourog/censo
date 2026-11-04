@@ -1,0 +1,18 @@
+name: Beta deployment signal
+
+on:
+  push:
+    branches: [beta]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Confirm beta branch change
+        run: |
+          echo "Beta updated. The main-branch Pages publisher will include its latest commit."
+          echo "SHA: ${{ github.sha }}"
