@@ -48,7 +48,7 @@
 
     <div style="position: absolute; bottom: 30px; font-size: 0.7rem; font-family: 'Space Mono', monospace; font-weight: 700; letter-spacing: 0.1em;">
       <span style="color: var(--muted);">ROUROG</span> <span style="color: var(--text); opacity: 0.5;">Innovations</span>
-      <span data-censo-version style="opacity: 0.9; margin-left: 6px; color: #fb923c;">Beta V —</span>
+      <span data-censo-version style="opacity: 0.9; margin-left: 6px; color: #fb923c;">Beta v—</span>
     </div>
   </div>
 
@@ -92,11 +92,15 @@
             </button>
             <div id="censoHeaderMenu" class="censo-header-menu" hidden role="group" aria-label="Opciones del Censo">
               <div class="censo-header-menu__heading">AJUSTES Y ACCIONES <span>BETA</span></div>
-              <button type="button" data-menu-action="theme"><span class="material-symbols-outlined">palette</span><span>Apariencia y colores</span></button>
-              <button type="button" data-menu-action="season"><span class="material-symbols-outlined">ac_unit</span><span>Temporada y vista previa</span></button>
+              <button type="button" data-menu-action="search"><span class="material-symbols-outlined">search</span><span>Buscar paciente</span></button>
+              <button type="button" data-menu-action="history"><span class="material-symbols-outlined">history</span><span>Historial</span></button>
+              <button type="button" data-menu-action="cie10"><span class="material-symbols-outlined">medical_information</span><span>CIE-10 · Lesiones</span></button>
+              <button type="button" data-menu-action="print"><span class="material-symbols-outlined">print</span><span>Imprimir censo</span></button>
+              <div class="censo-header-menu__separator"></div>
+              <button type="button" data-menu-action="theme"><span class="material-symbols-outlined">palette</span><span>Apariencia y temas</span></button>
               <button type="button" data-menu-action="beds"><span class="material-symbols-outlined">bed</span><span>Camas y sillas</span></button>
               <button type="button" data-menu-action="view"><span class="material-symbols-outlined">view_agenda</span><span data-view-label>Tipo de vista</span></button>
-              <button type="button" data-menu-action="reload"><span class="material-symbols-outlined">sync</span><span>Actualizar censo</span></button>
+              <button type="button" data-menu-action="reload"><span class="material-symbols-outlined">refresh</span><span>Recargar censo</span></button>
               <div class="censo-header-menu__separator"></div>
               <button type="button" data-menu-action="logout" class="censo-header-menu__logout"><span class="material-symbols-outlined">logout</span><span>Cerrar sesión</span></button>
             </div>
@@ -125,7 +129,7 @@
 
     <div class="footer">
       Hospital Regional de Delicias - <span style="color: var(--accent); font-weight: 600;">Rourog Innovations</span>
-      <span data-censo-version style="opacity: 0.9; font-size: 0.8em; margin-left: 8px; color: #fb923c;">Beta V —</span>
+      <span data-censo-version style="opacity: 0.9; font-size: 0.8em; margin-left: 8px; color: #fb923c;">Beta v—</span>
     </div>
 
     <div id="easterEggContainer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; pointer-events: none; overflow: hidden;"></div>
@@ -317,7 +321,7 @@
       };
 
       document.querySelectorAll('[data-censo-version]').forEach((element) => {
-        element.textContent = `Beta V ${displayVersion.replace(/^(?:beta[\\s-]*|v)/i, '')}`;
+        element.textContent = `Beta v${displayVersion.replace(/^(?:beta[\\s-]*|v)/i, '')}`;
       });
 
       const stylesheet = document.getElementById('censoAppStylesheet');
