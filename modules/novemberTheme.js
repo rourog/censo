@@ -260,8 +260,8 @@ export function initNovemberTheme(app) {
     }
     updateAreaGuides();
   }
-  // Fuegos: salvas tricolores (90 partículas), anillos ocasionales;
-  // tamaño 140, estelas .80, duración máxima de 5s y frecuencia baja.
+  // Fuegos tricolores más amplios y densos; duración máxima intacta de 5s.
+  // Se activan únicamente por eventos explícitos, nunca por temporizador.
   function resizeCanvas() {
     const dpr=Math.min(devicePixelRatio||1,1.5);
     canvas.width=Math.floor(innerWidth*dpr);canvas.height=Math.floor(innerHeight*dpr);
@@ -269,16 +269,16 @@ export function initNovemberTheme(app) {
     ctx.setTransform(dpr,0,0,dpr,0,0);
   }
   function burst(x,y,color,ring=false,scale=1){
-    const n=ring?60:90;
+    const n=ring?110:150;
     for(let i=0;i<n;i++){
       const a=(i/n)*Math.PI*2+(ring?0:Math.random()*.15);
-      const v=(ring?2.1:1.25+Math.random()*1.45)*1.4*scale;
-      particles.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,life:1,color,size:1.2+Math.random()*1.4});
+      const v=(ring?2.45:1.45+Math.random()*1.75)*1.53*scale;
+      particles.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,life:1,color,size:2.1+Math.random()*2.1});
     }
   }
   function animate(now) {
     if(!active)return;
-    ctx.fillStyle='rgba(0,0,0,0.20)';ctx.globalCompositeOperation='destination-out';ctx.fillRect(0,0,innerWidth,innerHeight);
+    ctx.fillStyle='rgba(0,0,0,0.15)';ctx.globalCompositeOperation='destination-out';ctx.fillRect(0,0,innerWidth,innerHeight);
     ctx.globalCompositeOperation='source-over';
     for(let i=particles.length-1;i>=0;i--){
       const p=particles[i];p.x+=p.vx;p.y+=p.vy;p.vy+=.028;p.vx*=.994;p.life-=.014;
@@ -298,7 +298,7 @@ export function initNovemberTheme(app) {
     // Tres estallidos sincronizados distribuidos sobre la franja superior.
     const x0=innerWidth*.25,x1=innerWidth*.50,x2=innerWidth*.75,y=Math.max(100,innerHeight*.23);
     burst(x0,y,colors[0]);burst(x1,y-30,colors[1]);burst(x2,y,colors[2]);
-    if(Math.random()<.45){
+    if(Math.random()<.70){
       burst(innerWidth*.5,y+65,colors[0],true,.64);
       burst(innerWidth*.5,y+65,colors[1],true,.88);
       burst(innerWidth*.5,y+65,colors[2],true,1.12);
