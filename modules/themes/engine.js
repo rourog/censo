@@ -86,6 +86,7 @@ export function createSeasonalEngine(app,{onChange=()=>{}}={}) {
   }
   return {
     start,stop,sync,syncPatients,setEnabled,setPreview,
+    salute:options=>controller?.salute?.(options) ?? false,
     getStatus:()=>({engine:'2.0',activeSeason:active?.id||null,calendarSeason:getSeasonalConfiguration()?.id||null,
       enabled:isDecorationEnabled('november'),preview:getPreviewSeason(),registered:getRegisteredSeasons().map(item=>item.id),
       controller:controller?.getStatus?.()||null})
