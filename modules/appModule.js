@@ -130,15 +130,13 @@ export async function bootApp() {
   app.bindMaintenanceEvents();
   app.exposeWindowActions();
   app.initTheme();
-  // Decoración de noviembre aislada del flujo clínico.
-  const { initNovemberTheme } = await import(moduleUrl('novemberTheme'));
-  app.setNovemberThemeEnabled = enabled => {
-    if (enabled) initNovemberTheme(app);
-    else window.__novemberThemeController?.dispose();
-    // El controlador del Plexus normal se mantiene fuera del tema estacional.
-    if (!enabled) app.initPlexus?.();
-  };
-  initNovemberTheme(app);
+  // Seasonal Engine 2.0: one lifecycle manager; season plugins are loaded lazily.
+  const { createSeasonalEngine } = await import(moduleUrl('themes/engine'));
+  app.seasonalEngine = createSeasonalEngine(app, {
+    onChange: () => app.refreshSeasonalAppearance?.()
+  });
+  app.syncSeasonalPatients = patients => app.seasonalEngine.syncPatients(patients);
+  await app.seasonalEngine.start();
   app.initPrintUi();
   app.initSubrogadaUi();
   app.bindUiEvents();
