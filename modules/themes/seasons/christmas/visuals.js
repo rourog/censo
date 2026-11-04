@@ -18,7 +18,7 @@ export function initChristmasTheme(app,{scope,config,createSnowfall,createChrist
    position:absolute!important;left:50%!important;top:50%!important;
    transform:translate(-50%,-50%)!important;margin:0!important;
    z-index:6!important;pointer-events:none;
-   width:max-content;max-width:calc(100% - 95px);text-align:center;
+   width:max-content;max-width:calc(100% - 95px);text-align:center;white-space:nowrap;
  }
  body.christmas-theme .header .title-censo{
    font-family:'Mountains of Christmas',Georgia,serif!important;
