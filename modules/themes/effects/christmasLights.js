@@ -38,7 +38,8 @@ export function createChristmasLights(header){
   root.className='christmas-lights';
   root.setAttribute('aria-label','Luces navideñas interactivas');
   header.prepend(root);
-  let patients=[],renderKey='',disposed=false;
+  let patients=[],renderKey='',disposed=false,shuffleStep=0;
+  let patientSignature='';
   const timers=new Set();
   const later=(fn,ms)=>{
     const id=setTimeout(()=>{timers.delete(id);if(!disposed)fn();},ms);
@@ -75,7 +76,8 @@ export function createChristmasLights(header){
       id:patientId(patient,index),color:patientColor(patient)
     })).sort((a,b)=>a.id.localeCompare(b.id));
     const signature=sorted.map(entry=>entry.id+'='+entry.color).join('|');
-    const key=JSON.stringify(layout)+'|'+signature;
+    const key=JSON.stringify(layout);
+    patientSignature=signature;
     if(key===renderKey)return;
     renderKey=key;
     root.replaceChildren();
@@ -85,7 +87,7 @@ export function createChristmasLights(header){
       positions.push(layout.left[i],layout.right[i]);
     }
     const seed=sorted.map(entry=>entry.id).join('|')||'sin-pacientes';
-    const selected=shuffledSlots(seed);
+    const selected=shuffledSlots(seed+'|'+shuffleStep);
     const illuminated=new Map();
     for(let i=0;i<Math.min(sorted.length,TOTAL_BULBS);i++){
       illuminated.set(selected[i],sorted[i].color);
@@ -101,8 +103,8 @@ export function createChristmasLights(header){
       bulb.style.left=position+'px';
       bulb.style.top=(14+Math.sin(index*.55)*5)+'px';
       bulb.style.setProperty('--bulb-size',layout.bulbSize+'px');
-      bulb.style.animationDelay=(-((index*.53)%5.1))+'s';
-      bulb.style.animationDuration=(4.0+(index%6)*.48)+'s';
+      bulb.style.setProperty('--sway-delay',(-((index*.61)%5.7))+'s');
+      bulb.style.setProperty('--glow-delay',(-((index*.53)%4.6))+'s');
       bulb.dataset.color=color||'#ffffff';
       if(color){
         bulb.style.setProperty('--bulb-color',color);
@@ -111,6 +113,28 @@ export function createChristmasLights(header){
       bulb.setAttribute('aria-label',color?'Apagar luz navideña':'Luz navideña sin encender');
       bulb.disabled=!color;
       root.append(pine,bulb);
+    });
+    updateIllumination();
+  }
+  function updateIllumination(){
+    if(disposed)return;
+    const sorted=patients.map((patient,index)=>({id:patientId(patient,index),color:patientColor(patient)}))
+      .sort((a,b)=>a.id.localeCompare(b.id));
+    const seed=sorted.map(item=>item.id).join('|')||'sin-pacientes';
+    const shuffled=shuffledSlots(seed+'|'+shuffleStep);
+    const lit=new Map();
+    sorted.slice(0,TOTAL_BULBS).forEach((item,i)=>lit.set(shuffled[i],item.color));
+    root.querySelectorAll('.christmas-bulb').forEach((bulb,index)=>{
+      const color=lit.get(index);
+      bulb.classList.toggle('is-lit',!!color);
+      bulb.classList.toggle('is-idle',!color);
+      bulb.classList.remove('is-off');
+      bulb.disabled=!color;
+      bulb.dataset.color=color||'#ffffff';
+      bulb.setAttribute('aria-label',color?'Apagar luz navideña':'Luz navideña sin encender');
+      if(color){bulb.style.setProperty('--bulb-color',color);
+        bulb.style.setProperty('--bulb-glow',color+'88');}
+      else{bulb.style.removeProperty('--bulb-color');bulb.style.removeProperty('--bulb-glow');}
     });
   }
   function extinguish(bulb){
@@ -144,6 +168,13 @@ export function createChristmasLights(header){
     if(bulb&&root.contains(bulb))extinguish(bulb);
   };
   root.addEventListener('click',onClick);
+  // Switch illumination only. DOM nodes and coordinates remain fixed.
+  const shuffleTimer=window.setInterval(()=>{
+    if(disposed||document.hidden)return;
+    shuffleStep=(shuffleStep+1)%100000;
+    updateIllumination();
+  },20000);
+  timers.add(shuffleTimer);
   const observer=new ResizeObserver(draw);
   observer.observe(header);
   const title=header.querySelector('.main-title');
@@ -151,9 +182,17 @@ export function createChristmasLights(header){
   document.fonts?.ready?.then(()=>{if(!disposed){renderKey='';draw();}}).catch(()=>{});
   draw();
   return {
-    syncPatients(list){patients=Array.isArray(list)?list:[];draw();},
+    syncPatients(list){
+      patients=Array.isArray(list)?list:[];
+      const signature=patients.map((p,i)=>patientId(p,i)+'='+patientColor(p)).sort().join('|');
+      if(signature!==patientSignature){
+        patientSignature=signature;
+        draw();
+        updateIllumination();
+      }
+    },
     getStatus:()=>({patients:patients.length,totalBulbs:root.querySelectorAll('.christmas-bulb').length,
-      litBulbs:root.querySelectorAll('.christmas-bulb.is-lit').length,perSide:PER_SIDE}),
+      litBulbs:root.querySelectorAll('.christmas-bulb.is-lit').length,perSide:PER_SIDE,shuffleStep}),
     dispose(){
       if(disposed)return;
       disposed=true;for(const id of timers)clearTimeout(id);timers.clear();
