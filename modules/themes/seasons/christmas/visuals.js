@@ -25,19 +25,41 @@ export function initChristmasTheme(app,{scope,config,createSnowfall,createSnowMo
    font-size:clamp(2.1rem,3.4vw,3.25rem)!important;
    font-weight:700!important;line-height:1.04!important;letter-spacing:.035em!important;
    padding:0 8px 3px!important;
-   color:#ffe0a1!important;background:none!important;
-   -webkit-text-fill-color:#ffe0a1!important;
-   text-shadow:0 2px 2px #071a18,0 4px 11px #0009,0 0 10px #f5bc6655;
+   /* Candy cane diagonal stripes, clipped to the existing festive lettering. */
+   color:#fff8f3!important;
+   background:repeating-linear-gradient(135deg,
+     #fffaf4 0px,#fffaf4 8px,
+     #b91c2c 8px,#d6273d 16px,
+     #fffaf4 16px,#fffaf4 24px)!important;
+   background-clip:text!important;-webkit-background-clip:text!important;
+   -webkit-text-fill-color:transparent!important;
+   filter:drop-shadow(0 2px 2px rgba(5,19,32,.95))
+     drop-shadow(0 3px 5px rgba(0,0,0,.55));
+   text-shadow:none!important;
    animation:none!important;
  }
  body.christmas-theme .header .title-urgencias{
    font-size:clamp(.72rem,1.1vw,.93rem)!important;
-   letter-spacing:.19em!important;color:#f1f5f9!important;
-   text-shadow:0 2px 7px #000c;
+   letter-spacing:.19em!important;color:#fffafa!important;
+   background:repeating-linear-gradient(135deg,
+     #fffafa 0px,#fffafa 5px,#bb2031 5px,#e03548 10px,
+     #fffafa 10px,#fffafa 15px)!important;
+   background-clip:text!important;-webkit-background-clip:text!important;
+   -webkit-text-fill-color:transparent!important;
+   filter:drop-shadow(0 1px 2px #0e1729) drop-shadow(0 2px 4px #0008);
+   text-shadow:none!important;
  }
  body.christmas-theme #plexusCanvas{display:none!important;}
  body.christmas-theme .desktop-waves-bg .waves{display:none!important;}
- body.christmas-theme .desktop-waves-bg{isolation:isolate;overflow:hidden;}
+ body.christmas-theme .desktop-waves-bg{
+   isolation:isolate;overflow:hidden;
+   /* Cold ambient light is restricted to the snow landscape, not the banner. */
+   background:linear-gradient(180deg,
+     rgba(36,91,143,0) 0%,
+     rgba(100,160,208,.11) 40%,
+     rgba(171,214,243,.19) 76%,
+     rgba(234,248,255,.16) 100%)!important;
+ }
  body.christmas-theme .desktop-waves-bg::before,
  body.christmas-theme .desktop-waves-bg::after{content:none!important;}
  body.christmas-theme #mainAppContainer{
@@ -57,7 +79,8 @@ export function initChristmasTheme(app,{scope,config,createSnowfall,createSnowMo
  .christmas-winter-glow{position:absolute;inset:0;z-index:0;pointer-events:none;
    background:linear-gradient(90deg,rgba(109,13,24,.67),rgba(19,58,34,.48) 48%,rgba(126,16,31,.66));}
  .christmas-snow{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none;opacity:.85;}
- .christmas-snow-mountains{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden;}
+ .christmas-snow-mountains{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden;
+   filter:drop-shadow(0 -2px 7px rgba(202,230,249,.13));}
  .christmas-snow-mountains svg{position:absolute;inset:0;width:100%;height:100%;display:block;}
  .christmas-lights{position:absolute;inset:0;z-index:3;overflow:hidden;pointer-events:none;}
  .christmas-light-cable{display:none;}
@@ -125,7 +148,7 @@ export function initChristmasTheme(app,{scope,config,createSnowfall,createSnowMo
  return {
   syncPatients(patients){lights.syncPatients(patients);},
   salute:options=>fireworks.salute(options),
-  getStatus:()=>({revision:'christmas-v6',lights:lights.getStatus(),snow:snow.getStatus(),mountains:mountains.getStatus(),
+  getStatus:()=>({revision:'christmas-v7',lights:lights.getStatus(),snow:snow.getStatus(),mountains:mountains.getStatus(),
     fireworks:fireworks.getStatus()}),
   dispose(){
    if(disposed)return;
