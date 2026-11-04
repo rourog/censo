@@ -1,5 +1,5 @@
 /* Seasonal Engine 2.0 Christmas renderer: visuals only, no Firestore. */
-export function initChristmasTheme(app,{scope,config,createSnowfall,createChristmasLights,createChristmasFireworks}){
+export function initChristmasTheme(app,{scope,config,createSnowfall,createSnowMountains,createChristmasLights,createChristmasFireworks}){
  const header=document.querySelector('.header');
  if(!header)return null;
  const style=document.createElement('style');
@@ -43,10 +43,10 @@ export function initChristmasTheme(app,{scope,config,createSnowfall,createChrist
  .christmas-winter-glow{position:absolute;inset:0;z-index:0;pointer-events:none;
    background:linear-gradient(90deg,rgba(12,79,53,.45),rgba(21,40,65,.24) 48%,rgba(94,21,35,.48));}
  .christmas-snow{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none;opacity:.85;}
+ .christmas-snow-mountains{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden;}
+ .christmas-snow-mountains svg{position:absolute;inset:0;width:100%;height:100%;display:block;}
  .christmas-lights{position:absolute;inset:0;z-index:3;overflow:hidden;pointer-events:none;}
- .christmas-light-cable{position:absolute;left:0;right:0;top:2px;height:24px;
-   border-bottom:2px solid rgba(37,111,77,.85);border-radius:0 0 45% 45%;
-   pointer-events:none;box-shadow:0 2px 2px #0005;}
+ .christmas-light-cable{display:none;}
  .christmas-pine{position:absolute;top:3px;width:34px;height:13px;pointer-events:none;
    background:repeating-linear-gradient(115deg,#194532 0 3px,#307a53 3px 6px,#164a32 6px 9px);
    clip-path:polygon(0 55%,12% 7%,32% 38%,52% 0,74% 42%,91% 13%,100% 55%,78% 100%,55% 64%,32% 100%,12% 66%);}
@@ -71,24 +71,26 @@ export function initChristmasTheme(app,{scope,config,createSnowfall,createChrist
    body.christmas-theme .header .title-censo{font-size:2.1rem!important;}}
  @media(prefers-reduced-motion:reduce){.christmas-bulb{animation:none!important;}
    .christmas-spark,.christmas-snow,.christmas-fireworks{display:none!important;}}
- @media print{.christmas-winter-glow,.christmas-lights,.christmas-snow,.christmas-fireworks{display:none!important;}}
+ @media print{.christmas-winter-glow,.christmas-lights,.christmas-snow,.christmas-snow-mountains,.christmas-fireworks{display:none!important;}}
  `;
  document.head.appendChild(style);
  const glow=document.createElement('div');glow.className='christmas-winter-glow';
  glow.setAttribute('aria-hidden','true');header.prepend(glow);
  document.body.classList.add('christmas-theme');
  const lights=createChristmasLights(header);
- const snow=createSnowfall(document.querySelector('.desktop-waves-bg'));
+ const snowHost=document.querySelector('.desktop-waves-bg');
+ const snow=createSnowfall(snowHost);
+ const mountains=createSnowMountains(snowHost);
  const fireworks=createChristmasFireworks(config.celebration);
  let disposed=false;
  return {
   syncPatients(patients){lights.syncPatients(patients);},
   salute:options=>fireworks.salute(options),
-  getStatus:()=>({revision:'christmas-v2',lights:lights.getStatus(),snow:snow.getStatus(),
+  getStatus:()=>({revision:'christmas-v3',lights:lights.getStatus(),snow:snow.getStatus(),mountains:mountains.getStatus(),
     fireworks:fireworks.getStatus()}),
   dispose(){
    if(disposed)return;
-   disposed=true;lights.dispose();snow.dispose();fireworks.dispose();
+   disposed=true;lights.dispose();snow.dispose();mountains.dispose();fireworks.dispose();
    glow.remove();style.remove();document.body.classList.remove('christmas-theme');
    app.initPlexus?.();
   }
