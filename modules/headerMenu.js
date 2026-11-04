@@ -15,6 +15,10 @@ export function initHeaderMenu() {
     menu.style.right='auto';
   }
   const actions={
+    search:'searchToggleBtn',
+    history:'historyBtn',
+    cie10:'cie10PageBtn',
+    print:'printBtn',
     theme:'themeToggleBtn',
     beds:'adminSettingsBtn',
     view:'viewToggleBtn',
@@ -44,17 +48,14 @@ export function initHeaderMenu() {
     const action=event.target.closest('[data-menu-action]')?.dataset.menuAction;
     if(!action)return;
     close();
-    if(action==='season'){
-      document.getElementById('themeToggleBtn')?.click();
-      // Appearance dialog is long: show the seasonal controls directly.
-      requestAnimationFrame(()=>{
-        const selector=document.getElementById('seasonalEnginePreview');
-        selector?.scrollIntoView({block:'center',behavior:'smooth'});
-        selector?.focus({preventScroll:true});
-      });
+    // Reutilizar los manejadores existentes preserva permisos, confirmaciones
+    // y operaciones; no se duplican funciones dentro del menú.
+    const target=document.getElementById(actions[action]);
+    if(!target){
+      console.warn('[CENSO] Acción del menú no disponible:',action);
       return;
     }
-    document.getElementById(actions[action])?.click();
+    target.click();
   });
   window.addEventListener('resize',()=>{if(open)positionMenu();});
   window.addEventListener('scroll',()=>{if(open)positionMenu();},true);
