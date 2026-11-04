@@ -44,7 +44,7 @@ export function createEffectsModule(app) {
 
   function syncPlexusPatients(listaPacientes = []) {
     pendingPlexusPatients = Array.isArray(listaPacientes) ? listaPacientes : [];
-    app.syncNovemberPatients?.(pendingPlexusPatients);
+    app.syncSeasonalPatients?.(pendingPlexusPatients);
     if (!plexusController) return;
     if (app.state.isFetchingData && pendingPlexusPatients.length === 0) return;
     plexusController.syncPatients(pendingPlexusPatients);
