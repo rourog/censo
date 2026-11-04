@@ -1,6 +1,14 @@
 /* Seasonal Engine 2.0 - manages lifecycle, not patient data. */
-import {getSeasonalConfiguration,getRegisteredSeasons,loadSeasonController} from './registry.js';
-import {isDecorationEnabled,setDecorationEnabled,getPreviewSeason,setPreviewSeason} from './preferences.js';
+const build=String(window.CensoBuild?.version || 'runtime');
+const load=async path=>{
+  const url=new URL(path,import.meta.url);
+  url.searchParams.set('v',build);
+  return import(url.href);
+};
+const [{getSeasonalConfiguration,getRegisteredSeasons,loadSeasonController},
+  {isDecorationEnabled,setDecorationEnabled,getPreviewSeason,setPreviewSeason}]=await Promise.all([
+  load('./registry.js'),load('./preferences.js')
+]);
 
 export function createSeasonalEngine(app,{onChange=()=>{}}={}) {
   let active=null,controller=null,generation=0,timer=0,started=false,disposed=false;
