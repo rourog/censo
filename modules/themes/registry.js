@@ -1,7 +1,14 @@
 /* Seasonal Engine 2.0 - central catalog, independent from application wiring. */
-import november from './seasons/november/config.js';
-import {isSeasonInRange} from './calendar.js';
-import {getPreviewSeason,isDecorationEnabled} from './preferences.js';
+// Version each child independently: a new build must bypass stale ESM caches.
+const build=String(window.CensoBuild?.version || 'runtime');
+const load=async path=>{
+  const url=new URL(path,import.meta.url);
+  url.searchParams.set('v',build);
+  return import(url.href);
+};
+const [{default:november},{isSeasonInRange},{getPreviewSeason,isDecorationEnabled}] = await Promise.all([
+  load('./seasons/november/config.js'),load('./calendar.js'),load('./preferences.js')
+]);
 
 export const seasons=Object.freeze([november]);
 export const getRegisteredSeasons=()=>seasons;
