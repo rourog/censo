@@ -1,0 +1,59 @@
+name: Publish production and beta
+
+on:
+  push:
+    branches: [main, beta]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout production
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: main-src
+          persist-credentials: false
+
+      - name: Checkout beta
+        uses: actions/checkout@v4
+        with:
+          ref: beta
+          path: beta-src
+          persist-credentials: false
+
+      - name: Assemble both sites without modifying either branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p public/beta
+          rsync -a --exclude='.git' --exclude='.github' main-src/ public/
+          rsync -a --exclude='.git' --exclude='.github' beta-src/ public/beta/
+          touch public/.nojekyll
+          test -f public/index.html
+          test -f public/beta/index.html
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+      - name: Deploy GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
