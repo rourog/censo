@@ -6,12 +6,13 @@ const load=async path=>{
   return import(url.href);
 };
 const [{getSeasonalConfiguration,getRegisteredSeasons,loadSeasonController},
-  {isDecorationEnabled,setDecorationEnabled,getPreviewSeason,setPreviewSeason}]=await Promise.all([
-  load('./registry.js'),load('./preferences.js')
+  {isDecorationEnabled,setDecorationEnabled,getPreviewSeason,setPreviewSeason},
+  {createEffectScope}]=await Promise.all([
+  load('./registry.js'),load('./preferences.js'),load('./effects/lifecycle.js')
 ]);
 
 export function createSeasonalEngine(app,{onChange=()=>{}}={}) {
-  let active=null,controller=null,generation=0,timer=0,started=false,disposed=false;
+  let active=null,controller=null,scope=null,generation=0,timer=0,started=false,disposed=false;
   let latestPatients=Array.isArray(app.state?.pacientesGlobal)?app.state.pacientesGlobal:[];
   const emit=()=>{onChange(active);document.dispatchEvent(new CustomEvent('censo:enginechange',{detail:{season:active?.id||null}}));};
 
@@ -22,21 +23,25 @@ export function createSeasonalEngine(app,{onChange=()=>{}}={}) {
     const token=++generation;
     if(controller){
       try{controller.dispose?.();}catch(error){console.warn('[SeasonalEngine] Cleanup failed:',error);}
-      controller=null;active=null;
+      scope?.dispose();scope=null;controller=null;active=null;
     }
     if(!season){emit();return;}
+    const nextScope=createEffectScope();
     try {
-      const next=await loadSeasonController(season,app);
+      const next=await loadSeasonController(season,app,nextScope);
       if(disposed || token!==generation || getSeasonalConfiguration()?.id!==season.id){
-        next?.dispose?.();
+        next?.dispose?.();nextScope.dispose();
         return;
       }
       controller=next||null;
+      scope=next?nextScope:null;
+      if(!next)nextScope.dispose();
       active=controller?season:null;
       controller?.syncPatients?.(latestPatients);
       emit();
     }catch(error){
-      if(token===generation){active=null;controller=null;emit();}
+      nextScope.dispose();
+      if(token===generation){active=null;controller=null;scope=null;emit();}
       console.error('[SeasonalEngine] Unable to start season:',error);
     }
   }
@@ -73,7 +78,7 @@ export function createSeasonalEngine(app,{onChange=()=>{}}={}) {
     document.removeEventListener('visibilitychange',onVisible);
     window.removeEventListener('focus',onVisible);
     window.removeEventListener('storage',onStorage);
-    controller?.dispose?.();controller=null;active=null;
+    controller?.dispose?.();scope?.dispose();scope=null;controller=null;active=null;
   }
   return {
     start,stop,sync,syncPatients,setEnabled,setPreview,
