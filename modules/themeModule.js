@@ -97,12 +97,19 @@ export function createThemeModule(app) {
   // Noviembre 2026: el valor por defecto es grafito/naranja.
   // La elección manual del usuario sigue teniendo prioridad y no se
   // persiste este valor temporal (en diciembre recupera el predeterminado).
+  function novemberCalendarActive() {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone:'America/Chihuahua', year:'numeric', month:'numeric'
+    }).formatToParts(new Date());
+    const part = type => Number(parts.find(p => p.type === type)?.value);
+    return part('year') === 2026 && part('month') === 11;
+  }
   function novemberPaletteDefault() {
     const dateParts = new Intl.DateTimeFormat('en-US', {
       timeZone: 'America/Chihuahua', year: 'numeric', month: 'numeric'
     }).formatToParts(new Date());
     const value = type => Number(dateParts.find(part => part.type === type)?.value);
-    return value('year') === 2026 && value('month') === 11;
+    return value('year') === 2026 && value('month') === 11 && localStorage.getItem('censo-november-theme') !== 'off';
   }
   const baseIds = new Set(bases.map(item => item.id));
   const accentIds = new Set(accents.map(item => item.id));
@@ -173,6 +180,7 @@ export function createThemeModule(app) {
   function updateToggles() {
     const values = {
       season: localStorage.getItem('censo-season') === 'off' ? 'off' : 'on',
+      november: localStorage.getItem('censo-november-theme') === 'off' ? 'off' : 'on',
       celebrations: localStorage.getItem('censo-celebration-mode') === 'all' ? 'all' : 'seasonal',
       sound: localStorage.getItem('censo-celebration-sound') === 'on' ? 'on' : 'off'
     };
@@ -254,7 +262,7 @@ export function createThemeModule(app) {
     const extras = document.createElement('div');
     extras.id = 'themeV2Extras';
     extras.innerHTML = `
-      ${SEASONAL_ENABLED ? toggleGroup('season', 'Tema', [['on', 'Tema estacional'], ['off', 'Tema normal']]) : ''}
+      ${novemberCalendarActive() ? toggleGroup('november', 'Decoración de temporada', [['on', 'Activada'], ['off', 'Desactivada']]) : (SEASONAL_ENABLED ? toggleGroup('season', 'Tema', [['on', 'Tema estacional'], ['off', 'Tema normal']]) : '')}
       ${toggleGroup('celebrations', 'Celebraciones', [['all', 'Aleatoria'], ['seasonal', 'Elegida']])}
       ${toggleGroup('sound', 'Sonidos', [['on', 'ON'], ['off', 'OFF']])}
       <section class="season-picker" aria-label="Celebración">
@@ -286,7 +294,11 @@ export function createThemeModule(app) {
     extras.querySelectorAll('[data-theme-toggle]').forEach(button => {
       button.addEventListener('click', () => {
         const {themeToggle, value} = button.dataset;
-        if (themeToggle === 'season') {
+        if (themeToggle === 'november') {
+          localStorage.setItem('censo-november-theme', value);
+          window.CensoApp?.setNovemberThemeEnabled?.(value === 'on');
+          refreshSeason();
+        } else if (themeToggle === 'season') {
           if (value === 'off') {
             localStorage.setItem('censo-season-last', localStorage.getItem('censo-season') || 'auto');
             localStorage.setItem('censo-season', 'off');
