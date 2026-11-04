@@ -14,7 +14,7 @@ export function createNovemberPetalField() {
   if(!ctx){canvas.remove();return {dispose(){}};}
   let width=1,height=1,dpr=1,frame=0,previous=0,alive=true,layers=[],still=null,phase=0;
   const reduced=window.matchMedia('(prefers-reduced-motion: reduce)');
-  const colors=['#facc15','#f59e0b','#fde047','#ffb52b','#fbbf24','#ffd66b','#fbb536'];
+  const colors=['#facc15','#f59e0b','#fde047','#ffb52b','#fbbf24','#ffd66b','#fbb536','#f97316','#fb923c','#ff8c1a','#ffa43a','#fdba74'];
   const random=(a,b)=>a+Math.random()*(b-a);
   const shade=()=>colors[Math.floor(Math.random()*colors.length)];
   function petal(g,x,y,size,color,alpha,angle){
@@ -41,7 +41,7 @@ export function createNovemberPetalField() {
     for(let i=0;i<count;i++){
       const x=random(0,width);
       const waveY=Math.sin((x/width)*Math.PI*2*waves+phaseOffset);
-      const noise=random(-.075,.075)*height;
+      const noise=random(-.115,.115)*height;
       const y=Math.max(2,Math.min(height-2,height*(center+amplitude*waveY)+noise));
       const size=random(sizeMin,sizeMax);
       const color=shade(),alpha=random(alphaMin,alphaMax),angle=random(-Math.PI,Math.PI);
@@ -62,12 +62,12 @@ export function createNovemberPetalField() {
     // Sinusoidales periódicas: 2 ciclos enteros por mosaico para
     // repetir sin saltos; velocidad y tamaño producen parallax.
     const unit=width/1000;
-    still=makeTile(Math.round(24*unit),5,8,.09,.23,.72,.11,2,.3);
+    still=makeTile(Math.round(30*unit),5,8,.09,.23,.72,.13,2,.3);
     layers=[
-      {tile:makeTile(Math.round(80*unit),6,10,.24,.43,.37,.12,2,0),speed:40,offset:0,vertical:4,rate:.34},
-      {tile:makeTile(Math.round(105*unit),7,12,.30,.51,.49,.14,2,1.1),speed:68,offset:width*.24,vertical:6,rate:.48},
-      {tile:makeTile(Math.round(120*unit),8,15,.39,.61,.64,.17,2,2.2),speed:104,offset:width*.50,vertical:8,rate:.66},
-      {tile:makeTile(Math.round(100*unit),10,17,.50,.76,.74,.12,2,3.3),speed:144,offset:width*.73,vertical:10,rate:.86}
+      {tile:makeTile(Math.round(96*unit),6,10,.24,.43,.37,.145,2,0),speed:40,offset:0,vertical:4,rate:.34},
+      {tile:makeTile(Math.round(126*unit),7,12,.30,.51,.49,.17,2,1.1),speed:68,offset:width*.24,vertical:6,rate:.48},
+      {tile:makeTile(Math.round(144*unit),8,15,.39,.61,.64,.20,2,2.2),speed:104,offset:width*.50,vertical:8,rate:.66},
+      {tile:makeTile(Math.round(120*unit),10,17,.50,.76,.74,.15,2,3.3),speed:144,offset:width*.73,vertical:10,rate:.86}
     ];
     previous=0;
   }
@@ -99,7 +99,7 @@ export function createNovemberPetalField() {
   const onVisibility=()=>{previous=0;if(document.hidden)ctx.clearRect(0,0,width,height);};
   document.addEventListener('visibilitychange',onVisibility);
   redraw();frame=requestAnimationFrame(paint);
-  return {getStatus(){return {revision:'wind-v3.06',running:alive&&!document.hidden&&!reduced.matches&&!document.body.classList.contains('effect-none'),width,layerSpeeds:layers.map(layer=>layer.speed),layerOffsets:layers.map(layer=>Math.round(layer.offset))};},dispose(){
+  return {getStatus(){return {revision:'wind-v3.07',running:alive&&!document.hidden&&!reduced.matches&&!document.body.classList.contains('effect-none'),width,layerSpeeds:layers.map(layer=>layer.speed),layerOffsets:layers.map(layer=>Math.round(layer.offset))};},dispose(){
     alive=false;cancelAnimationFrame(frame);ro.disconnect();
     document.removeEventListener('visibilitychange',onVisibility);
     layers=[];still=null;canvas.remove();
