@@ -28,7 +28,10 @@ export function createNovemberPetalField() {
     g.fill();
     g.restore();
   }
-  function makeTile(count,sizeMin,sizeMax,alphaMin,alphaMax,bandCenter=.55,bandSpread=.43){
+  // La onda es espacial: cada pétalo sigue una sinusoide real
+  // definida por su coordenada X, no una franja uniforme de altura.
+  // Tres ciclos por lienzo y distinta fase/profundidad para cada plano.
+  function makeTile(count,sizeMin,sizeMax,alphaMin,alphaMax,center=.55,amplitude=.16,waves=2,phaseOffset=0){
     const tile=document.createElement('canvas');
     tile.width=Math.max(1,Math.ceil(width*dpr));
     tile.height=Math.max(1,Math.ceil(height*dpr));
@@ -36,13 +39,15 @@ export function createNovemberPetalField() {
     if(!g)return tile;
     g.setTransform(dpr,0,0,dpr,0,0);
     for(let i=0;i<count;i++){
-      const x=random(0,width),y=Math.max(2,Math.min(height-2,height*(bandCenter+random(-bandSpread,bandSpread)))),s=random(sizeMin,sizeMax);
+      const x=random(0,width);
+      const waveY=Math.sin((x/width)*Math.PI*2*waves+phaseOffset);
+      const noise=random(-.075,.075)*height;
+      const y=Math.max(2,Math.min(height-2,height*(center+amplitude*waveY)+noise));
+      const size=random(sizeMin,sizeMax);
       const color=shade(),alpha=random(alphaMin,alphaMax),angle=random(-Math.PI,Math.PI);
-      petal(g,x,y,s,color,alpha,angle);
-      // La misma figura aparece al otro extremo cuando toca el borde,
-      // de modo que los mosaicos continúan sin saltos.
-      if(x<s) petal(g,x+width,y,s,color,alpha,angle);
-      if(x>width-s) petal(g,x-width,y,s,color,alpha,angle);
+      petal(g,x,y,size,color,alpha,angle);
+      if(x<size)petal(g,x+width,y,size,color,alpha,angle);
+      if(x>width-size)petal(g,x-width,y,size,color,alpha,angle);
     }
     return tile;
   }
@@ -54,15 +59,15 @@ export function createNovemberPetalField() {
     canvas.height=Math.max(1,Math.ceil(height*dpr));
     canvas.style.width=width+'px';canvas.style.height=height+'px';
     ctx.setTransform(dpr,0,0,dpr,0,0);
-    // Distribución ondulada, comparable a las cuatro olas originales.
-    // Densidad alta pero imágenes precalculadas: un solo Canvas.
+    // Sinusoidales periódicas: 2 ciclos enteros por mosaico para
+    // repetir sin saltos; velocidad y tamaño producen parallax.
     const unit=width/1000;
-    still=makeTile(Math.round(42*unit),5,9,.14,.30,.67,.32);
+    still=makeTile(Math.round(24*unit),5,8,.09,.23,.72,.11,2,.3);
     layers=[
-      {tile:makeTile(Math.round(75*unit),6,11,.22,.42,.24,.19),speed:12,offset:0,vertical:4,rate:.32},
-      {tile:makeTile(Math.round(100*unit),7,13,.28,.52,.42,.22),speed:20,offset:width*.24,vertical:6,rate:.46},
-      {tile:makeTile(Math.round(108*unit),8,15,.37,.63,.63,.23),speed:29,offset:width*.50,vertical:8,rate:.60},
-      {tile:makeTile(Math.round(85*unit),10,18,.49,.78,.78,.19),speed:42,offset:width*.73,vertical:10,rate:.78}
+      {tile:makeTile(Math.round(80*unit),6,10,.24,.43,.37,.12,2,0),speed:11,offset:0,vertical:2,rate:.22},
+      {tile:makeTile(Math.round(105*unit),7,12,.30,.51,.49,.14,2,1.1),speed:20,offset:width*.24,vertical:4,rate:.32},
+      {tile:makeTile(Math.round(120*unit),8,15,.39,.61,.64,.17,2,2.2),speed:31,offset:width*.50,vertical:5,rate:.43},
+      {tile:makeTile(Math.round(100*unit),10,17,.50,.76,.74,.12,2,3.3),speed:44,offset:width*.73,vertical:6,rate:.56}
     ];
     previous=0;
   }
