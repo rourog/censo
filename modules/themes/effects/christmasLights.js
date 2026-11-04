@@ -1,20 +1,9 @@
 /* Christmas lights, one bulb per patient (up to visible header capacity).
  * Read-only snapshots: no Firebase access, clinical writes or layout changes.
  */
-const AREA_COLORS=Object.freeze({
-  'SALA DE CHOQUE':['#ef4444','#f97316','#fbbf24'],
-  'OBSERVACION':['#f472b6','#fb7185','#fda4af'],
-  'TRAUMA MENOR':['#22c55e','#4ade80','#86efac'],
-  'PEDIATRIA':['#38bdf8','#67e8f9','#93c5fd'],
-  'EXTRAS':['#fbbf24','#fde047','#f59e0b'],
-  'SIN AREA':['#f8fafc','#e2e8f0','#cbd5e1']
-});
-const normalizeArea=value=>String(value||'').normalize('NFD')
-  .replace(/[\u0300-\u036f]/g,'').trim().toUpperCase();
-const colorFor=(area,index)=>{
-  const tones=AREA_COLORS[normalizeArea(area)]||AREA_COLORS['SIN AREA'];
-  return tones[index%tones.length];
-};
+// Christmas palette: alternating red and warm/cool whites, no area colors.
+const HOLIDAY_COLORS=Object.freeze(['#d92c3b','#fff8e9','#b91c2c','#eef7ff','#f04755','#ffffff']);
+const colorFor=index=>HOLIDAY_COLORS[index%HOLIDAY_COLORS.length];
 
 export function createChristmasLights(header){
   const root=document.createElement('div');
@@ -30,32 +19,43 @@ export function createChristmasLights(header){
     timers.add(id);return id;
   };
   function slots(){
+    const title=header.querySelector('.main-title');
     const left=header.querySelector('.header-left');
     const right=header.querySelector('.header-right');
-    const h=header.getBoundingClientRect();
-    if(h.width<440)return [];
+    if(!title)return [];
+    const h=header.getBoundingClientRect(),t=title.getBoundingClientRect();
+    if(h.width<440||t.width<60)return [];
     const boundaries=el=>el?Array.from(el.querySelectorAll('button,[role="button"]'))
       .filter(node=>node.getClientRects().length&&getComputedStyle(node).display!=='none')
       .map(node=>node.getBoundingClientRect()):[];
     const L=boundaries(left),R=boundaries(right);
-    const leftEdge=L.length?Math.max(...L.map(r=>r.right))-h.left+14:20;
-    const rightEdge=R.length?Math.min(...R.map(r=>r.left))-h.left-14:h.width-20;
-    // Deliberately ignore the title: bulbs are an overlay *behind* it.
-    // Reserve only areas occupied by actual action buttons.
-    const positions=[];
-    for(let x=leftEdge+8;x+14<rightEdge;x+=31)positions.push(Math.round(x));
-    return positions.slice(0,48);
+    const leftLimit=L.length?Math.max(...L.map(r=>r.right))-h.left+16:16;
+    const rightLimit=R.length?Math.min(...R.map(r=>r.left))-h.left-16:h.width-16;
+    const margin=22,stride=30;
+    // Reserve the heading exactly. Fill symmetrical banks towards the margins.
+    const leftEnd=t.left-h.left-margin;
+    const rightStart=t.right-h.left+margin;
+    const leftSlots=[],rightSlots=[];
+    for(let x=leftEnd-13;x>=leftLimit+5;x-=stride)leftSlots.push(Math.round(x));
+    for(let x=rightStart+5;x+13<=rightLimit;x+=stride)rightSlots.push(Math.round(x));
+    // Alternation guarantees that even small censuses populate both sides.
+    const out=[];
+    for(let i=0;i<Math.max(leftSlots.length,rightSlots.length);i++){
+      if(i<leftSlots.length)out.push(leftSlots[i]);
+      if(i<rightSlots.length)out.push(rightSlots[i]);
+    }
+    return out.slice(0,48);
   }
   function draw(){
     if(disposed)return;
     const coordinates=slots();
     const size=Math.min(patients.length,coordinates.length);
-    const key=coordinates.join(',')+'|'+patients.map(p=>normalizeArea(p?.area)).join(',');
+    const key=coordinates.join(',')+'|'+patients.length;
     if(key===layoutKey)return;
     layoutKey=key;
     root.replaceChildren(cable);
     for(let i=0;i<size;i++){
-      const x=coordinates[i],color=colorFor(patients[i]?.area,i);
+      const x=coordinates[i],color=colorFor(i);
       const pine=document.createElement('span');
       pine.className='christmas-pine';pine.style.left=(x-10)+'px';
       const light=document.createElement('button');
