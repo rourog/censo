@@ -41,13 +41,21 @@ export function initChristmasTheme(app,{scope,config,createSnowfall,createSnowMo
  body.christmas-theme .desktop-waves-bg::before,
  body.christmas-theme .desktop-waves-bg::after{content:none!important;}
  body.christmas-theme #mainAppContainer{
-   background-image:linear-gradient(rgba(10,16,27,.86),rgba(10,16,27,.86)),
+   background-image:linear-gradient(rgba(8,28,22,.87),rgba(8,28,22,.87)),
      url('./assets/themes/christmas/tile.webp');
-   background-size:auto,270px 270px;
+   background-size:auto,175px 175px;
    background-repeat:repeat;
  }
+ /* Pine-green surfaces pair with the wine-red festive header;
+    individual palette selections remain available in Appearance. */
+ body.christmas-theme .header{
+   border-bottom-color:rgba(161,39,52,.6);
+ }
+ body.christmas-theme .christmas-winter-glow{
+   box-shadow:inset 0 -8px 22px rgba(3,49,30,.25);
+ }
  .christmas-winter-glow{position:absolute;inset:0;z-index:0;pointer-events:none;
-   background:linear-gradient(90deg,rgba(100,10,23,.61),rgba(65,10,20,.24) 48%,rgba(140,12,30,.57));}
+   background:linear-gradient(90deg,rgba(109,13,24,.67),rgba(19,58,34,.48) 48%,rgba(126,16,31,.66));}
  .christmas-snow{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none;opacity:.85;}
  .christmas-snow-mountains{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden;}
  .christmas-snow-mountains svg{position:absolute;inset:0;width:100%;height:100%;display:block;}
@@ -70,9 +78,9 @@ export function initChristmasTheme(app,{scope,config,createSnowfall,createSnowMo
    animation-delay:var(--sway-delay,0s);}
  .christmas-bulb.is-lit{background:var(--bulb-color);box-shadow:0 0 8px 2px var(--bulb-glow);
    animation:christmas-sway 5.2s ease-in-out infinite,
-     christmas-glimmer 4.4s ease-in-out infinite alternate,
-     christmas-pulse 20s ease-in-out infinite;
-   animation-delay:var(--sway-delay,0s),var(--glow-delay,0s),0s;}
+     christmas-glimmer 2.35s ease-in-out infinite,
+     christmas-pulse 7.4s ease-in-out infinite;
+   animation-delay:var(--sway-delay,0s),var(--glow-delay,0s),var(--pulse-delay,0s);}
  .christmas-bulb::before{content:'';position:absolute;top:-4px;left:30%;width:40%;height:4px;
    background:#aaa27e;border-radius:1px;}
  .christmas-bulb:focus-visible{outline:2px solid white;outline-offset:3px;}
@@ -81,17 +89,22 @@ export function initChristmasTheme(app,{scope,config,createSnowfall,createSnowMo
    animation:christmas-spark .65s ease-out forwards;}
  @keyframes christmas-spark{from{opacity:1;transform:translate(0,0) rotate(0)}
    to{opacity:0;transform:translate(var(--dx),var(--dy)) rotate(240deg)}}
- @keyframes christmas-glimmer{0%,100%{opacity:.89}
-   50%{opacity:1}}
+ @keyframes christmas-glimmer{0%,100%{opacity:.85}
+   10%{opacity:1} 19%{opacity:.54} 24%{opacity:1}
+   48%{opacity:.92} 52%{opacity:.48} 59%{opacity:1}
+   75%{opacity:.74} 83%{opacity:1}}
  @keyframes christmas-sway{0%,100%{transform:rotate(-1.8deg)}
    50%{transform:rotate(1.8deg)}}
  @keyframes christmas-pine-sway{0%,100%{transform:rotate(-1deg)}
    50%{transform:rotate(1deg)}}
- @keyframes christmas-pulse{0%,78%,100%{filter:brightness(1);
-   box-shadow:0 0 8px 2px var(--bulb-glow);}
-   86%{filter:brightness(1.24);
-   box-shadow:0 0 14px 4px var(--bulb-glow),0 0 23px 7px var(--bulb-glow);}
-   93%{filter:brightness(1.08);box-shadow:0 0 9px 3px var(--bulb-glow);}}
+ @keyframes christmas-pulse{0%,100%{filter:brightness(.85);
+   box-shadow:0 0 6px 1px var(--bulb-glow);}
+   12%{filter:brightness(1.32);box-shadow:0 0 13px 4px var(--bulb-glow);}
+   17%{filter:brightness(.72);box-shadow:0 0 5px 1px var(--bulb-glow);}
+   23%{filter:brightness(1.48);box-shadow:0 0 17px 5px var(--bulb-glow),0 0 27px 8px var(--bulb-glow);}
+   39%,68%{filter:brightness(.88);box-shadow:0 0 6px 1px var(--bulb-glow);}
+   76%{filter:brightness(1.36);box-shadow:0 0 15px 5px var(--bulb-glow);}
+   84%{filter:brightness(1.04);box-shadow:0 0 10px 3px var(--bulb-glow);}}
  .christmas-fireworks{position:fixed;inset:0;width:100vw;height:100vh;z-index:80;pointer-events:none;}
  @media(max-width:767px){.christmas-lights{display:none!important;}
    body.christmas-theme .header .title-censo{font-size:2.1rem!important;}}
@@ -112,7 +125,7 @@ export function initChristmasTheme(app,{scope,config,createSnowfall,createSnowMo
  return {
   syncPatients(patients){lights.syncPatients(patients);},
   salute:options=>fireworks.salute(options),
-  getStatus:()=>({revision:'christmas-v5',lights:lights.getStatus(),snow:snow.getStatus(),mountains:mountains.getStatus(),
+  getStatus:()=>({revision:'christmas-v6',lights:lights.getStatus(),snow:snow.getStatus(),mountains:mountains.getStatus(),
     fireworks:fireworks.getStatus()}),
   dispose(){
    if(disposed)return;
