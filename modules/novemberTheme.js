@@ -137,7 +137,7 @@ function shuffled(n) {
 }
 
 export function initNovemberTheme(app) {
-  if (!currentInChihuahua() || window.__novemberThemeController) return null;
+  if (!currentInChihuahua() || localStorage.getItem('censo-november-theme') === 'off' || window.__novemberThemeController) return null;
   const header=document.querySelector('.header');
   if (!header) return null;
   document.body.classList.add('november-theme');
@@ -335,6 +335,7 @@ export function initNovemberTheme(app) {
     for(const [icon,oldColor] of tintedIcons)icon.style.color=oldColor;
     tintedIcons.clear();
     background.remove();flags.remove();canvas.remove();document.body.classList.remove('november-theme');
+    if(app.syncNovemberPatients===syncPatients)delete app.syncNovemberPatients;
     delete window.__novemberThemeController;
     if(typeof app.initPlexus==='function')app.initPlexus();
   }};
