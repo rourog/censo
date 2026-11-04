@@ -132,6 +132,12 @@ export async function bootApp() {
   app.initTheme();
   // Decoración de noviembre aislada del flujo clínico.
   const { initNovemberTheme } = await import(moduleUrl('novemberTheme'));
+  app.setNovemberThemeEnabled = enabled => {
+    if (enabled) initNovemberTheme(app);
+    else window.__novemberThemeController?.dispose();
+    // El controlador del Plexus normal se mantiene fuera del tema estacional.
+    if (!enabled) app.initPlexus?.();
+  };
   initNovemberTheme(app);
   app.initPrintUi();
   app.initSubrogadaUi();
