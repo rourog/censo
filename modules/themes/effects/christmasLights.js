@@ -30,7 +30,9 @@ export function createChristmasLights(header){
   function draw(){
     if(disposed)return;
     const positions=slots(),w=Math.round(header.getBoundingClientRect().width);
-    if(w===width&&root.querySelectorAll('button').length===positions.length)return;
+    const current=Array.from(root.querySelectorAll('.christmas-bulb'));
+    if(w===width&&current.length===positions.length&&
+      current.every((bulb,i)=>Number(bulb.dataset.position)===positions[i]))return;
     width=w;root.replaceChildren();
     for(let i=0;i<positions.length;i++){
       const x=positions[i],color=colors[i%colors.length];
@@ -38,7 +40,7 @@ export function createChristmasLights(header){
       pine.className='christmas-pine';pine.style.left=(x-10)+'px';
       const light=document.createElement('button');
       light.type='button';light.className='christmas-bulb';
-      light.style.left=x+'px';light.style.animationDelay=(-i*.41)+'s';
+      light.style.left=x+'px';light.dataset.position=String(x);light.style.animationDelay=(-i*.41)+'s';
       light.style.setProperty('--bulb-color',color);
       light.style.setProperty('--bulb-glow',color+'88');
       light.dataset.color=color;
