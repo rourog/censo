@@ -11,7 +11,7 @@
   <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0f172a">
   <meta name="theme-color" media="(prefers-color-scheme: light)" content="#eef4fb">
 
-  <title>Censo Urgencias</title>
+  <title>Censo Urgencias · BETA</title>
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icono.png">
 
@@ -27,7 +27,7 @@
   <style id="censoBootStyle">html{background:#0f172a}body{visibility:hidden}</style>
   <link id="censoAppStylesheet" rel="stylesheet">
 </head>
-<body class="base-dark accent-blue">
+<body class="base-dark accent-blue" data-censo-channel="beta">
 
   <div id="loginScreen" class="modal-overlay active" style="z-index: 10000; background: var(--bg); flex-direction: column; justify-content: center; align-items: center; gap: 15px;">
 
@@ -48,7 +48,7 @@
 
     <div style="position: absolute; bottom: 30px; font-size: 0.7rem; font-family: 'Space Mono', monospace; font-weight: 700; letter-spacing: 0.1em;">
       <span style="color: var(--muted);">ROUROG</span> <span style="color: var(--text); opacity: 0.5;">Innovations</span>
-      <span data-censo-version style="opacity: 0.3; margin-left: 6px;">v—</span>
+      <span data-censo-version style="opacity: 0.9; margin-left: 6px; color: #fb923c;">Beta V —</span>
     </div>
   </div>
 
@@ -125,7 +125,7 @@
 
     <div class="footer">
       Hospital Regional de Delicias - <span style="color: var(--accent); font-weight: 600;">Rourog Innovations</span>
-      <span data-censo-version style="opacity: 0.4; font-size: 0.8em; margin-left: 8px;">v—</span>
+      <span data-censo-version style="opacity: 0.9; font-size: 0.8em; margin-left: 8px; color: #fb923c;">Beta V —</span>
     </div>
 
     <div id="easterEggContainer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; pointer-events: none; overflow: hidden;"></div>
@@ -317,7 +317,7 @@
       };
 
       document.querySelectorAll('[data-censo-version]').forEach((element) => {
-        element.textContent = `v${displayVersion}`;
+        element.textContent = `Beta V ${displayVersion.replace(/^(?:beta[\\s-]*|v)/i, '')}`;
       });
 
       const stylesheet = document.getElementById('censoAppStylesheet');
