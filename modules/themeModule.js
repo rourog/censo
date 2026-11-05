@@ -103,6 +103,19 @@ export function createThemeModule(app) {
     { id: 'effect-none', name: 'Ninguna', icon: 'motion_photos_off' }
   ];
 
+  // Complete appearance combinations. Personalizado preserves independent choices.
+  const themePresets = [
+    {id:'graphite',name:'Grafito',base:'base-surface-graphite',accent:'accent-blue'},
+    {id:'petrol',name:'Azul petróleo',base:'base-surface-petrol',accent:'accent-teal'},
+    {id:'forest',name:'Verde bosque',base:'base-surface-forest',accent:'accent-emerald'},
+    {id:'wine',name:'Vino',base:'base-surface-wine',accent:'accent-crimson'},
+    {id:'purple',name:'Púrpura',base:'base-surface-purple',accent:'accent-violet'},
+    {id:'pine-red',name:'Pino y rojo',base:'base-surface-forest',accent:'accent-red'},
+    {id:'oled',name:'OLED',base:'base-midnight',accent:'accent-silver'},
+    {id:'ice',name:'Hielo',base:'base-ice',accent:'accent-sky'},
+    {id:'light',name:'Blanco',base:'base-light',accent:'accent-blue'}
+  ];
+
   const DEFAULT_BASE = 'base-surface-graphite';
   const DEFAULT_ACCENT = 'accent-blue';
   const DEFAULT_EFFECT = 'effect-waves';
@@ -159,6 +172,58 @@ export function createThemeModule(app) {
       effect: validEffect(localStorage.getItem(preferenceKey('effect')) || defaults.effect)
     };
   }
+  function getActivePreset() {
+    const chosen=localStorage.getItem(preferenceKey('preset'));
+    if(chosen==='custom')return 'custom';
+    const theme=getCurrentTheme();
+    // Interpret existing v4 selections without discarding either saved color.
+    const matching=themePresets.find(p=>p.base===theme.base&&p.accent===theme.accent);
+    return matching?.id||'custom';
+  }
+  function updatePresetPicker(){
+    const chosen=getActivePreset();
+    document.querySelectorAll('[data-theme-preset]').forEach(button=>{
+      const active=button.dataset.themePreset===chosen;
+      button.classList.toggle('active',active);
+      button.setAttribute('aria-pressed',String(active));
+    });
+    const independent=chosen==='custom';
+    const customBase=document.getElementById('themeCustomBasePanel');
+    if(customBase)customBase.hidden=!independent;
+    const accentPanel=document.getElementById('accentColorPicker')?.parentElement;
+    if(accentPanel)accentPanel.hidden=!independent;
+  }
+  function choosePreset(id){
+    if(id==='custom'){
+      const current=getCurrentTheme();
+      const base=validBase(localStorage.getItem(preferenceKey('custom-base'))||current.base);
+      const accent=validAccent(localStorage.getItem(preferenceKey('custom-accent'))||current.accent);
+      localStorage.setItem(preferenceKey('preset'),'custom');
+      localStorage.setItem(preferenceKey('custom-base'),base);
+      localStorage.setItem(preferenceKey('custom-accent'),accent);
+      applyTheme(base,accent);
+      return;
+    }
+    const selected=themePresets.find(p=>p.id===id);
+    if(!selected)return;
+    if(getActivePreset()==='custom'){
+      const current=getCurrentTheme();
+      localStorage.setItem(preferenceKey('custom-base'),current.base);
+      localStorage.setItem(preferenceKey('custom-accent'),current.accent);
+    }
+    localStorage.setItem(preferenceKey('preset'),id);
+    applyTheme(selected.base,selected.accent);
+  }
+  function chooseCustom(base=null,accent=null){
+    const current=getCurrentTheme();
+    const nextBase=validBase(base||current.base);
+    const nextAccent=validAccent(accent||current.accent);
+    localStorage.setItem(preferenceKey('preset'),'custom');
+    localStorage.setItem(preferenceKey('custom-base'),nextBase);
+    localStorage.setItem(preferenceKey('custom-accent'),nextAccent);
+    applyTheme(nextBase,nextAccent);
+  }
+
   function applySeasonalBanner() {
     const profile = getSeasonalProfile(), body = document.body;
     const props = { '--season-banner-bg': 'background', '--season-banner-text': 'text', '--season-banner-accent': 'accent', '--season-title-font': 'titleFont' };
@@ -223,6 +288,40 @@ export function createThemeModule(app) {
         </div>
       </section>
     `;
+  }
+
+  function renderThemePresets(){
+    return `<section class="theme-picker-group" aria-label="Temas completos">
+      <div class="theme-picker-group__label"><span>Temas completos</span><span>${themePresets.length+1}</span></div>
+      <div class="theme-presets-grid">
+        ${themePresets.map(p=>{
+          const base=bases.find(item=>item.id===p.base);
+          const accent=accents.find(item=>item.id===p.accent);
+          const light=base?.mode==='light';
+          const head=base?.header||(light?'#e2e8f0':'#303a46');
+          const card=light?'#ffffff':'#242c35';
+          const foreground=light?'#253246':'#e7eef8';
+          const accentColor=light?accent?.light:accent?.dark;
+          return `<button type="button" class="theme-preset-button" data-theme-preset="${p.id}"
+            aria-label="Tema ${p.name}" aria-pressed="false" title="${p.name}"
+            style="--preset-bg:${base?.color};--preset-head:${head};--preset-card:${card};
+              --preset-accent:${accentColor};--preset-text:${foreground}">
+            <span class="theme-preset-art" aria-hidden="true">
+              <span class="theme-preset-art__header"></span>
+              <span class="theme-preset-art__card"><i></i><b></b></span>
+            </span>
+            <span class="theme-preset-name">${p.name}</span>
+          </button>`;
+        }).join('')}
+        <button type="button" class="theme-preset-button theme-preset-button--custom"
+          data-theme-preset="custom" aria-label="Tema Personalizado" aria-pressed="false">
+          <span class="theme-preset-art theme-preset-art--custom" aria-hidden="true">
+            <span class="material-symbols-outlined">tune</span>
+          </span>
+          <span class="theme-preset-name">Personalizado</span>
+        </button>
+      </div>
+    </section>`;
   }
 
   function renderAccentGrid() {
@@ -354,7 +453,8 @@ export function createThemeModule(app) {
       button.addEventListener('click', () => applyEffect(button.dataset.effect));
     });
     document.getElementById('themeResetBtn')?.addEventListener('click', () => {
-      for (const part of ['base', 'accent', 'effect']) localStorage.removeItem(preferenceKey(part));
+      for (const part of ['base','accent','effect','preset','custom-base','custom-accent'])
+        localStorage.removeItem(preferenceKey(part));
       refreshSeason();
     });
   }
@@ -368,35 +468,42 @@ export function createThemeModule(app) {
     baseGrid.className = 'theme-picker-section';
     accentGrid.className = 'theme-picker-section';
     baseGrid.innerHTML =
-      `<div class="theme-palette-primary">${renderBaseGroup('surface','Paletas de superficies · fondo + encabezado')}</div>
-       <details class="theme-palette-legacy" id="legacyThemePalettes">
-         <summary>Otras paletas · compatibilidad</summary>
-         <div class="theme-palette-legacy__grid">
-           ${renderBaseGroup('dark','Oscuros anteriores')}
-           ${renderBaseGroup('light','Claros')}
+      `${renderThemePresets()}
+       <div id="themeCustomBasePanel" class="theme-custom-panel" hidden>
+         <div class="theme-picker-group__label"><span>Personalizado · paleta de superficies</span></div>
+         <div class="theme-palette-primary">
+           ${renderBaseGroup('surface','Fondo y encabezados')}
          </div>
-       </details>`;
-    // Reveal the old theme if a user already has one selected.
-    const savedBase = getCurrentTheme().base;
-    const legacy = document.getElementById('legacyThemePalettes');
-    if (legacy && !bases.some(item => item.id === savedBase && item.mode === 'surface')) {
-      legacy.open = true;
-    }
-    accentGrid.innerHTML = renderAccentGrid();
+         <details class="theme-palette-legacy" id="legacyThemePalettes">
+           <summary>Más fondos · opciones anteriores</summary>
+           <div class="theme-palette-legacy__grid">
+             ${renderBaseGroup('dark','Oscuros')}
+             ${renderBaseGroup('light','Claros')}
+           </div>
+         </details>
+       </div>`;
+    const savedBase=getCurrentTheme().base;
+    const legacy=document.getElementById('legacyThemePalettes');
+    if(legacy && !bases.some(item=>item.id===savedBase&&item.mode==='surface'))legacy.open=true;
+    accentGrid.innerHTML=renderAccentGrid();
 
-    baseGrid.querySelectorAll('.base-swatch').forEach(button => {
-      button.addEventListener('click', () => applyTheme(button.dataset.val, null));
+    baseGrid.querySelectorAll('[data-theme-preset]').forEach(button=>{
+      button.addEventListener('click',()=>choosePreset(button.dataset.themePreset));
     });
-    accentGrid.querySelectorAll('.accent-swatch').forEach(button => {
-      button.addEventListener('click', () => applyTheme(null, button.dataset.val));
+    baseGrid.querySelectorAll('.base-swatch').forEach(button=>{
+      button.addEventListener('click',()=>chooseCustom(button.dataset.val,null));
+    });
+    accentGrid.querySelectorAll('.accent-swatch').forEach(button=>{
+      button.addEventListener('click',()=>chooseCustom(null,button.dataset.val));
     });
 
-    const baseLabel = baseGrid.parentElement?.querySelector('label');
-    const accentLabel = accentGrid.parentElement?.querySelector('label');
-    if (baseLabel) baseLabel.textContent = 'PALETA DE SUPERFICIES';
-    if (accentLabel) accentLabel.textContent = 'ACENTO INDEPENDIENTE';
+    const baseLabel=baseGrid.parentElement?.querySelector('label');
+    const accentLabel=accentGrid.parentElement?.querySelector('label');
+    if(baseLabel)baseLabel.textContent='TEMA';
+    if(accentLabel)accentLabel.textContent='PERSONALIZADO · ACENTO';
 
     ensureExtras();
+    updatePresetPicker();
   }
 
   function removeOldThemeClasses() {
@@ -426,7 +533,9 @@ export function createThemeModule(app) {
     const baseName = bases.find(item => item.id === base)?.name || base;
     const accentName = accents.find(item => item.id === accent)?.name || accent;
     const selection = document.getElementById('themeSelectionLabel');
-    if (selection) selection.textContent = `${baseName} · ${accentName}`;
+    const selectedPreset=themePresets.find(p=>p.id===getActivePreset());
+    if(selection)selection.textContent=selectedPreset?.name || `Personalizado · ${baseName} · ${accentName}`;
+    updatePresetPicker();
   }
 
   function updateEffectPicker(effect) {
