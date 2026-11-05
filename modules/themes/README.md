@@ -13,7 +13,7 @@ The engine is independent of the clinical workflow and **must never write to Fir
 - `seasons/christmas/config.js`: December calendar, graphite/red defaults and Christmas celebration.
 - `seasons/christmas/visuals.js`: Christmas header, snow and interactive lights controller.
 - `effects/snowfall.js`: one low-DPR Canvas with layered snow.
-- `effects/christmasLights.js`: clickable bulbs, same-color spark burst and 2s relight.
+- `effects/christmasLights.js`: 30 fixed patient bulbs, transient pointer/keyboard illumination, 20s shuffle, glass shards/electric sparks and 2s repair.
 - `effects/christmasFireworks.js`: explicit 5s celebration with disposable Canvas.
 
 ## Renderer interface

@@ -3,6 +3,7 @@
  */
 const PER_SIDE = 15;
 const TOTAL_BULBS = PER_SIDE * 2;
+const DECORATIVE_COLORS = ['#ff4455','#dc2626','#fb7185','#f43f5e'];
 const GROUP_COLORS = Object.freeze({
   'SALA DE CHOQUE':'#ff4455',
   'OBSERVACION':'#dc2626',
@@ -104,18 +105,25 @@ export function createChristmasLights(header){
       bulb.style.top=(14+Math.sin(index*.55)*5)+'px';
       bulb.style.setProperty('--bulb-size',layout.bulbSize+'px');
       bulb.style.setProperty('--sway-delay',(-((index*.61)%5.7))+'s');
-      bulb.style.setProperty('--glow-delay',(-((index*.79)%2.35))+'s');
-      bulb.style.setProperty('--pulse-delay',(-((index*1.37)%7.4))+'s');
-      bulb.dataset.color=color||'#ffffff';
-      if(color){
-        bulb.style.setProperty('--bulb-color',color);
-        bulb.style.setProperty('--bulb-glow',color+'88');
-      }
-      bulb.setAttribute('aria-label',color?'Apagar luz navideña':'Luz navideña sin encender');
-      bulb.disabled=!color;
+      bulb.style.setProperty('--glow-delay',(-((index*.79)%1.6))+'s');
+      bulb.style.setProperty('--pulse-delay',(-((index*1.37)%1.25))+'s');
+      setBulbColor(bulb,color||DECORATIVE_COLORS[index%DECORATIVE_COLORS.length]);
+      labelBulb(bulb);
       root.append(pine,bulb);
     });
     updateIllumination();
+  }
+  function setBulbColor(bulb,color){
+    bulb.dataset.color=color;
+    bulb.style.setProperty('--bulb-color',color);
+    bulb.style.setProperty('--bulb-glow',color+'88');
+  }
+  function labelBulb(bulb){
+    bulb.setAttribute('aria-label',bulb.classList.contains('is-off')
+      ?'Foco roto; se repondrá en un momento'
+      :bulb.classList.contains('is-lit')
+        ?'Foco encendido por paciente. Romper foco'
+        :'Encender foco al pasar el cursor o enfocar. Romper con clic');
   }
   function updateIllumination(){
     if(disposed)return;
@@ -129,46 +137,73 @@ export function createChristmasLights(header){
       const color=lit.get(index);
       bulb.classList.toggle('is-lit',!!color);
       bulb.classList.toggle('is-idle',!color);
-      bulb.classList.remove('is-off');
-      bulb.disabled=!color;
-      bulb.dataset.color=color||'#ffffff';
-      bulb.setAttribute('aria-label',color?'Apagar luz navideña':'Luz navideña sin encender');
-      if(color){bulb.style.setProperty('--bulb-color',color);
-        bulb.style.setProperty('--bulb-glow',color+'88');}
-      else{bulb.style.removeProperty('--bulb-color');bulb.style.removeProperty('--bulb-glow');}
+      // Patient assignments change without resetting a break or pointer/focus state.
+      setBulbColor(bulb,color||DECORATIVE_COLORS[index%DECORATIVE_COLORS.length]);
+      labelBulb(bulb);
     });
   }
   function extinguish(bulb){
-    if(!bulb.classList.contains('is-lit')||bulb.classList.contains('is-off'))return;
+    if(bulb.classList.contains('is-off'))return;
     bulb.classList.add('is-off');
-    bulb.setAttribute('aria-label','Luz apagada');
+    labelBulb(bulb);
     if(!matchMedia('(prefers-reduced-motion: reduce)').matches){
-      const x=bulb.offsetLeft+bulb.offsetWidth/2;
-      const y=bulb.offsetTop+bulb.offsetHeight/2;
-      for(let i=0;i<10;i++){
-        const spark=document.createElement('span');
-        spark.className='christmas-spark';
-        spark.style.left=x+'px';spark.style.top=y+'px';
-        spark.style.background=bulb.dataset.color;
-        const a=i*Math.PI/5;
-        spark.style.setProperty('--dx',Math.cos(a)*(14+Math.random()*15)+'px');
-        spark.style.setProperty('--dy',Math.sin(a)*(12+Math.random()*17)+'px');
-        root.append(spark);
-        later(()=>spark.remove(),750);
+      // Use visual bounds so fragments originate at the swaying glass itself.
+      const glass=bulb.getBoundingClientRect(), bounds=root.getBoundingClientRect();
+      const x=glass.left+glass.width/2-bounds.left;
+      const y=glass.top+glass.height/2-bounds.top;
+      const fragment=(kind)=>{
+        const node=document.createElement('span');
+        node.className=kind;
+        node.setAttribute('aria-hidden','true');
+        node.style.left=x+'px';node.style.top=y+'px';
+        node.style.setProperty('--fragment-color',bulb.dataset.color);
+        root.append(node);later(()=>node.remove(),900);
+        return node;
+      };
+      fragment('christmas-break-flash');
+      for(let i=0;i<8;i++){
+        const shard=fragment('christmas-glass-shard');
+        const angle=(i/8)*Math.PI*2;
+        const distance=12+Math.random()*20;
+        shard.style.setProperty('--dx',Math.cos(angle)*distance+'px');
+        shard.style.setProperty('--dy',Math.sin(angle)*distance*.6+'px');
+        shard.style.setProperty('--fall',(25+Math.random()*25)+'px');
+        shard.style.setProperty('--spin',((i%2?-1:1)*(100+Math.random()*240))+'deg');
+        shard.style.setProperty('--shard-width',(2+Math.random()*3)+'px');
+        shard.style.setProperty('--shard-height',(4+Math.random()*4)+'px');
+      }
+      for(let i=0;i<5;i++){
+        const spark=fragment('christmas-electric-spark');
+        spark.style.setProperty('--angle',(i*72+Math.random()*25)+'deg');
+        spark.style.setProperty('--reach',(10+Math.random()*12)+'px');
       }
     }
     later(()=>{
       if(bulb.isConnected){
         bulb.classList.remove('is-off');
-        bulb.setAttribute('aria-label','Apagar luz navideña');
+        labelBulb(bulb);
       }
     },2000);
   }
-  const onClick=event=>{
-    const bulb=event.target.closest('.christmas-bulb');
-    if(bulb&&root.contains(bulb))extinguish(bulb);
+  const targetBulb=event=>{
+    const bulb=event.target.closest?.('.christmas-bulb');
+    return bulb&&root.contains(bulb)?bulb:null;
   };
-  root.addEventListener('click',onClick);
+  const onClick=event=>{const bulb=targetBulb(event);if(bulb)extinguish(bulb);};
+  const onOver=event=>{
+    if(event.pointerType!=='touch')targetBulb(event)?.classList.add('is-hovered');
+  };
+  const onOut=event=>{
+    const bulb=targetBulb(event);
+    if(bulb&&!bulb.contains(event.relatedTarget))bulb.classList.remove('is-hovered');
+  };
+  const onFocus=event=>{
+    const bulb=targetBulb(event);
+    if(bulb?.matches(':focus-visible'))bulb.classList.add('is-focused');
+  };
+  const onBlur=event=>targetBulb(event)?.classList.remove('is-focused');
+  const handlers={click:onClick,pointerover:onOver,pointerout:onOut,focusin:onFocus,focusout:onBlur};
+  for(const [type,handler] of Object.entries(handlers))root.addEventListener(type,handler);
   // Switch illumination only. DOM nodes and coordinates remain fixed.
   const shuffleTimer=window.setInterval(()=>{
     if(disposed||document.hidden)return;
@@ -197,7 +232,9 @@ export function createChristmasLights(header){
     dispose(){
       if(disposed)return;
       disposed=true;for(const id of timers)clearTimeout(id);timers.clear();
-      observer.disconnect();root.removeEventListener('click',onClick);root.remove();
+      observer.disconnect();
+      for(const [type,handler] of Object.entries(handlers))root.removeEventListener(type,handler);
+      root.remove();
     }
   };
 }
