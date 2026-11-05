@@ -1,4 +1,4 @@
-/* Light snowfall: 1 canvas, <=30 FPS, no clinical reads/writes. */
+/* Layered snowfall: 1 canvas, <=30 FPS, no clinical reads/writes. */
 export function createSnowfall(host){
   if(!host)return {dispose(){},getStatus(){return {count:0}}};
   const canvas=document.createElement('canvas');
@@ -12,7 +12,7 @@ export function createSnowfall(host){
   const rand=(a,b)=>a+Math.random()*(b-a);
   function flake(randomY=true){
     return {x:rand(0,width),y:randomY?rand(0,height):rand(-12,-2),
-      r:rand(.7,2.5),depth:rand(.5,1.3),speed:rand(12,32),alpha:rand(.4,.85),sway:rand(0,7)};
+      r:rand(1,3.1),depth:rand(.5,1.3),speed:rand(16,38),sway:rand(0,7)};
   }
   function resize(){
     const box=host.getBoundingClientRect();
@@ -21,7 +21,7 @@ export function createSnowfall(host){
     canvas.width=Math.ceil(width*dpr);canvas.height=Math.ceil(height*dpr);
     canvas.style.width=width+'px';canvas.style.height=height+'px';
     ctx.setTransform(dpr,0,0,dpr,0,0);
-    flakes=Array.from({length:Math.min(150,Math.round(width*height/12500))},()=>flake());
+    flakes=Array.from({length:Math.min(240,Math.round(width*height/6000))},()=>flake());
   }
   function tick(now){
     if(!alive)return;
@@ -39,7 +39,7 @@ export function createSnowfall(host){
       p.x+=(Math.sin(phase*.7+p.sway)*11+5)*p.depth*dt;
       if(p.y>height+7)Object.assign(p,flake(false));
       if(p.x>width+5)p.x=-5;
-      ctx.globalAlpha=p.alpha;ctx.fillStyle='#eef8ff';
+      ctx.globalAlpha=1;ctx.fillStyle=p.depth<.8?'#b5cfe5':p.depth<1.08?'#d8eaf6':'#ffffff';
       ctx.beginPath();ctx.arc(p.x,p.y,p.r*p.depth,0,Math.PI*2);ctx.fill();
     }
     ctx.globalAlpha=1;
