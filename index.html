@@ -147,20 +147,22 @@
   <button class="fab-btn" id="mainFabBtn" onclick="abrirModalAgregar()" style="display: none;"><span class="material-symbols-outlined" style="font-size: 2rem;">add</span></button>
 
   <div id="themeModal" class="modal-overlay">
-    <div class="modal-content" style="max-width: 380px;">
+    <div class="modal-content theme-appearance-dialog" role="dialog" aria-modal="true" aria-labelledby="themeAppearanceTitle">
       <div class="modal-header">
-        <div class="modal-title" style="font-weight:700; font-family:'Space Mono';">APARIENCIA</div>
-        <button class="modal-close" onclick="cerrarModal('themeModal')"><span class="material-symbols-outlined">close</span></button>
+        <div class="modal-title" id="themeAppearanceTitle">APARIENCIA</div>
+        <button class="modal-close" type="button" aria-label="Cerrar apariencia" onclick="cerrarModal('themeModal')"><span class="material-symbols-outlined" aria-hidden="true">close</span></button>
       </div>
-
-      <div style="margin-bottom: 16px;">
-        <label class="label" style="margin-bottom: 8px;">COLOR BASE (FONDO)</label>
+      <div class="theme-appearance-tabs" role="tablist" aria-label="Opciones de apariencia">
+        <button type="button" class="theme-appearance-tab" data-appearance-page="themes" role="tab" aria-controls="themeAppearanceColors" aria-selected="true" tabindex="0"><span class="material-symbols-outlined" aria-hidden="true">palette</span><span>Temas</span></button>
+        <button type="button" class="theme-appearance-tab" data-appearance-page="custom" role="tab" aria-controls="themeAppearanceColors" aria-selected="false" tabindex="-1"><span class="material-symbols-outlined" aria-hidden="true">tune</span><span>Personalizado</span></button>
+        <button type="button" class="theme-appearance-tab" data-appearance-page="effects" role="tab" aria-controls="themeAppearanceEffects" aria-selected="false" tabindex="-1"><span class="material-symbols-outlined" aria-hidden="true">auto_awesome</span><span>Efectos</span></button>
+        <button type="button" class="theme-appearance-tab" data-appearance-page="season" role="tab" aria-controls="themeAppearanceSeason" aria-selected="false" tabindex="-1"><span class="material-symbols-outlined" aria-hidden="true">calendar_month</span><span>Temporada</span></button>
+      </div>
+      <section id="themeAppearanceColors" class="theme-appearance-page" role="tabpanel" aria-label="Temas y colores">
         <div class="color-picker-grid" id="baseColorPicker"></div>
-      </div>
-
-      <div>
-        <label class="label" style="margin-bottom: 8px;">COLOR DE ACENTO</label>
-        <div class="color-picker-grid" id="accentColorPicker"></div>
+      </section>
+      <div class="theme-appearance-legacy" hidden>
+        <div id="accentColorPicker"></div>
       </div>
     </div>
   </div>
