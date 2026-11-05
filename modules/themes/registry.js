@@ -30,12 +30,12 @@ export async function loadSeasonController(season,app) {
     return initNovemberTheme(app,{managed:true});
   }
   if (season.load==='christmas') {
-    const [{initChristmasTheme},{createSnowfall},{createSnowMountains},{createChristmasLights},{createChristmasFireworks}]=await Promise.all([
+    const [{initChristmasTheme},{createSnowfall},{createSnowMountains},{createChristmasLights},{createChristmasFireworks},{createChristmasScene}]=await Promise.all([
       load('./seasons/christmas/visuals.js'),load('./effects/snowfall.js'),
       load('./effects/snowMountains.js'),load('./effects/christmasLights.js'),
-      load('./effects/christmasFireworks.js')
+      load('./effects/christmasFireworks.js'),load('./effects/christmasScene.js')
     ]);
-    return initChristmasTheme(app,{config:season,createSnowfall,createSnowMountains,createChristmasLights,createChristmasFireworks});
+    return initChristmasTheme(app,{config:season,createSnowfall,createSnowMountains,createChristmasLights,createChristmasFireworks,createChristmasScene});
   }
   throw new Error('Season has no registered renderer: '+season.id);
 }
