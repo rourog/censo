@@ -10,6 +10,7 @@ const INITIAL_CAST=[0,1,4,2,5];
 const STATIC_COLUMNS=[0,1,2,3,4,1];
 const GIFT_LIMIT=20;
 const GIFT_LIFETIME=30000;
+const GIFT_OPEN_TIME=5000;
 export function createChristmasScene(app){
   if(!app)return {getStatus:()=>({characters:0,visible:false}),dispose(){}};
   const root=document.createElement('div');root.className='christmas-scene';root.setAttribute('aria-label','Escenario navideño interactivo');
@@ -25,6 +26,7 @@ export function createChristmasScene(app){
     giftStates.set(node,{node,kind:'gift',column:STATIC_COLUMNS[i],opened:false,flying:false,lootScale:.65});
     node.setAttribute('aria-label','Abrir regalo');node.title='Abrir regalo';node.onclick=()=>openGift(node);return node;});
   const thrown=[];
+  let treeShake=null;
   let width=0,stageHeight=180,scale=.65,visible=false,disposed=false,frame=0,last=0,time=0,nextCast=3;
   const reduced=matchMedia('(prefers-reduced-motion: reduce)');
   const random=(min,max)=>min+Math.random()*(max-min);
@@ -88,7 +90,7 @@ export function createChristmasScene(app){
   }
   function removeGift(gift){
     const index=thrown.indexOf(gift);if(index<0)return;
-    clearTimeout(gift.timer);gift.node.onclick=null;giftStates.delete(gift.node);
+    clearTimeout(gift.timer);clearTimeout(gift.closeTimer);gift.node.onclick=null;giftStates.delete(gift.node);
     thrown.splice(index,1);gift.node.remove();stackGifts();
   }
   function drawGifts(dt=0){
@@ -120,6 +122,10 @@ export function createChristmasScene(app){
     const state=giftStates.get(node);
     if(disposed||!visible||document.hidden||!state||state.flying||state.opened)return;
     state.opened=true;node.classList.add('is-open');paintGift(state);readyGift(state);
+    state.closeTimer=setTimeout(()=>{
+      state.closeTimer=0;if(disposed||!giftStates.has(node))return;
+      state.opened=false;node.classList.remove('is-open');paintGift(state);readyGift(state);
+    },GIFT_OPEN_TIME);
   }
   function tossGift(node,fromTree=false){
     if(disposed||!visible||document.hidden)return;
@@ -145,7 +151,18 @@ export function createChristmasScene(app){
     gift.timer=setTimeout(()=>removeGift(gift),GIFT_LIFETIME);
     drawGifts();if(!reduced.matches&&!frame)frame=requestAnimationFrame(tick);
   }
-  const onTreeClick=()=>tossGift(tree,true);tree.addEventListener('click',onTreeClick);
+  const onTreeClick=()=>{
+    if(disposed||!visible||document.hidden)return;
+    if(!reduced.matches){
+      treeShake?.cancel();
+      const animation=tree.animate([
+        {transform:'rotate(0deg)'},{transform:'rotate(-1.4deg)'},
+        {transform:'rotate(1.1deg)'},{transform:'rotate(-.6deg)'},{transform:'rotate(0deg)'}
+      ],{duration:420,easing:'ease-in-out'});
+      treeShake=animation;animation.onfinish=()=>{if(treeShake===animation)treeShake=null;};
+    }
+    tossGift(tree,true);
+  };tree.addEventListener('click',onTreeClick);
   for(const actor of actors){
     actor.onClick=()=>{
       if(!GIVERS[actor.cast.file]||disposed||!visible||document.hidden)return;
@@ -189,17 +206,17 @@ export function createChristmasScene(app){
     if(!visible||document.hidden||reduced.matches)stopFrame();else if(!frame)frame=requestAnimationFrame(tick);
   }
   function onVisibility(){if(document.hidden)stopFrame();else layout();}
-  function onMotion(){stopFrame();if(reduced.matches)for(const gift of thrown){gift.flying=false;readyGift(gift);}actors.forEach(drawActor);layout();}
+  function onMotion(){stopFrame();if(reduced.matches){treeShake?.cancel();treeShake=null;}if(reduced.matches)for(const gift of thrown){gift.flying=false;readyGift(gift);}actors.forEach(drawActor);layout();}
   const timer=window.setInterval(layout,500);
   window.addEventListener('resize',layout);document.addEventListener('visibilitychange',onVisibility);
   reduced.addEventListener?.('change',onMotion);layout();
   return {
-    getStatus:()=>({visible,characters:actors.length,cast:CAST.length,gifts:gifts.length,tree:'center',spawnedGifts:thrown.length,wreaths:thrown.filter(g=>g.kind==='wreath').length,openedGifts:[...giftStates.values()].filter(g=>g.opened).length,giftLimit:GIFT_LIMIT,giftLifetimeMs:GIFT_LIFETIME,animated:visible&&!document.hidden&&!reduced.matches}),
-    dispose(){if(disposed)return;disposed=true;stopFrame();clearInterval(timer);
+    getStatus:()=>({visible,characters:actors.length,cast:CAST.length,gifts:gifts.length,tree:'center',spawnedGifts:thrown.length,wreaths:thrown.filter(g=>g.kind==='wreath').length,openedGifts:[...giftStates.values()].filter(g=>g.opened).length,giftLimit:GIFT_LIMIT,giftLifetimeMs:GIFT_LIFETIME,giftOpenMs:GIFT_OPEN_TIME,animated:visible&&!document.hidden&&!reduced.matches}),
+    dispose(){if(disposed)return;disposed=true;stopFrame();clearInterval(timer);treeShake?.cancel();treeShake=null;
       window.removeEventListener('resize',layout);document.removeEventListener('visibilitychange',onVisibility);
       reduced.removeEventListener?.('change',onMotion);tree.removeEventListener('click',onTreeClick);
       actors.forEach(actor=>{actor.node.removeEventListener('click',actor.onClick);clearTimeout(actor.attentionTimer);});
       for(const gift of thrown)clearTimeout(gift.timer);
-      for(const node of giftStates.keys())node.onclick=null;giftStates.clear();thrown.length=0;root.remove();document.body.style.removeProperty('--christmas-floor-offset');}
+      for(const [node,state] of giftStates){clearTimeout(state.closeTimer);node.onclick=null;}giftStates.clear();thrown.length=0;root.remove();document.body.style.removeProperty('--christmas-floor-offset');}
   };
 }

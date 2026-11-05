@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {createChristmasScene} from '../modules/themes/effects/christmasScene.js';
 let id=0,tableBottom=400,newsTop=800,footerTop=840,motion;
-const frames=new Map(),timers=new Map(),events={},docEvents={},timeouts=new Map();
+const frames=new Map(),timers=new Map(),events={},docEvents={},timeouts=new Map(),animations=[];
 let clock=0;
 globalThis.performance={now:()=>clock};
 globalThis.setTimeout=(fn,ms)=>{const n=++id;timeouts.set(n,{fn,expires:clock+ms});return n;};
@@ -14,8 +14,9 @@ globalThis.window={setInterval(fn){const n=++id;timers.set(n,fn);return n;},addE
 const reduced={matches:false,addEventListener(k,fn){motion=fn;},removeEventListener(){motion=null;}};
 globalThis.matchMedia=()=>reduced;
 function element(){return {children:[],style:{setProperty(k,v){this[k]=v;},removeProperty(k){delete this[k];}},
-  className:'',attributes:{},events:{},classList:{contains:c=>c==='table-is-active',add(){},toggle(){}},setAttribute(k,v){this.attributes[k]=v;},removeAttribute(k){delete this.attributes[k];},
+  className:'',attributes:{},events:{},classList:{contains:c=>c==='table-is-active',add(){},remove(){},toggle(){}},setAttribute(k,v){this.attributes[k]=v;},removeAttribute(k){delete this.attributes[k];},
   addEventListener(k,fn){this.events[k]=fn;},removeEventListener(k){delete this.events[k];},
+  animate(keyframes,options){const animation={keyframes,options,cancelled:false,cancel(){this.cancelled=true;}};animations.push(animation);return animation;},
   append(n){this.children.push(n);n.parent=this;},remove(){this.parent.children=this.parent.children.filter(n=>n!==this);},
   getClientRects:()=>[1],getBoundingClientRect(){const width=parseFloat(this.style.width)||1300,height=parseFloat(this.style.height)||900;return {left:0,right:width,top:0,bottom:height,width,height};}};}
 const app=element(),header={getClientRects:()=>[1],getBoundingClientRect:()=>({bottom:80})};
@@ -46,6 +47,7 @@ const openPosition=stationary.style.backgroundPosition;
 [...timers.values()].forEach(fn=>fn());assert.equal(stationary.style.backgroundPosition,openPosition);
 stationary.onclick();assert.equal(scene.getStatus().openedGifts,1,'Opening twice has no additional effect');
 tree.events.click();assert.equal(scene.getStatus().spawnedGifts,1,'Tree throws a gift');
+assert.equal(animations.length,1,'Tree gives click feedback');
 const treeGift=root.children.at(-1);
 assert.equal(treeGift.attributes['data-kind'],'gift');
 treeGift.onclick();assert.equal(scene.getStatus().openedGifts,1,'Airborne gifts cannot open');
@@ -65,7 +67,8 @@ actors[3].events.click();assert.equal(scene.getStatus().spawnedGifts,4,'Other ch
 Math.random=()=>.5;
 for(let i=0;i<30;i++)tree.events.click();
 assert.equal(scene.getStatus().spawnedGifts,20,'Gift and wreath cap is shared');
-assert.equal(timeouts.size,20,'The cap creates no extra timers');
+assert.equal([...timeouts.values()].filter(t=>t.expires>clock+5000).length,20,'The cap creates no extra expiry timers');
+assert.ok(animations.slice(0,-1).every(a=>a.cancelled),'Repeated clicks restart rather than accumulate tree shakes');
 assert.equal(scene.getStatus().gifts,6);
 advance(1000);advance(2000);
 const grounded=root.children.slice(12);
@@ -73,14 +76,23 @@ assert.equal(grounded.length,20);
 assert.equal(new Set(grounded.map(n=>n.style.transform)).size,20);
 assert.ok(grounded.every(n=>n.style.transform&&!n.style.transform.includes('NaN')));
 assert.equal(treeGift.disabled,false,'Landed gifts become actionable');
-const expiryBefore=[...timeouts.values()].map(timer=>timer.expires).sort();
+const expiryBefore=[...timeouts.values()].filter(t=>t.expires>10000).map(timer=>timer.expires).sort();
 treeGift.onclick();assert.equal(treeGift.attributes['aria-label'],'Regalo abierto');
 assert.equal(scene.getStatus().openedGifts,2);
-assert.deepEqual([...timeouts.values()].map(timer=>timer.expires).sort(),expiryBefore,'Opening does not reset expiry');
+assert.deepEqual([...timeouts.values()].filter(t=>t.expires>10000).map(timer=>timer.expires).sort(),expiryBefore,'Opening does not reset expiry');
 assert.ok(grounded.filter(n=>n.attributes['data-kind']==='wreath').every(n=>!n.onclick),'Wreaths do not open');
+advance(5149);assert.equal(stationary.attributes['aria-label'],'Regalo abierto');
+advance(5150);assert.equal(stationary.attributes['aria-label'],'Abrir regalo','Static gift closes after five seconds');
+assert.equal(stationary.disabled,false);
+advance(6999);assert.equal(treeGift.attributes['aria-label'],'Regalo abierto');
+advance(7000);assert.equal(treeGift.attributes['aria-label'],'Abrir regalo','Thrown gift also closes');
+stationary.onclick();assert.equal(stationary.attributes['aria-label'],'Regalo abierto','Closed gifts can be reopened');
+advance(12000);assert.equal(stationary.attributes['aria-label'],'Abrir regalo');
 advance(30149);assert.equal(scene.getStatus().spawnedGifts,20);
+treeGift.onclick();assert.equal(treeGift.attributes['aria-label'],'Regalo abierto');
+advance(30150);assert.ok(![...timeouts.values()].some(t=>t.expires===35149),'Expiry cancels the pending close timer');
 advance(30830);assert.equal(scene.getStatus().spawnedGifts,0,'Temporary gifts and wreaths expire');
-assert.equal(scene.getStatus().openedGifts,1,'Static open gift remains after temporary loot expires');
+assert.equal(scene.getStatus().openedGifts,0,'Gifts have closed before temporary loot expires');
 assert.equal(timeouts.size,0);
 const positions=actors.map(n=>n.style.transform);
 for(let t=30900;t<=130000;t+=50){advance(t);if(t%500===0)[...timers.values()].forEach(fn=>fn());}
@@ -93,7 +105,8 @@ assert.equal(scene.getStatus().visible,false,'No room: scenery must not cover ro
 tableBottom=400;innerWidth=500;events.resize();assert.equal(scene.getStatus().visible,false,'Narrow screens hide the scene');
 innerWidth=1300;events.resize();assert.equal(scene.getStatus().visible,true);
 reduced.matches=true;motion();assert.equal(frames.size,0);assert.equal(scene.getStatus().animated,false);
-tree.events.click();assert.equal(scene.getStatus().spawnedGifts,1,'Reduced motion still permits gifts without flight');assert.equal(frames.size,0);
+const shakesBefore=animations.length;tree.events.click();assert.equal(animations.length,shakesBefore,'Reduced motion suppresses tree shake');assert.equal(scene.getStatus().spawnedGifts,1,'Reduced motion still permits gifts without flight');
+stationary.onclick();assert.equal(frames.size,0);
 reduced.matches=false;motion();assert.ok(frames.size);
 document.hidden=true;docEvents.visibilitychange();assert.equal(frames.size,0);
 scene.dispose();scene.dispose();Math.random=originalRandom;
@@ -101,4 +114,4 @@ assert.equal(app.children.length,0);assert.equal(timeouts.size,0);
 assert.equal(Object.keys(tree.events).length,0);assert.equal(stationary.onclick,null);assert.ok(actors.every(a=>Object.keys(a.events).length===0));assert.equal(timers.size,0);assert.equal(frames.size,0);
 assert.equal(Object.keys(events).length,0);assert.equal(Object.keys(docEvents).length,0);assert.equal(motion,null);
 assert.equal(document.body.style['--christmas-floor-offset'],undefined);
-console.log('OK: stage positioning, visible space, cast rotation, giver attention, random gifts/wreaths, gift opening, shared cap/expiry, reduced motion and disposal.');
+console.log('OK: stage positioning, visible space, cast rotation, giver attention, random gifts/wreaths, gift opening/auto-close, tree feedback, shared cap/expiry, reduced motion and disposal.');
