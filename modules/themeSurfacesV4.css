@@ -278,7 +278,7 @@ body:is(
   padding-top:14px;
 }
 #themeCustomBasePanel[hidden],
-#accentColorPicker.parent-hidden[hidden]{
+#themeModal [hidden]{
   display:none!important;
 }
 #baseColorPicker.theme-picker-section .theme-custom-panel .theme-palette-primary{
