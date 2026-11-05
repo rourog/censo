@@ -23,21 +23,13 @@ assert.equal(wrapper.children[1],mountains.villageHost);
 assert.equal(wrapper.children[2].children.length,1,'Only the closest snow layer covers the buildings');
 const village=createChristmasVillage(mountains.villageHost,app),[hospital,...houses]=mountains.villageHost.children;
 assert.ok(hospital.src.endsWith('/hospital-delicias-snow.png'));
-assert.equal(village.getStatus().buildings,4);assert.equal(houses.length,3);
+assert.equal(village.getStatus().buildings,1);assert.equal(houses.length,0,'Houses are absent from the DOM');assert.equal(village.getStatus().houses,'hidden');
 function checkLayout(){
   assert.equal(village.getStatus().visible,true);
   assert.ok(parseFloat(hospital.style.left)>=0);
   assert.ok(Math.abs(parseFloat(hospital.style.left)+parseFloat(hospital.style.width)/2-width/2)<.01,'Hospital is exactly centered');
   const treeLeft=width*.24-48,treeRight=width*.24+48;
   assert.ok(treeRight<parseFloat(hospital.style.left),'Tree remains clear of the hospital');
-  const boxes=houses.map(node=>({left:parseFloat(node.style.left),size:parseFloat(node.style.width)}));
-  assert.ok(boxes[0].left+boxes[0].size<treeLeft,'Left house stays clear of the tree');
-  assert.ok(boxes[1].left>parseFloat(hospital.style.left)+parseFloat(hospital.style.width),'Right houses stay clear of the hospital');
-  boxes.forEach((box,i)=>{
-    assert.ok(box.left+box.size<=width);
-    if(i)assert.ok(box.left>=boxes[i-1].left+boxes[i-1].size,'Houses cannot overlap');
-    assert.ok(800-parseFloat(houses[i].style.bottom)-box.size>=tableBottom+14-.01,'Houses stay below clinical content');
-  });
   assert.ok(800-parseFloat(hospital.style.bottom)-parseFloat(hospital.style.width)/(512/116)>=tableBottom+14-.01);
 }
 checkLayout();
@@ -48,4 +40,4 @@ width=500;innerWidth=width;events.resize();assert.equal(mountains.villageHost.hi
 width=1363;innerWidth=width;events.resize();checkLayout();
 village.dispose();village.dispose();assert.equal(mountains.villageHost.children.length,0);assert.equal(intervals.size,0);assert.equal(Object.keys(events).length,0);
 mountains.dispose();assert.equal(host.children.length,0);
-console.log('OK: centered hospital, tree corridor on the left, houses on both sides, snow layer order, responsive safe area, recovery and cleanup.');
+console.log('OK: centered hospital, tree corridor on the left, houses removed, snow layer order, responsive safe area, recovery and cleanup.');

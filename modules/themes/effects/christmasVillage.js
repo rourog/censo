@@ -6,8 +6,6 @@ export function createChristmasVillage(host,app){
   const hospital=document.createElement('img');hospital.className='christmas-village-hospital';
   hospital.src=new URL('hospital-delicias-snow.png',ASSETS).href;hospital.alt='';hospital.draggable=false;
   host.append(hospital);
-  const houses=Array.from({length:3},(_,i)=>{const node=document.createElement('span');node.className='christmas-village-house';
-    node.style.backgroundImage='url("'+new URL('christmas-houses.png',ASSETS).href+'")';host.append(node);return node;});
   let disposed=false,visible=false;
   const rect=node=>node?.getClientRects?.().length?node.getBoundingClientRect():null;
   function layout(){
@@ -26,16 +24,9 @@ export function createChristmasVillage(host,app){
     const hospitalWidth=Math.min(540,width*.36,available*HOSPITAL_RATIO);
     hospital.style.width=hospitalWidth+'px';hospital.style.height='auto';
     hospital.style.left=((width-hospitalWidth)/2)+'px';hospital.style.bottom=bottom+'px';
-    const houseSize=Math.min(120,available,width*.09);
-    const houseCenters=[.085,.79,.92];
-    houses.forEach((node,i)=>{
-      node.style.width=houseSize+'px';node.style.height=houseSize+'px';
-      node.style.left=(width*houseCenters[i]-houseSize/2)+'px';node.style.bottom=bottom+'px';
-      node.style.backgroundSize=(houseSize*3)+'px '+(houseSize*2)+'px';node.style.backgroundPosition=(-i*houseSize)+'px 0px';
-    });
   }
   const timer=window.setInterval(layout,500);window.addEventListener('resize',layout);layout();
-  return {getStatus:()=>({visible,buildings:4,hospital:'center',houses:'both-sides',snowPlane:'before-foreground'}),
+  return {getStatus:()=>({visible,buildings:1,hospital:'center',houses:'hidden',snowPlane:'before-foreground'}),
     dispose(){if(disposed)return;disposed=true;clearInterval(timer);window.removeEventListener('resize',layout);
-      hospital.remove();houses.forEach(node=>node.remove());host.hidden=false;}};
+      hospital.remove();host.hidden=false;}};
 }

@@ -1,14 +1,16 @@
 /* Interactive Christmas stage. Reads layout only; never reads or writes patient records. */
 const ASSETS=new URL('../../../assets/themes/christmas/scene/',import.meta.url);
-const PEOPLE=['xmas_santa_3.png','xmas_misses_3.png','gnomea_mv.png','gnomeb_mv.png','xmas_jesus_3.png'];
+const PEOPLE=['xmas_santa_3.png','xmas_misses_3.png','xmas_jesus_3.png'];
 const DEER=['rudolph_adult_3.png','reindeer_3.png','reindeerb_3.png','reindeer_child_3.png','rudolph_adultb_3.png','rudolph_child_3.png'];
 const CAST=[...PEOPLE,...DEER].map(file=>({file,width:PEOPLE.includes(file)?78:156,height:PEOPLE.includes(file)?108:159,
-  sheetWidth:PEOPLE.includes(file)?234:468,sheetHeight:PEOPLE.includes(file)?432:636,scale:PEOPLE.includes(file)?1:.72}));
+  sheetWidth:PEOPLE.includes(file)?234:468,sheetHeight:PEOPLE.includes(file)?432:636,scale:PEOPLE.includes(file)?1:.72,animal:!PEOPLE.includes(file)}));
 CAST.push(...['tuxedo-cat.png','husky-gray.png','husky-black.png'].map((file,i)=>({file,width:96,height:96,
-  sheetWidth:288,sheetHeight:384,scale:i===0?.62:.9})));
+  sheetWidth:288,sheetHeight:384,scale:i===0?.62:.9,animal:true})));
+// Pets get three chances per deer turn, while every deer receives a place in the cycle.
+const ANIMAL_ROTATION=DEER.flatMap((_,i)=>[9,10,11,3+i]).map(index=>CAST[index]);
 const WALK=[0,1,2,1];
 const GIVERS=Object.freeze({'xmas_santa_3.png':'Santa','xmas_misses_3.png':'la señora Claus','xmas_jesus_3.png':'Jesús'});
-const INITIAL_CAST=[0,1,4,2,5,11,12,13];
+const INITIAL_CAST=[0,1,2,9,10,11];
 const STATIC_COLUMNS=[0,1,2,3,4,1];
 const GIFT_LIMIT=20;
 const GIFT_LIFETIME=30000;
@@ -33,7 +35,7 @@ export function createChristmasScene(app){
     node.setAttribute('aria-label','Abrir regalo');node.title='Abrir regalo';node.onclick=()=>openGift(node);return node;});
   const thrown=[];
   let treeShake=null;
-  let width=0,stageHeight=180,scale=.65,visible=false,disposed=false,frame=0,last=0,time=0,nextCast=3;
+  let width=0,stageHeight=180,scale=.65,visible=false,disposed=false,frame=0,last=0,time=0,nextAnimal=0;
   const reduced=matchMedia('(prefers-reduced-motion: reduce)');
   const random=(min,max)=>min+Math.random()*(max-min);
   const actors=INITIAL_CAST.map((castIndex,i)=>({node:sprite(CAST[castIndex].file,true),cast:CAST[castIndex],
@@ -85,9 +87,10 @@ export function createChristmasScene(app){
   }
   function stopFrame(){cancelAnimationFrame(frame);frame=0;last=0;}
   function pickCast(actor){
-    for(let i=0;i<CAST.length;i++){
-      const candidate=CAST[nextCast++%CAST.length];
-      if(!actors.some(other=>other!==actor&&other.cast.file===candidate.file))return candidate;
+    if(!actor.cast.animal)return actor.cast;
+    for(let i=0;i<ANIMAL_ROTATION.length;i++){
+      const candidate=ANIMAL_ROTATION[nextAnimal++%ANIMAL_ROTATION.length];
+      if(!actors.some(other=>other.cast.file===candidate.file))return candidate;
     }
     return actor.cast;
   }
@@ -265,7 +268,7 @@ export function createChristmasScene(app){
   window.addEventListener('resize',layout);document.addEventListener('visibilitychange',onVisibility);
   reduced.addEventListener?.('change',onMotion);layout();
   return {
-    getStatus:()=>({visible,characters:actors.length,cast:CAST.length,gifts:gifts.length,tree:'left',snowman:snowmanState,snowmanFrame,snowmanWaitMs:SNOWMAN_WAIT,spawnedGifts:thrown.length,wreaths:thrown.filter(g=>g.kind==='wreath').length,openedGifts:[...giftStates.values()].filter(g=>g.opened).length,giftLimit:GIFT_LIMIT,giftLifetimeMs:GIFT_LIFETIME,giftOpenMs:GIFT_OPEN_TIME,animated:visible&&!document.hidden&&!reduced.matches}),
+    getStatus:()=>({visible,characters:actors.length,people:PEOPLE.length,animals:actors.filter(actor=>actor.cast.animal).length,animalLimit:3,cast:CAST.length,gifts:gifts.length,tree:'left',snowman:snowmanState,snowmanFrame,snowmanWaitMs:SNOWMAN_WAIT,spawnedGifts:thrown.length,wreaths:thrown.filter(g=>g.kind==='wreath').length,openedGifts:[...giftStates.values()].filter(g=>g.opened).length,giftLimit:GIFT_LIMIT,giftLifetimeMs:GIFT_LIFETIME,giftOpenMs:GIFT_OPEN_TIME,animated:visible&&!document.hidden&&!reduced.matches}),
     dispose(){if(disposed)return;disposed=true;stopFrame();clearInterval(timer);treeShake?.cancel();treeShake=null;
       window.removeEventListener('resize',layout);document.removeEventListener('visibilitychange',onVisibility);
       reduced.removeEventListener?.('change',onMotion);tree.removeEventListener('click',onTreeClick);
