@@ -307,7 +307,11 @@ export function createThemeModule(app) {
     const chosen=localStorage.getItem(preferenceKey('preset'));
     if(chosen==='custom')return 'custom';
     const theme=getCurrentTheme();
-    // Interpret existing v4 selections without discarding either saved color.
+    // Same base+accent pair may have several intentional finishes (e.g. OLED
+    // Verde versus Monitor Vital). Preserve the explicit preset ID first.
+    const selected=themePresets.find(p=>p.id===chosen);
+    if(selected&&selected.base===theme.base&&selected.accent===theme.accent)return selected.id;
+    // Migrate older saved base+accent pairs without changing their colors.
     const matching=themePresets.find(p=>p.base===theme.base&&p.accent===theme.accent);
     return matching?.id||'custom';
   }
