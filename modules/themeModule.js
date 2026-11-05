@@ -39,6 +39,18 @@ export function createThemeModule(app) {
     { id:'base-surface-forest',name:'Verde bosque',color:'#0b1915',header:'#2a4d3d',mode:'surface' },
     { id:'base-surface-wine',name:'Vino',color:'#1a1017',header:'#583544',mode:'surface' },
     { id:'base-surface-purple',name:'Púrpura',color:'#16121e',header:'#453559',mode:'surface' },
+    { id:'base-surface-carbon',name:'Carbono',color:'#0a1017',header:'#263747',card:'#202b37',mode:'surface' },
+    { id:'base-surface-atlantic',name:'Atlántico',color:'#071b2b',header:'#25506b',card:'#202d38',mode:'surface' },
+    { id:'base-surface-malachite',name:'Malaquita',color:'#0b2119',header:'#28644d',card:'#23332d',mode:'surface' },
+    { id:'base-surface-copper',name:'Cobre',color:'#24170f',header:'#674530',card:'#332921',mode:'surface' },
+    { id:'base-surface-aubergine',name:'Berenjena',color:'#1b1125',header:'#58365f',card:'#2d2736',mode:'surface' },
+    { id:'base-surface-indigo',name:'Índigo',color:'#101528',header:'#354977',card:'#242e3e',mode:'surface' },
+    { id:'base-surface-sienna',name:'Terracota',color:'#261816',header:'#704438',card:'#352b29',mode:'surface' },
+    { id:'base-surface-lagoon',name:'Laguna',color:'#09242a',header:'#285d68',card:'#20333a',mode:'surface' },
+    { id:'base-surface-ice-light',name:'Glaciar',color:'#e9f4fb',header:'#bfdcec',card:'#ffffff',mode:'surface-light' },
+    { id:'base-surface-pearl-light',name:'Perla',color:'#f4f3ee',header:'#d8d9d3',card:'#ffffff',mode:'surface-light' },
+    { id:'base-surface-mint-light',name:'Menta',color:'#edf9f1',header:'#c5e5d0',card:'#ffffff',mode:'surface-light' },
+    { id:'base-surface-lilac-light',name:'Lila',color:'#f5f0ff',header:'#dccdef',card:'#ffffff',mode:'surface-light' },
     { id: 'base-dark', name: 'Slate', color: '#0f172a', mode: 'dark' },
     { id: 'base-midnight', name: 'OLED', color: '#000000', mode: 'dark' },
     { id: 'base-gray-dark', name: 'Grafito', color: '#27272a', mode: 'dark' },
@@ -113,8 +125,57 @@ export function createThemeModule(app) {
     {id:'pine-red',name:'Pino y rojo',base:'base-surface-forest',accent:'accent-red'},
     {id:'oled',name:'OLED',base:'base-midnight',accent:'accent-silver'},
     {id:'ice',name:'Hielo',base:'base-ice',accent:'accent-sky'},
-    {id:'light',name:'Blanco',base:'base-light',accent:'accent-blue'}
+    {id:'light',name:'Blanco',base:'base-light',accent:'accent-blue'},
+    {id:'carbon-gold',name:'Carbono y oro',base:'base-surface-carbon',accent:'accent-gold'},
+    {id:'atlantic',name:'Atlántico',base:'base-surface-atlantic',accent:'accent-sky'},
+    {id:'malachite',name:'Malaquita',base:'base-surface-malachite',accent:'accent-lime'},
+    {id:'copper',name:'Cobre',base:'base-surface-copper',accent:'accent-copper'},
+    {id:'aubergine',name:'Berenjena',base:'base-surface-aubergine',accent:'accent-fuchsia'},
+    {id:'indigo',name:'Índigo',base:'base-surface-indigo',accent:'accent-indigo'},
+    {id:'sienna',name:'Terracota',base:'base-surface-sienna',accent:'accent-amber'},
+    {id:'lagoon',name:'Laguna',base:'base-surface-lagoon',accent:'accent-cyan'},
+    {id:'glacier',name:'Glaciar',base:'base-surface-ice-light',accent:'accent-sky'},
+    {id:'pearl',name:'Perla',base:'base-surface-pearl-light',accent:'accent-bronze'},
+    {id:'mint',name:'Menta',base:'base-surface-mint-light',accent:'accent-emerald'},
+    {id:'lilac',name:'Lila',base:'base-surface-lilac-light',accent:'accent-violet'},
+    {id:'graphite-gold',name:'Grafito y oro',base:'base-surface-graphite',accent:'accent-gold'},
+    {id:'petrol-amber',name:'Petróleo y ámbar',base:'base-surface-petrol',accent:'accent-amber'},
+    {id:'wine-silver',name:'Vino y plata',base:'base-surface-wine',accent:'accent-silver'},
+    {id:'forest-lime',name:'Bosque y lima',base:'base-surface-forest',accent:'accent-lime'}
   ];
+
+  // Header colors are independent of the background and accent in Custom mode.
+  // The first option keeps the selected base's natural header shade.
+  const headerChoices = [
+    {id:'auto',name:'Según fondo',color:null},
+    {id:'graphite',name:'Grafito',color:'#303741'},
+    {id:'slate',name:'Pizarra',color:'#40536a'},
+    {id:'midnight',name:'Noche',color:'#233047'},
+    {id:'marine',name:'Azul marino',color:'#204d68'},
+    {id:'iceblue',name:'Azul hielo',color:'#bddbe9'},
+    {id:'teal',name:'Petróleo',color:'#245663'},
+    {id:'forest',name:'Bosque',color:'#285c47'},
+    {id:'sage',name:'Salvia',color:'#c3dccb'},
+    {id:'olive',name:'Oliva',color:'#566346'},
+    {id:'wine',name:'Vino',color:'#633443'},
+    {id:'ruby',name:'Rubí',color:'#832d40'},
+    {id:'sienna',name:'Terracota',color:'#754737'},
+    {id:'copper',name:'Cobre',color:'#745038'},
+    {id:'aubergine',name:'Ciruela',color:'#553765'},
+    {id:'lavender',name:'Lavanda',color:'#d5c4ee'},
+    {id:'sand',name:'Arena',color:'#e3d5bf'},
+    {id:'pearl',name:'Perla',color:'#e6e8e6'},
+    {id:'white',name:'Blanco',color:'#f4f7fb'}
+  ];
+  const headerById=new Map(headerChoices.map(item=>[item.id,item]));
+  const getHeaderChoice=()=>headerById.has(localStorage.getItem(preferenceKey('custom-header')))
+    ?localStorage.getItem(preferenceKey('custom-header')):'auto';
+  function readableInk(hex) {
+    const rgb=[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)/255);
+    const lightness=rgb.map(x=>x<=.04045?x/12.92:((x+.055)/1.055)**2.4);
+    const lum=.2126*lightness[0]+.7152*lightness[1]+.0722*lightness[2];
+    return lum>.28?'#172331':'#f4f7fa';
+  }
 
   const DEFAULT_BASE = 'base-surface-graphite';
   const DEFAULT_ACCENT = 'accent-blue';
@@ -297,10 +358,10 @@ export function createThemeModule(app) {
         ${themePresets.map(p=>{
           const base=bases.find(item=>item.id===p.base);
           const accent=accents.find(item=>item.id===p.accent);
-          const light=base?.mode==='light';
+          const light=base?.mode==='light'||base?.mode==='surface-light';
           const extraHeaders={'base-midnight':'#29313a','base-ice':'#dbeafe','base-light':'#f1f5f9'};
           const head=base?.header||extraHeaders[p.base]||(light?'#e2e8f0':'#303a46');
-          const card=light?'#ffffff':'#242c35';
+          const card=base?.card||(light?'#ffffff':'#242c35');
           const foreground=light?'#253246':'#e7eef8';
           const accentColor=light?accent?.light:accent?.dark;
           return `<button type="button" class="theme-preset-button" data-theme-preset="${p.id}"
