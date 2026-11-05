@@ -5,6 +5,9 @@ const DEER=['rudolph_adult_3.png','reindeer_3.png','reindeerb_3.png','reindeer_c
 const CAST=[...PEOPLE,...DEER].map(file=>({file,width:PEOPLE.includes(file)?78:156,height:PEOPLE.includes(file)?108:159,
   sheetWidth:PEOPLE.includes(file)?234:468,sheetHeight:PEOPLE.includes(file)?432:636,deer:!PEOPLE.includes(file)}));
 const WALK=[0,1,2,1];
+const GIVERS=Object.freeze({'xmas_santa_3.png':'Santa','xmas_misses_3.png':'la señora Claus','xmas_jesus_3.png':'Jesús'});
+const INITIAL_CAST=[0,1,4,2,5];
+const STATIC_COLUMNS=[0,1,2,3,4,1];
 const GIFT_LIMIT=20;
 const GIFT_LIFETIME=30000;
 export function createChristmasScene(app){
@@ -16,21 +19,25 @@ export function createChristmasScene(app){
     node.style.backgroundImage='url("'+new URL(file,ASSETS).href+'")';root.append(node);return node;};
   const tree=sprite('christmastiles_3.png',true);tree.classList.add('christmas-scene-tree');
   tree.setAttribute('aria-label','Lanzar un regalo desde el pino');tree.title='¡Un regalo del pino!';
-  const gifts=Array.from({length:6},()=>{const node=sprite('christmastiles_3.png');node.classList.add('christmas-scene-gift');return node;});
+  const giftStates=new Map();
+  const gifts=Array.from({length:6},(_,i)=>{const node=sprite('christmastiles_3.png',true);
+    node.classList.add('christmas-scene-gift','christmas-gift-openable');
+    giftStates.set(node,{node,kind:'gift',column:STATIC_COLUMNS[i],opened:false,flying:false,lootScale:.65});
+    node.setAttribute('aria-label','Abrir regalo');node.title='Abrir regalo';node.onclick=()=>openGift(node);return node;});
   const thrown=[];
-  let width=0,stageHeight=180,scale=.65,visible=false,disposed=false,frame=0,last=0,time=0,nextCast=4;
+  let width=0,stageHeight=180,scale=.65,visible=false,disposed=false,frame=0,last=0,time=0,nextCast=3;
   const reduced=matchMedia('(prefers-reduced-motion: reduce)');
   const random=(min,max)=>min+Math.random()*(max-min);
-  const actors=Array.from({length:5},(_,i)=>({node:sprite(CAST[[0,1,2,3,5][i]].file,true),cast:CAST[[0,1,2,3,5][i]],
-    x:0,direction:i%2?-1:1,speed:random(24,42),lane:i%2,rest:0,nextRest:random(6,15),phase:i*.37}));
+  const actors=Array.from({length:5},(_,i)=>({node:sprite(CAST[INITIAL_CAST[i]].file,true),cast:CAST[INITIAL_CAST[i]],
+    x:0,direction:i%2?-1:1,speed:random(24,42),lane:i%2,rest:0,nextRest:random(6,15),phase:i*.37,interactive:null}));
   const size=(node,w,h,sw,sh,s)=>{node.style.width=w*s+'px';node.style.height=h*s+'px';node.style.backgroundSize=sw*s+'px '+sh*s+'px';};
   function drawActor(actor){
     const s=scale*(actor.cast.deer ? .72 : 1),{width:w,height:h,sheetWidth:sw,sheetHeight:sh}=actor.cast;
     size(actor.node,w,h,sw,sh,s);
-    const santa=actor.cast.file==='xmas_santa_3.png';
-    if(actor.interactive!==santa){
-      actor.interactive=santa;actor.node.classList.toggle('is-santa',santa);actor.node.disabled=!santa;
-      if(santa){actor.node.removeAttribute('aria-hidden');actor.node.setAttribute('aria-label','Pedir un regalo a Santa');actor.node.title='¡Un regalo de Santa!';}
+    const giver=GIVERS[actor.cast.file];
+    if(actor.interactive!==giver){
+      actor.interactive=giver;actor.node.classList.toggle('is-giver',!!giver);actor.node.disabled=!giver;
+      if(giver){actor.node.removeAttribute('aria-hidden');actor.node.setAttribute('aria-label','Llamar a '+giver);actor.node.title='¡Llama su atención!';}
       else{actor.node.setAttribute('aria-hidden','true');actor.node.removeAttribute('aria-label');actor.node.title='';}
     }
     const resting=reduced.matches||actor.rest>0;
@@ -81,7 +88,8 @@ export function createChristmasScene(app){
   }
   function removeGift(gift){
     const index=thrown.indexOf(gift);if(index<0)return;
-    clearTimeout(gift.timer);thrown.splice(index,1);gift.node.remove();stackGifts();
+    clearTimeout(gift.timer);gift.node.onclick=null;giftStates.delete(gift.node);
+    thrown.splice(index,1);gift.node.remove();stackGifts();
   }
   function drawGifts(dt=0){
     const now=performance.now();
@@ -93,10 +101,25 @@ export function createChristmasScene(app){
         gift.drawX=gift.fromX+(gift.x-gift.size/2-gift.fromX)*progress;
         gift.y=Math.max(0,gift.fromY+(endY-gift.fromY)*progress-Math.sin(progress*Math.PI)*gift.arc);
         gift.rotation=gift.spin*(1-progress);
-        if(progress===1)gift.flying=false;
+        if(progress===1){gift.flying=false;readyGift(gift);}
       }else{gift.drawX=gift.x-gift.size/2;gift.y=reduced.matches?endY:gift.y+Math.sign(endY-gift.y)*Math.min(Math.abs(endY-gift.y),dt*180);}
       gift.node.style.transform='translate('+gift.drawX.toFixed(2)+'px,'+gift.y.toFixed(2)+'px) rotate('+gift.rotation.toFixed(2)+'deg)';
     }
+  }
+  function paintGift(state){
+    state.node.style.backgroundPosition=(-state.column*48*state.lootScale)+'px '+(-(state.opened?288:240)*state.lootScale)+'px';
+  }
+  function readyGift(state){
+    if(state.kind!=='gift')return;
+    state.node.disabled=state.flying||state.opened;
+    if(state.flying){state.node.setAttribute('aria-hidden','true');state.node.tabIndex=-1;}
+    else{state.node.removeAttribute('aria-hidden');state.node.tabIndex=state.opened?-1:0;
+      state.node.setAttribute('aria-label',state.opened?'Regalo abierto':'Abrir regalo');state.node.title=state.opened?'Regalo abierto':'Abrir regalo';}
+  }
+  function openGift(node){
+    const state=giftStates.get(node);
+    if(disposed||!visible||document.hidden||!state||state.flying||state.opened)return;
+    state.opened=true;node.classList.add('is-open');paintGift(state);readyGift(state);
   }
   function tossGift(node,fromTree=false){
     if(disposed||!visible||document.hidden)return;
@@ -106,21 +129,31 @@ export function createChristmasScene(app){
     const giftScale=scale*.8,giftSize=48*giftScale;
     const direction=Math.random()<.5?-1:1;
     const target=clamp(center+direction*random(fromTree?55:25,fromTree?145:85),giftSize/2,width-giftSize/2);
-    const present=sprite('christmastiles_3.png');present.classList.add('christmas-tossed-gift');
-    size(present,48,48,240,336,giftScale);
-    present.style.backgroundPosition=(-Math.floor(random(0,5))*48*giftScale)+'px '+(-240*giftScale)+'px';
+    const kind=!fromTree&&Math.random()<.5?'wreath':'gift';
+    const column=Math.floor(random(0,kind==='wreath'?3:5));
+    const present=sprite(kind==='wreath'?'christmastiles_more_3.png':'christmastiles_3.png',kind==='gift');
+    present.classList.add('christmas-tossed-gift');present.setAttribute('data-kind',kind);
+    size(present,48,48,kind==='wreath'?192:240,kind==='wreath'?144:336,giftScale);
+    present.style.backgroundPosition=(-column*48*giftScale)+'px '+(-(kind==='wreath'?96:240)*giftScale)+'px';
     const now=performance.now();
-    const gift={node:present,size:giftSize,x:target,desiredX:target,bottom:0,started:now,expires:now+GIFT_LIFETIME,
+    const gift={node:present,kind,column,opened:false,lootScale:giftScale,size:giftSize,x:target,desiredX:target,bottom:0,started:now,expires:now+GIFT_LIFETIME,
       duration:reduced.matches?0:random(650,950),arc:random(24,48),spin:direction*random(80,170),
       fromX:center-giftSize/2,fromY:clamp(origin.top-bounds.top+origin.height*(fromTree ? .4 : .48),0,stageHeight-giftSize),
       drawX:0,y:0,rotation:0,flying:!reduced.matches,timer:0};
+    if(kind==='gift'){giftStates.set(present,gift);present.classList.add('christmas-gift-openable');present.onclick=()=>openGift(present);readyGift(gift);}
     thrown.push(gift);stackGifts();gift.y=stageHeight-giftSize-gift.bottom;
     gift.timer=setTimeout(()=>removeGift(gift),GIFT_LIFETIME);
     drawGifts();if(!reduced.matches&&!frame)frame=requestAnimationFrame(tick);
   }
   const onTreeClick=()=>tossGift(tree,true);tree.addEventListener('click',onTreeClick);
   for(const actor of actors){
-    actor.onClick=()=>{if(actor.cast.file==='xmas_santa_3.png'){actor.rest=Math.max(actor.rest,.8);tossGift(actor.node);}};
+    actor.onClick=()=>{
+      if(!GIVERS[actor.cast.file]||disposed||!visible||document.hidden)return;
+      actor.rest=Math.max(actor.rest,1.2);drawActor(actor);
+      if(actor.attentionTimer)return;
+      actor.attentionTimer=setTimeout(()=>{actor.attentionTimer=0;
+        if(!disposed&&GIVERS[actor.cast.file])tossGift(actor.node);},220);
+    };
     actor.node.addEventListener('click',actor.onClick);
   }
   function layout(){
@@ -143,9 +176,10 @@ export function createChristmasScene(app){
     const treeScale=Math.max(.3,Math.min(.8,(height-8)/192));
     size(tree,120,192,240,336,treeScale);tree.style.left=(width/2-60*treeScale)+'px';tree.style.bottom=(-9*treeScale)+'px';
     tree.style.backgroundPosition='0px 0px';
-    const offsets=[-180,-128,-77,77,128,180],columns=[0,1,2,3,4,1];
+    const offsets=[-180,-128,-77,77,128,180];
     gifts.forEach((gift,i)=>{size(gift,48,48,240,336,scale);gift.style.left=(width/2+(offsets[i]-24)*scale)+'px';
-      gift.style.bottom=((i%2?3:0)-4)*scale+'px';gift.style.backgroundPosition=(-columns[i]*48*scale)+'px '+(-240*scale)+'px';});
+      gift.style.bottom=((i%2?3:0)-4)*scale+'px';
+      const state=giftStates.get(gift);state.lootScale=scale;paintGift(state);});
     actors.forEach((actor,i)=>{
       if(!actor.initialized){actor.x=width*(i+.3)/actors.length;actor.initialized=true;}
       if(previousWidth!==width)actor.x=Math.max(-actor.cast.width*scale,Math.min(width,actor.x));
@@ -155,16 +189,17 @@ export function createChristmasScene(app){
     if(!visible||document.hidden||reduced.matches)stopFrame();else if(!frame)frame=requestAnimationFrame(tick);
   }
   function onVisibility(){if(document.hidden)stopFrame();else layout();}
-  function onMotion(){stopFrame();if(reduced.matches)for(const gift of thrown)gift.flying=false;actors.forEach(drawActor);layout();}
+  function onMotion(){stopFrame();if(reduced.matches)for(const gift of thrown){gift.flying=false;readyGift(gift);}actors.forEach(drawActor);layout();}
   const timer=window.setInterval(layout,500);
   window.addEventListener('resize',layout);document.addEventListener('visibilitychange',onVisibility);
   reduced.addEventListener?.('change',onMotion);layout();
   return {
-    getStatus:()=>({visible,characters:actors.length,cast:CAST.length,gifts:gifts.length,tree:'center',spawnedGifts:thrown.length,giftLimit:GIFT_LIMIT,giftLifetimeMs:GIFT_LIFETIME,animated:visible&&!document.hidden&&!reduced.matches}),
+    getStatus:()=>({visible,characters:actors.length,cast:CAST.length,gifts:gifts.length,tree:'center',spawnedGifts:thrown.length,wreaths:thrown.filter(g=>g.kind==='wreath').length,openedGifts:[...giftStates.values()].filter(g=>g.opened).length,giftLimit:GIFT_LIMIT,giftLifetimeMs:GIFT_LIFETIME,animated:visible&&!document.hidden&&!reduced.matches}),
     dispose(){if(disposed)return;disposed=true;stopFrame();clearInterval(timer);
       window.removeEventListener('resize',layout);document.removeEventListener('visibilitychange',onVisibility);
       reduced.removeEventListener?.('change',onMotion);tree.removeEventListener('click',onTreeClick);
-      actors.forEach(actor=>actor.node.removeEventListener('click',actor.onClick));
-      for(const gift of thrown)clearTimeout(gift.timer);thrown.length=0;root.remove();document.body.style.removeProperty('--christmas-floor-offset');}
+      actors.forEach(actor=>{actor.node.removeEventListener('click',actor.onClick);clearTimeout(actor.attentionTimer);});
+      for(const gift of thrown)clearTimeout(gift.timer);
+      for(const node of giftStates.keys())node.onclick=null;giftStates.clear();thrown.length=0;root.remove();document.body.style.removeProperty('--christmas-floor-offset');}
   };
 }

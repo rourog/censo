@@ -14,7 +14,7 @@ The engine is independent of the clinical workflow and **must never write to Fir
 - `seasons/christmas/visuals.js`: Christmas header, snow and interactive lights controller.
 - `effects/snowfall.js`: one low-DPR Canvas with layered snow.
 - `effects/christmasLights.js`: 30 fixed multicolor patient bulbs on continuous green U-shaped garlands, clear unlit glass, transient pointer/keyboard illumination, 20s shuffle, glass shards/electric sparks and 2s repair.
-- `effects/christmasScene.js`: centered tree, six gifts and five walkers rotating through eleven supplied characters; layout-aware floor, reduced motion and full cleanup; clicking the tree or Santa tosses stackable gifts (20 total, 30-second lifetime).
+- `effects/christmasScene.js`: centered tree, six gifts and five walkers rotating through eleven supplied characters; layout-aware floor, reduced motion and full cleanup; the tree tosses gifts; Santa, Mrs. Claus and Jesus face the user and randomly toss gifts or wreaths (20 total, 30-second lifetime). Grounded gifts open on click using the open-box sprite, without resetting their expiry.
 - `effects/christmasFireworks.js`: explicit 5s celebration with disposable Canvas.
 
 ## Renderer interface
