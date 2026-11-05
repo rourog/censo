@@ -11,6 +11,8 @@ const STATIC_COLUMNS=[0,1,2,3,4,1];
 const GIFT_LIMIT=20;
 const GIFT_LIFETIME=30000;
 const GIFT_OPEN_TIME=5000;
+const SNOWMAN_WAIT=10000;
+const SNOWMAN_FRAME_MS=140;
 export function createChristmasScene(app){
   if(!app)return {getStatus:()=>({characters:0,visible:false}),dispose(){}};
   const root=document.createElement('div');root.className='christmas-scene';root.setAttribute('aria-label','Escenario navideño interactivo');
@@ -32,6 +34,33 @@ export function createChristmasScene(app){
   const random=(min,max)=>min+Math.random()*(max-min);
   const actors=Array.from({length:5},(_,i)=>({node:sprite(CAST[INITIAL_CAST[i]].file,true),cast:CAST[INITIAL_CAST[i]],
     x:0,direction:i%2?-1:1,speed:random(24,42),lane:i%2,rest:0,nextRest:random(6,15),phase:i*.37,interactive:null}));
+  const snowman=sprite('snowman-melt.png',true);snowman.classList.add('christmas-scene-snowman');
+  let snowmanFrame=0,snowmanState='ready',snowmanTimer=0;
+  function paintSnowman(){
+    const s=scale*1.4;
+    size(snowman,96,96,384,288,s);
+    snowman.style.backgroundPosition=(-(snowmanFrame%4)*96*s)+'px '+(-Math.floor(snowmanFrame/4)*96*s)+'px';
+    snowman.disabled=snowmanState!=='ready';
+    const label=snowmanState==='ready'?'Derretir muñeco de nieve':snowmanState==='waiting'?'Muñeco derretido':snowmanState==='melting'?'Muñeco derritiéndose':'Muñeco reconstruyéndose';
+    snowman.setAttribute('aria-label',label);snowman.title=label;
+  }
+  function stepSnowman(direction){
+    if(disposed)return;
+    snowmanFrame=reduced.matches?(direction>0?11:0):clamp(snowmanFrame+direction,0,11);
+    paintSnowman();
+    if(direction>0&&snowmanFrame===11){
+      snowmanState='waiting';paintSnowman();
+      snowmanTimer=setTimeout(()=>{snowmanState='rebuilding';stepSnowman(-1);},SNOWMAN_WAIT);
+    }else if(direction<0&&snowmanFrame===0){snowmanState='ready';snowmanTimer=0;paintSnowman();}
+    else snowmanTimer=setTimeout(()=>stepSnowman(direction),SNOWMAN_FRAME_MS);
+  }
+  const onSnowmanClick=()=>{
+    if(disposed||!visible||document.hidden||snowmanState!=='ready')return;
+    snowmanState='melting';paintSnowman();
+    if(reduced.matches)stepSnowman(1);
+    else snowmanTimer=setTimeout(()=>stepSnowman(1),SNOWMAN_FRAME_MS);
+  };
+  snowman.addEventListener('click',onSnowmanClick);
   const size=(node,w,h,sw,sh,s)=>{node.style.width=w*s+'px';node.style.height=h*s+'px';node.style.backgroundSize=sw*s+'px '+sh*s+'px';};
   function drawActor(actor){
     const s=scale*(actor.cast.deer ? .72 : 1),{width:w,height:h,sheetWidth:sw,sheetHeight:sh}=actor.cast;
@@ -193,6 +222,7 @@ export function createChristmasScene(app){
     const treeScale=Math.max(.3,Math.min(.8,(height-8)/192));
     size(tree,120,192,240,336,treeScale);tree.style.left=(width/2-60*treeScale)+'px';tree.style.bottom=(-9*treeScale)+'px';
     tree.style.backgroundPosition='0px 0px';
+    paintSnowman();snowman.style.left=clamp(width/2+220*scale,0,width-96*scale*1.4)+'px';snowman.style.bottom='0px';
     const offsets=[-180,-128,-77,77,128,180];
     gifts.forEach((gift,i)=>{size(gift,48,48,240,336,scale);gift.style.left=(width/2+(offsets[i]-24)*scale)+'px';
       gift.style.bottom=((i%2?3:0)-4)*scale+'px';
@@ -211,10 +241,11 @@ export function createChristmasScene(app){
   window.addEventListener('resize',layout);document.addEventListener('visibilitychange',onVisibility);
   reduced.addEventListener?.('change',onMotion);layout();
   return {
-    getStatus:()=>({visible,characters:actors.length,cast:CAST.length,gifts:gifts.length,tree:'center',spawnedGifts:thrown.length,wreaths:thrown.filter(g=>g.kind==='wreath').length,openedGifts:[...giftStates.values()].filter(g=>g.opened).length,giftLimit:GIFT_LIMIT,giftLifetimeMs:GIFT_LIFETIME,giftOpenMs:GIFT_OPEN_TIME,animated:visible&&!document.hidden&&!reduced.matches}),
+    getStatus:()=>({visible,characters:actors.length,cast:CAST.length,gifts:gifts.length,tree:'center',snowman:snowmanState,snowmanFrame,snowmanWaitMs:SNOWMAN_WAIT,spawnedGifts:thrown.length,wreaths:thrown.filter(g=>g.kind==='wreath').length,openedGifts:[...giftStates.values()].filter(g=>g.opened).length,giftLimit:GIFT_LIMIT,giftLifetimeMs:GIFT_LIFETIME,giftOpenMs:GIFT_OPEN_TIME,animated:visible&&!document.hidden&&!reduced.matches}),
     dispose(){if(disposed)return;disposed=true;stopFrame();clearInterval(timer);treeShake?.cancel();treeShake=null;
       window.removeEventListener('resize',layout);document.removeEventListener('visibilitychange',onVisibility);
       reduced.removeEventListener?.('change',onMotion);tree.removeEventListener('click',onTreeClick);
+      clearTimeout(snowmanTimer);snowman.removeEventListener('click',onSnowmanClick);
       actors.forEach(actor=>{actor.node.removeEventListener('click',actor.onClick);clearTimeout(actor.attentionTimer);});
       for(const gift of thrown)clearTimeout(gift.timer);
       for(const [node,state] of giftStates){clearTimeout(state.closeTimer);node.onclick=null;}giftStates.clear();thrown.length=0;root.remove();document.body.style.removeProperty('--christmas-floor-offset');}

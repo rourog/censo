@@ -32,7 +32,7 @@ const scene=createChristmasScene(app),root=app.children[0];
 assert.equal(scene.getStatus().characters,5);assert.equal(scene.getStatus().cast,11);assert.equal(scene.getStatus().gifts,6);
 assert.equal(root.style.bottom,'106px','Stage stands above the highest visible bottom bar');
 assert.equal(document.body.style['--christmas-floor-offset'],'100px');
-const actors=root.children.slice(7),initial=actors.map(n=>n.style.backgroundImage);
+const actors=root.children.slice(7,12),initial=actors.map(n=>n.style.backgroundImage);
 const advance=now=>{clock=now;for(const [key,timer] of [...timeouts])if(clock>=timer.expires){timeouts.delete(key);timer.fn();}const callbacks=[...frames.values()];frames.clear();callbacks.forEach(fn=>fn(now));};
 advance(100);advance(150);
 assert.ok(actors.every(n=>n.style.backgroundPosition),'All walkers have sprite frames');
@@ -71,7 +71,7 @@ assert.equal([...timeouts.values()].filter(t=>t.expires>clock+5000).length,20,'T
 assert.ok(animations.slice(0,-1).every(a=>a.cancelled),'Repeated clicks restart rather than accumulate tree shakes');
 assert.equal(scene.getStatus().gifts,6);
 advance(1000);advance(2000);
-const grounded=root.children.slice(12);
+const grounded=root.children.slice(13);
 assert.equal(grounded.length,20);
 assert.equal(new Set(grounded.map(n=>n.style.transform)).size,20);
 assert.ok(grounded.every(n=>n.style.transform&&!n.style.transform.includes('NaN')));
@@ -98,6 +98,19 @@ const positions=actors.map(n=>n.style.transform);
 for(let t=30900;t<=130000;t+=50){advance(t);if(t%500===0)[...timers.values()].forEach(fn=>fn());}
 assert.notDeepEqual(actors.map(n=>n.style.transform),positions,'Walkers actually travel');
 assert.ok(actors.some((n,i)=>n.style.backgroundImage!==initial[i]),'Leaving an edge rotates the cast despite layout polling');
+// The snowman melts once, waits ten full seconds, then reverses every frame.
+const snowman=root.children[12];
+assert.equal(scene.getStatus().snowman,'ready');
+snowman.events.click();snowman.events.click();
+assert.equal(scene.getStatus().snowman,'melting');assert.equal(snowman.disabled,true);
+for(let i=1;i<=11;i++){advance(130000+i*140);assert.equal(scene.getStatus().snowmanFrame,i);}
+assert.equal(scene.getStatus().snowman,'waiting');
+const meltedPosition=snowman.style.backgroundPosition;
+[...timers.values()].forEach(fn=>fn());assert.equal(snowman.style.backgroundPosition,meltedPosition);
+advance(141539);assert.equal(scene.getStatus().snowmanFrame,11,'Full ten seconds as a puddle');
+advance(141540);assert.equal(scene.getStatus().snowman,'rebuilding');assert.equal(scene.getStatus().snowmanFrame,10);
+for(let i=1;i<=10;i++){advance(141540+i*140);assert.equal(scene.getStatus().snowmanFrame,10-i);}
+assert.equal(scene.getStatus().snowman,'ready');assert.equal(snowman.disabled,false);
 newsTop=0;[...timers.values()].forEach(fn=>fn());
 assert.equal(root.style.bottom,'66px','Footer becomes the floor when news is hidden');
 tableBottom=820;[...timers.values()].forEach(fn=>fn());
@@ -105,11 +118,15 @@ assert.equal(scene.getStatus().visible,false,'No room: scenery must not cover ro
 tableBottom=400;innerWidth=500;events.resize();assert.equal(scene.getStatus().visible,false,'Narrow screens hide the scene');
 innerWidth=1300;events.resize();assert.equal(scene.getStatus().visible,true);
 reduced.matches=true;motion();assert.equal(frames.size,0);assert.equal(scene.getStatus().animated,false);
+snowman.events.click();assert.equal(scene.getStatus().snowmanFrame,11,'Reduced motion jumps to melted frame');
+advance(clock+10000);assert.equal(scene.getStatus().snowman,'ready','Reduced motion rebuilds after ten seconds');
 const shakesBefore=animations.length;tree.events.click();assert.equal(animations.length,shakesBefore,'Reduced motion suppresses tree shake');assert.equal(scene.getStatus().spawnedGifts,1,'Reduced motion still permits gifts without flight');
 stationary.onclick();assert.equal(frames.size,0);
 reduced.matches=false;motion();assert.ok(frames.size);
 document.hidden=true;docEvents.visibilitychange();assert.equal(frames.size,0);
+snowman.events.click();assert.ok(timeouts.size,'Active melt has a pending timer');
 scene.dispose();scene.dispose();Math.random=originalRandom;
+assert.equal(Object.keys(snowman.events).length,0);
 assert.equal(app.children.length,0);assert.equal(timeouts.size,0);
 assert.equal(Object.keys(tree.events).length,0);assert.equal(stationary.onclick,null);assert.ok(actors.every(a=>Object.keys(a.events).length===0));assert.equal(timers.size,0);assert.equal(frames.size,0);
 assert.equal(Object.keys(events).length,0);assert.equal(Object.keys(docEvents).length,0);assert.equal(motion,null);
