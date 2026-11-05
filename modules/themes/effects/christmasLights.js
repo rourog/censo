@@ -4,7 +4,7 @@
 const PER_SIDE = 15;
 const TOTAL_BULBS = PER_SIDE * 2;
 // Colors belong to physical bulbs, so even patients from one area yield a varied string.
-const BULB_COLORS = ['#ff5252','#ffc94a','#4c9dff','#50df88','#b58aff','#ff9447'];
+const BULB_COLORS = ['#ff303f','#ffd12e','#248bff','#21e87a','#ac50ff','#ff841f'];
 const GARLAND_SWAGS = 3;
 const GARLAND_TOP = 7;
 const GARLAND_SAG = 15;
@@ -94,15 +94,29 @@ export function createChristmasLights(header){
       };
       addPath('christmas-garland-edge',curve);
       addPath('christmas-garland-green',curve);
-      // Small needles follow the same curve, giving the continuous cord a pine texture.
-      let needles='';
-      const count=Math.ceil((end-start)/7);
+      // Pointed leaves and fine veins follow the tangent of each U-shaped swag.
+      let darkLeaves='',lightLeaves='',veins='';
+      const count=Math.ceil((end-start)/9);
       for(let i=0;i<=count;i++){
         const progress=i/count,x=start+(end-start)*progress,y=garlandY(progress);
-        needles+=' M '+(x-2)+' '+(y-4)+' L '+(x+2)+' '+(y+3)
-          +' M '+(x-2)+' '+(y+4)+' L '+(x+2)+' '+(y-2);
+        const phase=progress>=1?0:(progress*GARLAND_SWAGS)%1;
+        const slope=4*GARLAND_SAG*GARLAND_SWAGS*(1-2*phase)/(end-start);
+        const length=Math.hypot(1,slope),tx=1/length,ty=slope/length;
+        for(const sign of [-1,1]){
+          const size=6+(i%3)*.55;
+          const tipX=x+tx*4-ty*sign*size,tipY=y+ty*4+tx*sign*size;
+          const midX=(x+tipX)/2,midY=(y+tipY)/2;
+          const dx=tipX-x,dy=tipY-y,norm=Math.hypot(dx,dy);
+          const px=-dy/norm*2.1,py=dx/norm*2.1;
+          const leaf=' M '+x+' '+y+' Q '+(midX+px)+' '+(midY+py)+' '+tipX+' '+tipY
+            +' Q '+(midX-px)+' '+(midY-py)+' '+x+' '+y+' Z';
+          if((i+(sign>0?1:0))%2)lightLeaves+=leaf;else darkLeaves+=leaf;
+          veins+=' M '+x+' '+y+' L '+tipX+' '+tipY;
+        }
       }
-      addPath('christmas-garland-needles',needles);
+      addPath('christmas-garland-leaves-dark',darkLeaves);
+      addPath('christmas-garland-leaves-light',lightLeaves);
+      addPath('christmas-garland-veins',veins);
     }
     root.append(garland);
     const positions=[];
@@ -119,7 +133,7 @@ export function createChristmasLights(header){
       bulb.style.setProperty('--bulb-size',layout.bulbSize+'px');
       bulb.style.setProperty('--sway-delay',(-((index*.61)%5.7))+'s');
       bulb.style.setProperty('--glow-delay',(-((index*.79)%1.6))+'s');
-      bulb.style.setProperty('--pulse-delay',(-((index*1.37)%1.25))+'s');
+      bulb.style.setProperty('--pulse-delay',(-((index*1.37)%.95))+'s');
       setBulbColor(bulb,BULB_COLORS[index%BULB_COLORS.length]);
       labelBulb(bulb);
       root.append(bulb);
@@ -129,14 +143,14 @@ export function createChristmasLights(header){
   function setBulbColor(bulb,color){
     bulb.dataset.color=color;
     bulb.style.setProperty('--bulb-color',color);
-    bulb.style.setProperty('--bulb-glow',color+'88');
+    bulb.style.setProperty('--bulb-glow',color+'b3');
   }
   function labelBulb(bulb){
     bulb.setAttribute('aria-label',bulb.classList.contains('is-off')
       ?'Foco roto; se repondrá en un momento'
       :bulb.classList.contains('is-lit')
         ?'Foco encendido por paciente. Romper foco'
-        :'Encender foco al pasar el cursor o enfocar. Romper con clic');
+        :'Encender con luz amarilla al pasar el cursor. Romper con clic');
   }
   function updateIllumination(){
     if(disposed)return;
@@ -166,7 +180,7 @@ export function createChristmasLights(header){
         node.className=kind;
         node.setAttribute('aria-hidden','true');
         node.style.left=x+'px';node.style.top=y+'px';
-        node.style.setProperty('--fragment-color',bulb.dataset.color);
+        node.style.setProperty('--fragment-color',bulb.classList.contains('is-idle')&&bulb.classList.contains('is-hovered')?'#ffd65a':bulb.dataset.color);
         root.append(node);later(()=>node.remove(),900);
         return node;
       };
