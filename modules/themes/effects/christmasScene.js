@@ -13,6 +13,8 @@ const GIFT_LIFETIME=30000;
 const GIFT_OPEN_TIME=5000;
 const SNOWMAN_WAIT=10000;
 const SNOWMAN_FRAME_MS=140;
+// Solid box edges in the 48px sprite cells; exclude transparent padding and bows.
+const GIFT_BOXES=[[3,3,42,45],[3,12,42,45],[6,6,39,45],[0,15,45,45],[9,21,36,45]];
 export function createChristmasScene(app){
   if(!app)return {getStatus:()=>({characters:0,visible:false}),dispose(){}};
   const root=document.createElement('div');root.className='christmas-scene';root.setAttribute('aria-label','Escenario navideño interactivo');
@@ -103,18 +105,29 @@ export function createChristmasScene(app){
   const rect=node=>node?.getClientRects?.().length?node.getBoundingClientRect():null;
   const clamp=(value,min,max)=>Math.max(min,Math.min(max,value));
   function stackGifts(){
-    const supports=gifts.map(node=>({x:parseFloat(node.style.left)+parseFloat(node.style.width)/2,
-      size:parseFloat(node.style.width),bottom:0}));
+    const box=(state,x,bottom)=>{
+      const [left,top,right,base]=state.kind==='gift'?GIFT_BOXES[state.column]:[0,0,48,48];
+      const s=state.lootScale,size=48*s;
+      return {left:x-size/2+left*s,right:x-size/2+right*s,top:bottom+(48-top)*s,base:bottom+(48-base)*s};
+    };
+    const supports=gifts.map(node=>box(giftStates.get(node),
+      parseFloat(node.style.left)+parseFloat(node.style.width)/2,parseFloat(node.style.bottom)));
     for(const gift of thrown){
+      const s=scale*.8;
+      gift.lootScale=s;gift.size=48*s;
+      size(gift.node,48,48,gift.kind==='wreath'?192:240,gift.kind==='wreath'?144:336,s);
+      if(gift.kind==='gift')paintGift(gift);
+      else gift.node.style.backgroundPosition=(-gift.column*48*s)+'px '+(-96*s)+'px';
       const maxBottom=Math.max(0,stageHeight-gift.size-38);
-      const offsets=[0,...Array.from({length:6},(_,i)=>i+1).flatMap(i=>[i,-i])];
+      const offsets=[0,...Array.from({length:Math.ceil(width/(gift.size*.9))},(_,i)=>i+1).flatMap(i=>[i,-i])];
       for(const offset of offsets){
         const x=clamp(gift.desiredX+offset*gift.size*.9,gift.size/2,width-gift.size/2);
-        const overlaps=supports.filter(other=>Math.abs(other.x-x)<(other.size+gift.size)*.3);
-        const bottom=Math.max(0,...overlaps.map(other=>other.bottom+other.size*.78));
+        const bounds=box(gift,x,0);
+        const overlaps=supports.filter(other=>Math.min(other.right,bounds.right)-Math.max(other.left,bounds.left)>.1);
+        const bottom=Math.max(0,...overlaps.map(other=>other.top))-bounds.base;
         if(bottom<=maxBottom){gift.x=x;gift.bottom=bottom;break;}
       }
-      supports.push(gift);
+      supports.push(box(gift,gift.x,gift.bottom));
     }
   }
   function removeGift(gift){

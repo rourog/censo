@@ -75,6 +75,30 @@ const grounded=root.children.slice(13);
 assert.equal(grounded.length,20);
 assert.equal(new Set(grounded.map(n=>n.style.transform)).size,20);
 assert.ok(grounded.every(n=>n.style.transform&&!n.style.transform.includes('NaN')));
+// Compare the rendered solid box edges, rather than the padded sprite cells.
+const boxEdges=[[3,3,42,45],[3,12,42,45],[6,6,39,45],[0,15,45,45],[9,21,36,45]];
+const stageHeight=parseFloat(root.style.height);
+const supportRects=root.children.slice(1,7).map(node=>{
+  const scale=parseFloat(node.style.width)/48;
+  const column=Math.round(-parseFloat(node.style.backgroundPosition)/(48*scale));
+  const [l,t,r,b]=boxEdges[column],left=parseFloat(node.style.left),top=stageHeight-parseFloat(node.style.bottom)-48*scale;
+  return {left:left+l*scale,right:left+r*scale,top:top+t*scale,bottom:top+b*scale};
+});
+let stacked=0;
+for(const node of grounded){
+  const scale=parseFloat(node.style.width)/48;
+  const column=Math.round(-parseFloat(node.style.backgroundPosition)/(48*scale));
+  const [l,t,r,b]=node.attributes['data-kind']==='wreath'?[0,0,48,48]:boxEdges[column];
+  const position=node.style.transform.match(/translate\(([-.\d]+)px,([-.\d]+)px\)/);
+  const left=Number(position[1]),top=Number(position[2]);
+  const bounds={left:left+l*scale,right:left+r*scale,top:top+t*scale,bottom:top+b*scale};
+  const overlaps=supportRects.filter(other=>Math.min(other.right,bounds.right)-Math.max(other.left,bounds.left)>.1);
+  const surface=Math.min(stageHeight,...overlaps.map(other=>other.top));
+  assert.ok(Math.abs(bounds.bottom-surface)<.02,'Visible gift base touches the ground or the highest overlapping box');
+  if(surface<stageHeight-.02)stacked++;
+  supportRects.push(bounds);
+}
+assert.ok(stacked>0,'This fixture exercises an actual pile');
 assert.equal(treeGift.disabled,false,'Landed gifts become actionable');
 const expiryBefore=[...timeouts.values()].filter(t=>t.expires>10000).map(timer=>timer.expires).sort();
 treeGift.onclick();assert.equal(treeGift.attributes['aria-label'],'Regalo abierto');
