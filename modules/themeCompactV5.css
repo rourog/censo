@@ -368,3 +368,178 @@
     grid-template-columns:1fr;
   }
 }
+
+
+/* v6 · Curated appearance families: compact sections in the existing modal. */
+#themeModal .theme-preset-families{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px 13px;
+}
+#themeModal .theme-preset-family{min-width:0;}
+#themeModal .theme-preset-family__name{
+  color:var(--muted);font-size:.65rem;font-weight:800;
+  text-transform:uppercase;letter-spacing:.075em;
+  padding:2px 0 5px;
+}
+#themeModal .theme-preset-family .theme-presets-grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:5px;
+}
+#themeModal .theme-preset-legacy{
+  margin-top:10px;padding:7px 8px;
+  border:1px solid var(--line);border-radius:8px;
+}
+#themeModal .theme-preset-legacy summary{
+  color:var(--muted);font-size:.66rem;font-weight:700;
+  cursor:pointer;outline-offset:3px;
+}
+#themeModal .theme-preset-legacy[open] summary{margin-bottom:9px;}
+#themeModal .theme-preset-legacy .theme-presets-grid{
+  grid-template-columns:repeat(auto-fill,minmax(99px,1fr));
+}
+#themeModal .theme-preset-family .theme-preset-button{
+  min-width:0;padding:4px;min-height:50px;
+}
+#themeModal .theme-preset-family .theme-preset-art{height:28px;}
+#themeModal .theme-preset-family .theme-preset-art__header{height:8px;}
+#themeModal .theme-preset-family .theme-preset-art__card{
+  top:12px;height:11px;left:5px;right:5px;
+}
+#themeModal .theme-preset-family .theme-preset-name{
+  font-size:.58rem;line-height:1.16;min-height:1.2em;
+}
+@media(max-width:740px){
+  #themeModal .theme-preset-families{grid-template-columns:1fr;gap:8px;}
+}
+@media(max-width:420px){
+  #themeModal .theme-preset-family .theme-presets-grid{
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:4px;
+  }
+}
+
+/* OLED, monitor and neon: near-black backgrounds, neutral patient surfaces,
+   strong decorative accents. Never recolor diagnoses or clinical status chips. */
+body:is(
+ [data-censo-theme-preset="oled-red"],
+ [data-censo-theme-preset="oled-cyan"],
+ [data-censo-theme-preset="oled-green"],
+ [data-censo-theme-preset="oled-amber"],
+ [data-censo-theme-preset="monitor-vital"],
+ [data-censo-theme-preset="ecg-green"],
+ [data-censo-theme-preset="uci-cyan"],
+ [data-censo-theme-preset="defib-yellow"]
+){
+  --bg:#000000;
+  --panel:#0b1117;
+  --card:#141b22;
+  --card-open:#202a32;
+  --section-head:#212a32;
+  --surface-header:#212a32;
+  --theme-meta:#000000;
+  --muted:#b8c6d1;
+}
+body:is(
+ [data-censo-theme-preset="monitor-vital"],
+ [data-censo-theme-preset="ecg-green"],
+ [data-censo-theme-preset="uci-cyan"],
+ [data-censo-theme-preset="defib-yellow"]
+) {
+  --section-head:#162128;
+  --surface-header:#162128;
+  --line:rgba(162,211,221,.19);
+}
+body[data-censo-theme-preset="monitor-vital"]{
+  --accent:#4ade80;
+  --on-accent:#052e16;
+  --monitor-secondary:#22d3ee;
+  --monitor-tertiary:#facc15;
+}
+body[data-censo-theme-preset="uci-cyan"]{
+  --accent:#22d3ee;
+  --on-accent:#083344;
+  --monitor-secondary:#a3e635;
+  --monitor-tertiary:#fbbf24;
+}
+body[data-censo-theme-preset="ecg-green"]{
+  --monitor-secondary:#a3e635;
+  --monitor-tertiary:#22d3ee;
+}
+body[data-censo-theme-preset="defib-yellow"]{
+  --monitor-secondary:#facc15;
+  --monitor-tertiary:#4ade80;
+}
+body:is(
+ [data-censo-theme-preset="monitor-vital"],
+ [data-censo-theme-preset="ecg-green"],
+ [data-censo-theme-preset="uci-cyan"],
+ [data-censo-theme-preset="defib-yellow"]
+):not(.christmas-theme) .header{
+  background-image:linear-gradient(90deg,
+    var(--accent) 0 33%,
+    var(--monitor-secondary) 33% 66%,
+    var(--monitor-tertiary) 66% 100%);
+  background-repeat:no-repeat;
+  background-size:100% 3px;
+  background-position:center bottom;
+}
+body[data-censo-theme-preset="monitor-vital"] .section-title,
+body[data-censo-theme-preset="uci-cyan"] .section-title{
+  color:var(--accent);
+}
+body:is(
+ [data-censo-theme-preset="neon-cyan"],
+ [data-censo-theme-preset="cyber-red"],
+ [data-censo-theme-preset="ultraviolet"]
+){
+  --bg:#060a0f;
+  --panel:#121920;
+  --card:#1a242c;
+  --card-open:#27343e;
+  --section-head:#172633;
+  --surface-header:#172633;
+  --line:rgba(217,235,246,.18);
+  --theme-meta:#060a0f;
+}
+body[data-censo-theme-preset="ultraviolet"]{
+  --bg:#12091c;--panel:#211729;--card:#2b2035;
+  --section-head:#352045;--surface-header:#352045;
+}
+body:is(
+ [data-censo-theme-preset="neon-cyan"],
+ [data-censo-theme-preset="cyber-red"],
+ [data-censo-theme-preset="ultraviolet"]
+) .section-header{
+  box-shadow:inset 0 -1px 0 var(--accent-border),0 2px 12px var(--accent-soft);
+}
+body:is(
+ [data-censo-theme-preset="neon-cyan"],
+ [data-censo-theme-preset="cyber-red"],
+ [data-censo-theme-preset="ultraviolet"]
+) .section-title{
+  text-shadow:0 0 9px var(--accent-border);
+}
+body[data-censo-theme-preset="clinical-gold"]{
+  --bg:#090b0f;--panel:#171b22;--card:#242832;
+  --section-head:#343137;--surface-header:#343137;
+}
+body[data-censo-theme-preset="chrome"]{
+  --bg:#10151b;--panel:#1d262f;--card:#29343e;
+  --section-head:#475563;--surface-header:#475563;
+}
+body[data-censo-theme-preset="bronze"]{
+  --bg:#1a1210;--panel:#29211f;--card:#342a26;
+  --section-head:#674533;--surface-header:#674533;
+}
+body[data-censo-theme-preset="ivory-gold"]{
+  --bg:#f8f3e7;--panel:#fffdf9;--card:#ffffff;
+  --section-head:#e8dbc2;--surface-header:#e8dbc2;
+  --text:#25211a;--muted:#655b4b;--theme-meta:#f8f3e7;
+}
+body[data-censo-theme-preset="clinical-white"]{
+  --bg:#ffffff;--panel:#f5f7fb;--card:#ffffff;
+  --section-head:#e1e8f1;--surface-header:#e1e8f1;
+  --text:#152537;--muted:#475569;--theme-meta:#ffffff;
+}
