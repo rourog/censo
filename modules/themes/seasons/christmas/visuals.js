@@ -82,6 +82,13 @@ export function initChristmasTheme(app,{scope,config,createSnowfall,createSnowMo
  .christmas-village[hidden]{display:none!important;}
  .christmas-village-hospital,.christmas-village-house{position:absolute;display:block;image-rendering:pixelated;pointer-events:none;}
  .christmas-village-house{background-repeat:no-repeat;}
+ .christmas-village-controls{position:fixed;z-index:11;pointer-events:none;overflow:hidden;}
+ .christmas-village-controls[hidden],.christmas-ambulance[hidden]{display:none!important;}
+ .christmas-hospital-trigger{position:absolute;border:0;padding:0;margin:0;background:transparent;
+   box-shadow:none;border-radius:0;pointer-events:auto;cursor:pointer;}
+ .christmas-hospital-trigger:disabled{pointer-events:none;}
+ .christmas-hospital-trigger:focus-visible{outline:2px solid #ffe293;outline-offset:3px;}
+ .christmas-ambulance{position:absolute;display:block;image-rendering:pixelated;background-repeat:no-repeat;pointer-events:none;}
  .christmas-snow-mountains .christmas-snow-foreground{z-index:2;pointer-events:none;}
  .christmas-lights{position:absolute;inset:0;z-index:3;overflow:hidden;pointer-events:none;}
  .christmas-garland{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;}
@@ -188,7 +195,7 @@ export function initChristmasTheme(app,{scope,config,createSnowfall,createSnowMo
  @media(prefers-reduced-motion:reduce){.christmas-bulb{animation:none!important;}
    .christmas-celestial{transition:none;}
    .christmas-glass-shard,.christmas-electric-spark,.christmas-break-flash,.christmas-snow,.christmas-fireworks{display:none!important;}}
- @media print{.christmas-sky-track,.christmas-scene,.christmas-winter-glow,.christmas-lights,.christmas-snow,.christmas-snow-mountains,.christmas-fireworks{display:none!important;}}
+ @media print{.christmas-village-controls,.christmas-sky-track,.christmas-scene,.christmas-winter-glow,.christmas-lights,.christmas-snow,.christmas-snow-mountains,.christmas-fireworks{display:none!important;}}
  `;
  document.head.appendChild(style);
  const glow=document.createElement('div');glow.className='christmas-winter-glow';
@@ -206,7 +213,7 @@ export function initChristmasTheme(app,{scope,config,createSnowfall,createSnowMo
  return {
   syncPatients(patients){lights.syncPatients(patients);},
   salute:options=>fireworks.salute(options),
-  getStatus:()=>({revision:'christmas-v26',village:village.getStatus(),sky:sky.getStatus(),lights:lights.getStatus(),snow:snow.getStatus(),mountains:mountains.getStatus(),
+  getStatus:()=>({revision:'christmas-v27',village:village.getStatus(),sky:sky.getStatus(),lights:lights.getStatus(),snow:snow.getStatus(),mountains:mountains.getStatus(),
     fireworks:fireworks.getStatus(),scene:scene.getStatus()}),
   dispose(){
    if(disposed)return;

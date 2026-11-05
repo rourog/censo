@@ -2,12 +2,16 @@ import assert from 'node:assert/strict';
 import {createSnowMountains} from '../modules/themes/effects/snowMountains.js';
 import {createChristmasVillage} from '../modules/themes/effects/christmasVillage.js';
 let width=1363,tableBottom=400,id=0;
-const intervals=new Map(),events={};
+const intervals=new Map(),events={},documentEvents={},frames=new Map();let now=0;
+globalThis.performance={now:()=>now};
+globalThis.requestAnimationFrame=fn=>{frames.set(++id,fn);return id;};
+globalThis.cancelAnimationFrame=id=>frames.delete(id);
+function tick(time){now=time;const pending=[...frames.values()];frames.clear();pending.forEach(fn=>fn(time));}
 globalThis.innerWidth=width;
 globalThis.window={setInterval(fn){intervals.set(++id,fn);return id;},addEventListener(k,fn){events[k]=fn;},removeEventListener(k){delete events[k];}};
 globalThis.clearInterval=id=>intervals.delete(id);
 function element(){const node={style:{},children:[],attributes:{},hidden:false,
-  setAttribute(k,v){this.attributes[k]=v;},cloneNode(){return element();},
+  addEventListener(k,fn){(this.events??={})[k]=fn;},removeEventListener(k){delete this.events[k];},setAttribute(k,v){this.attributes[k]=v;},cloneNode(){return element();},
   append(...nodes){this.children.push(...nodes);nodes.forEach(child=>child.parentElement=this);},
   remove(){this.parentElement.children=this.parentElement.children.filter(child=>child!==this);},
   getClientRects(){return this.hidden?[]:[1];},getBoundingClientRect:()=>({width,height:270,top:530,bottom:800,left:0,right:width})};
@@ -16,7 +20,7 @@ const app=element(),host=element();
 const header={getClientRects:()=>[1],getBoundingClientRect:()=>({bottom:80})};
 const table={getClientRects:()=>[1],getBoundingClientRect:()=>({bottom:tableBottom})};
 app.querySelector=()=>header;app.querySelectorAll=()=>[];
-globalThis.document={createElement:element,createElementNS:element,getElementById:()=>table};
+globalThis.document={createElement:element,createElementNS:element,getElementById:()=>table,addEventListener(k,fn){documentEvents[k]=fn;},removeEventListener(k){delete documentEvents[k];}};
 const mountains=createSnowMountains(host),wrapper=host.children[0];
 assert.equal(wrapper.children[0].children.length,2,'Two snow layers are behind the village');
 assert.equal(wrapper.children[1],mountains.villageHost);
@@ -38,6 +42,20 @@ tableBottom=750;events.resize();assert.equal(mountains.villageHost.hidden,true,'
 tableBottom=400;events.resize();checkLayout();
 width=500;innerWidth=width;events.resize();assert.equal(mountains.villageHost.hidden,true);
 width=1363;innerWidth=width;events.resize();checkLayout();
-village.dispose();village.dispose();assert.equal(mountains.villageHost.children.length,0);assert.equal(intervals.size,0);assert.equal(Object.keys(events).length,0);
+const controls=app.children[0],[trigger,ambulance]=controls.children;
+for(const direction of [.1,.9]){
+ Math.random=()=>direction;now=0;trigger.events.click();trigger.events.click();
+ assert.equal(frames.size,1,'Repeated clicks cannot duplicate the ambulance');
+ tick(0);assert.equal(village.getStatus().ambulance,'arriving');
+ assert.equal(ambulance.style.backgroundPosition.split(' ')[1],(direction<.5?0:-parseFloat(ambulance.style.height))+'px');
+ tick(1100);assert.equal(village.getStatus().ambulance,'parked');
+ const parkedX=ambulance.style.left;
+ tick(4099);assert.equal(village.getStatus().ambulance,'parked');assert.equal(ambulance.style.left,parkedX,'Stopped for the entire three seconds');
+ tick(4100);assert.equal(village.getStatus().ambulance,'leaving');
+ tick(4950);assert.equal(village.getStatus().ambulance,'idle');assert.equal(ambulance.hidden,true);assert.equal(trigger.disabled,false);assert.equal(frames.size,0);
+}
+trigger.events.click();width=500;events.resize();assert.equal(frames.size,0,'Hiding the village cancels the trip');
+width=1363;events.resize();trigger.events.click();document.hidden=true;documentEvents.visibilitychange();assert.equal(frames.size,0);document.hidden=false;
+trigger.events.click();village.dispose();village.dispose();assert.equal(frames.size,0);assert.equal(app.children.length,0);assert.equal(Object.keys(documentEvents).length,0);assert.equal(mountains.villageHost.children.length,0);assert.equal(intervals.size,0);assert.equal(Object.keys(events).length,0);
 mountains.dispose();assert.equal(host.children.length,0);
-console.log('OK: centered hospital, tree corridor on the left, houses removed, snow layer order, responsive safe area, recovery and cleanup.');
+console.log('OK: centered hospital, safe area, snow order, ambulance from both sides, exact three-second stop, single active trip, exit, visibility cancellation and disposal.');
