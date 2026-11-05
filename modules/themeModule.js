@@ -251,8 +251,9 @@ export function createThemeModule(app) {
     const independent=chosen==='custom';
     const customBase=document.getElementById('themeCustomBasePanel');
     if(customBase)customBase.hidden=!independent;
-    const accentPanel=document.getElementById('accentColorPicker')?.parentElement;
-    if(accentPanel)accentPanel.hidden=!independent;
+    // All three compact controls are now inside Personalizado.
+    const oldAccentPanel=document.getElementById('accentColorPicker')?.parentElement;
+    if(oldAccentPanel)oldAccentPanel.hidden=true;
   }
   function choosePreset(id){
     if(id==='custom'){
@@ -275,14 +276,31 @@ export function createThemeModule(app) {
     localStorage.setItem(preferenceKey('preset'),id);
     applyTheme(selected.base,selected.accent);
   }
-  function chooseCustom(base=null,accent=null){
+  function chooseCustom(base=null,accent=null,headerId=null){
     const current=getCurrentTheme();
     const nextBase=validBase(base||current.base);
     const nextAccent=validAccent(accent||current.accent);
     localStorage.setItem(preferenceKey('preset'),'custom');
     localStorage.setItem(preferenceKey('custom-base'),nextBase);
     localStorage.setItem(preferenceKey('custom-accent'),nextAccent);
+    if(headerId!==null && headerById.has(headerId)){
+      localStorage.setItem(preferenceKey('custom-header'),headerId);
+    }
     applyTheme(nextBase,nextAccent);
+  }
+
+  function applyHeaderOverride(){
+    const id=getHeaderChoice();
+    const entry=headerById.get(id);
+    const enabled=getActivePreset()==='custom' && !!entry?.color;
+    document.body.classList.toggle('theme-custom-header',enabled);
+    if(enabled){
+      document.body.style.setProperty('--custom-header-color',entry.color);
+      document.body.style.setProperty('--custom-header-ink',readableInk(entry.color));
+    }else{
+      document.body.style.removeProperty('--custom-header-color');
+      document.body.style.removeProperty('--custom-header-ink');
+    }
   }
 
   function applySeasonalBanner() {
@@ -386,20 +404,48 @@ export function createThemeModule(app) {
     </section>`;
   }
 
-  function renderAccentGrid() {
-    return `
-      <section class="theme-picker-group" aria-label="Colores de acento">
-        <div class="theme-picker-group__label"><span>Colores</span><span>${accents.length}</span></div>
-        <div class="theme-picker-grid">
-          ${accents.map(item => `
-            <button class="theme-swatch theme-swatch--accent accent-swatch ${item.metallic ? 'theme-swatch--metallic' : ''}" type="button" data-val="${item.id}" data-metal="${item.metallic || ''}" aria-label="Acento ${item.name}" title="${item.name}" style="--swatch-light:${item.light};--swatch-dark:${item.dark}">
-              <span class="theme-swatch__dot"></span>
-              <span class="theme-swatch__name">${item.name}</span>
-            </button>
-          `).join('')}
-        </div>
-      </section>
-    `;
+  function renderCustomBaseGrid(){
+    return `<section class="theme-custom-choice" aria-label="Fondo">
+      <div class="theme-custom-choice__title">FONDO</div>
+      <div class="theme-custom-swatches">
+        ${bases.map(item=>`
+          <button type="button" class="theme-color-chip base-swatch"
+            data-val="${item.id}" aria-label="Fondo ${item.name}" aria-pressed="false"
+            title="${item.name}" style="--chip-fill:${item.color}">
+            <span class="theme-color-chip__fill" aria-hidden="true"></span>
+          </button>`).join('')}
+      </div>
+    </section>`;
+  }
+  function renderCustomHeaderGrid(){
+    return `<section class="theme-custom-choice" aria-label="Encabezados">
+      <div class="theme-custom-choice__title">ENCABEZADOS</div>
+      <div class="theme-custom-swatches">
+        ${headerChoices.map(item=>`
+          <button type="button" class="theme-color-chip theme-header-swatch"
+            data-header="${item.id}" aria-label="Encabezados: ${item.name}"
+            aria-pressed="false" title="${item.name}"
+            style="--chip-fill:${item.color||'#465565'}">
+            <span class="theme-color-chip__fill ${item.color?'':'theme-color-chip__fill--auto'}"
+              aria-hidden="true"></span>
+          </button>`).join('')}
+      </div>
+    </section>`;
+  }
+  function renderAccentGrid(){
+    return `<section class="theme-custom-choice" aria-label="Acento">
+      <div class="theme-custom-choice__title">ACENTO</div>
+      <div class="theme-custom-swatches">
+        ${accents.map(item=>`
+          <button type="button" class="theme-color-chip accent-swatch"
+            data-val="${item.id}" aria-label="Acento ${item.name}"
+            aria-pressed="false" title="${item.name}"
+            style="--chip-fill:${item.dark};--chip-fill-light:${item.light}">
+            <span class="theme-color-chip__fill theme-color-chip__fill--accent"
+              aria-hidden="true"></span>
+          </button>`).join('')}
+      </div>
+    </section>`;
   }
 
   function renderEffectPicker() {
@@ -515,7 +561,7 @@ export function createThemeModule(app) {
       button.addEventListener('click', () => applyEffect(button.dataset.effect));
     });
     document.getElementById('themeResetBtn')?.addEventListener('click', () => {
-      for (const part of ['base','accent','effect','preset','custom-base','custom-accent'])
+      for (const part of ['base','accent','effect','preset','custom-base','custom-accent','custom-header'])
         localStorage.removeItem(preferenceKey(part));
       refreshSeason();
     });
@@ -532,22 +578,14 @@ export function createThemeModule(app) {
     baseGrid.innerHTML =
       `${renderThemePresets()}
        <div id="themeCustomBasePanel" class="theme-custom-panel" hidden>
-         <div class="theme-picker-group__label"><span>Personalizado · paleta de superficies</span></div>
-         <div class="theme-palette-primary">
-           ${renderBaseGroup('surface','Fondo y encabezados')}
+         <div class="theme-custom-choices">
+           ${renderCustomBaseGrid()}
+           ${renderCustomHeaderGrid()}
+           ${renderAccentGrid()}
          </div>
-         <details class="theme-palette-legacy" id="legacyThemePalettes">
-           <summary>Más fondos · opciones anteriores</summary>
-           <div class="theme-palette-legacy__grid">
-             ${renderBaseGroup('dark','Oscuros')}
-             ${renderBaseGroup('light','Claros')}
-           </div>
-         </details>
        </div>`;
-    const savedBase=getCurrentTheme().base;
-    const legacy=document.getElementById('legacyThemePalettes');
-    if(legacy && !bases.some(item=>item.id===savedBase&&item.mode==='surface'))legacy.open=true;
-    accentGrid.innerHTML=renderAccentGrid();
+    // The former accent picker stays in markup for compatibility but is unused.
+    accentGrid.innerHTML='';
 
     baseGrid.querySelectorAll('[data-theme-preset]').forEach(button=>{
       button.addEventListener('click',()=>choosePreset(button.dataset.themePreset));
@@ -555,14 +593,17 @@ export function createThemeModule(app) {
     baseGrid.querySelectorAll('.base-swatch').forEach(button=>{
       button.addEventListener('click',()=>chooseCustom(button.dataset.val,null));
     });
-    accentGrid.querySelectorAll('.accent-swatch').forEach(button=>{
+    baseGrid.querySelectorAll('.theme-header-swatch').forEach(button=>{
+      button.addEventListener('click',()=>chooseCustom(null,null,button.dataset.header));
+    });
+    baseGrid.querySelectorAll('.accent-swatch').forEach(button=>{
       button.addEventListener('click',()=>chooseCustom(null,button.dataset.val));
     });
 
     const baseLabel=baseGrid.parentElement?.querySelector('label');
-    const accentLabel=accentGrid.parentElement?.querySelector('label');
-    if(baseLabel)baseLabel.textContent='TEMA';
-    if(accentLabel)accentLabel.textContent='PERSONALIZADO · ACENTO';
+    if(baseLabel)baseLabel.textContent='TEMAS COMPLETOS';
+    const oldAccentLabel=accentGrid.parentElement?.querySelector('label');
+    if(oldAccentLabel)oldAccentLabel.textContent='ACENTO';
 
     ensureExtras();
     updatePresetPicker();
@@ -591,6 +632,11 @@ export function createThemeModule(app) {
       button.classList.toggle('active', active);
       button.setAttribute('aria-pressed', String(active));
     });
+    document.querySelectorAll('.theme-header-swatch').forEach(button => {
+      const active=button.dataset.header===getHeaderChoice();
+      button.classList.toggle('active',active);
+      button.setAttribute('aria-pressed',String(active));
+    });
 
     const baseName = bases.find(item => item.id === base)?.name || base;
     const accentName = accents.find(item => item.id === accent)?.name || accent;
@@ -615,6 +661,7 @@ export function createThemeModule(app) {
 
     removeOldThemeClasses();
     document.body.classList.add(base, accent);
+    applyHeaderOverride();
     if (persist) {
       localStorage.setItem(preferenceKey('base'), base);
       localStorage.setItem(preferenceKey('accent'), accent);
