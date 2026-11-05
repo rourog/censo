@@ -26,9 +26,12 @@ assert.equal(village.getStatus().buildings,4);assert.equal(houses.length,3);
 function checkLayout(){
   assert.equal(village.getStatus().visible,true);
   assert.ok(parseFloat(hospital.style.left)>=0);
-  assert.ok(parseFloat(hospital.style.left)+parseFloat(hospital.style.width)<=width/2-100+.01,'Hospital leaves the pine corridor clear');
+  assert.ok(Math.abs(parseFloat(hospital.style.left)+parseFloat(hospital.style.width)/2-width/2)<.01,'Hospital is exactly centered');
+  const treeLeft=width*.24-48,treeRight=width*.24+48;
+  assert.ok(treeRight<parseFloat(hospital.style.left),'Tree remains clear of the hospital');
   const boxes=houses.map(node=>({left:parseFloat(node.style.left),size:parseFloat(node.style.width)}));
-  assert.ok(boxes[0].left>=width/2+100,'Houses start outside the pine corridor');
+  assert.ok(boxes[0].left+boxes[0].size<treeLeft,'Left house stays clear of the tree');
+  assert.ok(boxes[1].left>parseFloat(hospital.style.left)+parseFloat(hospital.style.width),'Right houses stay clear of the hospital');
   boxes.forEach((box,i)=>{
     assert.ok(box.left+box.size<=width);
     if(i)assert.ok(box.left>=boxes[i-1].left+boxes[i-1].size,'Houses cannot overlap');
@@ -44,4 +47,4 @@ width=500;innerWidth=width;events.resize();assert.equal(mountains.villageHost.hi
 width=1363;innerWidth=width;events.resize();checkLayout();
 village.dispose();village.dispose();assert.equal(mountains.villageHost.children.length,0);assert.equal(intervals.size,0);assert.equal(Object.keys(events).length,0);
 mountains.dispose();assert.equal(host.children.length,0);
-console.log('OK: hospital left, three houses right, central pine corridor, snow layer order, responsive safe area, recovery and cleanup.');
+console.log('OK: centered hospital, tree corridor on the left, houses on both sides, snow layer order, responsive safe area, recovery and cleanup.');

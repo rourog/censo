@@ -243,11 +243,12 @@ export function createChristmasScene(app){
     root.hidden=!visible;root.style.height=height+'px';root.style.bottom=(innerHeight-floor+6)+'px';
     const previousScale=scale;scale=Math.max(.3,Math.min(.65,(height-8)/240));
     const treeScale=Math.max(.3,Math.min(.8,(height-8)/192));
-    size(tree,120,192,240,336,treeScale);tree.style.left=(width/2-60*treeScale)+'px';tree.style.bottom=(-9*treeScale)+'px';
+    const treeCenter=width*.24;
+    size(tree,120,192,240,336,treeScale);tree.style.left=(treeCenter-60*treeScale)+'px';tree.style.bottom=(-9*treeScale)+'px';
     tree.style.backgroundPosition='0px 0px';
-    paintSnowman();snowman.style.left=clamp(width/2+220*scale,0,width-96*scale*1.4)+'px';snowman.style.bottom='0px';
+    paintSnowman();snowman.style.left=clamp(width*.7-48*scale*1.4,0,width-96*scale*1.4)+'px';snowman.style.bottom='0px';
     const offsets=[-180,-128,-77,77,128,180];
-    gifts.forEach((gift,i)=>{size(gift,48,48,240,336,scale);gift.style.left=(width/2+(offsets[i]-24)*scale)+'px';
+    gifts.forEach((gift,i)=>{size(gift,48,48,240,336,scale);gift.style.left=(treeCenter+(offsets[i]-24)*scale)+'px';
       gift.style.bottom=((i%2?3:0)-4)*scale+'px';
       const state=giftStates.get(gift);state.lootScale=scale;paintGift(state);});
     actors.forEach((actor,i)=>{
@@ -264,7 +265,7 @@ export function createChristmasScene(app){
   window.addEventListener('resize',layout);document.addEventListener('visibilitychange',onVisibility);
   reduced.addEventListener?.('change',onMotion);layout();
   return {
-    getStatus:()=>({visible,characters:actors.length,cast:CAST.length,gifts:gifts.length,tree:'center',snowman:snowmanState,snowmanFrame,snowmanWaitMs:SNOWMAN_WAIT,spawnedGifts:thrown.length,wreaths:thrown.filter(g=>g.kind==='wreath').length,openedGifts:[...giftStates.values()].filter(g=>g.opened).length,giftLimit:GIFT_LIMIT,giftLifetimeMs:GIFT_LIFETIME,giftOpenMs:GIFT_OPEN_TIME,animated:visible&&!document.hidden&&!reduced.matches}),
+    getStatus:()=>({visible,characters:actors.length,cast:CAST.length,gifts:gifts.length,tree:'left',snowman:snowmanState,snowmanFrame,snowmanWaitMs:SNOWMAN_WAIT,spawnedGifts:thrown.length,wreaths:thrown.filter(g=>g.kind==='wreath').length,openedGifts:[...giftStates.values()].filter(g=>g.opened).length,giftLimit:GIFT_LIMIT,giftLifetimeMs:GIFT_LIFETIME,giftOpenMs:GIFT_OPEN_TIME,animated:visible&&!document.hidden&&!reduced.matches}),
     dispose(){if(disposed)return;disposed=true;stopFrame();clearInterval(timer);treeShake?.cancel();treeShake=null;
       window.removeEventListener('resize',layout);document.removeEventListener('visibilitychange',onVisibility);
       reduced.removeEventListener?.('change',onMotion);tree.removeEventListener('click',onTreeClick);

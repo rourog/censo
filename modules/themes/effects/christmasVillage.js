@@ -23,19 +23,19 @@ export function createChristmasVillage(host,app){
     const bottom=Math.max(8,height*.08),available=(bounds?.bottom||0)-top-bottom-14;
     visible=!!appBounds&&width>=768&&available>=45;
     host.hidden=!visible;if(!visible)return;
-    const gap=100,margin=width*.04,sideWidth=width/2-gap-margin;
-    const hospitalWidth=Math.min(500,sideWidth,available*HOSPITAL_RATIO);
+    const hospitalWidth=Math.min(540,width*.36,available*HOSPITAL_RATIO);
     hospital.style.width=hospitalWidth+'px';hospital.style.height='auto';
-    hospital.style.left=(width/2-gap-hospitalWidth)+'px';hospital.style.bottom=bottom+'px';
-    const houseSize=Math.min(120,available,sideWidth/3.4);
+    hospital.style.left=((width-hospitalWidth)/2)+'px';hospital.style.bottom=bottom+'px';
+    const houseSize=Math.min(120,available,width*.09);
+    const houseCenters=[.085,.79,.92];
     houses.forEach((node,i)=>{
       node.style.width=houseSize+'px';node.style.height=houseSize+'px';
-      node.style.left=(width/2+gap+i*(sideWidth-houseSize)/2)+'px';node.style.bottom=bottom+'px';
+      node.style.left=(width*houseCenters[i]-houseSize/2)+'px';node.style.bottom=bottom+'px';
       node.style.backgroundSize=(houseSize*3)+'px '+(houseSize*2)+'px';node.style.backgroundPosition=(-i*houseSize)+'px 0px';
     });
   }
   const timer=window.setInterval(layout,500);window.addEventListener('resize',layout);layout();
-  return {getStatus:()=>({visible,buildings:4,hospital:'left',houses:'right',snowPlane:'before-foreground'}),
+  return {getStatus:()=>({visible,buildings:4,hospital:'center',houses:'both-sides',snowPlane:'before-foreground'}),
     dispose(){if(disposed)return;disposed=true;clearInterval(timer);window.removeEventListener('resize',layout);
       hospital.remove();houses.forEach(node=>node.remove());host.hidden=false;}};
 }

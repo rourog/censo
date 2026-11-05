@@ -45,6 +45,10 @@ assert.ok(Math.abs(parseFloat(actors[5].style.backgroundPosition.split(' ')[1])+
 assert.ok(Math.abs(parseFloat(actors[6].style.backgroundPosition.split(' ')[1])+192*.65*.9)<.001,'Husky uses the right-walk row');
 const tree=root.children[0];
 assert.equal(tree.attributes['aria-label'],'Lanzar un regalo desde el pino');
+assert.equal(scene.getStatus().tree,'left');
+assert.ok(Math.abs(parseFloat(tree.style.left)+parseFloat(tree.style.width)/2-innerWidth*.24)<.01,'Tree is anchored to the left quarter');
+const giftCenters=root.children.slice(1,7).map(node=>parseFloat(node.style.left)+parseFloat(node.style.width)/2);
+assert.ok(Math.abs(giftCenters.reduce((a,b)=>a+b,0)/6-innerWidth*.24)<.01,'Stationary presents follow the tree');
 // Static presents open once and survive layout recalculation.
 const stationary=root.children[1];
 assert.equal(stationary.attributes['aria-label'],'Abrir regalo');
