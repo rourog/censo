@@ -87,22 +87,31 @@
           <button id="themeToggleBtn" class="icon-btn" type="button" aria-label="Tema"><span class="material-symbols-outlined">palette</span></button>
           <button id="btnLogoutBtn" class="icon-btn" type="button" aria-label="Cerrar Sesión" title="Cerrar Sesión"><span class="material-symbols-outlined">logout</span></button>
           <div class="censo-header-menu-container">
-            <button id="censoMenuButton" class="icon-btn" type="button" aria-label="Menú del Censo" aria-haspopup="true" aria-expanded="false" aria-controls="censoHeaderMenu" title="Menú">
-              <span class="material-symbols-outlined">menu</span>
+            <button id="censoMenuButton" class="icon-btn" type="button"
+              aria-label="Abrir menú del Censo" aria-haspopup="menu" aria-expanded="false"
+              aria-controls="censoHeaderMenu" title="Abrir menú">
+              <span class="material-symbols-outlined" aria-hidden="true">menu</span>
             </button>
-            <div id="censoHeaderMenu" class="censo-header-menu" hidden role="group" aria-label="Opciones del Censo">
-              <div class="censo-header-menu__heading">AJUSTES Y ACCIONES <span>BETA</span></div>
-              <button type="button" data-menu-action="search"><span class="material-symbols-outlined">search</span><span>Buscar paciente</span></button>
-              <button type="button" data-menu-action="history"><span class="material-symbols-outlined">history</span><span>Historial</span></button>
-              <button type="button" data-menu-action="cie10"><span class="material-symbols-outlined">medical_information</span><span>CIE-10 · Lesiones</span></button>
-              <button type="button" data-menu-action="print"><span class="material-symbols-outlined">print</span><span>Imprimir censo</span></button>
-              <div class="censo-header-menu__separator"></div>
-              <button type="button" data-menu-action="theme"><span class="material-symbols-outlined">palette</span><span>Apariencia y temas</span></button>
-              <button type="button" data-menu-action="beds"><span class="material-symbols-outlined">bed</span><span>Camas y sillas</span></button>
-              <button type="button" data-menu-action="view"><span class="material-symbols-outlined">view_agenda</span><span data-view-label>Tipo de vista</span></button>
-              <button type="button" data-menu-action="reload"><span class="material-symbols-outlined">refresh</span><span>Recargar censo</span></button>
-              <div class="censo-header-menu__separator"></div>
-              <button type="button" data-menu-action="logout" class="censo-header-menu__logout"><span class="material-symbols-outlined">logout</span><span>Cerrar sesión</span></button>
+            <div id="censoHeaderMenu" class="censo-header-menu" hidden role="menu" aria-label="Acciones del Censo">
+              <div class="censo-header-menu__heading" role="presentation">
+                <span>MENÚ DEL CENSO</span><span class="censo-header-menu__beta">BETA</span>
+              </div>
+              <div class="censo-header-menu__section-label" role="presentation">PACIENTES</div>
+              <button type="button" role="menuitem" tabindex="-1" data-menu-action="search"><span class="material-symbols-outlined" aria-hidden="true">search</span><span>Buscar paciente</span></button>
+              <button type="button" role="menuitem" tabindex="-1" data-menu-action="history"><span class="material-symbols-outlined" aria-hidden="true">history</span><span>Historial</span></button>
+              <button type="button" role="menuitem" tabindex="-1" data-menu-action="cie10"><span class="material-symbols-outlined" aria-hidden="true">medical_information</span><span>CIE-10 · Lesiones</span></button>
+              <div class="censo-header-menu__separator" role="separator"></div>
+              <div class="censo-header-menu__section-label" role="presentation">OPERACIÓN</div>
+              <button type="button" role="menuitem" tabindex="-1" data-menu-action="print"><span class="material-symbols-outlined" aria-hidden="true">print</span><span>Imprimir censo</span></button>
+              <button type="button" role="menuitem" tabindex="-1" data-menu-action="beds"><span class="material-symbols-outlined" aria-hidden="true">bed</span><span>Camas y sillas</span></button>
+              <button type="button" role="menuitem" tabindex="-1" data-menu-action="view"><span class="material-symbols-outlined" aria-hidden="true">view_agenda</span><span data-view-label>Tipo de vista</span></button>
+              <button type="button" role="menuitem" tabindex="-1" data-menu-action="reload"><span class="material-symbols-outlined" aria-hidden="true">refresh</span><span>Recargar censo</span></button>
+              <div class="censo-header-menu__separator" role="separator"></div>
+              <div class="censo-header-menu__section-label" role="presentation">PREFERENCIAS</div>
+              <button type="button" role="menuitem" tabindex="-1" data-menu-action="theme"><span class="material-symbols-outlined" aria-hidden="true">palette</span><span>Apariencia y temas</span></button>
+              <div class="censo-header-menu__separator" role="separator"></div>
+              <button type="button" role="menuitem" tabindex="-1" data-menu-action="logout" class="censo-header-menu__logout"><span class="material-symbols-outlined" aria-hidden="true">logout</span><span>Cerrar sesión</span></button>
+              <div class="censo-header-menu__hint" aria-hidden="true">↑ ↓ Navegar · Esc Cerrar</div>
             </div>
           </div>
         </div>
