@@ -1,5 +1,5 @@
 /* Seasonal Engine 2.0 Christmas renderer: visuals only, no Firestore. */
-export function initChristmasTheme(app,{scope,config,createSnowfall,createSnowMountains,createChristmasLights,createChristmasFireworks,createChristmasScene,createChristmasSky}){
+export function initChristmasTheme(app,{scope,config,createSnowfall,createSnowMountains,createChristmasLights,createChristmasFireworks,createChristmasScene,createChristmasSky,createChristmasVillage}){
  const header=document.querySelector('.header');
  if(!header)return null;
  const style=document.createElement('style');
@@ -78,6 +78,11 @@ export function initChristmasTheme(app,{scope,config,createSnowfall,createSnowMo
  .christmas-snow-mountains{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden;
    filter:drop-shadow(0 -2px 7px rgba(202,230,249,.13));}
  .christmas-snow-mountains svg{position:absolute;inset:0;width:100%;height:100%;display:block;}
+ .christmas-village{position:absolute;inset:0;z-index:1;pointer-events:none;}
+ .christmas-village[hidden]{display:none!important;}
+ .christmas-village-hospital,.christmas-village-house{position:absolute;display:block;image-rendering:pixelated;pointer-events:none;}
+ .christmas-village-house{background-repeat:no-repeat;}
+ .christmas-snow-mountains .christmas-snow-foreground{z-index:2;pointer-events:none;}
  .christmas-lights{position:absolute;inset:0;z-index:3;overflow:hidden;pointer-events:none;}
  .christmas-garland{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;}
  .christmas-garland path{fill:none;stroke-linecap:round;stroke-linejoin:round;}
@@ -193,6 +198,7 @@ export function initChristmasTheme(app,{scope,config,createSnowfall,createSnowMo
  const snowHost=document.querySelector('.desktop-waves-bg');
  const snow=createSnowfall(snowHost);
  const mountains=createSnowMountains(snowHost);
+ const village=createChristmasVillage(mountains.villageHost,document.getElementById('mainAppContainer'));
  const fireworks=createChristmasFireworks(config.celebration);
  const scene=createChristmasScene(document.getElementById('mainAppContainer'));
  const sky=createChristmasSky(document.getElementById('mainAppContainer'));
@@ -200,11 +206,11 @@ export function initChristmasTheme(app,{scope,config,createSnowfall,createSnowMo
  return {
   syncPatients(patients){lights.syncPatients(patients);},
   salute:options=>fireworks.salute(options),
-  getStatus:()=>({revision:'christmas-v22',sky:sky.getStatus(),lights:lights.getStatus(),snow:snow.getStatus(),mountains:mountains.getStatus(),
+  getStatus:()=>({revision:'christmas-v23',village:village.getStatus(),sky:sky.getStatus(),lights:lights.getStatus(),snow:snow.getStatus(),mountains:mountains.getStatus(),
     fireworks:fireworks.getStatus(),scene:scene.getStatus()}),
   dispose(){
    if(disposed)return;
-   disposed=true;lights.dispose();snow.dispose();mountains.dispose();fireworks.dispose();scene.dispose();sky.dispose();
+   disposed=true;lights.dispose();snow.dispose();village.dispose();mountains.dispose();fireworks.dispose();scene.dispose();sky.dispose();
    glow.remove();style.remove();document.body.classList.remove('christmas-theme');
    app.initPlexus?.();
   }

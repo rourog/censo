@@ -1,5 +1,5 @@
 /* Three opaque stationary sinusoidal snow bands with phase offsets.
- * Pure SVG: no per-frame animation, observers or clinical data.
+ * Two rear SVG bands, a village slot, then the closest SVG band. No per-frame work or clinical data.
  */
 const SVG_NS='http://www.w3.org/2000/svg';
 function sinePath({width=1200,height=240,base,amplitude,cycles,phase}){
@@ -20,21 +20,25 @@ export function createSnowMountains(host){
   svg.setAttribute('preserveAspectRatio','none');
   svg.setAttribute('focusable','false');
   svg.setAttribute('aria-hidden','true');
+  const foreground=svg.cloneNode(false);
+  const villageHost=document.createElement('div');villageHost.className='christmas-village';
   const layers=[
     {base:176,amplitude:11,cycles:2.1,phase:0.25,fill:'#8dbbdc'},
     {base:196,amplitude:13,cycles:2.1,phase:1.05,fill:'#bfdef4'},
     {base:215,amplitude:10,cycles:2.1,phase:1.88,fill:'#f8fcff'}
   ];
-  for(const layer of layers){
+  for(const [index,layer] of layers.entries()){
     const path=document.createElementNS(SVG_NS,'path');
     path.setAttribute('d',sinePath(layer));
     path.setAttribute('fill',layer.fill);
     path.setAttribute('fill-opacity','1');
-    svg.append(path);
+    (index===layers.length-1?foreground:svg).append(path);
   }
-  wrapper.append(svg);
+  foreground.classList.add('christmas-snow-foreground');
+  wrapper.append(svg,villageHost,foreground);
   host.append(wrapper);
   return {
+    villageHost,
     getStatus:()=>({layers:layers.length,animated:false,shape:'sinusoidal'}),
     dispose(){wrapper.remove();}
   };
