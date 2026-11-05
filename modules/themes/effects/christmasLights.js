@@ -3,18 +3,15 @@
  */
 const PER_SIDE = 15;
 const TOTAL_BULBS = PER_SIDE * 2;
-const DECORATIVE_COLORS = ['#ff4455','#dc2626','#fb7185','#f43f5e'];
-const GROUP_COLORS = Object.freeze({
-  'SALA DE CHOQUE':'#ff4455',
-  'OBSERVACION':'#dc2626',
-  'TRAUMA MENOR':'#be123c',
-  'PEDIATRIA':'#fb7185',
-  'EXTRAS':'#f43f5e',
-  'SIN AREA':'#e11d48'
-});
-const normalizeArea = value => String(value || '').normalize('NFD')
-  .replace(/[\u0300-\u036f]/g,'').trim().toUpperCase();
-const patientColor = patient => GROUP_COLORS[normalizeArea(patient?.area)] || GROUP_COLORS['SIN AREA'];
+// Colors belong to physical bulbs, so even patients from one area yield a varied string.
+const BULB_COLORS = ['#ff5252','#ffc94a','#4c9dff','#50df88','#b58aff','#ff9447'];
+const GARLAND_SWAGS = 3;
+const GARLAND_TOP = 7;
+const GARLAND_SAG = 15;
+function garlandY(progress){
+  const phase=progress>=1?0:(progress*GARLAND_SWAGS)%1;
+  return GARLAND_TOP+4*GARLAND_SAG*phase*(1-phase);
+}
 const patientId = (p,index) => String(p?.fila ?? p?.id ?? (p?.cama || '') + ':' + (p?.nombre || '') + ':' + index);
 function hash(value){
   let result=2166136261;
@@ -73,43 +70,59 @@ export function createChristmasLights(header){
   function draw(){
     if(disposed)return;
     const layout=geometry();
-    const sorted=patients.map((patient,index)=>({
-      id:patientId(patient,index),color:patientColor(patient)
-    })).sort((a,b)=>a.id.localeCompare(b.id));
-    const signature=sorted.map(entry=>entry.id+'='+entry.color).join('|');
+    const signature=patients.map(patientId).sort().join('|');
     const key=JSON.stringify(layout);
     patientSignature=signature;
     if(key===renderKey)return;
     renderKey=key;
     root.replaceChildren();
     if(!layout)return;
+    const garland=document.createElementNS('http://www.w3.org/2000/svg','svg');
+    garland.classList.add('christmas-garland');
+    garland.setAttribute('aria-hidden','true');
+    garland.setAttribute('focusable','false');
+    for(const side of [layout.left,layout.right]){
+      const start=side[0],end=side[PER_SIDE-1],span=(end-start)/GARLAND_SWAGS;
+      let curve='M '+start+' '+GARLAND_TOP;
+      for(let i=0;i<GARLAND_SWAGS;i++){
+        curve+=' Q '+(start+span*(i+.5))+' '+(GARLAND_TOP+GARLAND_SAG*2)
+          +' '+(start+span*(i+1))+' '+GARLAND_TOP;
+      }
+      const addPath=(className,d)=>{
+        const path=document.createElementNS('http://www.w3.org/2000/svg','path');
+        path.setAttribute('class',className);path.setAttribute('d',d);garland.append(path);
+      };
+      addPath('christmas-garland-edge',curve);
+      addPath('christmas-garland-green',curve);
+      // Small needles follow the same curve, giving the continuous cord a pine texture.
+      let needles='';
+      const count=Math.ceil((end-start)/7);
+      for(let i=0;i<=count;i++){
+        const progress=i/count,x=start+(end-start)*progress,y=garlandY(progress);
+        needles+=' M '+(x-2)+' '+(y-4)+' L '+(x+2)+' '+(y+3)
+          +' M '+(x-2)+' '+(y+4)+' L '+(x+2)+' '+(y-2);
+      }
+      addPath('christmas-garland-needles',needles);
+    }
+    root.append(garland);
     const positions=[];
     for(let i=0;i<PER_SIDE;i++){
-      positions.push(layout.left[i],layout.right[i]);
-    }
-    const seed=sorted.map(entry=>entry.id).join('|')||'sin-pacientes';
-    const selected=shuffledSlots(seed+'|'+shuffleStep);
-    const illuminated=new Map();
-    for(let i=0;i<Math.min(sorted.length,TOTAL_BULBS);i++){
-      illuminated.set(selected[i],sorted[i].color);
+      const top=garlandY(i/(PER_SIDE-1))+4;
+      positions.push({x:layout.left[i],top},{x:layout.right[i],top});
     }
     positions.forEach((position,index)=>{
-      const color=illuminated.get(index);
-      const pine=document.createElement('span');
-      pine.className='christmas-pine';
-      pine.style.left=(position-7)+'px';
       const bulb=document.createElement('button');
       bulb.type='button';
-      bulb.className='christmas-bulb '+(color?'is-lit':'is-idle');
-      bulb.style.left=position+'px';
-      bulb.style.top=(14+Math.sin(index*.55)*5)+'px';
+      bulb.className='christmas-bulb is-idle';
+      bulb.style.left=(position.x-layout.bulbSize/2)+'px';
+      bulb.style.top=position.top+'px';
       bulb.style.setProperty('--bulb-size',layout.bulbSize+'px');
       bulb.style.setProperty('--sway-delay',(-((index*.61)%5.7))+'s');
       bulb.style.setProperty('--glow-delay',(-((index*.79)%1.6))+'s');
       bulb.style.setProperty('--pulse-delay',(-((index*1.37)%1.25))+'s');
-      setBulbColor(bulb,color||DECORATIVE_COLORS[index%DECORATIVE_COLORS.length]);
+      setBulbColor(bulb,BULB_COLORS[index%BULB_COLORS.length]);
       labelBulb(bulb);
-      root.append(pine,bulb);
+      root.append(bulb);
     });
     updateIllumination();
   }
@@ -127,18 +140,15 @@ export function createChristmasLights(header){
   }
   function updateIllumination(){
     if(disposed)return;
-    const sorted=patients.map((patient,index)=>({id:patientId(patient,index),color:patientColor(patient)}))
-      .sort((a,b)=>a.id.localeCompare(b.id));
-    const seed=sorted.map(item=>item.id).join('|')||'sin-pacientes';
+    const ids=patients.map(patientId).sort();
+    const seed=ids.join('|')||'sin-pacientes';
     const shuffled=shuffledSlots(seed+'|'+shuffleStep);
-    const lit=new Map();
-    sorted.slice(0,TOTAL_BULBS).forEach((item,i)=>lit.set(shuffled[i],item.color));
+    const lit=new Set(shuffled.slice(0,Math.min(ids.length,TOTAL_BULBS)));
     root.querySelectorAll('.christmas-bulb').forEach((bulb,index)=>{
-      const color=lit.get(index);
-      bulb.classList.toggle('is-lit',!!color);
-      bulb.classList.toggle('is-idle',!color);
+      bulb.classList.toggle('is-lit',lit.has(index));
+      bulb.classList.toggle('is-idle',!lit.has(index));
       // Patient assignments change without resetting a break or pointer/focus state.
-      setBulbColor(bulb,color||DECORATIVE_COLORS[index%DECORATIVE_COLORS.length]);
+      setBulbColor(bulb,BULB_COLORS[index%BULB_COLORS.length]);
       labelBulb(bulb);
     });
   }
@@ -220,7 +230,7 @@ export function createChristmasLights(header){
   return {
     syncPatients(list){
       patients=Array.isArray(list)?list:[];
-      const signature=patients.map((p,i)=>patientId(p,i)+'='+patientColor(p)).sort().join('|');
+      const signature=patients.map(patientId).sort().join('|');
       if(signature!==patientSignature){
         patientSignature=signature;
         draw();
