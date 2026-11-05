@@ -1,0 +1,651 @@
+/* Censo Beta · Appearance UI 5: compact, tabbed, viewport-aware.
+   Appearance-only: does not modify clinical colors or patient data. */
+#themeModal .theme-appearance-dialog {
+  box-sizing:border-box;
+  width:min(940px,calc(100vw - 26px))!important;
+  max-width:940px!important;
+  max-height:calc(100dvh - 28px)!important;
+  padding:14px 16px 12px!important;
+  gap:0!important;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden!important;
+}
+#themeModal .theme-appearance-dialog > .modal-header{
+  flex:0 0 auto;
+  position:relative;
+  top:auto;
+  z-index:2;
+  margin:0!important;
+  padding:0 0 10px!important;
+  background:var(--panel)!important;
+  border-bottom:0;
+  backdrop-filter:none;
+  -webkit-backdrop-filter:none;
+}
+#themeModal .theme-appearance-dialog .modal-title {
+  font-size:1rem;
+  line-height:1.4;
+}
+#themeModal .theme-appearance-dialog .modal-close{
+  min-width:34px;
+  min-height:34px;
+}
+#themeModal .theme-appearance-tabs {
+  flex:0 0 auto;
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:5px;
+  padding:4px;
+  border:1px solid var(--line);
+  border-radius:11px;
+  background:var(--bg);
+}
+#themeModal .theme-appearance-tab {
+  min-width:0;
+  min-height:38px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  padding:6px 8px;
+  border:1px solid transparent;
+  border-radius:8px;
+  background:transparent;
+  color:var(--muted);
+  font:700 .72rem/1.2 'Fira Code',monospace;
+  cursor:pointer;
+}
+#themeModal .theme-appearance-tab .material-symbols-outlined {
+  font-size:18px;
+  flex-shrink:0;
+}
+#themeModal .theme-appearance-tab:hover{
+  color:var(--text);
+  background:var(--field);
+}
+#themeModal .theme-appearance-tab[aria-selected="true"]{
+  background:var(--panel);
+  color:var(--accent);
+  border-color:var(--accent-border);
+  box-shadow:0 1px 6px #0002;
+}
+#themeModal .theme-appearance-tab:focus-visible{
+  outline:2px solid var(--accent);
+  outline-offset:1px;
+}
+#themeModal [hidden] { display:none!important; }
+#themeModal #themeV2Extras { display:contents!important; }
+#themeModal .theme-appearance-page{
+  flex:0 1 auto;
+  min-height:0;
+  max-height:calc(100dvh - 190px);
+  padding:10px 3px;
+  margin:0;
+  overflow-x:hidden;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  scrollbar-width:thin;
+  scrollbar-color:var(--muted) transparent;
+}
+#themeModal #baseColorPicker.theme-picker-section {
+  display:block!important;
+  padding:0;
+  margin:0;
+}
+#themeModal #baseColorPicker .theme-picker-group__label {
+  font-size:.62rem;
+  margin-bottom:6px;
+}
+#themeModal #baseColorPicker .theme-presets-grid{
+  grid-template-columns:repeat(auto-fill,minmax(100px,1fr));
+  gap:6px;
+  margin:0;
+}
+#themeModal #baseColorPicker .theme-preset-button{
+  padding:5px;
+  gap:4px;
+  border-radius:7px;
+  min-height:55px;
+}
+#themeModal #baseColorPicker .theme-preset-art{
+  height:34px;
+  border-radius:5px;
+}
+#themeModal #baseColorPicker .theme-preset-art__header{height:10px;}
+#themeModal #baseColorPicker .theme-preset-art__card{
+  top:15px;
+  height:13px;
+  left:6px;
+  right:6px;
+}
+#themeModal #baseColorPicker .theme-preset-name{
+  font-size:.61rem;
+  font-weight:700;
+  min-height:1.1em;
+  line-height:1.13;
+  overflow-wrap:anywhere;
+}
+#themeModal #baseColorPicker .theme-preset-art--custom .material-symbols-outlined{font-size:19px;}
+#themeModal #themeCustomBasePanel{
+  margin:0;
+  padding:4px 0;
+  border:0;
+}
+#themeModal #themeCustomBasePanel .theme-custom-choices {
+  grid-template-columns:1.22fr .96fr 1fr;
+  gap:12px;
+}
+#themeModal #themeCustomBasePanel .theme-custom-choice__title{
+  margin-bottom:7px;
+  font-size:.66rem;
+}
+#themeModal #themeCustomBasePanel .theme-custom-swatches{gap:4px;}
+#themeModal #themeCustomBasePanel .theme-color-chip{
+  width:30px;
+  height:30px;
+  flex-basis:30px;
+  padding:3px;
+  border-radius:7px;
+}
+#themeModal #themeCustomBasePanel .theme-color-chip__fill{border-radius:4px;}
+#themeModal #themeAppearanceEffects .theme-effect-picker{
+  margin:0;
+}
+#themeModal #themeAppearanceEffects .theme-effect-grid{
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:7px;
+}
+#themeModal #themeAppearanceEffects .theme-effect-option{
+  min-width:0;
+  min-height:50px;
+  padding:7px 8px;
+  display:flex;
+  flex-direction:row;
+  justify-content:center;
+  gap:7px;
+  border-radius:9px;
+  font-size:.69rem;
+}
+#themeModal #themeAppearanceEffects .theme-effect-option .material-symbols-outlined{
+  font-size:19px;
+}
+#themeModal #themeAppearanceSeason:not([hidden]){
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px 14px;
+  align-content:start;
+  align-items:end;
+}
+#themeModal #themeAppearanceSeason .theme-toggle-section,
+#themeModal #themeAppearanceSeason .season-picker{
+  grid-column:auto;
+  min-width:0;
+  margin:0!important;
+  padding:0;
+}
+#themeModal #themeAppearanceSeason .theme-picker-group__label,
+#themeModal #themeAppearanceSeason label{
+  display:block;
+  margin:0 0 6px;
+  font-size:.65rem;
+  font-weight:800;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:.055em;
+}
+#themeModal #themeAppearanceSeason .theme-toggle-group{
+  padding:3px;
+  gap:3px;
+}
+#themeModal #themeAppearanceSeason .theme-toggle-group button{
+  min-height:34px;
+  padding:6px;
+  font-size:.7rem;
+}
+#themeModal #themeAppearanceSeason select{
+  box-sizing:border-box;
+  width:100%;
+  height:38px;
+  min-width:0;
+  padding:6px 8px;
+  border-radius:8px;
+  font:.72rem 'Fira Code',monospace;
+  color:var(--text);
+  background:var(--panel);
+  border:1px solid var(--line);
+}
+#themeModal #themeAppearanceSeason .theme-season-celebration{
+  display:flex;
+  gap:7px;
+  align-items:flex-end;
+}
+#themeModal #themeAppearanceSeason .theme-season-choice{
+  flex:1 1 auto;
+  min-width:0;
+}
+#themeModal #themeAppearanceSeason #celebrationPreview{
+  flex:0 0 auto;
+  width:auto;
+  height:38px;
+  margin:0;
+  padding:4px 10px;
+  font-size:.68rem;
+}
+#themeModal .theme-appearance-footer{
+  flex:0 0 auto;
+  min-width:0;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:10px;
+  align-items:center;
+  margin:6px 0 0;
+  padding:9px 0 0;
+  border-top:1px solid var(--line);
+}
+#themeModal .theme-appearance-footer .theme-preview{
+  min-width:0;
+  margin:0!important;
+  padding:0!important;
+  border-radius:9px;
+  overflow:hidden;
+}
+#themeModal .theme-appearance-footer .theme-preview__surface-header{
+  box-sizing:border-box;
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:center;
+  min-height:26px;
+  margin:0!important;
+  padding:6px 10px;
+  border-radius:0!important;
+  font-size:.67rem;
+}
+#themeModal .theme-appearance-footer .theme-preview__selection{
+  min-width:0;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+  font-size:.64rem;
+  color:inherit;
+  opacity:.82;
+}
+#themeModal .theme-appearance-footer .theme-preview__card{
+  min-width:0;
+  display:flex;
+  gap:10px;
+  align-items:center;
+  padding:8px 10px;
+  border:0;
+  border-radius:0;
+  box-shadow:none;
+}
+#themeModal .theme-appearance-footer .theme-preview__patient{
+  white-space:nowrap;
+  font-size:.72rem;
+}
+#themeModal .theme-appearance-footer .theme-preview__meta{
+  margin:0;
+  color:var(--muted);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  font-size:.63rem;
+}
+#themeModal .theme-appearance-footer .theme-preview__chip{
+  flex:0 0 auto;
+  margin-left:auto;
+  font-size:.6rem;
+  padding:4px 6px;
+}
+#themeModal .theme-appearance-footer #themeResetBtn{
+  width:auto;
+  min-width:110px;
+  height:42px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+  margin:0!important;
+  padding:7px 10px;
+  font-size:.67rem;
+}
+#themeModal .theme-appearance-footer #themeResetBtn .material-symbols-outlined{font-size:17px;}
+@media(max-width:760px){
+  #themeModal .theme-appearance-dialog{
+    padding:12px 12px 10px!important;
+    width:calc(100vw - 18px)!important;
+    max-height:calc(100dvh - 18px)!important;
+  }
+  #themeModal #baseColorPicker .theme-presets-grid{
+    grid-template-columns:repeat(auto-fill,minmax(82px,1fr));
+    gap:5px;
+  }
+  #themeModal #themeCustomBasePanel .theme-custom-choices{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:12px;
+  }
+  #themeModal #themeAppearanceEffects .theme-effect-grid{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+  }
+  #themeModal .theme-appearance-footer .theme-preview__meta{display:none;}
+}
+@media(max-width:540px){
+  #themeModal .theme-appearance-tab{
+    min-height:45px;
+    flex-direction:column;
+    gap:2px;
+    padding:5px 2px;
+    font-size:.59rem;
+  }
+  #themeModal .theme-appearance-tab .material-symbols-outlined{font-size:18px;}
+  #themeModal #baseColorPicker .theme-presets-grid{
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:5px;
+  }
+  #themeModal #themeAppearanceSeason:not([hidden]){
+    grid-template-columns:1fr;
+  }
+  #themeModal .theme-appearance-footer{
+    gap:7px;
+  }
+  #themeModal .theme-appearance-footer .theme-preview__patient{font-size:.66rem;}
+  #themeModal .theme-appearance-footer .theme-preview__chip{display:none;}
+  #themeModal .theme-appearance-footer #themeResetBtn{
+    min-width:42px;
+    width:42px;
+    padding:4px;
+  }
+  #themeModal .theme-appearance-footer #themeResetBtn span:last-child{display:none;}
+}
+@media(max-width:380px){
+  #themeModal #baseColorPicker .theme-presets-grid{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+  }
+  #themeModal #themeCustomBasePanel .theme-custom-choices{
+    grid-template-columns:1fr;
+  }
+}
+
+
+/* v6 · Curated appearance families: compact sections in the existing modal. */
+#themeModal .theme-preset-families{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px 13px;
+}
+#themeModal .theme-preset-family{min-width:0;}
+#themeModal .theme-preset-family__name{
+  color:var(--muted);font-size:.65rem;font-weight:800;
+  text-transform:uppercase;letter-spacing:.075em;
+  padding:2px 0 5px;
+}
+#themeModal .theme-preset-family .theme-presets-grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:5px;
+}
+#themeModal .theme-preset-legacy{
+  margin-top:10px;padding:7px 8px;
+  border:1px solid var(--line);border-radius:8px;
+}
+#themeModal .theme-preset-legacy summary{
+  color:var(--muted);font-size:.66rem;font-weight:700;
+  cursor:pointer;outline-offset:3px;
+}
+#themeModal .theme-preset-legacy[open] summary{margin-bottom:9px;}
+#themeModal .theme-preset-legacy .theme-presets-grid{
+  grid-template-columns:repeat(auto-fill,minmax(99px,1fr));
+}
+#themeModal .theme-preset-family .theme-preset-button{
+  min-width:0;padding:4px;min-height:50px;
+}
+#themeModal .theme-preset-family .theme-preset-art{height:28px;}
+#themeModal .theme-preset-family .theme-preset-art__header{height:8px;}
+#themeModal .theme-preset-family .theme-preset-art__card{
+  top:12px;height:11px;left:5px;right:5px;
+}
+#themeModal .theme-preset-family .theme-preset-name{
+  font-size:.58rem;line-height:1.16;min-height:1.2em;
+}
+@media(max-width:740px){
+  #themeModal .theme-preset-families{grid-template-columns:1fr;gap:8px;}
+}
+@media(max-width:420px){
+  #themeModal .theme-preset-family .theme-presets-grid{
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:4px;
+  }
+}
+
+/* OLED, monitor and neon: near-black backgrounds, neutral patient surfaces,
+   strong decorative accents. Never recolor diagnoses or clinical status chips. */
+body:is(
+ [data-censo-theme-preset="oled-red"],
+ [data-censo-theme-preset="oled-cyan"],
+ [data-censo-theme-preset="oled-green"],
+ [data-censo-theme-preset="oled-amber"],
+ [data-censo-theme-preset="monitor-vital"],
+ [data-censo-theme-preset="ecg-green"],
+ [data-censo-theme-preset="uci-cyan"],
+ [data-censo-theme-preset="defib-yellow"]
+){
+  --bg:#000000;
+  --panel:#0b1117;
+  --card:#141b22;
+  --card-open:#202a32;
+  --section-head:#212a32;
+  --surface-header:#212a32;
+  --theme-meta:#000000;
+  --muted:#b8c6d1;
+}
+body:is(
+ [data-censo-theme-preset="monitor-vital"],
+ [data-censo-theme-preset="ecg-green"],
+ [data-censo-theme-preset="uci-cyan"],
+ [data-censo-theme-preset="defib-yellow"]
+) {
+  --section-head:#162128;
+  --surface-header:#162128;
+  --line:rgba(162,211,221,.19);
+}
+body[data-censo-theme-preset="monitor-vital"]{
+  --accent:#4ade80;
+  --on-accent:#052e16;
+  --monitor-secondary:#22d3ee;
+  --monitor-tertiary:#facc15;
+}
+body[data-censo-theme-preset="uci-cyan"]{
+  --accent:#22d3ee;
+  --on-accent:#083344;
+  --monitor-secondary:#a3e635;
+  --monitor-tertiary:#fbbf24;
+}
+body[data-censo-theme-preset="ecg-green"]{
+  --monitor-secondary:#a3e635;
+  --monitor-tertiary:#22d3ee;
+}
+body[data-censo-theme-preset="defib-yellow"]{
+  --monitor-secondary:#facc15;
+  --monitor-tertiary:#4ade80;
+}
+body:is(
+ [data-censo-theme-preset="monitor-vital"],
+ [data-censo-theme-preset="ecg-green"],
+ [data-censo-theme-preset="uci-cyan"],
+ [data-censo-theme-preset="defib-yellow"]
+):not(.christmas-theme) .header{
+  background-image:linear-gradient(90deg,
+    var(--accent) 0 33%,
+    var(--monitor-secondary) 33% 66%,
+    var(--monitor-tertiary) 66% 100%);
+  background-repeat:no-repeat;
+  background-size:100% 3px;
+  background-position:center bottom;
+}
+body[data-censo-theme-preset="monitor-vital"] .section-title,
+body[data-censo-theme-preset="uci-cyan"] .section-title{
+  color:var(--accent);
+}
+body:is(
+ [data-censo-theme-preset="neon-cyan"],
+ [data-censo-theme-preset="cyber-red"],
+ [data-censo-theme-preset="ultraviolet"]
+){
+  --bg:#060a0f;
+  --panel:#121920;
+  --card:#1a242c;
+  --card-open:#27343e;
+  --section-head:#172633;
+  --surface-header:#172633;
+  --line:rgba(217,235,246,.18);
+  --theme-meta:#060a0f;
+}
+body[data-censo-theme-preset="ultraviolet"]{
+  --bg:#12091c;--panel:#211729;--card:#2b2035;
+  --section-head:#352045;--surface-header:#352045;
+}
+body:is(
+ [data-censo-theme-preset="neon-cyan"],
+ [data-censo-theme-preset="cyber-red"],
+ [data-censo-theme-preset="ultraviolet"]
+) .section-header{
+  box-shadow:inset 0 -1px 0 var(--accent-border),0 2px 12px var(--accent-soft);
+}
+body:is(
+ [data-censo-theme-preset="neon-cyan"],
+ [data-censo-theme-preset="cyber-red"],
+ [data-censo-theme-preset="ultraviolet"]
+) .section-title{
+  text-shadow:0 0 9px var(--accent-border);
+}
+body[data-censo-theme-preset="clinical-gold"]{
+  --bg:#090b0f;--panel:#171b22;--card:#242832;
+  --section-head:#343137;--surface-header:#343137;
+}
+body[data-censo-theme-preset="chrome"]{
+  --bg:#10151b;--panel:#1d262f;--card:#29343e;
+  --section-head:#475563;--surface-header:#475563;
+}
+body[data-censo-theme-preset="bronze"]{
+  --bg:#1a1210;--panel:#29211f;--card:#342a26;
+  --section-head:#674533;--surface-header:#674533;
+}
+body[data-censo-theme-preset="ivory-gold"]{
+  --bg:#f8f3e7;--panel:#fffdf9;--card:#ffffff;
+  --section-head:#e8dbc2;--surface-header:#e8dbc2;
+  --text:#25211a;--muted:#655b4b;--theme-meta:#f8f3e7;
+}
+body[data-censo-theme-preset="clinical-white"]{
+  --bg:#ffffff;--panel:#f5f7fb;--card:#ffffff;
+  --section-head:#e1e8f1;--surface-header:#e1e8f1;
+  --text:#152537;--muted:#475569;--theme-meta:#ffffff;
+}
+
+
+/* Appearance v3.30 · all eight families have four featured tiles.
+   Finishes remain decorative; patient status colors stay unchanged. */
+body[data-censo-theme-preset="neon-magenta"] {
+  --bg:#100717;
+  --panel:#201225;
+  --card:#2a1d32;
+  --card-open:#39273f;
+  --section-head:#382042;
+  --surface-header:#382042;
+  --line:rgba(230,191,240,.20);
+  --theme-meta:#100717;
+}
+body[data-censo-theme-preset="neon-magenta"] .section-header {
+  box-shadow:inset 0 -1px 0 var(--accent-border),0 2px 12px var(--accent-soft);
+}
+body[data-censo-theme-preset="neon-magenta"] .section-title {
+  text-shadow:0 0 9px var(--accent-border);
+}
+body[data-censo-theme-preset="titanium-blue"] {
+  --bg:#111821;
+  --panel:#232c35;
+  --card:#2b3540;
+  --card-open:#394653;
+  --section-head:#405264;
+  --surface-header:#405264;
+  --line:rgba(195,212,231,.21);
+  --theme-meta:#111821;
+}
+body[data-censo-theme-preset="white-cyan"] {
+  --bg:#ffffff;
+  --panel:#f3fbfd;
+  --card:#ffffff;
+  --card-open:#dcf4f7;
+  --section-head:#cdeaf0;
+  --surface-header:#cdeaf0;
+  --text:#172d35;
+  --muted:#45636d;
+  --theme-meta:#ffffff;
+}
+body[data-censo-theme-preset="white-red"] {
+  --bg:#f9fafb;
+  --panel:#ffffff;
+  --card:#ffffff;
+  --card-open:#f0e8ea;
+  --section-head:#e7e9ed;
+  --surface-header:#e7e9ed;
+  --text:#252630;
+  --muted:#59606b;
+  --theme-meta:#f9fafb;
+}
+body[data-censo-theme-preset="midnight-gold-elegant"] {
+  --bg:#000000;
+  --panel:#111317;
+  --card:#1d2026;
+  --card-open:#2a2e34;
+  --section-head:#2e2d2a;
+  --surface-header:#2e2d2a;
+  --theme-meta:#000000;
+}
+body[data-censo-theme-preset="pearl-chrome"] {
+  --bg:#f5f6f7;
+  --panel:#ffffff;
+  --card:#ffffff;
+  --card-open:#e4eaf0;
+  --section-head:#d8e0e7;
+  --surface-header:#d8e0e7;
+  --text:#1b2b39;
+  --muted:#4e5e70;
+  --theme-meta:#f5f6f7;
+}
+body[data-censo-theme-preset="mint-hospital"] {
+  --bg:#ebf8f1;
+  --panel:#f7fcf9;
+  --card:#ffffff;
+  --card-open:#d7efe2;
+  --section-head:#c1e5d0;
+  --surface-header:#c1e5d0;
+  --text:#1c382d;
+  --muted:#506b5c;
+  --theme-meta:#ebf8f1;
+}
+body[data-censo-theme-preset="lavender-cold"] {
+  --bg:#f6f2fc;
+  --panel:#fffaff;
+  --card:#ffffff;
+  --card-open:#e8ddf4;
+  --section-head:#d9cdea;
+  --surface-header:#d9cdea;
+  --text:#302842;
+  --muted:#685d78;
+  --theme-meta:#f6f2fc;
+}
+body[data-censo-theme-preset="glacier-blue"] {
+  --bg:#eaf5fb;
+  --panel:#f7fcfe;
+  --card:#ffffff;
+  --card-open:#d9ebf4;
+  --section-head:#bbdce9;
+  --surface-header:#bbdce9;
+  --text:#173244;
+  --muted:#4c697a;
+  --theme-meta:#eaf5fb;
+}
+/* Keep clinical cells neutral; no custom color applied to destination chips. */

@@ -12,6 +12,13 @@
 const seasonUrl = new URL('./seasonalTheme.js', import.meta.url);
 seasonUrl.searchParams.set('v', String(window.CensoBuild?.version || Date.now()));
 const { getSeasonalProfile, SEASONAL_PROFILES, SEASONAL_ENABLED, getCelebrationChoice, setCelebrationChoice, launchSeasonalConfetti, initCelebrationAudio, unlockCelebrationAudio } = await import(seasonUrl.href);
+const engineBuild=String(window.CensoBuild?.version || Date.now());
+const registryUrl=new URL('./themes/registry.js',import.meta.url);
+registryUrl.searchParams.set('v',engineBuild);
+const {getSeasonalConfiguration,getRegisteredSeasons}=await import(registryUrl.href);
+const prefsUrl=new URL('./themes/preferences.js',import.meta.url);
+prefsUrl.searchParams.set('v',engineBuild);
+const {isDecorationEnabled,getPreviewSeason}=await import(prefsUrl.href);
 const ambientUrl = new URL('./seasonalAmbient.js', import.meta.url);
 ambientUrl.searchParams.set('v', String(window.CensoBuild?.version || Date.now()));
 // Keep the ambient implementation in Git, but avoid loading it outside the season.
@@ -27,6 +34,23 @@ export function createThemeModule(app) {
   } });
 
   const bases = [
+    { id:'base-surface-graphite',name:'Grafito',color:'#101318',header:'#303741',mode:'surface' },
+    { id:'base-surface-petrol',name:'Azul petróleo',color:'#081820',header:'#244854',mode:'surface' },
+    { id:'base-surface-forest',name:'Verde bosque',color:'#0b1915',header:'#2a4d3d',mode:'surface' },
+    { id:'base-surface-wine',name:'Vino',color:'#1a1017',header:'#583544',mode:'surface' },
+    { id:'base-surface-purple',name:'Púrpura',color:'#16121e',header:'#453559',mode:'surface' },
+    { id:'base-surface-carbon',name:'Carbono',color:'#0a1017',header:'#263747',card:'#202b37',mode:'surface' },
+    { id:'base-surface-atlantic',name:'Atlántico',color:'#071b2b',header:'#25506b',card:'#202d38',mode:'surface' },
+    { id:'base-surface-malachite',name:'Malaquita',color:'#0b2119',header:'#28644d',card:'#23332d',mode:'surface' },
+    { id:'base-surface-copper',name:'Cobre',color:'#24170f',header:'#674530',card:'#332921',mode:'surface' },
+    { id:'base-surface-aubergine',name:'Berenjena',color:'#1b1125',header:'#58365f',card:'#2d2736',mode:'surface' },
+    { id:'base-surface-indigo',name:'Índigo',color:'#101528',header:'#354977',card:'#242e3e',mode:'surface' },
+    { id:'base-surface-sienna',name:'Terracota',color:'#261816',header:'#704438',card:'#352b29',mode:'surface' },
+    { id:'base-surface-lagoon',name:'Laguna',color:'#09242a',header:'#285d68',card:'#20333a',mode:'surface' },
+    { id:'base-surface-ice-light',name:'Glaciar',color:'#e9f4fb',header:'#bfdcec',card:'#ffffff',mode:'surface-light' },
+    { id:'base-surface-pearl-light',name:'Perla',color:'#f4f3ee',header:'#d8d9d3',card:'#ffffff',mode:'surface-light' },
+    { id:'base-surface-mint-light',name:'Menta',color:'#edf9f1',header:'#c5e5d0',card:'#ffffff',mode:'surface-light' },
+    { id:'base-surface-lilac-light',name:'Lila',color:'#f5f0ff',header:'#dccdef',card:'#ffffff',mode:'surface-light' },
     { id: 'base-dark', name: 'Slate', color: '#0f172a', mode: 'dark' },
     { id: 'base-midnight', name: 'OLED', color: '#000000', mode: 'dark' },
     { id: 'base-gray-dark', name: 'Grafito', color: '#27272a', mode: 'dark' },
@@ -91,26 +115,104 @@ export function createThemeModule(app) {
     { id: 'effect-none', name: 'Ninguna', icon: 'motion_photos_off' }
   ];
 
-  const DEFAULT_BASE = 'base-dark';
+  // Complete appearance combinations. Personalizado preserves independent choices.
+  const themePresets = [
+    {id:'graphite-red',name:'Grafito Rojo',base:'base-surface-graphite',accent:'accent-red',family:'Oscuros',featured:true},
+    {id:'graphite-green',name:'Grafito Verde',base:'base-surface-graphite',accent:'accent-green',family:'Oscuros',featured:true},
+    {id:'graphite-cyan',name:'Grafito Cyan',base:'base-surface-graphite',accent:'accent-cyan',family:'Oscuros',featured:true},
+    {id:'graphite-gold-v2',name:'Grafito Dorado',base:'base-gray-dark',accent:'accent-gold',family:'Oscuros',featured:true},
+    {id:'oled-red',name:'OLED Rojo',base:'base-midnight',accent:'accent-pure-red',family:'OLED',featured:true},
+    {id:'oled-cyan',name:'OLED Cyan',base:'base-midnight',accent:'accent-cyan',family:'OLED',featured:true},
+    {id:'oled-green',name:'OLED Verde',base:'base-midnight',accent:'accent-green',family:'OLED',featured:true},
+    {id:'oled-amber',name:'OLED Ámbar',base:'base-midnight',accent:'accent-amber',family:'OLED',featured:true},
+    {id:'monitor-vital',name:'Monitor Vital',base:'base-midnight',accent:'accent-green',family:'Monitor',featured:true},
+    {id:'ecg-green',name:'ECG Verde',base:'base-midnight',accent:'accent-lime',family:'Monitor',featured:true},
+    {id:'uci-cyan',name:'UCI Cyan',base:'base-midnight',accent:'accent-cyan',family:'Monitor',featured:true},
+    {id:'defib-yellow',name:'Desfibrilador',base:'base-midnight',accent:'accent-gold',family:'Monitor',featured:true},
+    {id:'neon-cyan',name:'Neón Cyan',base:'base-surface-carbon',accent:'accent-cyan',family:'Neón',featured:true},
+    {id:'cyber-red',name:'Cyber Red',base:'base-surface-carbon',accent:'accent-scarlet',family:'Neón',featured:true},
+    {id:'ultraviolet',name:'Ultravioleta',base:'base-surface-aubergine',accent:'accent-violet',family:'Neón',featured:true},
+    {id:'clinical-gold',name:'Oro Clínico',base:'base-surface-carbon',accent:'accent-gold',family:'Metálicos',featured:true},
+    {id:'bronze',name:'Bronce',base:'base-surface-copper',accent:'accent-bronze',family:'Metálicos',featured:true},
+    {id:'chrome',name:'Cromo',base:'base-gray-dark',accent:'accent-silver',family:'Metálicos',featured:true},
+    {id:'clinical-white',name:'Blanco Clínico',base:'base-pure-white',accent:'accent-blue',family:'Claros',featured:true},
+    {id:'ivory-gold',name:'Marfil Dorado',base:'base-surface-pearl-light',accent:'accent-gold',family:'Claros',featured:true},
+    {id:'neon-magenta',name:'Neón Magenta',base:'base-surface-aubergine',accent:'accent-fuchsia',family:'Neón',featured:true},
+    {id:'titanium-blue',name:'Titanio Azul',base:'base-surface-indigo',accent:'accent-pure-blue',family:'Metálicos',featured:true},
+    {id:'white-cyan',name:'Blanco Cyan',base:'base-pure-white',accent:'accent-cyan',family:'Claros',featured:true},
+    {id:'white-red',name:'Blanco Rojo',base:'base-light',accent:'accent-red',family:'Claros',featured:true},
+    {id:'wine-silver-elegant',name:'Vino y Plata',base:'base-surface-wine',accent:'accent-silver',family:'Elegantes',featured:true},
+    {id:'pine-red-elegant',name:'Pino y Rojo',base:'base-surface-forest',accent:'accent-red',family:'Elegantes',featured:true},
+    {id:'petrol-amber-elegant',name:'Petróleo y Ámbar',base:'base-surface-petrol',accent:'accent-amber',family:'Elegantes',featured:true},
+    {id:'midnight-gold-elegant',name:'Noche Dorada',base:'base-midnight',accent:'accent-gold',family:'Elegantes',featured:true},
+    {id:'pearl-chrome',name:'Perla Cromo',base:'base-surface-pearl-light',accent:'accent-silver',family:'Pastel',featured:true},
+    {id:'mint-hospital',name:'Menta Hospital',base:'base-surface-mint-light',accent:'accent-emerald',family:'Pastel',featured:true},
+    {id:'lavender-cold',name:'Lavanda Fría',base:'base-surface-lilac-light',accent:'accent-violet',family:'Pastel',featured:true},
+    {id:'glacier-blue',name:'Glaciar Azul',base:'base-surface-ice-light',accent:'accent-sky',family:'Pastel',featured:true},
+    {id:'graphite',name:'Grafito',base:'base-surface-graphite',accent:'accent-blue'},
+    {id:'petrol',name:'Azul petróleo',base:'base-surface-petrol',accent:'accent-teal'},
+    {id:'forest',name:'Verde bosque',base:'base-surface-forest',accent:'accent-emerald'},
+    {id:'wine',name:'Vino',base:'base-surface-wine',accent:'accent-crimson'},
+    {id:'purple',name:'Púrpura',base:'base-surface-purple',accent:'accent-violet'},
+    {id:'pine-red',name:'Pino y rojo',base:'base-surface-forest',accent:'accent-red'},
+    {id:'oled',name:'OLED',base:'base-midnight',accent:'accent-silver'},
+    {id:'ice',name:'Hielo',base:'base-ice',accent:'accent-sky'},
+    {id:'light',name:'Blanco',base:'base-light',accent:'accent-blue'},
+    {id:'carbon-gold',name:'Carbono y oro',base:'base-surface-carbon',accent:'accent-gold'},
+    {id:'atlantic',name:'Atlántico',base:'base-surface-atlantic',accent:'accent-sky'},
+    {id:'malachite',name:'Malaquita',base:'base-surface-malachite',accent:'accent-lime'},
+    {id:'copper',name:'Cobre',base:'base-surface-copper',accent:'accent-copper'},
+    {id:'aubergine',name:'Berenjena',base:'base-surface-aubergine',accent:'accent-fuchsia'},
+    {id:'indigo',name:'Índigo',base:'base-surface-indigo',accent:'accent-indigo'},
+    {id:'sienna',name:'Terracota',base:'base-surface-sienna',accent:'accent-amber'},
+    {id:'lagoon',name:'Laguna',base:'base-surface-lagoon',accent:'accent-cyan'},
+    {id:'glacier',name:'Glaciar',base:'base-surface-ice-light',accent:'accent-sky'},
+    {id:'pearl',name:'Perla',base:'base-surface-pearl-light',accent:'accent-bronze'},
+    {id:'mint',name:'Menta',base:'base-surface-mint-light',accent:'accent-emerald'},
+    {id:'lilac',name:'Lila',base:'base-surface-lilac-light',accent:'accent-violet'},
+    {id:'graphite-gold',name:'Grafito y oro',base:'base-surface-graphite',accent:'accent-gold'},
+    {id:'petrol-amber',name:'Petróleo y ámbar',base:'base-surface-petrol',accent:'accent-amber'},
+    {id:'wine-silver',name:'Vino y plata',base:'base-surface-wine',accent:'accent-silver'},
+    {id:'forest-lime',name:'Bosque y lima',base:'base-surface-forest',accent:'accent-lime'}
+  ];
+
+  // Header colors are independent of the background and accent in Custom mode.
+  // The first option keeps the selected base's natural header shade.
+  const headerChoices = [
+    {id:'auto',name:'Según fondo',color:null},
+    {id:'graphite',name:'Grafito',color:'#303741'},
+    {id:'slate',name:'Pizarra',color:'#40536a'},
+    {id:'midnight',name:'Noche',color:'#233047'},
+    {id:'marine',name:'Azul marino',color:'#204d68'},
+    {id:'iceblue',name:'Azul hielo',color:'#bddbe9'},
+    {id:'teal',name:'Petróleo',color:'#245663'},
+    {id:'forest',name:'Bosque',color:'#285c47'},
+    {id:'sage',name:'Salvia',color:'#c3dccb'},
+    {id:'olive',name:'Oliva',color:'#566346'},
+    {id:'wine',name:'Vino',color:'#633443'},
+    {id:'ruby',name:'Rubí',color:'#832d40'},
+    {id:'sienna',name:'Terracota',color:'#754737'},
+    {id:'copper',name:'Cobre',color:'#745038'},
+    {id:'aubergine',name:'Ciruela',color:'#553765'},
+    {id:'lavender',name:'Lavanda',color:'#d5c4ee'},
+    {id:'sand',name:'Arena',color:'#e3d5bf'},
+    {id:'pearl',name:'Perla',color:'#e6e8e6'},
+    {id:'white',name:'Blanco',color:'#f4f7fb'}
+  ];
+  const headerById=new Map(headerChoices.map(item=>[item.id,item]));
+  const getHeaderChoice=()=>headerById.has(localStorage.getItem(preferenceKey('custom-header')))
+    ?localStorage.getItem(preferenceKey('custom-header')):'auto';
+  function readableInk(hex) {
+    const rgb=[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)/255);
+    const lightness=rgb.map(x=>x<=.04045?x/12.92:((x+.055)/1.055)**2.4);
+    const lum=.2126*lightness[0]+.7152*lightness[1]+.0722*lightness[2];
+    // At the crossover (~0.179 luminance), white and black each exceed 4.5:1.
+    return (1.05/(lum+.05)) >= ((lum+.05)/.05) ? '#ffffff' : '#000000';
+  }
+
+  const DEFAULT_BASE = 'base-surface-graphite';
   const DEFAULT_ACCENT = 'accent-blue';
   const DEFAULT_EFFECT = 'effect-waves';
-  // Noviembre 2026: el valor por defecto es grafito/naranja.
-  // La elección manual del usuario sigue teniendo prioridad y no se
-  // persiste este valor temporal (en diciembre recupera el predeterminado).
-  function novemberCalendarActive() {
-    const parts = new Intl.DateTimeFormat('en-US', {
-      timeZone:'America/Chihuahua', year:'numeric', month:'numeric'
-    }).formatToParts(new Date());
-    const part = type => Number(parts.find(p => p.type === type)?.value);
-    return part('year') === 2026 && part('month') === 11;
-  }
-  function novemberPaletteDefault() {
-    const dateParts = new Intl.DateTimeFormat('en-US', {
-      timeZone: 'America/Chihuahua', year: 'numeric', month: 'numeric'
-    }).formatToParts(new Date());
-    const value = type => Number(dateParts.find(part => part.type === type)?.value);
-    return value('year') === 2026 && value('month') === 11 && localStorage.getItem('censo-november-theme') !== 'off';
-  }
   const baseIds = new Set(bases.map(item => item.id));
   const accentIds = new Set(accents.map(item => item.id));
   const effectIds = new Set(effects.map(item => item.id));
@@ -131,6 +233,9 @@ export function createThemeModule(app) {
     ensureStylesheet('censo-theme-v2-styles', 'themePaletteV2.css');
     ensureStylesheet('censo-theme-v3-effects', 'themeEffectsV3.css');
     ensureStylesheet('censo-theme-v3-layout-effects', 'themeEffectsV4.css');
+    // Load last: surface colors take precedence without changing clinical status classes.
+    ensureStylesheet('censo-theme-v4-surfaces', 'themeSurfacesV4.css');
+    ensureStylesheet('censo-theme-v5-compact', 'themeCompactV5.css');
   }
 
   function validBase(value) {
@@ -147,19 +252,146 @@ export function createThemeModule(app) {
   }
 
   function preferenceKey(part) {
+    // Independent preferences for Seasonal Engine themes. General user
+    // preferences must not suppress Christmas defaults or be overwritten.
     const profile = getSeasonalProfile();
-    return profile ? `censo-season-${profile.id}-${part}` : `censo-${part}`;
+    const id = profile?.id || getSeasonalConfiguration()?.id;
+    return id ? `censo-season-${id}-${part}` : `censo-${part}`;
   }
   function getCurrentTheme() {
-    const defaults = getSeasonalProfile()?.defaults || (novemberPaletteDefault()
-      ? { base: 'base-gray-dark', accent: 'accent-orange', effect: DEFAULT_EFFECT }
-      : { base: DEFAULT_BASE, accent: DEFAULT_ACCENT, effect: DEFAULT_EFFECT });
+    const defaults = getSeasonalProfile()?.defaults || getSeasonalConfiguration()?.palette ||
+      { base: DEFAULT_BASE, accent: DEFAULT_ACCENT, effect: DEFAULT_EFFECT };
     return {
       base: validBase(localStorage.getItem(preferenceKey('base')) || defaults.base),
       accent: validAccent(localStorage.getItem(preferenceKey('accent')) || defaults.accent),
       effect: validEffect(localStorage.getItem(preferenceKey('effect')) || defaults.effect)
     };
   }
+  let appearancePage='themes';
+  function showAppearancePage(page){
+    const available=['themes','custom','effects','season'];
+    if(!available.includes(page))page='themes';
+    appearancePage=page;
+    const colorPanel=document.getElementById('themeAppearanceColors');
+    const catalogue=document.getElementById('themePresetCatalogue');
+    const custom=document.getElementById('themeCustomBasePanel');
+    const effects=document.getElementById('themeAppearanceEffects');
+    const season=document.getElementById('themeAppearanceSeason');
+    if(colorPanel)colorPanel.hidden=!['themes','custom'].includes(page);
+    if(catalogue)catalogue.hidden=page!=='themes';
+    if(custom)custom.hidden=page!=='custom';
+    if(effects)effects.hidden=page!=='effects';
+    if(season)season.hidden=page!=='season';
+    document.querySelectorAll('#themeModal .theme-appearance-tab')
+      .forEach(tab=>{
+        const active=tab.dataset.appearancePage===page;
+        tab.setAttribute('aria-selected',String(active));
+        tab.tabIndex=active?0:-1;
+        tab.classList.toggle('is-active',active);
+      });
+  }
+  function bindAppearanceTabs(){
+    const tabs=Array.from(document.querySelectorAll('#themeModal .theme-appearance-tab'));
+    if(!tabs.length||tabs[0].dataset.bound==='true')return;
+    tabs[0].dataset.bound='true';
+    tabs.forEach(tab=>{
+      tab.addEventListener('click',()=>{
+        const page=tab.dataset.appearancePage;
+        if(page==='custom'&&getActivePreset()!=='custom'){
+          choosePreset('custom');
+        } else {
+          showAppearancePage(page);
+        }
+      });
+      tab.addEventListener('keydown',event=>{
+        const names=['ArrowRight','ArrowLeft','Home','End'];
+        if(!names.includes(event.key))return;
+        event.preventDefault();
+        const current=tabs.indexOf(tab);
+        const next=event.key==='Home'?0:event.key==='End'?tabs.length-1:
+          (current+(event.key==='ArrowRight'?1:-1)+tabs.length)%tabs.length;
+        tabs[next].focus();
+        tabs[next].click();
+      });
+    });
+  }
+  function getActivePreset() {
+    const chosen=localStorage.getItem(preferenceKey('preset'));
+    if(chosen==='custom')return 'custom';
+    const theme=getCurrentTheme();
+    // Same base+accent pair may have several intentional finishes (e.g. OLED
+    // Verde versus Monitor Vital). Preserve the explicit preset ID first.
+    const selected=themePresets.find(p=>p.id===chosen);
+    if(selected&&selected.base===theme.base&&selected.accent===theme.accent)return selected.id;
+    // Migrate older saved base+accent pairs without changing their colors.
+    const matching=themePresets.find(p=>p.base===theme.base&&p.accent===theme.accent);
+    return matching?.id||'custom';
+  }
+  function updatePresetPicker(){
+    const chosen=getActivePreset();
+    const legacyGallery=document.getElementById('themeLegacyPresets');
+    if(legacyGallery && themePresets.some(p=>p.id===chosen&&!p.featured))legacyGallery.open=true;
+    document.querySelectorAll('[data-theme-preset]').forEach(button=>{
+      const active=button.dataset.themePreset===chosen;
+      button.classList.toggle('active',active);
+      button.setAttribute('aria-pressed',String(active));
+    });
+    const customBase=document.getElementById('themeCustomBasePanel');
+    if(customBase)customBase.hidden=appearancePage!=='custom';
+    // All three compact controls are now inside Personalizado.
+    const oldAccentPanel=document.getElementById('accentColorPicker')?.parentElement;
+    if(oldAccentPanel)oldAccentPanel.hidden=true;
+  }
+  function choosePreset(id){
+    if(id==='custom'){
+      const current=getCurrentTheme();
+      const base=validBase(localStorage.getItem(preferenceKey('custom-base'))||current.base);
+      const accent=validAccent(localStorage.getItem(preferenceKey('custom-accent'))||current.accent);
+      localStorage.setItem(preferenceKey('preset'),'custom');
+      localStorage.setItem(preferenceKey('custom-base'),base);
+      localStorage.setItem(preferenceKey('custom-accent'),accent);
+      applyTheme(base,accent);
+      showAppearancePage('custom');
+      return;
+    }
+    const selected=themePresets.find(p=>p.id===id);
+    if(!selected)return;
+    if(getActivePreset()==='custom'){
+      const current=getCurrentTheme();
+      localStorage.setItem(preferenceKey('custom-base'),current.base);
+      localStorage.setItem(preferenceKey('custom-accent'),current.accent);
+    }
+    localStorage.setItem(preferenceKey('preset'),id);
+    applyTheme(selected.base,selected.accent);
+    showAppearancePage('themes');
+  }
+  function chooseCustom(base=null,accent=null,headerId=null){
+    const current=getCurrentTheme();
+    const nextBase=validBase(base||current.base);
+    const nextAccent=validAccent(accent||current.accent);
+    localStorage.setItem(preferenceKey('preset'),'custom');
+    localStorage.setItem(preferenceKey('custom-base'),nextBase);
+    localStorage.setItem(preferenceKey('custom-accent'),nextAccent);
+    if(headerId!==null && headerById.has(headerId)){
+      localStorage.setItem(preferenceKey('custom-header'),headerId);
+    }
+    applyTheme(nextBase,nextAccent);
+  }
+
+  function applyHeaderOverride(){
+    const id=getHeaderChoice();
+    const entry=headerById.get(id);
+    const enabled=getActivePreset()==='custom' && !!entry?.color;
+    document.body.classList.toggle('theme-custom-header',enabled);
+    if(enabled){
+      document.body.style.setProperty('--custom-header-color',entry.color);
+      document.body.style.setProperty('--custom-header-ink',readableInk(entry.color));
+    }else{
+      document.body.style.removeProperty('--custom-header-color');
+      document.body.style.removeProperty('--custom-header-ink');
+    }
+  }
+
   function applySeasonalBanner() {
     const profile = getSeasonalProfile(), body = document.body;
     const props = { '--season-banner-bg': 'background', '--season-banner-text': 'text', '--season-banner-accent': 'accent', '--season-title-font': 'titleFont' };
@@ -175,12 +407,14 @@ export function createThemeModule(app) {
     const ghostColor = document.getElementById('ghostColorPicker');
     if (ghostColor) ghostColor.value = localStorage.getItem('censo-ghost-color') || 'mixed';
     const celebration = document.getElementById('celebrationPicker');
-    if (celebration) celebration.value = getCelebrationChoice();
+    if (celebration) celebration.value = getSeasonalConfiguration()?.id==='christmas'
+      ? (localStorage.getItem('censo-christmas-celebration') || 'fireworks')
+      : getCelebrationChoice();
   }
   function updateToggles() {
     const values = {
       season: localStorage.getItem('censo-season') === 'off' ? 'off' : 'on',
-      november: localStorage.getItem('censo-november-theme') === 'off' ? 'off' : 'on',
+      decorations: isDecorationEnabled('november') ? 'on' : 'off',
       celebrations: localStorage.getItem('censo-celebration-mode') === 'all' ? 'all' : 'seasonal',
       sound: localStorage.getItem('censo-celebration-sound') === 'on' ? 'on' : 'off'
     };
@@ -190,6 +424,8 @@ export function createThemeModule(app) {
     });
     const picker = document.getElementById('celebrationPicker');
     if (picker) picker.parentElement.hidden = values.celebrations === 'all' || !!getSeasonalProfile();
+    const preview = document.getElementById('seasonalEnginePreview');
+    if (preview) preview.value=getPreviewSeason();
   }
   function toggleGroup(id, label, choices) {
     return `<section class="theme-toggle-section"><div class="theme-picker-group__label">${label}</div>
@@ -212,8 +448,8 @@ export function createThemeModule(app) {
         <div class="theme-picker-group__label"><span>${title}</span><span>${items.length}</span></div>
         <div class="theme-picker-grid">
           ${items.map(item => `
-            <button class="theme-swatch base-swatch" type="button" data-val="${item.id}" aria-label="Fondo ${item.name}" title="${item.name}">
-              <span class="theme-swatch__dot" style="background:${item.color}"></span>
+            <button class="theme-swatch base-swatch ${item.header ? 'theme-swatch--duo' : ''}" type="button" data-val="${item.id}" aria-label="${item.header ? 'Paleta' : 'Fondo'} ${item.name}" title="${item.name}">
+              ${item.header ? `<span class="theme-swatch__duo" style="--surface-dark:${item.color};--surface-light:${item.header}"></span>` : `<span class="theme-swatch__dot" style="background:${item.color}"></span>`}
               <span class="theme-swatch__name">${item.name}</span>
             </button>
           `).join('')}
@@ -222,20 +458,90 @@ export function createThemeModule(app) {
     `;
   }
 
-  function renderAccentGrid() {
-    return `
-      <section class="theme-picker-group" aria-label="Colores de acento">
-        <div class="theme-picker-group__label"><span>Colores</span><span>${accents.length}</span></div>
-        <div class="theme-picker-grid">
-          ${accents.map(item => `
-            <button class="theme-swatch theme-swatch--accent accent-swatch ${item.metallic ? 'theme-swatch--metallic' : ''}" type="button" data-val="${item.id}" data-metal="${item.metallic || ''}" aria-label="Acento ${item.name}" title="${item.name}" style="--swatch-light:${item.light};--swatch-dark:${item.dark}">
-              <span class="theme-swatch__dot"></span>
-              <span class="theme-swatch__name">${item.name}</span>
-            </button>
-          `).join('')}
-        </div>
-      </section>
-    `;
+
+  function renderThemePresetCard(p){
+    const base=bases.find(item=>item.id===p.base);
+    const accent=accents.find(item=>item.id===p.accent);
+    const light=base?.mode==='light'||base?.mode==='surface-light';
+    const extraHeaders={'base-midnight':'#242a31','base-ice':'#dbeafe','base-light':'#f1f5f9'};
+    const head=base?.header||extraHeaders[p.base]||(light?'#e2e8f0':'#303a46');
+    const card=base?.card||(light?'#ffffff':p.base==='base-midnight'?'#12191f':'#242c35');
+    const foreground=light?'#253246':'#e7eef8';
+    const accentColor=light?accent?.light:accent?.dark;
+    return `<button type="button" class="theme-preset-button"
+      data-theme-preset="${p.id}" data-theme-family="${p.family||'Legado'}"
+      aria-label="Tema ${p.name}" aria-pressed="false" title="${p.name}"
+      style="--preset-bg:${base?.color};--preset-head:${head};--preset-card:${card};
+        --preset-accent:${accentColor};--preset-text:${foreground}">
+      <span class="theme-preset-art" aria-hidden="true">
+        <span class="theme-preset-art__header"></span>
+        <span class="theme-preset-art__card"><i></i><b></b></span>
+      </span>
+      <span class="theme-preset-name">${p.name}</span>
+    </button>`;
+  }
+  function renderThemePresets(){
+    const families=['Oscuros','OLED','Monitor','Neón','Metálicos','Claros','Elegantes','Pastel'];
+    const featured=families.map(family=>{
+      const options=themePresets.filter(item=>item.featured&&item.family===family);
+      return `<section class="theme-preset-family" aria-label="${family}">
+        <div class="theme-preset-family__name">${family}</div>
+        <div class="theme-presets-grid">${options.map(renderThemePresetCard).join('')}</div>
+      </section>`;
+    }).join('');
+    const previous=themePresets.filter(item=>!item.featured);
+    return `<section class="theme-picker-group" aria-label="Temas completos">
+      <div class="theme-picker-group__label"><span>Temas completos</span><span>${themePresets.filter(p=>p.featured).length} principales</span></div>
+      <div class="theme-preset-families">${featured}</div>
+      <details id="themeLegacyPresets" class="theme-preset-legacy">
+        <summary>Más temas · ${previous.length} anteriores</summary>
+        <div class="theme-presets-grid">${previous.map(renderThemePresetCard).join('')}</div>
+      </details>
+    </section>`;
+  }
+
+  function renderCustomBaseGrid(){
+    return `<section class="theme-custom-choice" aria-label="Fondo">
+      <div class="theme-custom-choice__title">FONDO</div>
+      <div class="theme-custom-swatches">
+        ${bases.map(item=>`
+          <button type="button" class="theme-color-chip base-swatch"
+            data-val="${item.id}" aria-label="Fondo ${item.name}" aria-pressed="false"
+            title="${item.name}" style="--chip-fill:${item.color}">
+            <span class="theme-color-chip__fill" aria-hidden="true"></span>
+          </button>`).join('')}
+      </div>
+    </section>`;
+  }
+  function renderCustomHeaderGrid(){
+    return `<section class="theme-custom-choice" aria-label="Encabezados">
+      <div class="theme-custom-choice__title">ENCABEZADOS</div>
+      <div class="theme-custom-swatches">
+        ${headerChoices.map(item=>`
+          <button type="button" class="theme-color-chip theme-header-swatch"
+            data-header="${item.id}" aria-label="Encabezados: ${item.name}"
+            aria-pressed="false" title="${item.name}"
+            style="--chip-fill:${item.color||'#465565'}">
+            <span class="theme-color-chip__fill ${item.color?'':'theme-color-chip__fill--auto'}"
+              aria-hidden="true"></span>
+          </button>`).join('')}
+      </div>
+    </section>`;
+  }
+  function renderAccentGrid(){
+    return `<section class="theme-custom-choice" aria-label="Acento">
+      <div class="theme-custom-choice__title">ACENTO</div>
+      <div class="theme-custom-swatches">
+        ${accents.map(item=>`
+          <button type="button" class="theme-color-chip accent-swatch"
+            data-val="${item.id}" aria-label="Acento ${item.name}"
+            aria-pressed="false" title="${item.name}"
+            style="--chip-fill:${item.dark};--chip-fill-light:${item.light}">
+            <span class="theme-color-chip__fill theme-color-chip__fill--accent"
+              aria-hidden="true"></span>
+          </button>`).join('')}
+      </div>
+    </section>`;
   }
 
   function renderEffectPicker() {
@@ -262,41 +568,64 @@ export function createThemeModule(app) {
     const extras = document.createElement('div');
     extras.id = 'themeV2Extras';
     extras.innerHTML = `
-      ${novemberCalendarActive() ? toggleGroup('november', 'Decoración de temporada', [['on', 'Activada'], ['off', 'Desactivada']]) : (SEASONAL_ENABLED ? toggleGroup('season', 'Tema', [['on', 'Tema estacional'], ['off', 'Tema normal']]) : '')}
-      ${toggleGroup('celebrations', 'Celebraciones', [['all', 'Aleatoria'], ['seasonal', 'Elegida']])}
-      ${toggleGroup('sound', 'Sonidos', [['on', 'ON'], ['off', 'OFF']])}
-      <section class="season-picker" aria-label="Celebración">
-        <div><label for="celebrationPicker">Celebración</label>
-        <select id="celebrationPicker"><option value="confetti">Confeti</option><option value="fireworks">Fuegos artificiales</option><option value="balloons">Globos</option></select></div>
-        <button id="celebrationPreview" type="button" class="theme-reset">PROBAR CELEBRACIÓN</button>
+      <section id="themeAppearanceEffects" class="theme-appearance-page" role="tabpanel" aria-label="Efectos visuales" hidden>
+        ${renderEffectPicker()}
       </section>
-      ${SEASONAL_ENABLED ? '<section class="season-picker"><label for="ghostColorPicker">Fantasmas</label><select id="ghostColorPicker"><option value="mixed">Azules y rosas</option><option value="cyan">Azules</option><option value="pink">Rosas</option></select></section>' : ''}
-      ${renderEffectPicker()}
-      <section class="theme-preview" aria-label="Vista previa del tema">
-        <div class="theme-preview__head">
-          <span class="theme-preview__title">Vista previa</span>
-          <span id="themeSelectionLabel" class="theme-preview__selection"></span>
-        </div>
-        <div class="theme-preview__card">
-          <div class="theme-preview__patient">CAMA 3 · PACIENTE</div>
-          <div class="theme-preview__meta">DIAGNÓSTICO Y PENDIENTES</div>
-          <div class="theme-preview__row">
-            <span class="theme-preview__chip">OBSERVACIÓN</span>
-            <button class="theme-preview__cta" type="button" tabindex="-1">ACCIÓN</button>
+      <section id="themeAppearanceSeason" class="theme-appearance-page theme-appearance-season" role="tabpanel" aria-label="Opciones de temporada" hidden>
+        ${toggleGroup('decorations','Decoración de temporada',[['on','Activada'],['off','Desactivada']])}
+        <section class="season-picker" aria-label="Laboratorio estacional beta">
+          <label for="seasonalEnginePreview">Tema estacional</label>
+          <select id="seasonalEnginePreview">
+            <option value="auto">Automático (calendario)</option>
+            ${getRegisteredSeasons().map(item=>`<option value="${item.id}">Vista previa: ${item.name}</option>`).join('')}
+          </select>
+        </section>
+        ${toggleGroup('celebrations','Celebraciones',[['all','Aleatoria'],['seasonal','Elegida']])}
+        ${toggleGroup('sound','Sonidos',[['on','ON'],['off','OFF']])}
+        <section class="season-picker theme-season-celebration" aria-label="Celebración">
+          <div class="theme-season-choice">
+            <label for="celebrationPicker">Efecto de celebración</label>
+            <select id="celebrationPicker"><option value="confetti">Confeti</option><option value="fireworks">Fuegos artificiales</option><option value="balloons">Globos</option></select>
           </div>
-        </div>
+          <button id="celebrationPreview" type="button" class="theme-reset">PROBAR</button>
+        </section>
+        ${SEASONAL_ENABLED ? '<section class="season-picker"><label for="ghostColorPicker">Fantasmas</label><select id="ghostColorPicker"><option value="mixed">Azules y rosas</option><option value="cyan">Azules</option><option value="pink">Rosas</option></select></section>' : ''}
       </section>
-      <button id="themeResetBtn" class="theme-reset" type="button">RESTABLECER APARIENCIA</button>
+      <div class="theme-appearance-footer">
+        <section class="theme-preview" aria-label="Vista previa del tema">
+          <div class="theme-preview__surface-header">
+            <span>SALA DE CHOQUE</span>
+            <span id="themeSelectionLabel" class="theme-preview__selection"></span>
+          </div>
+          <div class="theme-preview__card">
+            <span class="theme-preview__patient">CAMA 3 · PACIENTE</span>
+            <span class="theme-preview__meta">DIAGNÓSTICO Y PENDIENTES</span>
+            <span class="theme-preview__chip">OBSERVACIÓN</span>
+          </div>
+        </section>
+        <button id="themeResetBtn" class="theme-reset" type="button" title="Restablecer paleta y efectos predeterminados">
+          <span class="material-symbols-outlined" aria-hidden="true">restart_alt</span>
+          <span>Restablecer</span>
+        </button>
+      </div>
     `;
     modalContent.appendChild(extras);
-    document.getElementById('celebrationPicker').value = getCelebrationChoice();
-    document.getElementById('celebrationPicker').addEventListener('change', event => setCelebrationChoice(event.target.value));
+    // Production uses only real calendar seasons; no manual seasonal preview.
+    if(document.body.dataset.censoChannel!=='beta') {
+      extras.querySelector('#seasonalEnginePreview')?.closest('.season-picker')?.setAttribute('hidden','');
+    }
+    document.getElementById('celebrationPicker').value = getSeasonalConfiguration()?.id==='christmas'
+      ? (localStorage.getItem('censo-christmas-celebration') || 'fireworks')
+      : getCelebrationChoice();
+    document.getElementById('celebrationPicker').addEventListener('change', event => {
+      if(getSeasonalConfiguration()?.id==='christmas')localStorage.setItem('censo-christmas-celebration',event.target.value);
+      else setCelebrationChoice(event.target.value);
+    });
     extras.querySelectorAll('[data-theme-toggle]').forEach(button => {
       button.addEventListener('click', () => {
         const {themeToggle, value} = button.dataset;
-        if (themeToggle === 'november') {
-          localStorage.setItem('censo-november-theme', value);
-          window.CensoApp?.setNovemberThemeEnabled?.(value === 'on');
+        if (themeToggle === 'decorations') {
+          void app.seasonalEngine?.setEnabled(value === 'on');
           refreshSeason();
         } else if (themeToggle === 'season') {
           if (value === 'off') {
@@ -317,6 +646,10 @@ export function createThemeModule(app) {
         }
       });
     });
+    document.getElementById('seasonalEnginePreview')?.addEventListener('change',event=>{
+      void app.seasonalEngine?.setPreview(event.target.value);
+      refreshSeason();
+    });
     const ghostColorPicker = document.getElementById('ghostColorPicker');
     if (ghostColorPicker) {
       ghostColorPicker.value = localStorage.getItem('censo-ghost-color') || 'mixed';
@@ -326,7 +659,7 @@ export function createThemeModule(app) {
     document.getElementById('celebrationPreview').addEventListener('click', async () => {
       app.cerrarModal?.('themeModal');
       await unlockCelebrationAudio();
-      launchSeasonalConfetti({particleCount:150, spread:80, origin:{y:.6}});
+      app.launchSeasonalConfetti?.({particleCount:150, spread:80, origin:{y:.6}});
     });
     initCelebrationAudio().catch(error => console.warn('[CENSO] Audio decorativo no disponible:', error));
 
@@ -334,8 +667,10 @@ export function createThemeModule(app) {
       button.addEventListener('click', () => applyEffect(button.dataset.effect));
     });
     document.getElementById('themeResetBtn')?.addEventListener('click', () => {
-      for (const part of ['base', 'accent', 'effect']) localStorage.removeItem(preferenceKey(part));
+      for (const part of ['base','accent','effect','preset','custom-base','custom-accent','custom-header'])
+        localStorage.removeItem(preferenceKey(part));
       refreshSeason();
+      showAppearancePage('themes');
     });
   }
 
@@ -347,22 +682,40 @@ export function createThemeModule(app) {
 
     baseGrid.className = 'theme-picker-section';
     accentGrid.className = 'theme-picker-section';
-    baseGrid.innerHTML = renderBaseGroup('dark', 'Oscuros') + renderBaseGroup('light', 'Claros');
-    accentGrid.innerHTML = renderAccentGrid();
+    baseGrid.innerHTML =
+      `<div id="themePresetCatalogue">${renderThemePresets()}</div>
+       <div id="themeCustomBasePanel" class="theme-custom-panel" hidden>
+         <div class="theme-custom-choices">
+           ${renderCustomBaseGrid()}
+           ${renderCustomHeaderGrid()}
+           ${renderAccentGrid()}
+         </div>
+       </div>`;
+    // The former accent picker stays in markup for compatibility but is unused.
+    accentGrid.innerHTML='';
 
-    baseGrid.querySelectorAll('.base-swatch').forEach(button => {
-      button.addEventListener('click', () => applyTheme(button.dataset.val, null));
+    baseGrid.querySelectorAll('[data-theme-preset]').forEach(button=>{
+      button.addEventListener('click',()=>choosePreset(button.dataset.themePreset));
     });
-    accentGrid.querySelectorAll('.accent-swatch').forEach(button => {
-      button.addEventListener('click', () => applyTheme(null, button.dataset.val));
+    baseGrid.querySelectorAll('.base-swatch').forEach(button=>{
+      button.addEventListener('click',()=>chooseCustom(button.dataset.val,null));
+    });
+    baseGrid.querySelectorAll('.theme-header-swatch').forEach(button=>{
+      button.addEventListener('click',()=>chooseCustom(null,null,button.dataset.header));
+    });
+    baseGrid.querySelectorAll('.accent-swatch').forEach(button=>{
+      button.addEventListener('click',()=>chooseCustom(null,button.dataset.val));
     });
 
-    const baseLabel = baseGrid.parentElement?.querySelector('label');
-    const accentLabel = accentGrid.parentElement?.querySelector('label');
-    if (baseLabel) baseLabel.textContent = 'FONDO';
-    if (accentLabel) accentLabel.textContent = 'ACENTO';
+    const baseLabel=baseGrid.parentElement?.querySelector('label');
+    if(baseLabel)baseLabel.textContent='TEMAS COMPLETOS';
+    const oldAccentLabel=accentGrid.parentElement?.querySelector('label');
+    if(oldAccentLabel)oldAccentLabel.textContent='ACENTO';
 
     ensureExtras();
+    bindAppearanceTabs();
+    showAppearancePage(getActivePreset()==='custom'?'custom':'themes');
+    updatePresetPicker();
   }
 
   function removeOldThemeClasses() {
@@ -388,11 +741,18 @@ export function createThemeModule(app) {
       button.classList.toggle('active', active);
       button.setAttribute('aria-pressed', String(active));
     });
+    document.querySelectorAll('.theme-header-swatch').forEach(button => {
+      const active=button.dataset.header===getHeaderChoice();
+      button.classList.toggle('active',active);
+      button.setAttribute('aria-pressed',String(active));
+    });
 
     const baseName = bases.find(item => item.id === base)?.name || base;
     const accentName = accents.find(item => item.id === accent)?.name || accent;
     const selection = document.getElementById('themeSelectionLabel');
-    if (selection) selection.textContent = `${baseName} · ${accentName}`;
+    const selectedPreset=themePresets.find(p=>p.id===getActivePreset());
+    if(selection)selection.textContent=selectedPreset?.name || `Personalizado · ${baseName} · ${accentName}`;
+    updatePresetPicker();
   }
 
   function updateEffectPicker(effect) {
@@ -410,6 +770,8 @@ export function createThemeModule(app) {
 
     removeOldThemeClasses();
     document.body.classList.add(base, accent);
+    document.body.dataset.censoThemePreset=getActivePreset();
+    applyHeaderOverride();
     if (persist) {
       localStorage.setItem(preferenceKey('base'), base);
       localStorage.setItem(preferenceKey('accent'), accent);
@@ -454,6 +816,7 @@ export function createThemeModule(app) {
 
   return {
     initTheme,
+    refreshSeasonalAppearance:refreshSeason,
     applyTheme,
     applyEffect,
     renderThemePickers

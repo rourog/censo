@@ -44,7 +44,7 @@ export function createEffectsModule(app) {
 
   function syncPlexusPatients(listaPacientes = []) {
     pendingPlexusPatients = Array.isArray(listaPacientes) ? listaPacientes : [];
-    app.syncNovemberPatients?.(pendingPlexusPatients);
+    app.syncSeasonalPatients?.(pendingPlexusPatients);
     if (!plexusController) return;
     if (app.state.isFetchingData && pendingPlexusPatients.length === 0) return;
     plexusController.syncPatients(pendingPlexusPatients);
@@ -101,8 +101,20 @@ export function createEffectsModule(app) {
     wrapper.appendChild(inner); container.appendChild(wrapper);
   }
 
+  function launchCelebration(options={}) {
+    const engine=app.seasonalEngine;
+    if(engine?.getStatus?.().activeSeason==='christmas') {
+      const preference=localStorage.getItem('censo-christmas-celebration');
+      const mode=localStorage.getItem('censo-celebration-mode');
+      if(mode!=='all' && (!preference || preference==='fireworks')) {
+        return engine.salute({force:true});
+      }
+    }
+    return launchSeasonalConfetti(options);
+  }
+
   return {
-    launchSeasonalConfetti,
+    launchSeasonalConfetti:launchCelebration,
     initPlexus,
     syncPlexusPatients,
     checkEasterEggs
