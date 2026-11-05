@@ -160,11 +160,16 @@ export function initChristmasTheme(app,{scope,config,createSnowfall,createSnowMo
      box-shadow:0 0 17px 5px var(--bulb-glow),0 0 29px 8px var(--bulb-glow);}
    84%{filter:brightness(1.16) saturate(1.5);
      box-shadow:0 0 12px 3px var(--bulb-glow),0 0 23px 6px var(--bulb-glow);}}
- .christmas-scene{position:fixed;left:0;width:100%;z-index:4;overflow:hidden;pointer-events:none;}
+ .christmas-scene{position:fixed;left:0;width:100%;z-index:11;overflow:hidden;pointer-events:none;}
  .christmas-scene[hidden]{display:none!important;}
  .christmas-scene-sprite{position:absolute;display:block;background-repeat:no-repeat;
    image-rendering:pixelated;image-rendering:crisp-edges;pointer-events:none;}
- .christmas-scene-tree{z-index:3;}
+ .christmas-scene button{border:0;padding:0;margin:0;background-color:transparent;border-radius:0;box-shadow:none;}
+ .christmas-scene button:focus-visible{outline:2px solid #ffe293;outline-offset:3px;}
+ .christmas-scene-tree{z-index:3;pointer-events:auto;cursor:pointer;}
+ .christmas-scene-sprite.is-santa{pointer-events:auto;cursor:pointer;}
+ .christmas-tossed-gift{left:0;top:0;z-index:6;animation:christmas-gift-lifetime 30s linear forwards;}
+ @keyframes christmas-gift-lifetime{0%,97%{opacity:1}100%{opacity:0}}
  .christmas-scene-gift{z-index:4;}
  .christmas-fireworks{position:fixed;inset:0;width:100vw;height:100vh;z-index:80;pointer-events:none;}
  @media(max-width:767px){.christmas-lights{display:none!important;}
@@ -187,7 +192,7 @@ export function initChristmasTheme(app,{scope,config,createSnowfall,createSnowMo
  return {
   syncPatients(patients){lights.syncPatients(patients);},
   salute:options=>fireworks.salute(options),
-  getStatus:()=>({revision:'christmas-v12',lights:lights.getStatus(),snow:snow.getStatus(),mountains:mountains.getStatus(),
+  getStatus:()=>({revision:'christmas-v13',lights:lights.getStatus(),snow:snow.getStatus(),mountains:mountains.getStatus(),
     fireworks:fireworks.getStatus(),scene:scene.getStatus()}),
   dispose(){
    if(disposed)return;
