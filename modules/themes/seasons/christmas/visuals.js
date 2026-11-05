@@ -46,20 +46,23 @@ export function initChristmasTheme(app,{scope,config,createSnowfall,createSnowMo
  body.christmas-theme .desktop-waves-bg .waves{display:none!important;}
  body.christmas-theme .desktop-waves-bg{
    isolation:isolate;overflow:hidden;bottom:var(--christmas-floor-offset,0px)!important;
+   z-index:1!important;
    background:transparent!important;
  }
  body.christmas-theme .desktop-waves-bg::before,
  body.christmas-theme .desktop-waves-bg::after{content:none!important;}
  body.christmas-theme #mainAppContainer{
-   background:linear-gradient(180deg,var(--christmas-sky-top,#4888b5),var(--christmas-sky-horizon,#99c0d4))!important;
+   background:linear-gradient(180deg,var(--christmas-sky-top,#4888b5),var(--christmas-sky-middle,#73abcb) 58%,var(--christmas-sky-horizon,#99c0d4))!important;
  }
  .christmas-sky-track{position:fixed;left:0;width:100%;z-index:11;overflow:hidden;pointer-events:none;}
+ .christmas-sky-art{z-index:0;}
+ .christmas-celestial-art{filter:blur(1.8px);}
  .christmas-sky-track[hidden],.christmas-celestial[hidden]{display:none!important;}
  .christmas-celestial{position:absolute;top:0;left:0;display:block;background:transparent center/contain no-repeat;
    image-rendering:pixelated;border:0;padding:0;margin:0;box-shadow:none;border-radius:0;pointer-events:none;
    transition:transform 1s linear;}
  .christmas-sky-track[data-turning="true"] .christmas-celestial{transition:none;}
- .christmas-celestial:not(:disabled){pointer-events:auto;cursor:pointer;}
+ button.christmas-celestial:not(:disabled){pointer-events:auto;cursor:pointer;}
  .christmas-celestial:focus-visible{outline:2px solid #ffe293;outline-offset:3px;}
  /* Pine-green surfaces pair with the wine-red festive header;
     individual palette selections remain available in Appearance. */
@@ -197,7 +200,7 @@ export function initChristmasTheme(app,{scope,config,createSnowfall,createSnowMo
  return {
   syncPatients(patients){lights.syncPatients(patients);},
   salute:options=>fireworks.salute(options),
-  getStatus:()=>({revision:'christmas-v19',sky:sky.getStatus(),lights:lights.getStatus(),snow:snow.getStatus(),mountains:mountains.getStatus(),
+  getStatus:()=>({revision:'christmas-v20',sky:sky.getStatus(),lights:lights.getStatus(),snow:snow.getStatus(),mountains:mountains.getStatus(),
     fireworks:fireworks.getStatus(),scene:scene.getStatus()}),
   dispose(){
    if(disposed)return;
