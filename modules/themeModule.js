@@ -203,6 +203,7 @@ export function createThemeModule(app) {
     ensureStylesheet('censo-theme-v3-layout-effects', 'themeEffectsV4.css');
     // Load last: surface colors take precedence without changing clinical status classes.
     ensureStylesheet('censo-theme-v4-surfaces', 'themeSurfacesV4.css');
+    ensureStylesheet('censo-theme-v5-compact', 'themeCompactV5.css');
   }
 
   function validBase(value) {
@@ -234,6 +235,54 @@ export function createThemeModule(app) {
       effect: validEffect(localStorage.getItem(preferenceKey('effect')) || defaults.effect)
     };
   }
+  let appearancePage='themes';
+  function showAppearancePage(page){
+    const available=['themes','custom','effects','season'];
+    if(!available.includes(page))page='themes';
+    appearancePage=page;
+    const colorPanel=document.getElementById('themeAppearanceColors');
+    const catalogue=document.getElementById('themePresetCatalogue');
+    const custom=document.getElementById('themeCustomBasePanel');
+    const effects=document.getElementById('themeAppearanceEffects');
+    const season=document.getElementById('themeAppearanceSeason');
+    if(colorPanel)colorPanel.hidden=!['themes','custom'].includes(page);
+    if(catalogue)catalogue.hidden=page!=='themes';
+    if(custom)custom.hidden=page!=='custom';
+    if(effects)effects.hidden=page!=='effects';
+    if(season)season.hidden=page!=='season';
+    document.querySelectorAll('#themeAppearanceTabs [data-appearance-page], #themeModal .theme-appearance-tab')
+      .forEach(tab=>{
+        const active=tab.dataset.appearancePage===page;
+        tab.setAttribute('aria-selected',String(active));
+        tab.tabIndex=active?0:-1;
+        tab.classList.toggle('is-active',active);
+      });
+  }
+  function bindAppearanceTabs(){
+    const tabs=Array.from(document.querySelectorAll('#themeModal .theme-appearance-tab'));
+    if(!tabs.length||tabs[0].dataset.bound==='true')return;
+    tabs[0].dataset.bound='true';
+    tabs.forEach(tab=>{
+      tab.addEventListener('click',()=>{
+        const page=tab.dataset.appearancePage;
+        if(page==='custom'&&getActivePreset()!=='custom'){
+          choosePreset('custom');
+        } else {
+          showAppearancePage(page);
+        }
+      });
+      tab.addEventListener('keydown',event=>{
+        const names=['ArrowRight','ArrowLeft','Home','End'];
+        if(!names.includes(event.key))return;
+        event.preventDefault();
+        const current=tabs.indexOf(tab);
+        const next=event.key==='Home'?0:event.key==='End'?tabs.length-1:
+          (current+(event.key==='ArrowRight'?1:-1)+tabs.length)%tabs.length;
+        tabs[next].focus();
+        tabs[next].click();
+      });
+    });
+  }
   function getActivePreset() {
     const chosen=localStorage.getItem(preferenceKey('preset'));
     if(chosen==='custom')return 'custom';
@@ -249,9 +298,8 @@ export function createThemeModule(app) {
       button.classList.toggle('active',active);
       button.setAttribute('aria-pressed',String(active));
     });
-    const independent=chosen==='custom';
     const customBase=document.getElementById('themeCustomBasePanel');
-    if(customBase)customBase.hidden=!independent;
+    if(customBase)customBase.hidden=appearancePage!=='custom';
     // All three compact controls are now inside Personalizado.
     const oldAccentPanel=document.getElementById('accentColorPicker')?.parentElement;
     if(oldAccentPanel)oldAccentPanel.hidden=true;
@@ -265,6 +313,7 @@ export function createThemeModule(app) {
       localStorage.setItem(preferenceKey('custom-base'),base);
       localStorage.setItem(preferenceKey('custom-accent'),accent);
       applyTheme(base,accent);
+      showAppearancePage('custom');
       return;
     }
     const selected=themePresets.find(p=>p.id===id);
@@ -276,6 +325,7 @@ export function createThemeModule(app) {
     }
     localStorage.setItem(preferenceKey('preset'),id);
     applyTheme(selected.base,selected.accent);
+    showAppearancePage('themes');
   }
   function chooseCustom(base=null,accent=null,headerId=null){
     const current=getCurrentTheme();
@@ -473,40 +523,44 @@ export function createThemeModule(app) {
     const extras = document.createElement('div');
     extras.id = 'themeV2Extras';
     extras.innerHTML = `
-      ${toggleGroup('decorations', 'Decoración de temporada', [['on', 'Activada'], ['off', 'Desactivada']])}
-      <section class="season-picker" aria-label="Laboratorio estacional beta">
-        <div><label for="seasonalEnginePreview">SEASONAL ENGINE 2.0 · BETA</label>
+      <section id="themeAppearanceEffects" class="theme-appearance-page" role="tabpanel" aria-label="Efectos visuales" hidden>
+        ${renderEffectPicker()}
+      </section>
+      <section id="themeAppearanceSeason" class="theme-appearance-page theme-appearance-season" role="tabpanel" aria-label="Opciones de temporada" hidden>
+        ${toggleGroup('decorations','Decoración de temporada',[['on','Activada'],['off','Desactivada']])}
+        <section class="season-picker" aria-label="Laboratorio estacional beta">
+          <label for="seasonalEnginePreview">Tema estacional</label>
           <select id="seasonalEnginePreview">
             <option value="auto">Automático (calendario)</option>
             ${getRegisteredSeasons().map(item=>`<option value="${item.id}">Vista previa: ${item.name}</option>`).join('')}
           </select>
-        </div>
+        </section>
+        ${toggleGroup('celebrations','Celebraciones',[['all','Aleatoria'],['seasonal','Elegida']])}
+        ${toggleGroup('sound','Sonidos',[['on','ON'],['off','OFF']])}
+        <section class="season-picker theme-season-celebration" aria-label="Celebración">
+          <label for="celebrationPicker">Efecto de celebración</label>
+          <select id="celebrationPicker"><option value="confetti">Confeti</option><option value="fireworks">Fuegos artificiales</option><option value="balloons">Globos</option></select>
+          <button id="celebrationPreview" type="button" class="theme-reset">PROBAR</button>
+        </section>
+        ${SEASONAL_ENABLED ? '<section class="season-picker"><label for="ghostColorPicker">Fantasmas</label><select id="ghostColorPicker"><option value="mixed">Azules y rosas</option><option value="cyan">Azules</option><option value="pink">Rosas</option></select></section>' : ''}
       </section>
-      ${toggleGroup('celebrations', 'Celebraciones', [['all', 'Aleatoria'], ['seasonal', 'Elegida']])}
-      ${toggleGroup('sound', 'Sonidos', [['on', 'ON'], ['off', 'OFF']])}
-      <section class="season-picker" aria-label="Celebración">
-        <div><label for="celebrationPicker">Celebración</label>
-        <select id="celebrationPicker"><option value="confetti">Confeti</option><option value="fireworks">Fuegos artificiales</option><option value="balloons">Globos</option></select></div>
-        <button id="celebrationPreview" type="button" class="theme-reset">PROBAR CELEBRACIÓN</button>
-      </section>
-      ${SEASONAL_ENABLED ? '<section class="season-picker"><label for="ghostColorPicker">Fantasmas</label><select id="ghostColorPicker"><option value="mixed">Azules y rosas</option><option value="cyan">Azules</option><option value="pink">Rosas</option></select></section>' : ''}
-      ${renderEffectPicker()}
-      <section class="theme-preview" aria-label="Vista previa del tema">
-        <div class="theme-preview__surface-header">ENCABEZADO · SALA DE CHOQUE</div>
-        <div class="theme-preview__head">
-          <span class="theme-preview__title">Vista previa</span>
-          <span id="themeSelectionLabel" class="theme-preview__selection"></span>
-        </div>
-        <div class="theme-preview__card">
-          <div class="theme-preview__patient">CAMA 3 · PACIENTE</div>
-          <div class="theme-preview__meta">DIAGNÓSTICO Y PENDIENTES</div>
-          <div class="theme-preview__row">
-            <span class="theme-preview__chip">OBSERVACIÓN</span>
-            <button class="theme-preview__cta" type="button" tabindex="-1">ACCIÓN</button>
+      <div class="theme-appearance-footer">
+        <section class="theme-preview" aria-label="Vista previa del tema">
+          <div class="theme-preview__surface-header">
+            <span>SALA DE CHOQUE</span>
+            <span id="themeSelectionLabel" class="theme-preview__selection"></span>
           </div>
-        </div>
-      </section>
-      <button id="themeResetBtn" class="theme-reset" type="button">RESTABLECER APARIENCIA</button>
+          <div class="theme-preview__card">
+            <span class="theme-preview__patient">CAMA 3 · PACIENTE</span>
+            <span class="theme-preview__meta">DIAGNÓSTICO Y PENDIENTES</span>
+            <span class="theme-preview__chip">OBSERVACIÓN</span>
+          </div>
+        </section>
+        <button id="themeResetBtn" class="theme-reset" type="button" title="Restablecer paleta y efectos predeterminados">
+          <span class="material-symbols-outlined" aria-hidden="true">restart_alt</span>
+          <span>Restablecer</span>
+        </button>
+      </div>
     `;
     modalContent.appendChild(extras);
     document.getElementById('celebrationPicker').value = getSeasonalConfiguration()?.id==='christmas'
@@ -565,6 +619,7 @@ export function createThemeModule(app) {
       for (const part of ['base','accent','effect','preset','custom-base','custom-accent','custom-header'])
         localStorage.removeItem(preferenceKey(part));
       refreshSeason();
+      showAppearancePage('themes');
     });
   }
 
@@ -577,7 +632,7 @@ export function createThemeModule(app) {
     baseGrid.className = 'theme-picker-section';
     accentGrid.className = 'theme-picker-section';
     baseGrid.innerHTML =
-      `${renderThemePresets()}
+      `<div id="themePresetCatalogue">${renderThemePresets()}</div>
        <div id="themeCustomBasePanel" class="theme-custom-panel" hidden>
          <div class="theme-custom-choices">
            ${renderCustomBaseGrid()}
@@ -607,6 +662,8 @@ export function createThemeModule(app) {
     if(oldAccentLabel)oldAccentLabel.textContent='ACENTO';
 
     ensureExtras();
+    bindAppearanceTabs();
+    showAppearancePage(getActivePreset()==='custom'?'custom':'themes');
     updatePresetPicker();
   }
 
