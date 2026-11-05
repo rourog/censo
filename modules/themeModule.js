@@ -34,6 +34,11 @@ export function createThemeModule(app) {
   } });
 
   const bases = [
+    { id:'base-surface-graphite',name:'Grafito',color:'#101318',header:'#303741',mode:'surface' },
+    { id:'base-surface-petrol',name:'Azul petróleo',color:'#081820',header:'#244854',mode:'surface' },
+    { id:'base-surface-forest',name:'Verde bosque',color:'#0b1915',header:'#2a4d3d',mode:'surface' },
+    { id:'base-surface-wine',name:'Vino',color:'#1a1017',header:'#583544',mode:'surface' },
+    { id:'base-surface-purple',name:'Púrpura',color:'#16121e',header:'#453559',mode:'surface' },
     { id: 'base-dark', name: 'Slate', color: '#0f172a', mode: 'dark' },
     { id: 'base-midnight', name: 'OLED', color: '#000000', mode: 'dark' },
     { id: 'base-gray-dark', name: 'Grafito', color: '#27272a', mode: 'dark' },
@@ -98,7 +103,7 @@ export function createThemeModule(app) {
     { id: 'effect-none', name: 'Ninguna', icon: 'motion_photos_off' }
   ];
 
-  const DEFAULT_BASE = 'base-dark';
+  const DEFAULT_BASE = 'base-surface-graphite';
   const DEFAULT_ACCENT = 'accent-blue';
   const DEFAULT_EFFECT = 'effect-waves';
   const baseIds = new Set(bases.map(item => item.id));
@@ -121,6 +126,8 @@ export function createThemeModule(app) {
     ensureStylesheet('censo-theme-v2-styles', 'themePaletteV2.css');
     ensureStylesheet('censo-theme-v3-effects', 'themeEffectsV3.css');
     ensureStylesheet('censo-theme-v3-layout-effects', 'themeEffectsV4.css');
+    // Load last: surface colors take precedence without changing clinical status classes.
+    ensureStylesheet('censo-theme-v4-surfaces', 'themeSurfacesV4.css');
   }
 
   function validBase(value) {
@@ -208,8 +215,8 @@ export function createThemeModule(app) {
         <div class="theme-picker-group__label"><span>${title}</span><span>${items.length}</span></div>
         <div class="theme-picker-grid">
           ${items.map(item => `
-            <button class="theme-swatch base-swatch" type="button" data-val="${item.id}" aria-label="Fondo ${item.name}" title="${item.name}">
-              <span class="theme-swatch__dot" style="background:${item.color}"></span>
+            <button class="theme-swatch base-swatch ${item.header ? 'theme-swatch--duo' : ''}" type="button" data-val="${item.id}" aria-label="${item.header ? 'Paleta' : 'Fondo'} ${item.name}" title="${item.name}">
+              ${item.header ? `<span class="theme-swatch__duo" style="--surface-dark:${item.color};--surface-light:${item.header}"></span>` : `<span class="theme-swatch__dot" style="background:${item.color}"></span>`}
               <span class="theme-swatch__name">${item.name}</span>
             </button>
           `).join('')}
@@ -277,6 +284,7 @@ export function createThemeModule(app) {
       ${SEASONAL_ENABLED ? '<section class="season-picker"><label for="ghostColorPicker">Fantasmas</label><select id="ghostColorPicker"><option value="mixed">Azules y rosas</option><option value="cyan">Azules</option><option value="pink">Rosas</option></select></section>' : ''}
       ${renderEffectPicker()}
       <section class="theme-preview" aria-label="Vista previa del tema">
+        <div class="theme-preview__surface-header">ENCABEZADO · SALA DE CHOQUE</div>
         <div class="theme-preview__head">
           <span class="theme-preview__title">Vista previa</span>
           <span id="themeSelectionLabel" class="theme-preview__selection"></span>
@@ -359,7 +367,21 @@ export function createThemeModule(app) {
 
     baseGrid.className = 'theme-picker-section';
     accentGrid.className = 'theme-picker-section';
-    baseGrid.innerHTML = renderBaseGroup('dark', 'Oscuros') + renderBaseGroup('light', 'Claros');
+    baseGrid.innerHTML =
+      `<div class="theme-palette-primary">${renderBaseGroup('surface','Paletas de superficies · fondo + encabezado')}</div>
+       <details class="theme-palette-legacy" id="legacyThemePalettes">
+         <summary>Otras paletas · compatibilidad</summary>
+         <div class="theme-palette-legacy__grid">
+           ${renderBaseGroup('dark','Oscuros anteriores')}
+           ${renderBaseGroup('light','Claros')}
+         </div>
+       </details>`;
+    // Reveal the old theme if a user already has one selected.
+    const savedBase = getCurrentTheme().base;
+    const legacy = document.getElementById('legacyThemePalettes');
+    if (legacy && !bases.some(item => item.id === savedBase && item.mode === 'surface')) {
+      legacy.open = true;
+    }
     accentGrid.innerHTML = renderAccentGrid();
 
     baseGrid.querySelectorAll('.base-swatch').forEach(button => {
@@ -371,8 +393,8 @@ export function createThemeModule(app) {
 
     const baseLabel = baseGrid.parentElement?.querySelector('label');
     const accentLabel = accentGrid.parentElement?.querySelector('label');
-    if (baseLabel) baseLabel.textContent = 'FONDO';
-    if (accentLabel) accentLabel.textContent = 'ACENTO';
+    if (baseLabel) baseLabel.textContent = 'PALETA DE SUPERFICIES';
+    if (accentLabel) accentLabel.textContent = 'ACENTO INDEPENDIENTE';
 
     ensureExtras();
   }
