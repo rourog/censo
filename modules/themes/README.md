@@ -15,6 +15,7 @@ The engine is independent of the clinical workflow and **must never write to Fir
 - `effects/snowfall.js`: one low-DPR Canvas with layered snow.
 - `effects/christmasLights.js`: 30 fixed multicolor patient bulbs on continuous green U-shaped garlands, clear unlit glass, transient pointer/keyboard illumination, 20s shuffle, glass shards/electric sparks and 2s repair.
 - `effects/christmasScene.js`: centered tree, six gifts and five walkers rotating through eleven supplied characters; layout-aware floor, reduced motion and full cleanup; the tree tosses gifts; Santa, Mrs. Claus and Jesus face the user and randomly toss gifts or wreaths (20 total, 30-second lifetime). Grounded gifts open on click using the open-box sprite, close again after five seconds without resetting their expiry. The tree gives a subtle 420ms shake on click, respecting reduced motion.
+- `effects/christmasSky.js`: blue day/night sky with the approved pixel sun/moon. Beta starts at 09:00; one real minute equals one simulated hour (24-minute loop). Clicking the sun advances 12 simulated hours and exchanges it for the moon at the same arc position. Layout stays below clinical content; no record writes or system-clock changes.
 - `effects/christmasFireworks.js`: explicit 5s celebration with disposable Canvas.
 
 ## Renderer interface
