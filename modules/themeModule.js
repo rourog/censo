@@ -174,7 +174,8 @@ export function createThemeModule(app) {
     const rgb=[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)/255);
     const lightness=rgb.map(x=>x<=.04045?x/12.92:((x+.055)/1.055)**2.4);
     const lum=.2126*lightness[0]+.7152*lightness[1]+.0722*lightness[2];
-    return lum>.28?'#172331':'#f4f7fa';
+    // At the crossover (~0.179 luminance), white and black each exceed 4.5:1.
+    return (1.05/(lum+.05)) >= ((lum+.05)/.05) ? '#ffffff' : '#000000';
   }
 
   const DEFAULT_BASE = 'base-surface-graphite';
