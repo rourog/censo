@@ -3,10 +3,12 @@ const ASSETS=new URL('../../../assets/themes/christmas/scene/',import.meta.url);
 const PEOPLE=['xmas_santa_3.png','xmas_misses_3.png','gnomea_mv.png','gnomeb_mv.png','xmas_jesus_3.png'];
 const DEER=['rudolph_adult_3.png','reindeer_3.png','reindeerb_3.png','reindeer_child_3.png','rudolph_adultb_3.png','rudolph_child_3.png'];
 const CAST=[...PEOPLE,...DEER].map(file=>({file,width:PEOPLE.includes(file)?78:156,height:PEOPLE.includes(file)?108:159,
-  sheetWidth:PEOPLE.includes(file)?234:468,sheetHeight:PEOPLE.includes(file)?432:636,deer:!PEOPLE.includes(file)}));
+  sheetWidth:PEOPLE.includes(file)?234:468,sheetHeight:PEOPLE.includes(file)?432:636,scale:PEOPLE.includes(file)?1:.72}));
+CAST.push(...['tuxedo-cat.png','husky-gray.png','husky-black.png'].map((file,i)=>({file,width:96,height:96,
+  sheetWidth:288,sheetHeight:384,scale:i===0?.62:.9})));
 const WALK=[0,1,2,1];
 const GIVERS=Object.freeze({'xmas_santa_3.png':'Santa','xmas_misses_3.png':'la señora Claus','xmas_jesus_3.png':'Jesús'});
-const INITIAL_CAST=[0,1,4,2,5];
+const INITIAL_CAST=[0,1,4,2,5,11,12,13];
 const STATIC_COLUMNS=[0,1,2,3,4,1];
 const GIFT_LIMIT=20;
 const GIFT_LIFETIME=30000;
@@ -34,7 +36,7 @@ export function createChristmasScene(app){
   let width=0,stageHeight=180,scale=.65,visible=false,disposed=false,frame=0,last=0,time=0,nextCast=3;
   const reduced=matchMedia('(prefers-reduced-motion: reduce)');
   const random=(min,max)=>min+Math.random()*(max-min);
-  const actors=Array.from({length:5},(_,i)=>({node:sprite(CAST[INITIAL_CAST[i]].file,true),cast:CAST[INITIAL_CAST[i]],
+  const actors=INITIAL_CAST.map((castIndex,i)=>({node:sprite(CAST[castIndex].file,true),cast:CAST[castIndex],
     x:0,direction:i%2?-1:1,speed:random(24,42),lane:i%2,rest:0,nextRest:random(6,15),phase:i*.37,interactive:null}));
   const snowman=sprite('snowman-melt.png',true);snowman.classList.add('christmas-scene-snowman');
   let snowmanFrame=0,snowmanState='ready',snowmanTimer=0;
@@ -65,8 +67,9 @@ export function createChristmasScene(app){
   snowman.addEventListener('click',onSnowmanClick);
   const size=(node,w,h,sw,sh,s)=>{node.style.width=w*s+'px';node.style.height=h*s+'px';node.style.backgroundSize=sw*s+'px '+sh*s+'px';};
   function drawActor(actor){
-    const s=scale*(actor.cast.deer ? .72 : 1),{width:w,height:h,sheetWidth:sw,sheetHeight:sh}=actor.cast;
+    const s=scale*actor.cast.scale,{width:w,height:h,sheetWidth:sw,sheetHeight:sh}=actor.cast;
     size(actor.node,w,h,sw,sh,s);
+    actor.node.setAttribute('data-character',actor.cast.file);
     const giver=GIVERS[actor.cast.file];
     if(actor.interactive!==giver){
       actor.interactive=giver;actor.node.classList.toggle('is-giver',!!giver);actor.node.disabled=!giver;
@@ -81,6 +84,13 @@ export function createChristmasScene(app){
     actor.node.style.transform='translateX('+actor.x.toFixed(2)+'px)';
   }
   function stopFrame(){cancelAnimationFrame(frame);frame=0;last=0;}
+  function pickCast(actor){
+    for(let i=0;i<CAST.length;i++){
+      const candidate=CAST[nextCast++%CAST.length];
+      if(!actors.some(other=>other!==actor&&other.cast.file===candidate.file))return candidate;
+    }
+    return actor.cast;
+  }
   function tick(now){
     frame=0;if(disposed||!visible||document.hidden||(reduced.matches&&!thrown.some(g=>g.flying))){last=0;return;}
     if(last&&now-last<33){frame=requestAnimationFrame(tick);return;}
@@ -90,11 +100,11 @@ export function createChristmasScene(app){
       else{
         actor.x+=actor.direction*actor.speed*dt;
         if(time>actor.nextRest){actor.rest=random(.8,2.4);actor.nextRest=time+random(8,18);}
-        const actorWidth=actor.cast.width*scale*(actor.cast.deer ? .72 : 1);
+        const actorWidth=actor.cast.width*scale*actor.cast.scale;
         if(actor.x>width+actorWidth||actor.x<-actorWidth*2){
           actor.direction=actor.x<0?1:-1;
-          actor.cast=CAST[nextCast++%CAST.length];actor.node.style.backgroundImage='url("'+new URL(actor.cast.file,ASSETS).href+'")';
-          actor.x=actor.direction>0?-actor.cast.width*scale:width;actor.speed=random(24,42);
+          actor.cast=pickCast(actor);actor.node.style.backgroundImage='url("'+new URL(actor.cast.file,ASSETS).href+'")';
+          actor.x=actor.direction>0?-actor.cast.width*scale*actor.cast.scale:width;actor.speed=random(24,42);
         }
       }
       drawActor(actor);

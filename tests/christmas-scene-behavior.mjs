@@ -29,13 +29,20 @@ globalThis.document={hidden:false,body:element(),createElement:element,
   addEventListener(k,fn){docEvents[k]=fn;},removeEventListener(k){delete docEvents[k];}};
 const originalRandom=Math.random;Math.random=()=>.5;
 const scene=createChristmasScene(app),root=app.children[0];
-assert.equal(scene.getStatus().characters,5);assert.equal(scene.getStatus().cast,11);assert.equal(scene.getStatus().gifts,6);
+assert.equal(scene.getStatus().characters,8);assert.equal(scene.getStatus().cast,14);assert.equal(scene.getStatus().gifts,6);
 assert.equal(root.style.bottom,'106px','Stage stands above the highest visible bottom bar');
 assert.equal(document.body.style['--christmas-floor-offset'],'100px');
-const actors=root.children.slice(7,12),initial=actors.map(n=>n.style.backgroundImage);
+const actors=root.children.slice(7,15),initial=actors.map(n=>n.style.backgroundImage);
 const advance=now=>{clock=now;for(const [key,timer] of [...timeouts])if(clock>=timer.expires){timeouts.delete(key);timer.fn();}const callbacks=[...frames.values()];frames.clear();callbacks.forEach(fn=>fn(now));};
 advance(100);advance(150);
 assert.ok(actors.every(n=>n.style.backgroundPosition),'All walkers have sprite frames');
+const activeFiles=()=>actors.map(n=>n.attributes['data-character']);
+assert.equal(new Set(activeFiles()).size,actors.length,'Every initial character has a unique identity');
+assert.deepEqual(activeFiles().slice(5),['tuxedo-cat.png','husky-gray.png','husky-black.png']);
+assert.ok(parseFloat(actors[5].style.width)<parseFloat(actors[6].style.width)*.7,'Cat is at most 70% of husky scale');
+assert.equal(actors[6].style.width,actors[7].style.width,'Both huskies use the same proportions');
+assert.ok(Math.abs(parseFloat(actors[5].style.backgroundPosition.split(' ')[1])+96*.65*.62)<.001,'Cat uses the left-walk row');
+assert.ok(Math.abs(parseFloat(actors[6].style.backgroundPosition.split(' ')[1])+192*.65*.9)<.001,'Husky uses the right-walk row');
 const tree=root.children[0];
 assert.equal(tree.attributes['aria-label'],'Lanzar un regalo desde el pino');
 // Static presents open once and survive layout recalculation.
@@ -71,7 +78,7 @@ assert.equal([...timeouts.values()].filter(t=>t.expires>clock+5000).length,20,'T
 assert.ok(animations.slice(0,-1).every(a=>a.cancelled),'Repeated clicks restart rather than accumulate tree shakes');
 assert.equal(scene.getStatus().gifts,6);
 advance(1000);advance(2000);
-const grounded=root.children.slice(13);
+const grounded=root.children.slice(16);
 assert.equal(grounded.length,20);
 assert.equal(new Set(grounded.map(n=>n.style.transform)).size,20);
 assert.ok(grounded.every(n=>n.style.transform&&!n.style.transform.includes('NaN')));
@@ -119,11 +126,11 @@ advance(30830);assert.equal(scene.getStatus().spawnedGifts,0,'Temporary gifts an
 assert.equal(scene.getStatus().openedGifts,0,'Gifts have closed before temporary loot expires');
 assert.equal(timeouts.size,0);
 const positions=actors.map(n=>n.style.transform);
-for(let t=30900;t<=130000;t+=50){advance(t);if(t%500===0)[...timers.values()].forEach(fn=>fn());}
+for(let t=30900;t<=130000;t+=50){advance(t);assert.equal(new Set(activeFiles()).size,actors.length,'Cast rotation must never duplicate an active character');if(t%500===0)[...timers.values()].forEach(fn=>fn());}
 assert.notDeepEqual(actors.map(n=>n.style.transform),positions,'Walkers actually travel');
 assert.ok(actors.some((n,i)=>n.style.backgroundImage!==initial[i]),'Leaving an edge rotates the cast despite layout polling');
 // The snowman melts once, waits ten full seconds, then reverses every frame.
-const snowman=root.children[12];
+const snowman=root.children[15];
 assert.equal(scene.getStatus().snowman,'ready');
 snowman.events.click();snowman.events.click();
 assert.equal(scene.getStatus().snowman,'melting');assert.equal(snowman.disabled,true);
@@ -155,4 +162,4 @@ assert.equal(app.children.length,0);assert.equal(timeouts.size,0);
 assert.equal(Object.keys(tree.events).length,0);assert.equal(stationary.onclick,null);assert.ok(actors.every(a=>Object.keys(a.events).length===0));assert.equal(timers.size,0);assert.equal(frames.size,0);
 assert.equal(Object.keys(events).length,0);assert.equal(Object.keys(docEvents).length,0);assert.equal(motion,null);
 assert.equal(document.body.style['--christmas-floor-offset'],undefined);
-console.log('OK: stage positioning, visible space, cast rotation, giver attention, random gifts/wreaths, gift opening/auto-close, tree feedback, shared cap/expiry, reduced motion and disposal.');
+console.log('OK: stage positioning, visible space, cast rotation, giver attention, random gifts/wreaths, gift opening/auto-close, tree feedback, shared cap/expiry, pet proportions, unique cast rotation, reduced motion and disposal.');
