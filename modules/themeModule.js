@@ -137,6 +137,18 @@ export function createThemeModule(app) {
     {id:'chrome',name:'Cromo',base:'base-gray-dark',accent:'accent-silver',family:'Metálicos',featured:true},
     {id:'clinical-white',name:'Blanco Clínico',base:'base-pure-white',accent:'accent-blue',family:'Claros',featured:true},
     {id:'ivory-gold',name:'Marfil Dorado',base:'base-surface-pearl-light',accent:'accent-gold',family:'Claros',featured:true},
+    {id:'neon-magenta',name:'Neón Magenta',base:'base-surface-aubergine',accent:'accent-fuchsia',family:'Neón',featured:true},
+    {id:'titanium-blue',name:'Titanio Azul',base:'base-surface-indigo',accent:'accent-pure-blue',family:'Metálicos',featured:true},
+    {id:'white-cyan',name:'Blanco Cyan',base:'base-pure-white',accent:'accent-cyan',family:'Claros',featured:true},
+    {id:'white-red',name:'Blanco Rojo',base:'base-light',accent:'accent-red',family:'Claros',featured:true},
+    {id:'wine-silver-elegant',name:'Vino y Plata',base:'base-surface-wine',accent:'accent-silver',family:'Elegantes',featured:true},
+    {id:'pine-red-elegant',name:'Pino y Rojo',base:'base-surface-forest',accent:'accent-red',family:'Elegantes',featured:true},
+    {id:'petrol-amber-elegant',name:'Petróleo y Ámbar',base:'base-surface-petrol',accent:'accent-amber',family:'Elegantes',featured:true},
+    {id:'midnight-gold-elegant',name:'Noche Dorada',base:'base-midnight',accent:'accent-gold',family:'Elegantes',featured:true},
+    {id:'pearl-chrome',name:'Perla Cromo',base:'base-surface-pearl-light',accent:'accent-silver',family:'Pastel',featured:true},
+    {id:'mint-hospital',name:'Menta Hospital',base:'base-surface-mint-light',accent:'accent-emerald',family:'Pastel',featured:true},
+    {id:'lavender-cold',name:'Lavanda Fría',base:'base-surface-lilac-light',accent:'accent-violet',family:'Pastel',featured:true},
+    {id:'glacier-blue',name:'Glaciar Azul',base:'base-surface-ice-light',accent:'accent-sky',family:'Pastel',featured:true},
     {id:'graphite',name:'Grafito',base:'base-surface-graphite',accent:'accent-blue'},
     {id:'petrol',name:'Azul petróleo',base:'base-surface-petrol',accent:'accent-teal'},
     {id:'forest',name:'Verde bosque',base:'base-surface-forest',accent:'accent-emerald'},
@@ -469,7 +481,7 @@ export function createThemeModule(app) {
     </button>`;
   }
   function renderThemePresets(){
-    const families=['Oscuros','OLED','Monitor','Neón','Metálicos','Claros'];
+    const families=['Oscuros','OLED','Monitor','Neón','Metálicos','Claros','Elegantes','Pastel'];
     const featured=families.map(family=>{
       const options=themePresets.filter(item=>item.featured&&item.family===family);
       return `<section class="theme-preset-family" aria-label="${family}">
@@ -479,7 +491,7 @@ export function createThemeModule(app) {
     }).join('');
     const previous=themePresets.filter(item=>!item.featured);
     return `<section class="theme-picker-group" aria-label="Temas completos">
-      <div class="theme-picker-group__label"><span>Temas completos</span><span>20 principales</span></div>
+      <div class="theme-picker-group__label"><span>Temas completos</span><span>${themePresets.filter(p=>p.featured).length} principales</span></div>
       <div class="theme-preset-families">${featured}</div>
       <details id="themeLegacyPresets" class="theme-preset-legacy">
         <summary>Más temas · ${previous.length} anteriores</summary>
