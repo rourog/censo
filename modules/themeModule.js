@@ -298,7 +298,8 @@ export function createThemeModule(app) {
           const base=bases.find(item=>item.id===p.base);
           const accent=accents.find(item=>item.id===p.accent);
           const light=base?.mode==='light';
-          const head=base?.header||(light?'#e2e8f0':'#303a46');
+          const extraHeaders={'base-midnight':'#29313a','base-ice':'#dbeafe','base-light':'#f1f5f9'};
+          const head=base?.header||extraHeaders[p.base]||(light?'#e2e8f0':'#303a46');
           const card=light?'#ffffff':'#242c35';
           const foreground=light?'#253246':'#e7eef8';
           const accentColor=light?accent?.light:accent?.dark;
