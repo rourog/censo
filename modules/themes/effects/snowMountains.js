@@ -1,4 +1,4 @@
-/* Three stationary sinusoidal snow bands with phase offsets.
+/* Three opaque stationary sinusoidal snow bands with phase offsets.
  * Pure SVG: no per-frame animation, observers or clinical data.
  */
 const SVG_NS='http://www.w3.org/2000/svg';
@@ -21,15 +21,15 @@ export function createSnowMountains(host){
   svg.setAttribute('focusable','false');
   svg.setAttribute('aria-hidden','true');
   const layers=[
-    {base:176,amplitude:11,cycles:2.1,phase:0.25,fill:'#8dbbdc',opacity:.32},
-    {base:196,amplitude:13,cycles:2.1,phase:1.05,fill:'#bfdef4',opacity:.55},
-    {base:215,amplitude:10,cycles:2.1,phase:1.88,fill:'#f8fcff',opacity:.82}
+    {base:176,amplitude:11,cycles:2.1,phase:0.25,fill:'#8dbbdc'},
+    {base:196,amplitude:13,cycles:2.1,phase:1.05,fill:'#bfdef4'},
+    {base:215,amplitude:10,cycles:2.1,phase:1.88,fill:'#f8fcff'}
   ];
   for(const layer of layers){
     const path=document.createElementNS(SVG_NS,'path');
     path.setAttribute('d',sinePath(layer));
     path.setAttribute('fill',layer.fill);
-    path.setAttribute('fill-opacity',String(layer.opacity));
+    path.setAttribute('fill-opacity','1');
     svg.append(path);
   }
   wrapper.append(svg);
