@@ -117,6 +117,26 @@ export function createThemeModule(app) {
 
   // Complete appearance combinations. Personalizado preserves independent choices.
   const themePresets = [
+    {id:'graphite-red',name:'Grafito Rojo',base:'base-surface-graphite',accent:'accent-red',family:'Oscuros',featured:true},
+    {id:'graphite-green',name:'Grafito Verde',base:'base-surface-graphite',accent:'accent-green',family:'Oscuros',featured:true},
+    {id:'graphite-cyan',name:'Grafito Cyan',base:'base-surface-graphite',accent:'accent-cyan',family:'Oscuros',featured:true},
+    {id:'graphite-gold-v2',name:'Grafito Dorado',base:'base-gray-dark',accent:'accent-gold',family:'Oscuros',featured:true},
+    {id:'oled-red',name:'OLED Rojo',base:'base-midnight',accent:'accent-pure-red',family:'OLED',featured:true},
+    {id:'oled-cyan',name:'OLED Cyan',base:'base-midnight',accent:'accent-cyan',family:'OLED',featured:true},
+    {id:'oled-green',name:'OLED Verde',base:'base-midnight',accent:'accent-green',family:'OLED',featured:true},
+    {id:'oled-amber',name:'OLED Ámbar',base:'base-midnight',accent:'accent-amber',family:'OLED',featured:true},
+    {id:'monitor-vital',name:'Monitor Vital',base:'base-midnight',accent:'accent-green',family:'Monitor',featured:true},
+    {id:'ecg-green',name:'ECG Verde',base:'base-midnight',accent:'accent-lime',family:'Monitor',featured:true},
+    {id:'uci-cyan',name:'UCI Cyan',base:'base-midnight',accent:'accent-cyan',family:'Monitor',featured:true},
+    {id:'defib-yellow',name:'Desfibrilador',base:'base-midnight',accent:'accent-gold',family:'Monitor',featured:true},
+    {id:'neon-cyan',name:'Neón Cyan',base:'base-surface-carbon',accent:'accent-cyan',family:'Neón',featured:true},
+    {id:'cyber-red',name:'Cyber Red',base:'base-surface-carbon',accent:'accent-scarlet',family:'Neón',featured:true},
+    {id:'ultraviolet',name:'Ultravioleta',base:'base-surface-aubergine',accent:'accent-violet',family:'Neón',featured:true},
+    {id:'clinical-gold',name:'Oro Clínico',base:'base-surface-carbon',accent:'accent-gold',family:'Metálicos',featured:true},
+    {id:'bronze',name:'Bronce',base:'base-surface-copper',accent:'accent-bronze',family:'Metálicos',featured:true},
+    {id:'chrome',name:'Cromo',base:'base-gray-dark',accent:'accent-silver',family:'Metálicos',featured:true},
+    {id:'clinical-white',name:'Blanco Clínico',base:'base-pure-white',accent:'accent-blue',family:'Claros',featured:true},
+    {id:'ivory-gold',name:'Marfil Dorado',base:'base-surface-pearl-light',accent:'accent-gold',family:'Claros',featured:true},
     {id:'graphite',name:'Grafito',base:'base-surface-graphite',accent:'accent-blue'},
     {id:'petrol',name:'Azul petróleo',base:'base-surface-petrol',accent:'accent-teal'},
     {id:'forest',name:'Verde bosque',base:'base-surface-forest',accent:'accent-emerald'},
@@ -293,6 +313,8 @@ export function createThemeModule(app) {
   }
   function updatePresetPicker(){
     const chosen=getActivePreset();
+    const legacyGallery=document.getElementById('themeLegacyPresets');
+    if(legacyGallery && themePresets.some(p=>p.id===chosen&&!p.featured))legacyGallery.open=true;
     document.querySelectorAll('[data-theme-preset]').forEach(button=>{
       const active=button.dataset.themePreset===chosen;
       button.classList.toggle('active',active);
@@ -420,38 +442,45 @@ export function createThemeModule(app) {
     `;
   }
 
+
+  function renderThemePresetCard(p){
+    const base=bases.find(item=>item.id===p.base);
+    const accent=accents.find(item=>item.id===p.accent);
+    const light=base?.mode==='light'||base?.mode==='surface-light';
+    const extraHeaders={'base-midnight':'#242a31','base-ice':'#dbeafe','base-light':'#f1f5f9'};
+    const head=base?.header||extraHeaders[p.base]||(light?'#e2e8f0':'#303a46');
+    const card=base?.card||(light?'#ffffff':p.base==='base-midnight'?'#12191f':'#242c35');
+    const foreground=light?'#253246':'#e7eef8';
+    const accentColor=light?accent?.light:accent?.dark;
+    return `<button type="button" class="theme-preset-button"
+      data-theme-preset="${p.id}" data-theme-family="${p.family||'Legado'}"
+      aria-label="Tema ${p.name}" aria-pressed="false" title="${p.name}"
+      style="--preset-bg:${base?.color};--preset-head:${head};--preset-card:${card};
+        --preset-accent:${accentColor};--preset-text:${foreground}">
+      <span class="theme-preset-art" aria-hidden="true">
+        <span class="theme-preset-art__header"></span>
+        <span class="theme-preset-art__card"><i></i><b></b></span>
+      </span>
+      <span class="theme-preset-name">${p.name}</span>
+    </button>`;
+  }
   function renderThemePresets(){
+    const families=['Oscuros','OLED','Monitor','Neón','Metálicos','Claros'];
+    const featured=families.map(family=>{
+      const options=themePresets.filter(item=>item.featured&&item.family===family);
+      return `<section class="theme-preset-family" aria-label="${family}">
+        <div class="theme-preset-family__name">${family}</div>
+        <div class="theme-presets-grid">${options.map(renderThemePresetCard).join('')}</div>
+      </section>`;
+    }).join('');
+    const previous=themePresets.filter(item=>!item.featured);
     return `<section class="theme-picker-group" aria-label="Temas completos">
-      <div class="theme-picker-group__label"><span>Temas completos</span><span>${themePresets.length+1}</span></div>
-      <div class="theme-presets-grid">
-        ${themePresets.map(p=>{
-          const base=bases.find(item=>item.id===p.base);
-          const accent=accents.find(item=>item.id===p.accent);
-          const light=base?.mode==='light'||base?.mode==='surface-light';
-          const extraHeaders={'base-midnight':'#29313a','base-ice':'#dbeafe','base-light':'#f1f5f9'};
-          const head=base?.header||extraHeaders[p.base]||(light?'#e2e8f0':'#303a46');
-          const card=base?.card||(light?'#ffffff':'#242c35');
-          const foreground=light?'#253246':'#e7eef8';
-          const accentColor=light?accent?.light:accent?.dark;
-          return `<button type="button" class="theme-preset-button" data-theme-preset="${p.id}"
-            aria-label="Tema ${p.name}" aria-pressed="false" title="${p.name}"
-            style="--preset-bg:${base?.color};--preset-head:${head};--preset-card:${card};
-              --preset-accent:${accentColor};--preset-text:${foreground}">
-            <span class="theme-preset-art" aria-hidden="true">
-              <span class="theme-preset-art__header"></span>
-              <span class="theme-preset-art__card"><i></i><b></b></span>
-            </span>
-            <span class="theme-preset-name">${p.name}</span>
-          </button>`;
-        }).join('')}
-        <button type="button" class="theme-preset-button theme-preset-button--custom"
-          data-theme-preset="custom" aria-label="Tema Personalizado" aria-pressed="false">
-          <span class="theme-preset-art theme-preset-art--custom" aria-hidden="true">
-            <span class="material-symbols-outlined">tune</span>
-          </span>
-          <span class="theme-preset-name">Personalizado</span>
-        </button>
-      </div>
+      <div class="theme-picker-group__label"><span>Temas completos</span><span>20 principales</span></div>
+      <div class="theme-preset-families">${featured}</div>
+      <details id="themeLegacyPresets" class="theme-preset-legacy">
+        <summary>Más temas · ${previous.length} anteriores</summary>
+        <div class="theme-presets-grid">${previous.map(renderThemePresetCard).join('')}</div>
+      </details>
     </section>`;
   }
 
@@ -721,6 +750,7 @@ export function createThemeModule(app) {
 
     removeOldThemeClasses();
     document.body.classList.add(base, accent);
+    document.body.dataset.censoThemePreset=getActivePreset();
     applyHeaderOverride();
     if (persist) {
       localStorage.setItem(preferenceKey('base'), base);
