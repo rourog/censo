@@ -1,0 +1,163 @@
+/* CENSO · Surface Palette Engine v4 · beta
+   Two-tone identity: deep background + lighter title bars.
+   Clinical statuses retain their own independent colors.
+   Loaded after the legacy palette and effects sheets. */
+
+/* New curated palettes. Neutral intermediate surfaces keep patient data legible. */
+body.base-surface-graphite {
+  --bg:#101318; --surface-header:#303741; --section-head:#303741;
+  --panel:#1a2028; --card:#232a33; --card-open:#303945;
+  --theme-meta:#101318;
+}
+body.base-surface-petrol {
+  --bg:#081820; --surface-header:#244854; --section-head:#244854;
+  --panel:#15232c; --card:#202b34; --card-open:#2b3943;
+  --theme-meta:#081820;
+}
+body.base-surface-forest {
+  --bg:#0b1915; --surface-header:#2a4d3d; --section-head:#2a4d3d;
+  --panel:#18231f; --card:#222e29; --card-open:#2d3b34;
+  --theme-meta:#0b1915;
+}
+body.base-surface-wine {
+  --bg:#1a1017; --surface-header:#583544; --section-head:#583544;
+  --panel:#241e25; --card:#30272e; --card-open:#3b3039;
+  --theme-meta:#1a1017;
+}
+body.base-surface-purple {
+  --bg:#16121e; --surface-header:#453559; --section-head:#453559;
+  --panel:#241f2b; --card:#302a38; --card-open:#3d3448;
+  --theme-meta:#16121e;
+}
+
+/* Legacy dark backgrounds remain selectable, but no longer wash out
+   the cards with the same saturated color as their background. */
+body.base-dark        { --bg:#101827; --section-head:#30465d; --surface-header:#30465d; }
+body.base-midnight    { --bg:#05070a; --section-head:#29313a; --surface-header:#29313a; }
+body.base-gray-dark   { --bg:#17181c; --section-head:#363b46; --surface-header:#363b46; }
+body.base-navy        { --bg:#081827; --section-head:#25425e; --surface-header:#25425e; }
+body.base-ocean       { --bg:#082330; --section-head:#29566a; --surface-header:#29566a; }
+body.base-teal-dark   { --bg:#0a2427; --section-head:#29525a; --surface-header:#29525a; }
+body.base-forest      { --bg:#0b221b; --section-head:#315746; --surface-header:#315746; }
+body.base-plum        { --bg:#201429; --section-head:#4d365b; --surface-header:#4d365b; }
+body.base-burgundy    { --bg:#250e18; --section-head:#5c3140; --surface-header:#5c3140; }
+body.base-coffee      { --bg:#25180e; --section-head:#5c4632; --surface-header:#5c4632; }
+
+body:is(
+ .base-surface-graphite,.base-surface-petrol,.base-surface-forest,
+ .base-surface-wine,.base-surface-purple
+) {
+  --text:#f4f7fa;
+  --muted:#b8c3d0;
+  --line:rgba(217,229,242,.18);
+  --field:rgba(235,243,252,.075);
+  --search-bg:rgba(235,243,252,.085);
+  --skeleton:#303945;
+  --skeleton-shimmer:rgba(255,255,255,.075);
+  --accent:var(--accent-on-dark,#60a5fa);
+  --on-accent:var(--on-accent-dark,#0f172a);
+  --theme-surface-mode:dark;
+}
+body:is(
+ .base-dark,.base-midnight,.base-gray-dark,.base-navy,.base-ocean,
+ .base-teal-dark,.base-forest,.base-plum,.base-burgundy,.base-coffee
+) {
+  --panel:#1b242d; --card:#252d37; --card-open:#323d4a;
+  --text:#f4f7fa; --muted:#b8c3d0; --line:rgba(217,229,242,.18);
+  --field:rgba(235,243,252,.075); --search-bg:rgba(235,243,252,.085);
+  --skeleton:#323d4a;
+}
+
+/* Header, section tabs, and the table share the lighter half of the palette.
+   Preserve any clinically significant row/cell colors and badge styles. */
+body:is(
+ .base-surface-graphite,.base-surface-petrol,.base-surface-forest,
+ .base-surface-wine,.base-surface-purple,
+ .base-dark,.base-midnight,.base-gray-dark,.base-navy,.base-ocean,
+ .base-teal-dark,.base-forest,.base-plum,.base-burgundy,.base-coffee
+) .header {
+  background:var(--surface-header,var(--section-head));
+}
+body:is(
+ .base-surface-graphite,.base-surface-petrol,.base-surface-forest,
+ .base-surface-wine,.base-surface-purple,
+ .base-dark,.base-midnight,.base-gray-dark,.base-navy,.base-ocean,
+ .base-teal-dark,.base-forest,.base-plum,.base-burgundy,.base-coffee
+) .section-title,
+body:is(
+ .base-surface-graphite,.base-surface-petrol,.base-surface-forest,
+ .base-surface-wine,.base-surface-purple,
+ .base-dark,.base-midnight,.base-gray-dark,.base-navy,.base-ocean,
+ .base-teal-dark,.base-forest,.base-plum,.base-burgundy,.base-coffee
+) .censo-table th {
+  color:#f4f7fa;
+  text-shadow:0 1px 2px rgba(0,0,0,.3);
+}
+
+/* Palette selector: two-color swatches and a collapsible legacy catalog. */
+#baseColorPicker.theme-picker-section{
+  display:block;
+}
+#baseColorPicker .theme-palette-primary{
+  margin:2px 0 12px;
+}
+#baseColorPicker .theme-palette-primary .theme-picker-grid{
+  grid-template-columns:repeat(auto-fill,minmax(130px,1fr));
+}
+#baseColorPicker .theme-swatch--duo{
+  gap:10px;
+  min-height:49px;
+}
+.theme-swatch__duo{
+  display:block;
+  width:44px;
+  height:29px;
+  flex:0 0 44px;
+  border-radius:7px;
+  border:1px solid rgba(167,187,201,.4);
+  background:linear-gradient(155deg,
+    var(--surface-dark) 0 49%,var(--surface-light) 50% 100%);
+  box-shadow:0 2px 5px rgba(0,0,0,.2);
+}
+.theme-palette-legacy{
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:8px 10px;
+}
+.theme-palette-legacy summary{
+  cursor:pointer;
+  color:var(--muted);
+  font-size:.72rem;
+  font-weight:700;
+  letter-spacing:.04em;
+}
+.theme-palette-legacy[open] summary{margin-bottom:12px;}
+.theme-palette-legacy__grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+}
+#themeModal .theme-palette-legacy__grid .theme-picker-group + .theme-picker-group{
+  margin-top:0;
+}
+
+/* The preview demonstrates the actual background/header/card separation. */
+.theme-preview__surface-header{
+  background:var(--section-head);
+  color:var(--text);
+  border-radius:8px 8px 0 0;
+  padding:9px 11px;
+  margin:-12px -12px 12px;
+  font-size:.7rem;
+  font-weight:800;
+  letter-spacing:.08em;
+}
+.theme-preview__card{
+  box-shadow:0 3px 12px rgba(0,0,0,.1);
+}
+@media(max-width:600px){
+  .theme-palette-legacy__grid{grid-template-columns:1fr;}
+  #baseColorPicker .theme-palette-primary .theme-picker-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+}
