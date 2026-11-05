@@ -63,7 +63,7 @@ export function initChristmasTheme(app,{scope,config,createSnowfall,createSnowMo
  body.christmas-theme .desktop-waves-bg::before,
  body.christmas-theme .desktop-waves-bg::after{content:none!important;}
  body.christmas-theme #mainAppContainer{
-   background-image:linear-gradient(rgba(8,28,22,.87),rgba(8,28,22,.87)),
+   background-image:linear-gradient(rgba(10,16,24,.86),rgba(10,16,24,.86)),
      url('./assets/themes/christmas/tile.webp');
    background-size:auto,175px 175px;
    background-repeat:repeat;
