@@ -250,7 +250,7 @@ export function createThemeModule(app) {
     if(custom)custom.hidden=page!=='custom';
     if(effects)effects.hidden=page!=='effects';
     if(season)season.hidden=page!=='season';
-    document.querySelectorAll('#themeAppearanceTabs [data-appearance-page], #themeModal .theme-appearance-tab')
+    document.querySelectorAll('#themeModal .theme-appearance-tab')
       .forEach(tab=>{
         const active=tab.dataset.appearancePage===page;
         tab.setAttribute('aria-selected',String(active));
@@ -538,8 +538,10 @@ export function createThemeModule(app) {
         ${toggleGroup('celebrations','Celebraciones',[['all','Aleatoria'],['seasonal','Elegida']])}
         ${toggleGroup('sound','Sonidos',[['on','ON'],['off','OFF']])}
         <section class="season-picker theme-season-celebration" aria-label="Celebración">
-          <label for="celebrationPicker">Efecto de celebración</label>
-          <select id="celebrationPicker"><option value="confetti">Confeti</option><option value="fireworks">Fuegos artificiales</option><option value="balloons">Globos</option></select>
+          <div class="theme-season-choice">
+            <label for="celebrationPicker">Efecto de celebración</label>
+            <select id="celebrationPicker"><option value="confetti">Confeti</option><option value="fireworks">Fuegos artificiales</option><option value="balloons">Globos</option></select>
+          </div>
           <button id="celebrationPreview" type="button" class="theme-reset">PROBAR</button>
         </section>
         ${SEASONAL_ENABLED ? '<section class="season-picker"><label for="ghostColorPicker">Fantasmas</label><select id="ghostColorPicker"><option value="mixed">Azules y rosas</option><option value="cyan">Azules</option><option value="pink">Rosas</option></select></section>' : ''}
