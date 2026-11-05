@@ -409,7 +409,8 @@ body.theme-custom-header .censo-table th{
 body.theme-custom-header .theme-preview__surface-header{
   color:var(--custom-header-ink);
 }
-body.theme-custom-header:not(.christmas-theme) .header .icon-btn{
+body.theme-custom-header:not(.christmas-theme) .header .icon-btn,
+body.theme-custom-header:not(.christmas-theme) .header .title-urgencias{
   color:var(--custom-header-ink);
 }
 
