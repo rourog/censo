@@ -58,8 +58,9 @@ export function initChristmasTheme(app,{scope,config,createSnowfall,createSnowMo
  .christmas-celestial{position:absolute;top:0;left:0;display:block;background:transparent center/contain no-repeat;
    image-rendering:pixelated;border:0;padding:0;margin:0;box-shadow:none;border-radius:0;pointer-events:none;
    transition:transform 1s linear;}
- .christmas-sun:not(:disabled){pointer-events:auto;cursor:pointer;}
- .christmas-sun:focus-visible{outline:2px solid #ffe293;outline-offset:3px;}
+ .christmas-sky-track[data-turning="true"] .christmas-celestial{transition:none;}
+ .christmas-celestial:not(:disabled){pointer-events:auto;cursor:pointer;}
+ .christmas-celestial:focus-visible{outline:2px solid #ffe293;outline-offset:3px;}
  /* Pine-green surfaces pair with the wine-red festive header;
     individual palette selections remain available in Appearance. */
  body.christmas-theme .header{
@@ -196,7 +197,7 @@ export function initChristmasTheme(app,{scope,config,createSnowfall,createSnowMo
  return {
   syncPatients(patients){lights.syncPatients(patients);},
   salute:options=>fireworks.salute(options),
-  getStatus:()=>({revision:'christmas-v18',sky:sky.getStatus(),lights:lights.getStatus(),snow:snow.getStatus(),mountains:mountains.getStatus(),
+  getStatus:()=>({revision:'christmas-v19',sky:sky.getStatus(),lights:lights.getStatus(),snow:snow.getStatus(),mountains:mountains.getStatus(),
     fireworks:fireworks.getStatus(),scene:scene.getStatus()}),
   dispose(){
    if(disposed)return;
