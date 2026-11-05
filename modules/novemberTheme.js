@@ -7,6 +7,9 @@ import { normalizePlexusArea } from './plexus.js';
 const petalsUrl = new URL('./novemberPetals.js', import.meta.url);
 petalsUrl.searchParams.set('v', String(window.CensoBuild?.version || 'november-2026'));
 const { createNovemberPetalField } = await import(petalsUrl.href);
+const skullsUrl = new URL('./novemberSkulls.js', import.meta.url);
+skullsUrl.searchParams.set('v', String(window.CensoBuild?.version || 'november-2026'));
+const { createNovemberSkullGarland } = await import(skullsUrl.href);
 
 const FAMILIES = Object.freeze({
   'SALA DE CHOQUE': ['#dc2626','#ef4444','#f97316','#fb923c'],
@@ -159,6 +162,7 @@ export function initNovemberTheme(app,{managed=false}={}) {
   const flags=document.createElement('div');flags.className='november-flags';
   const confetti=document.createElement('div');confetti.className='november-confetti';confetti.setAttribute('aria-hidden','true');
   header.prepend(background,flags,confetti);
+  const skullGarland=createNovemberSkullGarland(header);
   const respawnTimers=new Set();
   const fragmentTimers=new Set();
   function breakFlag(slot) {
@@ -243,7 +247,8 @@ export function initNovemberTheme(app,{managed=false}={}) {
     return available;
   }
   function updateLayout() {
-    positions=capacity();
+    skullGarland.layout();
+    positions=capacity().filter(x=>!skullGarland.overlaps(x,FLAGS.size));
     const desired=count;
     const visible=Math.max(0,Math.min(desired,positions.length));
     if (flags.childElementCount!==visible) {
@@ -384,7 +389,7 @@ export function initNovemberTheme(app,{managed=false}={}) {
   const shuffleTimer=setInterval(()=>{if(!document.hidden)shuffleFlags();},FLAGS.shuffle);
   // Las celebraciones solo se ejecutan desde borrado confirmado de pacientes
   // o botón de prueba manual. Ningún lanzamiento temporizado.
-  window.__novemberThemeController={syncPatients,shuffleFlags,salute,getStatus(){return {patients:count,byArea:Object.fromEntries(Object.keys(FAMILIES).map(k=>[k,patientFamilies.filter(p=>p===k).length])),availablePositions:positions.length,visibleFlags:flags.childElementCount,headerWidth:header.getBoundingClientRect().width,petalField:petals.getStatus?.() ?? null,fireworksActive:active,fireworksZIndex:getComputedStyle(canvas).zIndex,lastFireworkAt:lastFired?new Date(lastFired).toISOString():null};},dispose(){
+  window.__novemberThemeController={syncPatients,shuffleFlags,salute,getStatus(){return {patients:count,byArea:Object.fromEntries(Object.keys(FAMILIES).map(k=>[k,patientFamilies.filter(p=>p===k).length])),availablePositions:positions.length,visibleFlags:flags.childElementCount,visibleSkulls:skullGarland.getCount(),headerWidth:header.getBoundingClientRect().width,petalField:petals.getStatus?.() ?? null,fireworksActive:active,fireworksZIndex:getComputedStyle(canvas).zIndex,lastFireworkAt:lastFired?new Date(lastFired).toISOString():null};},dispose(){
     clearInterval(firstLayoutCheck);
     clearInterval(shuffleTimer);
     ro.disconnect();cancelAnimationFrame(raf);document.removeEventListener('visibilitychange',onVisibilityChange);petals.dispose();waveStone.remove();
@@ -393,7 +398,7 @@ export function initNovemberTheme(app,{managed=false}={}) {
     respawnTimers.clear();fragmentTimers.clear();
     for(const [icon,oldColor] of tintedIcons)icon.style.color=oldColor;
     tintedIcons.clear();
-    background.remove();flags.remove();confetti.remove();canvas.remove();document.body.classList.remove('november-theme');
+    skullGarland.dispose();background.remove();flags.remove();confetti.remove();canvas.remove();document.body.classList.remove('november-theme');
     delete window.__novemberThemeController;
     if(typeof app.initPlexus==='function')app.initPlexus();
   }};
