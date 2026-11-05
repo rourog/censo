@@ -103,11 +103,14 @@ export function initChristmasTheme(app,{scope,config,createSnowfall,createSnowMo
      christmas-glimmer 1.6s ease-in-out infinite,
      christmas-pulse .95s ease-in-out infinite;
    animation-delay:var(--sway-delay,0s),var(--glow-delay,0s),var(--pulse-delay,0s);}
- /* Empty glass bulbs only glow while the pointer remains over them.
-    No glimmer, pulse or persistent keyboard-focus illumination. */
- .christmas-bulb.is-idle.is-hovered:not(.is-off){opacity:1;animation:none;
-   background:#ffd65a;border-color:#fff1b5;filter:none;
-   box-shadow:0 0 8px 2px #ffd65aa6,0 0 18px 4px #ffd65a66;}
+ /* Pointer energy is independent of the patient count and colored pulses. */
+ .christmas-bulb.is-idle.has-pointer-energy:not(.is-off){animation:none;}
+ .christmas-bulb.has-pointer-energy:not(.is-off)::after{
+   inset:-1px;width:auto;height:auto;transform:none;border-radius:inherit;
+   background:var(--pointer-tint);opacity:var(--pointer-strength,0);
+   box-shadow:0 0 9px 3px var(--pointer-glow),
+     0 0 var(--pointer-spread,20px) 6px var(--pointer-halo);
+ }
  .christmas-bulb::before{content:'';position:absolute;top:-4px;left:30%;width:40%;height:4px;
    background:#aaa27e;border-radius:1px;}
  .christmas-bulb::after{content:'';position:absolute;left:20%;top:18%;width:18%;height:40%;
@@ -177,7 +180,7 @@ export function initChristmasTheme(app,{scope,config,createSnowfall,createSnowMo
  return {
   syncPatients(patients){lights.syncPatients(patients);},
   salute:options=>fireworks.salute(options),
-  getStatus:()=>({revision:'christmas-v10',lights:lights.getStatus(),snow:snow.getStatus(),mountains:mountains.getStatus(),
+  getStatus:()=>({revision:'christmas-v11',lights:lights.getStatus(),snow:snow.getStatus(),mountains:mountains.getStatus(),
     fireworks:fireworks.getStatus()}),
   dispose(){
    if(disposed)return;

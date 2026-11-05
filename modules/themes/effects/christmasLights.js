@@ -3,6 +3,12 @@
  */
 const PER_SIDE = 15;
 const TOTAL_BULBS = PER_SIDE * 2;
+const POINTER_RADIUS = 90;
+const OVERLOAD_TIME = 1500;
+export function getChristmasLightEnergy(distance,radius=POINTER_RADIUS){
+  const value=Math.max(0,Math.min(1,1-distance/radius));
+  return value*value*(3-2*value);
+}
 // Colors belong to physical bulbs, so even patients from one area yield a varied string.
 const BULB_COLORS = ['#ff303f','#ffd12e','#248bff','#21e87a','#ac50ff','#ff841f'];
 const GARLAND_SWAGS = 3;
@@ -39,6 +45,8 @@ export function createChristmasLights(header){
   let patients=[],renderKey='',disposed=false,shuffleStep=0;
   let patientSignature='';
   const timers=new Set();
+  const heat=new Map();
+  let pointer=null,energyFrame=0,lastEnergyTime=null;
   const later=(fn,ms)=>{
     const id=setTimeout(()=>{timers.delete(id);if(!disposed)fn();},ms);
     timers.add(id);
@@ -75,6 +83,7 @@ export function createChristmasLights(header){
     patientSignature=signature;
     if(key===renderKey)return;
     renderKey=key;
+    stopPointerEnergy();
     root.replaceChildren();
     if(!layout)return;
     const garland=document.createElementNS('http://www.w3.org/2000/svg','svg');
@@ -150,7 +159,7 @@ export function createChristmasLights(header){
       ?'Foco roto; se repondrá en un momento'
       :bulb.classList.contains('is-lit')
         ?'Foco encendido por paciente. Romper foco'
-        :'Encender con luz amarilla al pasar el cursor. Romper con clic');
+        :'Acercar el cursor para dar energía. Mantenerlo encima para sobrecargar, o romper con clic');
   }
   function updateIllumination(){
     if(disposed)return;
@@ -168,6 +177,8 @@ export function createChristmasLights(header){
   }
   function extinguish(bulb){
     if(bulb.classList.contains('is-off'))return;
+    const fractureColor=bulb.dataset.pointerTint||bulb.dataset.color;
+    resetBulbEnergy(bulb);
     bulb.classList.add('is-off');
     labelBulb(bulb);
     if(!matchMedia('(prefers-reduced-motion: reduce)').matches){
@@ -180,7 +191,7 @@ export function createChristmasLights(header){
         node.className=kind;
         node.setAttribute('aria-hidden','true');
         node.style.left=x+'px';node.style.top=y+'px';
-        node.style.setProperty('--fragment-color',bulb.classList.contains('is-idle')&&bulb.classList.contains('is-hovered')?'#ffd65a':bulb.dataset.color);
+        node.style.setProperty('--fragment-color',fractureColor);
         root.append(node);later(()=>node.remove(),900);
         return node;
       };
@@ -214,20 +225,70 @@ export function createChristmasLights(header){
     return bulb&&root.contains(bulb)?bulb:null;
   };
   const onClick=event=>{const bulb=targetBulb(event);if(bulb)extinguish(bulb);};
-  const onOver=event=>{
-    if(event.pointerType!=='touch')targetBulb(event)?.classList.add('is-hovered');
+  function resetBulbEnergy(bulb){
+    heat.delete(bulb);
+    bulb.classList.remove('has-pointer-energy');
+    for(const property of ['--pointer-strength','--pointer-tint','--pointer-glow','--pointer-halo','--pointer-spread']){
+      bulb.style.removeProperty(property);
+    }
+    delete bulb.dataset.pointerTint;
+  }
+  function stopPointerEnergy(){
+    pointer=null;lastEnergyTime=null;
+    if(energyFrame)cancelAnimationFrame(energyFrame);
+    energyFrame=0;
+    root.querySelectorAll('.christmas-bulb').forEach(resetBulbEnergy);
+  }
+  function updatePointerEnergy(timestamp){
+    energyFrame=0;
+    if(disposed||document.hidden||!pointer){stopPointerEnergy();return;}
+    const elapsed=lastEnergyTime===null?0:Math.min(50,Math.max(0,timestamp-lastEnergyTime));
+    lastEnergyTime=timestamp;
+    // Batch all layout reads before changing bulb styles.
+    const positions=Array.from(root.querySelectorAll('.christmas-bulb'),bulb=>({
+      bulb,rect:bulb.getClientRects().length?bulb.getBoundingClientRect():null
+    }));
+    let focusBulb=null,nearestDistance=Infinity;
+    for(const {bulb,rect} of positions){
+      if(!rect)continue;
+      const distance=Math.hypot(pointer.x-rect.left-rect.width/2,pointer.y-rect.top-rect.height/2);
+      if(distance<=14&&distance<nearestDistance){focusBulb=bulb;nearestDistance=distance;}
+    }
+    for(const {bulb,rect} of positions){
+      if(!rect||bulb.classList.contains('is-off')){resetBulbEnergy(bulb);continue;}
+      const distance=Math.hypot(pointer.x-rect.left-rect.width/2,pointer.y-rect.top-rect.height/2);
+      const strength=getChristmasLightEnergy(distance);
+      if(strength<.005){resetBulbEnergy(bulb);continue;}
+      // Only direct, sustained exposure can break a bulb; nearby bulbs merely glow.
+      const currentHeat=heat.get(bulb)||0;
+      const nextHeat=bulb===focusBulb?currentHeat+elapsed:Math.max(0,currentHeat-elapsed*2);
+      heat.set(bulb,nextHeat);
+      const core=Math.max(0,(strength-.65)/.35);
+      const green=Math.round(203+52*core),blue=Math.round(65+190*core);
+      const tint='rgb(255,'+green+','+blue+')';
+      bulb.dataset.pointerTint=tint;
+      bulb.classList.add('has-pointer-energy');
+      bulb.style.setProperty('--pointer-strength',strength.toFixed(3));
+      bulb.style.setProperty('--pointer-tint',tint);
+      bulb.style.setProperty('--pointer-glow','rgba(255,'+green+','+blue+',.85)');
+      bulb.style.setProperty('--pointer-halo','rgba(255,'+green+','+blue+',.45)');
+      bulb.style.setProperty('--pointer-spread',(12+strength*12+Math.min(1,nextHeat/OVERLOAD_TIME)*8)+'px');
+      if(nextHeat>=OVERLOAD_TIME)extinguish(bulb);
+    }
+    if(pointer&&!disposed)energyFrame=requestAnimationFrame(updatePointerEnergy);
+  }
+  const onMove=event=>{
+    if(event.pointerType==='touch'||!Number.isFinite(event.clientX)||!Number.isFinite(event.clientY))return;
+    pointer={x:event.clientX,y:event.clientY};
+    if(!energyFrame)energyFrame=requestAnimationFrame(updatePointerEnergy);
   };
-  const onOut=event=>{
-    const bulb=targetBulb(event);
-    if(bulb&&!bulb.contains(event.relatedTarget))bulb.classList.remove('is-hovered');
-  };
-  const onFocus=event=>{
-    const bulb=targetBulb(event);
-    if(bulb?.matches(':focus-visible'))bulb.classList.add('is-focused');
-  };
-  const onBlur=event=>targetBulb(event)?.classList.remove('is-focused');
-  const handlers={click:onClick,pointerover:onOver,pointerout:onOut,focusin:onFocus,focusout:onBlur};
+  const onVisibility=()=>{if(document.hidden)stopPointerEnergy();};
+  const handlers={click:onClick};
   for(const [type,handler] of Object.entries(handlers))root.addEventListener(type,handler);
+  header.addEventListener('pointermove',onMove,{passive:true});
+  header.addEventListener('pointerleave',stopPointerEnergy);
+  header.addEventListener('pointercancel',stopPointerEnergy);
+  document.addEventListener('visibilitychange',onVisibility);
   // Switch illumination only. DOM nodes and coordinates remain fixed.
   const shuffleTimer=window.setInterval(()=>{
     if(disposed||document.hidden)return;
@@ -255,9 +316,14 @@ export function createChristmasLights(header){
       litBulbs:root.querySelectorAll('.christmas-bulb.is-lit').length,perSide:PER_SIDE,shuffleStep}),
     dispose(){
       if(disposed)return;
-      disposed=true;for(const id of timers)clearTimeout(id);timers.clear();
+      disposed=true;stopPointerEnergy();
+      for(const id of timers)clearTimeout(id);timers.clear();
       observer.disconnect();
       for(const [type,handler] of Object.entries(handlers))root.removeEventListener(type,handler);
+      header.removeEventListener('pointermove',onMove);
+      header.removeEventListener('pointerleave',stopPointerEnergy);
+      header.removeEventListener('pointercancel',stopPointerEnergy);
+      document.removeEventListener('visibilitychange',onVisibility);
       root.remove();
     }
   };
