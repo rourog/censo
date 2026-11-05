@@ -1,10 +1,10 @@
 /* Decorative buildings between the middle and foreground snow; no clinical state. */
 const ASSETS=new URL('../../../assets/themes/christmas/scene/',import.meta.url);
-const HOSPITAL_RATIO=512/106;
+const HOSPITAL_RATIO=512/116;
 export function createChristmasVillage(host,app){
   if(!host||!app)return {getStatus:()=>({visible:false,buildings:0}),dispose(){}};
   const hospital=document.createElement('img');hospital.className='christmas-village-hospital';
-  hospital.src=new URL('hospital-delicias.png',ASSETS).href;hospital.alt='';hospital.draggable=false;
+  hospital.src=new URL('hospital-delicias-snow.png',ASSETS).href;hospital.alt='';hospital.draggable=false;
   host.append(hospital);
   const houses=Array.from({length:3},(_,i)=>{const node=document.createElement('span');node.className='christmas-village-house';
     node.style.backgroundImage='url("'+new URL('christmas-houses.png',ASSETS).href+'")';host.append(node);return node;});

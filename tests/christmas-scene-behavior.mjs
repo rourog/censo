@@ -45,6 +45,8 @@ assert.ok(Math.abs(parseFloat(actors[5].style.backgroundPosition.split(' ')[1])+
 assert.ok(Math.abs(parseFloat(actors[6].style.backgroundPosition.split(' ')[1])+192*.65*.9)<.001,'Husky uses the right-walk row');
 const tree=root.children[0];
 assert.equal(tree.attributes['aria-label'],'Lanzar un regalo desde el pino');
+assert.ok(tree.style.backgroundImage.includes('/christmas-tree.png'),'Tree uses its complete standalone sprite');
+assert.equal(tree.style.backgroundSize,tree.style.width+' '+tree.style.height,'Standalone tree is not clipped by a tileset crop');
 assert.equal(scene.getStatus().tree,'left');
 assert.ok(Math.abs(parseFloat(tree.style.left)+parseFloat(tree.style.width)/2-innerWidth*.24)<.01,'Tree is anchored to the left quarter');
 const giftCenters=root.children.slice(1,7).map(node=>parseFloat(node.style.left)+parseFloat(node.style.width)/2);

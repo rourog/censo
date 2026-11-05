@@ -24,7 +24,7 @@ export function createChristmasScene(app){
   const sprite=(file,interactive=false)=>{const node=document.createElement(interactive?'button':'span');node.className='christmas-scene-sprite';
     if(interactive)node.type='button';else node.setAttribute('aria-hidden','true');
     node.style.backgroundImage='url("'+new URL(file,ASSETS).href+'")';root.append(node);return node;};
-  const tree=sprite('christmastiles_3.png',true);tree.classList.add('christmas-scene-tree');
+  const tree=sprite('christmas-tree.png',true);tree.classList.add('christmas-scene-tree');
   tree.setAttribute('aria-label','Lanzar un regalo desde el pino');tree.title='¡Un regalo del pino!';
   const giftStates=new Map();
   const gifts=Array.from({length:6},(_,i)=>{const node=sprite('christmastiles_3.png',true);
@@ -244,7 +244,7 @@ export function createChristmasScene(app){
     const previousScale=scale;scale=Math.max(.3,Math.min(.65,(height-8)/240));
     const treeScale=Math.max(.3,Math.min(.8,(height-8)/192));
     const treeCenter=width*.24;
-    size(tree,120,192,240,336,treeScale);tree.style.left=(treeCenter-60*treeScale)+'px';tree.style.bottom=(-9*treeScale)+'px';
+    size(tree,136,192,136,192,treeScale);tree.style.left=(treeCenter-68*treeScale)+'px';tree.style.bottom=(-14*treeScale)+'px';
     tree.style.backgroundPosition='0px 0px';
     paintSnowman();snowman.style.left=clamp(width*.7-48*scale*1.4,0,width-96*scale*1.4)+'px';snowman.style.bottom='0px';
     const offsets=[-180,-128,-77,77,128,180];
