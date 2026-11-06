@@ -78,7 +78,7 @@ export function initChristmasTheme(app,{scope,config,createSnowfall,createSnowMo
  .christmas-snow-mountains{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden;
    filter:drop-shadow(0 -2px 7px rgba(202,230,249,.13));}
  .christmas-snow-mountains svg{position:absolute;inset:0;width:100%;height:100%;display:block;}
- .christmas-village{position:absolute;inset:0;z-index:1;pointer-events:none;}
+ .christmas-village{position:absolute;inset:0;z-index:3;pointer-events:none;}
  .christmas-village[hidden]{display:none!important;}
  .christmas-village-hospital,.christmas-village-house{position:absolute;display:block;image-rendering:pixelated;pointer-events:none;}
  .christmas-village-house{background-repeat:no-repeat;}
@@ -213,7 +213,7 @@ export function initChristmasTheme(app,{scope,config,createSnowfall,createSnowMo
  return {
   syncPatients(patients){lights.syncPatients(patients);},
   salute:options=>fireworks.salute(options),
-  getStatus:()=>({revision:'christmas-v27',village:village.getStatus(),sky:sky.getStatus(),lights:lights.getStatus(),snow:snow.getStatus(),mountains:mountains.getStatus(),
+  getStatus:()=>({revision:'christmas-v28',village:village.getStatus(),sky:sky.getStatus(),lights:lights.getStatus(),snow:snow.getStatus(),mountains:mountains.getStatus(),
     fireworks:fireworks.getStatus(),scene:scene.getStatus()}),
   dispose(){
    if(disposed)return;

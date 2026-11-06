@@ -27,6 +27,8 @@ assert.equal(wrapper.children[1],mountains.villageHost);
 assert.equal(wrapper.children[2].children.length,1,'Only the closest snow layer covers the buildings');
 const village=createChristmasVillage(mountains.villageHost,app),[hospital,...houses]=mountains.villageHost.children;
 assert.ok(hospital.src.endsWith('/hospital-delicias-final-snow.png'));
+assert.equal(parseFloat(hospital.style.bottom),0,'Curb rests at the scene floor');
+assert.equal(village.getStatus().snowPlane,'in-front-of-snow');
 assert.equal(village.getStatus().buildings,1);assert.equal(houses.length,0,'Houses are absent from the DOM');assert.equal(village.getStatus().houses,'hidden');
 function checkLayout(){
   assert.equal(village.getStatus().visible,true);
@@ -38,6 +40,8 @@ function checkLayout(){
 }
 checkLayout();
 for(width of [768,1000,1920,2560]){innerWidth=width;events.resize();checkLayout();}
+tableBottom=720;events.resize();checkLayout();
+assert.ok(parseFloat(hospital.style.width)/(720/115)>=45,'Hospital stays readable with 80px below the census');
 tableBottom=750;events.resize();assert.equal(mountains.villageHost.hidden,true,'Hide when no safe room remains');
 tableBottom=400;events.resize();checkLayout();
 width=500;innerWidth=width;events.resize();assert.equal(mountains.villageHost.hidden,true);

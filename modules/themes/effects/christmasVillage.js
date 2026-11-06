@@ -54,7 +54,8 @@ export function createChristmasVillage(host,app){
       const box=rect(section);if(box&&box.right>0&&box.left<innerWidth)top=Math.max(top,box.bottom);
     }
     const width=bounds?.width||0,height=bounds?.height||0;
-    const bottom=Math.max(8,height*.14),available=(bounds?.bottom||0)-top-bottom-14;
+    // Anchor the curb to the scene floor, retaining usable space as patient rows grow.
+    const bottom=0,available=(bounds?.bottom||0)-top-bottom-14;
     visible=!!appBounds&&width>=768&&available>=45;
     host.hidden=!visible;controls.hidden=!visible;if(!visible){cancelTrip();return;}
     const hospitalWidth=Math.min(720,width*.48,width*.52-108,available*HOSPITAL_RATIO);
@@ -67,7 +68,7 @@ export function createChristmasVillage(host,app){
     trigger.style.width=hospitalWidth+'px';trigger.style.height=(hospitalWidth/HOSPITAL_RATIO)+'px';
   }
   const timer=window.setInterval(layout,500);window.addEventListener('resize',layout);layout();
-  return {getStatus:()=>({visible,buildings:1,hospital:'center',houses:'hidden',snowPlane:'before-foreground',ambulance:trip?.phase||'idle'}),
+  return {getStatus:()=>({visible,buildings:1,hospital:'center',houses:'hidden',snowPlane:'in-front-of-snow',ambulance:trip?.phase||'idle'}),
     dispose(){if(disposed)return;disposed=true;clearInterval(timer);window.removeEventListener('resize',layout);
       cancelTrip();trigger.removeEventListener('click',launch);document.removeEventListener('visibilitychange',onVisibility);
       controls.remove();hospital.remove();host.hidden=false;}};
