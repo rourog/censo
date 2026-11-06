@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
 import {PERSON_CAST,EYE_HEIGHT,PEOPLE_PORTALS,createPeopleTraffic} from '../modules/themes/effects/christmasPeople.js';
 import {getChristmasStageLayout} from '../modules/themes/effects/christmasStageLayout.js';
-for(const cast of PERSON_CAST)assert.ok(Math.abs(cast.scale*cast.eyeHeight-EYE_HEIGHT)<1e-9,'All eyes align regardless of hat or hairstyle');
+assert.equal(PERSON_CAST.find(c=>c.file==='gnomea_mv.png').scale,1,'Small elf never receives adult eye-line normalization');
+for(const cast of PERSON_CAST.filter(c=>c.file!=='gnomea_mv.png'))assert.ok(Math.abs(cast.scale*cast.eyeHeight-EYE_HEIGHT)<1e-9,'All eyes align regardless of hat or hairstyle');
 assert.ok(PERSON_CAST.find(c=>c.file==='doctor-navy.webp').scale<PERSON_CAST[0].scale,'Doctors shrink relative to the hat-wearing reference');
 let viewport=1300,seed=42;
 const random=(min,max)=>min+(((seed=(seed*1664525+1013904223)>>>0)/4294967296))*(max-min);

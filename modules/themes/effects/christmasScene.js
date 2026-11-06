@@ -73,7 +73,7 @@ export function createChristmasScene(app,{audio}={}){
     const s=scale*actor.cast.scale,{width:w,height:h,sheetWidth:sw,sheetHeight:sh}=actor.cast;
     size(actor.node,w,h,sw,sh,s);
     actor.node.setAttribute('data-character',actor.cast.file);
-    actor.node.style.backgroundImage='url("'+new URL(actor.cast.file,ASSETS).href+'")';
+    actor.node.style.backgroundImage='url("'+new URL(actor.cast.file+(actor.cast.imageVersion?'?v=walk-'+actor.cast.imageVersion:''),ASSETS).href+'")';
     actor.node.setAttribute('data-state',actor.state||'walking');
     actor.node.setAttribute('data-person',String(!actor.cast.animal));
     actor.node.setAttribute('data-holiday',String(!!actor.cast.holiday));
@@ -119,7 +119,7 @@ export function createChristmasScene(app,{audio}={}){
         const actorWidth=actor.cast.width*scale*actor.cast.scale;
         if(actor.x>width+actorWidth||actor.x<-actorWidth*2){
           actor.direction=actor.x<0?1:-1;
-          actor.cast=pickCast(actor);actor.node.style.backgroundImage='url("'+new URL(actor.cast.file,ASSETS).href+'")';
+          actor.cast=pickCast(actor);actor.node.style.backgroundImage='url("'+new URL(actor.cast.file+(actor.cast.imageVersion?'?v=walk-'+actor.cast.imageVersion:''),ASSETS).href+'")';
           actor.x=actor.direction>0?-actor.cast.width*scale*actor.cast.scale:width;actor.speed=random(24,42);
         }
       }
