@@ -1,11 +1,11 @@
 /* Decorative village and local ambulance interaction; no clinical state. */
 const ASSETS=new URL('../../../assets/themes/christmas/scene/',import.meta.url);
-const HOSPITAL_RATIO=512/116;
+const HOSPITAL_RATIO=720/125;
 const ARRIVE_MS=1100,STOP_MS=3000,LEAVE_MS=850;
 export function createChristmasVillage(host,app){
   if(!host||!app)return {getStatus:()=>({visible:false,buildings:0}),dispose(){}};
   const hospital=document.createElement('img');hospital.className='christmas-village-hospital';
-  hospital.src=new URL('hospital-delicias-snow.png',ASSETS).href;hospital.alt='';hospital.draggable=false;
+  hospital.src=new URL('hospital-delicias-expanded-snow.png',ASSETS).href;hospital.alt='';hospital.draggable=false;
   host.append(hospital);
   // The decorative snow is aria-hidden and behind the app. Put the control in its safe empty area.
   const controls=document.createElement('div');controls.className='christmas-village-controls';
@@ -21,9 +21,9 @@ export function createChristmasVillage(host,app){
   function animate(now){
     frame=0;if(disposed||!visible||!trip||document.hidden){cancelTrip();return;}
     const elapsed=now-trip.started,{width,hospitalWidth,hospitalLeft,bottom}=geometry;
-    const size=Math.min(132,hospitalWidth*.25),height=size*.75;
+    const size=Math.min(132,hospitalWidth/HOSPITAL_RATIO*1.1),height=size*.75;
     // The far-left entrance between the two blue pillars is the ambulance bay.
-    const target=hospitalLeft+hospitalWidth*.12-size/2;
+    const target=hospitalLeft+hospitalWidth*.18-size/2;
     const start=trip.direction===1?-size:width,end=trip.direction===1?width:-size;
     let x,row,phase;
     if(elapsed<ARRIVE_MS){const t=elapsed/ARRIVE_MS;x=start+(target-start)*(1-(1-t)**2);row=trip.direction===1?0:1;phase='arriving';}
@@ -54,10 +54,10 @@ export function createChristmasVillage(host,app){
       const box=rect(section);if(box&&box.right>0&&box.left<innerWidth)top=Math.max(top,box.bottom);
     }
     const width=bounds?.width||0,height=bounds?.height||0;
-    const bottom=Math.max(8,height*.08),available=(bounds?.bottom||0)-top-bottom-14;
+    const bottom=Math.max(8,height*.14),available=(bounds?.bottom||0)-top-bottom-14;
     visible=!!appBounds&&width>=768&&available>=45;
     host.hidden=!visible;controls.hidden=!visible;if(!visible){cancelTrip();return;}
-    const hospitalWidth=Math.min(540,width*.36,available*HOSPITAL_RATIO);
+    const hospitalWidth=Math.min(720,width*.48,width*.52-108,available*HOSPITAL_RATIO);
     hospital.style.width=hospitalWidth+'px';hospital.style.height='auto';
     hospital.style.left=((width-hospitalWidth)/2)+'px';hospital.style.bottom=bottom+'px';
     geometry={width,hospitalWidth,hospitalLeft:(width-hospitalWidth)/2,bottom};

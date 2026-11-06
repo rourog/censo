@@ -26,7 +26,7 @@ assert.equal(wrapper.children[0].children.length,2,'Two snow layers are behind t
 assert.equal(wrapper.children[1],mountains.villageHost);
 assert.equal(wrapper.children[2].children.length,1,'Only the closest snow layer covers the buildings');
 const village=createChristmasVillage(mountains.villageHost,app),[hospital,...houses]=mountains.villageHost.children;
-assert.ok(hospital.src.endsWith('/hospital-delicias-snow.png'));
+assert.ok(hospital.src.endsWith('/hospital-delicias-expanded-snow.png'));
 assert.equal(village.getStatus().buildings,1);assert.equal(houses.length,0,'Houses are absent from the DOM');assert.equal(village.getStatus().houses,'hidden');
 function checkLayout(){
   assert.equal(village.getStatus().visible,true);
@@ -34,7 +34,7 @@ function checkLayout(){
   assert.ok(Math.abs(parseFloat(hospital.style.left)+parseFloat(hospital.style.width)/2-width/2)<.01,'Hospital is exactly centered');
   const treeLeft=width*.24-48,treeRight=width*.24+48;
   assert.ok(treeRight<parseFloat(hospital.style.left),'Tree remains clear of the hospital');
-  assert.ok(800-parseFloat(hospital.style.bottom)-parseFloat(hospital.style.width)/(512/116)>=tableBottom+14-.01);
+  assert.ok(800-parseFloat(hospital.style.bottom)-parseFloat(hospital.style.width)/(720/125)>=tableBottom+14-.01);
 }
 checkLayout();
 for(width of [768,1000,1920,2560]){innerWidth=width;events.resize();checkLayout();}
