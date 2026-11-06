@@ -1,6 +1,6 @@
 /* Decorative village and local ambulance interaction; no clinical state. */
 const ASSETS=new URL('../../../assets/themes/christmas/scene/',import.meta.url);
-const HOSPITAL_RATIO=720/115;
+import {HOSPITAL_RATIO,getChristmasStageLayout} from './christmasStageLayout.js';
 const ARRIVE_MS=1100,STOP_MS=3000,LEAVE_MS=850;
 export function createChristmasVillage(host,app){
   if(!host||!app)return {getStatus:()=>({visible:false,buildings:0}),dispose(){}};
@@ -56,9 +56,10 @@ export function createChristmasVillage(host,app){
     const width=bounds?.width||0,height=bounds?.height||0;
     // Anchor the curb to the scene floor, retaining usable space as patient rows grow.
     const bottom=0,available=(bounds?.bottom||0)-top-bottom-14;
-    visible=!!appBounds&&width>=768&&available>=45;
+    const stage=getChristmasStageLayout(width);
+    visible=!!appBounds&&width>=768&&available>=stage.hospitalHeight;
     host.hidden=!visible;controls.hidden=!visible;if(!visible){cancelTrip();return;}
-    const hospitalWidth=Math.min(720,width*.48,width*.52-108,available*HOSPITAL_RATIO);
+    const {hospitalWidth}=stage;
     hospital.style.width=hospitalWidth+'px';hospital.style.height='auto';
     hospital.style.left=((width-hospitalWidth)/2)+'px';hospital.style.bottom=bottom+'px';
     geometry={width,hospitalWidth,hospitalLeft:(width-hospitalWidth)/2,bottom};

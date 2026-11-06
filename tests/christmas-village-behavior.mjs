@@ -40,8 +40,10 @@ function checkLayout(){
 }
 checkLayout();
 for(width of [768,1000,1920,2560]){innerWidth=width;events.resize();checkLayout();}
-tableBottom=720;events.resize();checkLayout();
-assert.ok(parseFloat(hospital.style.width)/(720/115)>=45,'Hospital stays readable with 80px below the census');
+width=1363;innerWidth=width;events.resize();
+const stableWidth=hospital.style.width;
+tableBottom=680;events.resize();checkLayout();assert.equal(hospital.style.width,stableWidth,'Census growth never shrinks the hospital');
+tableBottom=720;events.resize();assert.equal(village.getStatus().visible,false,'Hide instead of shrinking when the fixed hospital no longer fits');
 tableBottom=750;events.resize();assert.equal(mountains.villageHost.hidden,true,'Hide when no safe room remains');
 tableBottom=400;events.resize();checkLayout();
 width=500;innerWidth=width;events.resize();assert.equal(mountains.villageHost.hidden,true);

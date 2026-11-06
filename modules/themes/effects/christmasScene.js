@@ -1,3 +1,4 @@
+import {CHARACTER_SCALE,TREE_SCALE,getChristmasStageLayout} from './christmasStageLayout.js';
 /* Interactive Christmas stage. Reads layout only; never reads or writes patient records. */
 const ASSETS=new URL('../../../assets/themes/christmas/scene/',import.meta.url);
 const PEOPLE=['xmas_santa_3.png','xmas_misses_3.png','xmas_jesus_3.png'];
@@ -207,7 +208,7 @@ export function createChristmasScene(app){
     drawGifts();if(!reduced.matches&&!frame)frame=requestAnimationFrame(tick);
   }
   const onTreeClick=()=>{
-    if(disposed||!visible||document.hidden)return;
+    if(disposed||!visible||tree.hidden||document.hidden)return;
     if(!reduced.matches){
       treeShake?.cancel();
       const animation=tree.animate([
@@ -244,14 +245,16 @@ export function createChristmasScene(app){
     const height=Math.min(180,Math.max(0,floor-top-14));stageHeight=height;
     visible=!!appRect&&width>=768&&height>=95;
     root.hidden=!visible;root.style.height=height+'px';root.style.bottom=(innerHeight-floor+6)+'px';
-    const previousScale=scale;scale=Math.max(.3,Math.min(.65,(height-8)/240));
-    const treeScale=Math.max(.3,Math.min(.8,(height-8)/192));
-    const treeCenter=width*.24;
+    const previousScale=scale;scale=CHARACTER_SCALE;
+    const treeScale=TREE_SCALE;
+    const stage=getChristmasStageLayout(width);
+    const treeCenter=stage.treeCenter;
+    tree.hidden=height<192*treeScale;
     size(tree,136,192,136,192,treeScale);tree.style.left=(treeCenter-68*treeScale)+'px';tree.style.bottom=(-14*treeScale)+'px';
     tree.style.backgroundPosition='0px 0px';
-    paintSnowman();snowman.style.left=clamp(width*.7-48*scale*1.4,0,width-96*scale*1.4)+'px';snowman.style.bottom='0px';
+    paintSnowman();snowman.style.left=stage.snowmanLeft+'px';snowman.style.bottom='0px';
     const offsets=[-180,-128,-77,77,128,180];
-    gifts.forEach((gift,i)=>{size(gift,48,48,240,336,scale);gift.style.left=(treeCenter+(offsets[i]-24)*scale)+'px';
+    gifts.forEach((gift,i)=>{gift.hidden=tree.hidden;size(gift,48,48,240,336,scale);gift.style.left=(treeCenter+(offsets[i]-24)*scale)+'px';
       gift.style.bottom=((i%2?3:0)-4)*scale+'px';
       const state=giftStates.get(gift);state.lootScale=scale;paintGift(state);});
     actors.forEach((actor,i)=>{

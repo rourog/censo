@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import {createChristmasScene} from '../modules/themes/effects/christmasScene.js';
+import {getChristmasStageLayout} from '../modules/themes/effects/christmasStageLayout.js';
 let id=0,tableBottom=400,newsTop=800,footerTop=840,motion;
 const frames=new Map(),timers=new Map(),events={},docEvents={},timeouts=new Map(),animations=[];
 let clock=0;
@@ -48,9 +49,9 @@ assert.equal(tree.attributes['aria-label'],'Lanzar un regalo desde el pino');
 assert.ok(tree.style.backgroundImage.includes('/christmas-tree.png'),'Tree uses its complete standalone sprite');
 assert.equal(tree.style.backgroundSize,tree.style.width+' '+tree.style.height,'Standalone tree is not clipped by a tileset crop');
 assert.equal(scene.getStatus().tree,'left');
-assert.ok(Math.abs(parseFloat(tree.style.left)+parseFloat(tree.style.width)/2-innerWidth*.24)<.01,'Tree is anchored to the left quarter');
+assert.ok(Math.abs(parseFloat(tree.style.left)+parseFloat(tree.style.width)/2-getChristmasStageLayout(innerWidth).treeCenter)<.01,'Tree is anchored to the left quarter');
 const giftCenters=root.children.slice(1,7).map(node=>parseFloat(node.style.left)+parseFloat(node.style.width)/2);
-assert.ok(Math.abs(giftCenters.reduce((a,b)=>a+b,0)/6-innerWidth*.24)<.01,'Stationary presents follow the tree');
+assert.ok(Math.abs(giftCenters.reduce((a,b)=>a+b,0)/6-getChristmasStageLayout(innerWidth).treeCenter)<.01,'Stationary presents follow the tree');
 // Static presents open once and survive layout recalculation.
 const stationary=root.children[1];
 assert.equal(stationary.attributes['aria-label'],'Abrir regalo');
@@ -171,6 +172,18 @@ tableBottom=820;[...timers.values()].forEach(fn=>fn());
 assert.equal(scene.getStatus().visible,false,'No room: scenery must not cover rows');assert.equal(frames.size,0);
 tableBottom=400;innerWidth=500;events.resize();assert.equal(scene.getStatus().visible,false,'Narrow screens hide the scene');
 innerWidth=1300;events.resize();assert.equal(scene.getStatus().visible,true);
+const fixedTreeWidth=tree.style.width,fixedSnowmanWidth=snowman.style.width,fixedActorWidth=actors[0].style.width;
+for(const viewport of [768,1000,1363,1920,2560]){
+ innerWidth=viewport;tableBottom=400;events.resize();const geometry=getChristmasStageLayout(viewport);
+ assert.ok(parseFloat(tree.style.left)+parseFloat(tree.style.width)+19.9<=geometry.hospitalLeft,'Tree stays left of hospital with a gap');
+ assert.ok(parseFloat(snowman.style.left)>=geometry.hospitalRight+19.9,'Snowman stays right of hospital with a gap');
+ assert.equal(tree.style.width,fixedTreeWidth);assert.equal(snowman.style.width,fixedSnowmanWidth);
+}
+innerWidth=1300;tableBottom=690;events.resize();
+assert.equal(tree.hidden,true,'Hide pine rather than shrinking it');assert.equal(scene.getStatus().visible,true,'Smaller characters still fit');
+assert.equal(tree.style.width,fixedTreeWidth);assert.equal(snowman.style.width,fixedSnowmanWidth);assert.equal(actors[0].style.width,fixedActorWidth);
+assert.ok(root.children.slice(1,7).every(g=>g.hidden),'Tree gifts hide with the pine');
+tableBottom=400;events.resize();assert.equal(tree.hidden,false);assert.ok(root.children.slice(1,7).every(g=>!g.hidden));
 reduced.matches=true;motion();assert.equal(frames.size,0);assert.equal(scene.getStatus().animated,false);
 snowman.events.click();assert.equal(scene.getStatus().snowmanFrame,11,'Reduced motion jumps to melted frame');
 advance(clock+10000);assert.equal(scene.getStatus().snowman,'ready','Reduced motion rebuilds after ten seconds');
