@@ -86,7 +86,7 @@ export function createChristmasScene(app,{audio}={}){
     }
     const resting=reduced.matches||actor.rest>0;
     const column=resting?1:WALK[Math.floor((time+actor.phase)*7)%WALK.length];
-    const row=['approaching','entering'].includes(actor.state)?3:['exiting','departing'].includes(actor.state)?0:resting?0:actor.direction<0?1:2;
+    const row=actor.state==='entering'?3:actor.state==='exiting'?0:resting?0:actor.direction<0?1:2;
     const atlas=actor.cast.frames?.[row*3+column];
     actor.node.style.backgroundPosition=atlas?(-atlas[0]*s)+'px '+(-atlas[1]*s)+'px':(-column*w*s)+'px '+(-row*h*s)+'px';
     actor.node.style.bottom=(actor.cast.animal?(actor.lane?0:8):0)+'px';
@@ -94,7 +94,8 @@ export function createChristmasScene(app,{audio}={}){
     actor.node.style.transformOrigin='50% 100%';
     actor.node.style.transform=actor.cast.animal?'translateX('+actor.x.toFixed(2)+'px)':
       'translateX('+actor.x.toFixed(2)+'px) translateY('+(-(actor.depth||0)).toFixed(2)+'px) scale('+(actor.shrink??1).toFixed(4)+')';
-    actor.node.style.clipPath='inset('+((actor.clip||0)*100).toFixed(2)+'% 0 0)';
+    actor.node.style.clipPath='none';
+    actor.node.style.opacity=String(actor.opacity??1);
   }
   function stopFrame(){cancelAnimationFrame(frame);frame=0;last=0;}
   function pickCast(actor){
@@ -285,7 +286,7 @@ export function createChristmasScene(app,{audio}={}){
   window.addEventListener('resize',layout);document.addEventListener('visibilitychange',onVisibility);
   reduced.addEventListener?.('change',onMotion);layout();
   return {
-    getStatus:()=>({visible,characters:actors.filter(a=>a.state!=='inside').length,people:actors.filter(a=>!a.cast.animal&&a.state!=='inside').length,peopleLimit:4,holidayPeople:actors.filter(a=>a.cast.holiday&&a.state!=='inside').length,holidayLimit:2,personStates:actors.filter(a=>!a.cast.animal).map(a=>({file:a.cast.file,state:a.state||'walking',door:a.door===0?'urgencias':'principal'})),animals:actors.filter(actor=>actor.cast.animal).length,animalLimit:3,cast:CAST.length,gifts:gifts.length,tree:'left',snowman:snowmanState,snowmanFrame,snowmanWaitMs:SNOWMAN_WAIT,spawnedGifts:thrown.length,wreaths:thrown.filter(g=>g.kind==='wreath').length,openedGifts:[...giftStates.values()].filter(g=>g.opened).length,giftLimit:GIFT_LIMIT,giftLifetimeMs:GIFT_LIFETIME,giftOpenMs:GIFT_OPEN_TIME,animated:visible&&!document.hidden&&!reduced.matches}),
+    getStatus:()=>({visible,characters:actors.filter(a=>a.state!=='inside').length,people:actors.filter(a=>!a.cast.animal&&a.state!=='inside').length,peopleLimit:4,holidayPeople:actors.filter(a=>a.cast.holiday&&a.state!=='inside').length,holidayLimit:2,personStates:actors.filter(a=>!a.cast.animal).map(a=>({file:a.cast.file,state:a.state||'walking',point:a.point||'pending'})),animals:actors.filter(actor=>actor.cast.animal).length,animalLimit:3,cast:CAST.length,gifts:gifts.length,tree:'left',snowman:snowmanState,snowmanFrame,snowmanWaitMs:SNOWMAN_WAIT,spawnedGifts:thrown.length,wreaths:thrown.filter(g=>g.kind==='wreath').length,openedGifts:[...giftStates.values()].filter(g=>g.opened).length,giftLimit:GIFT_LIMIT,giftLifetimeMs:GIFT_LIFETIME,giftOpenMs:GIFT_OPEN_TIME,animated:visible&&!document.hidden&&!reduced.matches}),
     dispose(){if(disposed)return;disposed=true;stopFrame();clearInterval(timer);treeShake?.cancel();treeShake=null;
       window.removeEventListener('resize',layout);document.removeEventListener('visibilitychange',onVisibility);
       reduced.removeEventListener?.('change',onMotion);tree.removeEventListener('click',onTreeClick);

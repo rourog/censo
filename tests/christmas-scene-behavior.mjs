@@ -154,12 +154,12 @@ for(let t=61300;t<=400000;t+=50){
     seenPeople.add(person.file);states.add(person.state);
     if(person.state==='inside')assert.equal(actors[index].hidden,true,'Indoor people are hidden');
     if(person.state==='entering'||person.state==='exiting'){
-      doors.add(person.door);
+      doors.add(person.point);
       const x=Number(actors[index].style.transform.match(/translateX\(([-.\d]+)px\)/)[1]);
       const stage=getChristmasStageLayout(innerWidth),center=x+parseFloat(actors[index].style.width)/2;
-      const expected=stage.hospitalLeft+stage.hospitalWidth*(person.door==='urgencias'?224:394)/720;
+      const expected=stage.hospitalLeft+stage.hospitalWidth*(person.point==='urgencias'?224:394)/720;
       assert.ok(Math.abs(center-expected)<.01,'Door transition stays centered on the pedestrian doorway');
-      assert.ok(Number(actors[index].style.transform.match(/scale\(([-.\d]+)\)/)[1])<=.5,'People recede to fit the doorway');
+      assert.ok(Number(actors[index].style.transform.match(/scale\(([-.\d]+)\)/)[1])>=.8,'Door transition uses only a modest reduction');
     }
   }
   assert.equal(status.animals,3);assert.equal(status.animalLimit,3);
@@ -170,7 +170,7 @@ for(let t=61300;t<=400000;t+=50){
   if(t%500===0)[...timers.values()].forEach(fn=>fn());
 }
 assert.equal(seenPeople.size,9,'All five clinicians and four holiday guests take turns');
-for(const state of ['walking','approaching','entering','inside','exiting','departing'])assert.ok(states.has(state),'Exercise '+state);
+for(const state of ['walking','entering','inside','exiting','arriving'])assert.ok(states.has(state),'Exercise '+state);
 assert.equal(doors.size,2,'Both pedestrian entrances are used');
 assert.ok(changes>0&&deerSamples>0);assert.ok(petSamples>deerSamples);
 assert.notDeepEqual(actors.map(n=>n.style.transform),positions,'Walkers actually travel');
@@ -219,4 +219,4 @@ assert.equal(app.children.length,0);assert.equal(timeouts.size,0);
 assert.equal(Object.keys(tree.events).length,0);assert.equal(stationary.onclick,null);assert.ok(actors.every(a=>Object.keys(a.events).length===0));assert.equal(timers.size,0);assert.equal(frames.size,0);
 assert.equal(Object.keys(events).length,0);assert.equal(Object.keys(docEvents).length,0);assert.equal(motion,null);
 assert.equal(document.body.style['--christmas-floor-offset'],undefined);
-console.log('OK: four people/two holiday limits, nine unique rotating people, both pedestrian doors with depth/clipping, three prioritized animals, gift cap/expiry, layout, reduced motion and disposal.');
+console.log('OK: four people/two holiday limits, nine unique rotating people, four portals, modest door fade, three prioritized animals, gift cap/expiry, layout, reduced motion and disposal.');
