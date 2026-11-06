@@ -30,20 +30,20 @@ globalThis.document={hidden:false,body:element(),createElement:element,
   addEventListener(k,fn){docEvents[k]=fn;},removeEventListener(k){delete docEvents[k];}};
 const originalRandom=Math.random;Math.random=()=>.5;
 const played=[];const scene=createChristmasScene(app,{audio:{play:kind=>played.push(kind)}}),root=app.children[0];
-assert.equal(scene.getStatus().characters,6);assert.equal(scene.getStatus().cast,12);assert.equal(scene.getStatus().gifts,6);
+assert.equal(scene.getStatus().characters,7);assert.equal(scene.getStatus().cast,18);assert.equal(scene.getStatus().gifts,6);
 assert.equal(root.style.bottom,'106px','Stage stands above the highest visible bottom bar');
 assert.equal(document.body.style['--christmas-floor-offset'],'100px');
-const actors=root.children.slice(7,13),initial=actors.map(n=>n.style.backgroundImage);
+const actors=root.children.slice(7,14),initial=actors.map(n=>n.style.backgroundImage);
 const advance=now=>{clock=now;for(const [key,timer] of [...timeouts])if(clock>=timer.expires){timeouts.delete(key);timer.fn();}const callbacks=[...frames.values()];frames.clear();callbacks.forEach(fn=>fn(now));};
 advance(100);advance(150);
 assert.ok(actors.every(n=>n.style.backgroundPosition),'All walkers have sprite frames');
 const activeFiles=()=>actors.map(n=>n.attributes['data-character']);
 assert.equal(new Set(activeFiles()).size,actors.length,'Every initial character has a unique identity');
-assert.deepEqual(activeFiles().slice(3),['tuxedo-cat.png','husky-gray.png','husky-black.png']);
-assert.ok(parseFloat(actors[3].style.width)<parseFloat(actors[4].style.width)*.7,'Cat is at most 70% of husky scale');
-assert.equal(actors[4].style.width,actors[5].style.width,'Both huskies use the same proportions');
-assert.ok(Math.abs(parseFloat(actors[3].style.backgroundPosition.split(' ')[1])+96*.65*.62)<.001,'Cat uses the left-walk row');
-assert.ok(Math.abs(parseFloat(actors[4].style.backgroundPosition.split(' ')[1])+192*.65*.9)<.001,'Husky uses the right-walk row');
+assert.deepEqual(activeFiles().slice(4),['tuxedo-cat.png','husky-gray.png','husky-black.png']);
+assert.ok(parseFloat(actors[4].style.width)<parseFloat(actors[5].style.width)*.7,'Cat is at most 70% of husky scale');
+assert.equal(actors[5].style.width,actors[6].style.width,'Both huskies use the same proportions');
+assert.ok(Math.abs(parseFloat(actors[4].style.backgroundPosition.split(' ')[1])+192*.65*.62)<.001,'Cat uses the right-walk row');
+assert.ok(Math.abs(parseFloat(actors[5].style.backgroundPosition.split(' ')[1])+96*.65*.9)<.001,'Husky uses the left-walk row');
 const tree=root.children[0];
 assert.equal(tree.attributes['aria-label'],'Lanzar un regalo desde el pino');
 assert.ok(tree.style.backgroundImage.includes('/christmas-tree.png'),'Tree uses its complete standalone sprite');
@@ -74,14 +74,12 @@ advance(370);assert.equal(scene.getStatus().spawnedGifts,2);
 assert.equal(root.children.at(-1).attributes['data-kind'],'wreath','Santa can throw a wreath');
 Math.random=()=>.8;actors[1].events.click();advance(600);
 assert.equal(root.children.at(-1).attributes['data-kind'],'gift','Mrs. Claus can throw a gift');
-Math.random=()=>.1;actors[2].events.click();advance(830);
-assert.equal(root.children.at(-1).attributes['data-kind'],'wreath','Jesus can throw a wreath');
-assert.equal(scene.getStatus().spawnedGifts,4);
-actors[3].events.click();assert.equal(scene.getStatus().spawnedGifts,4,'Other characters do not throw');
-// Each giver owns at most one object, including wreaths and airborne gifts.
-for(let round=0;round<3;round++)for(const actor of actors.slice(0,3))actor.events.click();
+actors[2].events.click();actors[4].events.click();
+assert.equal(scene.getStatus().spawnedGifts,3,'Doctors and animals do not throw');
+// Each holiday giver owns at most one object, including wreaths and airborne gifts.
+for(let round=0;round<3;round++)for(const actor of actors.slice(0,2))actor.events.click();
 advance(1060);
-assert.equal(scene.getStatus().spawnedGifts,4,'Repeated clicks never add a second object per giver');
+assert.equal(scene.getStatus().spawnedGifts,3,'Repeated clicks never add a second object per giver');
 Math.random=()=>.5;
 for(let i=0;i<30;i++)tree.events.click();
 assert.equal(scene.getStatus().spawnedGifts,20,'Gift and wreath cap is shared');
@@ -89,7 +87,7 @@ assert.equal([...timeouts.values()].filter(t=>t.expires>clock+5000).length,20,'T
 assert.ok(animations.slice(0,-1).every(a=>a.cancelled),'Repeated clicks restart rather than accumulate tree shakes');
 assert.equal(scene.getStatus().gifts,6);
 advance(1100);advance(2000);
-const grounded=root.children.slice(14);
+const grounded=root.children.slice(15);
 assert.equal(grounded.length,20);
 assert.equal(new Set(grounded.map(n=>n.style.transform)).size,20);
 assert.ok(grounded.every(n=>n.style.transform&&!n.style.transform.includes('NaN')));
@@ -136,42 +134,58 @@ advance(31060);assert.ok(![...timeouts.values()].some(t=>t.expires===35149),'Exp
 assert.equal(scene.getStatus().spawnedGifts,0,'Temporary gifts and wreaths expire');
 assert.equal(scene.getStatus().openedGifts,0,'Gifts have closed before temporary loot expires');
 assert.equal(timeouts.size,0);
-for(const actor of actors.slice(0,3))actor.events.click();advance(31290);
-assert.equal(scene.getStatus().spawnedGifts,3,'Expiry lets each giver throw again');
+for(const actor of actors.slice(0,2))actor.events.click();advance(31290);
+assert.equal(scene.getStatus().spawnedGifts,2,'Expiry lets each giver throw again');
 advance(61290);assert.equal(scene.getStatus().spawnedGifts,0);
 const positions=actors.map(n=>n.style.transform);
-const people=activeFiles().slice(0,3),pets=new Set(['tuxedo-cat.png','husky-gray.png','husky-black.png']);
+const pets=new Set(['tuxedo-cat.png','husky-gray.png','husky-black.png']);
+const seenPeople=new Set(),states=new Set(),doors=new Set();
 let petSamples=0,deerSamples=0,changes=0;
-for(let t=61300;t<=130000;t+=50){
+let seed=42;Math.random=()=>((seed=(seed*1664525+1013904223)>>>0)/4294967296);
+for(let t=61300;t<=400000;t+=50){
   const before=actors.map(node=>({file:node.attributes['data-character'],x:Number(node.style.transform.match(/translateX\(([-.\d]+)px\)/)[1]),width:parseFloat(node.style.width)}));
   advance(t);
   const active=activeFiles();
-  assert.equal(new Set(active).size,actors.length,'Cast rotation must never duplicate an active character');
-  assert.deepEqual(active.slice(0,3),people,'Santa, Mrs. Claus and Jesus retain their dedicated slots');
-  assert.equal(scene.getStatus().animals,3);assert.equal(scene.getStatus().animalLimit,3);
-  assert.ok(active.slice(3).every(file=>!file.startsWith('xmas_')&&!file.startsWith('gnome')),'Animal slots never turn into people');
-  active.slice(3).forEach((file,i)=>{
+  assert.equal(new Set(active).size,actors.length,'Rotation must never duplicate a reserved or active character');
+  const status=scene.getStatus();
+  assert.ok(status.people<=4);assert.equal(status.peopleLimit,4);
+  assert.ok(status.holidayPeople<=2);assert.equal(status.holidayLimit,2);
+  for(const [index,person] of status.personStates.entries()){
+    seenPeople.add(person.file);states.add(person.state);
+    if(person.state==='inside')assert.equal(actors[index].hidden,true,'Indoor people are hidden');
+    if(person.state==='entering'||person.state==='exiting'){
+      doors.add(person.door);
+      const x=Number(actors[index].style.transform.match(/translateX\(([-.\d]+)px\)/)[1]);
+      const stage=getChristmasStageLayout(innerWidth),center=x+parseFloat(actors[index].style.width)/2;
+      const expected=stage.hospitalLeft+stage.hospitalWidth*(person.door==='urgencias'?224:394)/720;
+      assert.ok(Math.abs(center-expected)<.01,'Door transition stays centered on the pedestrian doorway');
+      assert.ok(Number(actors[index].style.transform.match(/scale\(([-.\d]+)\)/)[1])<=.5,'People recede to fit the doorway');
+    }
+  }
+  assert.equal(status.animals,3);assert.equal(status.animalLimit,3);
+  active.slice(4).forEach((file,i)=>{
     if(pets.has(file))petSamples++;else deerSamples++;
-    if(file!==before[i+3].file){changes++;assert.ok(before[i+3].x>=innerWidth||before[i+3].x+before[i+3].width<=0,'An animal must be fully off screen before replacement');}
+    if(file!==before[i+4].file){changes++;assert.ok(before[i+4].x>=innerWidth||before[i+4].x+before[i+4].width<=0,'Animals rotate only fully offscreen');}
   });
   if(t%500===0)[...timers.values()].forEach(fn=>fn());
 }
-assert.ok(changes>0&&deerSamples>0,'Other animals get turns');
-assert.ok(petSamples>deerSamples,'Cat and huskies receive most of the animal screen time');
+assert.equal(seenPeople.size,9,'All five clinicians and four holiday guests take turns');
+for(const state of ['walking','approaching','entering','inside','exiting','departing'])assert.ok(states.has(state),'Exercise '+state);
+assert.equal(doors.size,2,'Both pedestrian entrances are used');
+assert.ok(changes>0&&deerSamples>0);assert.ok(petSamples>deerSamples);
 assert.notDeepEqual(actors.map(n=>n.style.transform),positions,'Walkers actually travel');
-assert.ok(actors.some((n,i)=>n.style.backgroundImage!==initial[i]),'Leaving an edge rotates the cast despite layout polling');
 // The snowman melts once, waits ten full seconds, then reverses every frame.
-const snowman=root.children[13];
+const snowman=root.children[14];
 assert.equal(scene.getStatus().snowman,'ready');
 snowman.events.click();snowman.events.click();
 assert.equal(scene.getStatus().snowman,'melting');assert.equal(snowman.disabled,true);
-for(let i=1;i<=11;i++){advance(130000+i*140);assert.equal(scene.getStatus().snowmanFrame,i);}
+for(let i=1;i<=11;i++){advance(400000+i*140);assert.equal(scene.getStatus().snowmanFrame,i);}
 assert.equal(scene.getStatus().snowman,'waiting');
 const meltedPosition=snowman.style.backgroundPosition;
 [...timers.values()].forEach(fn=>fn());assert.equal(snowman.style.backgroundPosition,meltedPosition);
-advance(141539);assert.equal(scene.getStatus().snowmanFrame,11,'Full ten seconds as a puddle');
-advance(141540);assert.equal(scene.getStatus().snowman,'rebuilding');assert.equal(scene.getStatus().snowmanFrame,10);
-for(let i=1;i<=10;i++){advance(141540+i*140);assert.equal(scene.getStatus().snowmanFrame,10-i);}
+advance(411539);assert.equal(scene.getStatus().snowmanFrame,11,'Full ten seconds as a puddle');
+advance(411540);assert.equal(scene.getStatus().snowman,'rebuilding');assert.equal(scene.getStatus().snowmanFrame,10);
+for(let i=1;i<=10;i++){advance(411540+i*140);assert.equal(scene.getStatus().snowmanFrame,10-i);}
 assert.equal(scene.getStatus().snowman,'ready');assert.equal(snowman.disabled,false);
 newsTop=0;[...timers.values()].forEach(fn=>fn());
 assert.equal(root.style.bottom,'66px','Footer becomes the floor when news is hidden');
@@ -205,4 +219,4 @@ assert.equal(app.children.length,0);assert.equal(timeouts.size,0);
 assert.equal(Object.keys(tree.events).length,0);assert.equal(stationary.onclick,null);assert.ok(actors.every(a=>Object.keys(a.events).length===0));assert.equal(timers.size,0);assert.equal(frames.size,0);
 assert.equal(Object.keys(events).length,0);assert.equal(Object.keys(docEvents).length,0);assert.equal(motion,null);
 assert.equal(document.body.style['--christmas-floor-offset'],undefined);
-console.log('OK: stage positioning, visible space, cast rotation, giver attention, random gifts/wreaths, gift opening/auto-close, tree feedback, shared cap/expiry, pet proportions, unique cast rotation, reduced motion and disposal.');
+console.log('OK: four people/two holiday limits, nine unique rotating people, both pedestrian doors with depth/clipping, three prioritized animals, gift cap/expiry, layout, reduced motion and disposal.');

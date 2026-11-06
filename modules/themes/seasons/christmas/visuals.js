@@ -215,7 +215,7 @@ export function initChristmasTheme(app,{scope,config,createSnowfall,createSnowMo
  return {
   syncPatients(patients){lights.syncPatients(patients);},
   salute:options=>fireworks.salute(options),
-  getStatus:()=>({revision:'christmas-v31',audio:audio?.getStatus(),village:village.getStatus(),sky:sky.getStatus(),lights:lights.getStatus(),snow:snow.getStatus(),mountains:mountains.getStatus(),
+  getStatus:()=>({revision:'christmas-v32',audio:audio?.getStatus(),village:village.getStatus(),sky:sky.getStatus(),lights:lights.getStatus(),snow:snow.getStatus(),mountains:mountains.getStatus(),
     fireworks:fireworks.getStatus(),scene:scene.getStatus()}),
   dispose(){
    if(disposed)return;
