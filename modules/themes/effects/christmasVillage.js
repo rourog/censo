@@ -1,4 +1,4 @@
-import {createChristmasPickup} from './christmasPickup.js?v=3.65.0';
+import {createChristmasPickup} from './christmasPickup.js?v=3.66.0';
 /* Decorative village and local ambulance interaction; no clinical state. */
 import {AMBULANCE_DURATION_MS} from './christmasAudio.js';
 const ASSETS=new URL('../../../assets/themes/christmas/scene/',import.meta.url);
@@ -31,7 +31,7 @@ export function createChristmasVillage(host,app,{audio}={}){
     if(next&&visible&&!disposed&&!document.hidden){laneOwner=next.kind;next.start();}
   }
   function cancelVehicles(){vehicleQueue.length=0;laneOwner=null;cancelTrip();pickup.cancel();}
-  const pickup=createChristmasPickup(controls,{getGeometry:()=>geometry,isVisible:()=>visible,requestLane:start=>requestVehicle('pickup',start),releaseLane:()=>releaseVehicle('pickup'),ownsLane:()=>laneOwner==='pickup'&&!trip});
+  const pickup=createChristmasPickup(controls,{getGeometry:()=>geometry,isVisible:()=>visible,requestLane:start=>requestVehicle('pickup',start),releaseLane:()=>releaseVehicle('pickup'),ownsLane:()=>laneOwner==='pickup'&&!trip,audio});
   const rect=node=>node?.getClientRects?.().length?node.getBoundingClientRect():null;
   function cancelTrip(){const active=!!trip;ambulanceQueued=false;if(frame)cancelAnimationFrame(frame);frame=0;trip?.sound?.stop();trip=null;ambulance.hidden=true;trigger.disabled=false;if(active)releaseVehicle('ambulance');}
   function animate(now){

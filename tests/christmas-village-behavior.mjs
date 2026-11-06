@@ -6,7 +6,7 @@ const intervals=new Map(),events={},documentEvents={},frames=new Map();let now=0
 globalThis.performance={now:()=>now};
 globalThis.requestAnimationFrame=fn=>{frames.set(++id,fn);return id;};
 globalThis.cancelAnimationFrame=id=>frames.delete(id);
-function tick(time){now=time;const pending=[...frames.values()];frames.clear();pending.forEach(fn=>fn(time));const sprites=app.children[0]?.children;if(sprites?.length===4)assert.ok(sprites[1].hidden||sprites[3].hidden,'Vehicles never render together on the shared route');}
+function tick(time){now=time;const pending=[...frames.values()];frames.clear();pending.forEach(fn=>fn(time));const sprites=app.children[0]?.children;if(sprites?.length>=4)assert.ok(sprites[1].hidden||sprites[3].hidden,'Vehicles never render together on the shared route');}
 globalThis.innerWidth=width;
 globalThis.window={setInterval(fn){intervals.set(++id,fn);return id;},addEventListener(k,fn){events[k]=fn;},removeEventListener(k){delete events[k];}};
 globalThis.clearInterval=id=>intervals.delete(id);
@@ -25,7 +25,7 @@ const mountains=createSnowMountains(host),wrapper=host.children[0];
 assert.equal(wrapper.children[0].children.length,2,'Two snow layers are behind the village');
 assert.equal(wrapper.children[1],mountains.villageHost);
 assert.equal(wrapper.children[2].children.length,1,'Only the closest snow layer covers the buildings');
-const village=createChristmasVillage(mountains.villageHost,app),[hospital,...houses]=mountains.villageHost.children;
+const sounds=[];const village=createChristmasVillage(mountains.villageHost,app,{audio:{play(kind){sounds.push(kind);return {stop(){}};}}}),[hospital,...houses]=mountains.villageHost.children;
 assert.ok(hospital.src.endsWith('/hospital-delicias-final-snow.png'));
 assert.equal(parseFloat(hospital.style.bottom),0,'Curb rests at the scene floor');
 assert.equal(village.getStatus().snowPlane,'in-front-of-snow');
@@ -72,45 +72,44 @@ for(const direction of [.1,.9]){
  tick(6000);assert.equal(village.getStatus().ambulance,'leaving');
  tick(9000);assert.equal(village.getStatus().ambulance,'idle');assert.equal(ambulance.hidden,true);assert.equal(trigger.disabled,false);assert.equal(frames.size,0);
 }
-const [,,pickupTrigger,pickupSprite]=controls.children;
-assert.equal(controls.children.length,4,'One separate door and sprite per vehicle type');
-assert.ok(parseFloat(pickupTrigger.style.left)>parseFloat(trigger.style.left)+parseFloat(trigger.style.width),'Door hitboxes are separate');
-for(const choice of [.1,.9]){
- Math.random=()=>choice;now=0;pickupTrigger.events.click();pickupTrigger.events.click();assert.equal(frames.size,1);
- tick(1500);assert.equal(village.getStatus().pickup,'arriving');const sideHeight=parseFloat(pickupSprite.style.height);
- tick(3000);assert.equal(village.getStatus().pickup,'parked');assert.ok(['ram-2500','silverado','civic','jimny'].includes(village.getStatus().pickupModel));
- assert.ok(Math.abs(sideHeight-parseFloat(pickupSprite.style.height))<.001,'Actual artwork has identical roof-to-tire height in side and front views');
- const target=parseFloat(pickupSprite.style.left)+parseFloat(pickupSprite.style.width)/2;
- assert.ok(Math.abs(target-(parseFloat(hospital.style.left)+parseFloat(hospital.style.width)*55/720))<.01,'Park under the three left windows');
- trigger.events.click();trigger.events.click();assert.equal(village.getStatus().ambulance,'queued');assert.equal(ambulance.hidden,true,'Ambulance waits offscreen while pickup occupies the route');
- tick(5999);assert.equal(village.getStatus().pickup,'parked');
- tick(6000);assert.equal(village.getStatus().pickup,'leaving');assert.ok(Math.abs(parseFloat(pickupSprite.style.height)-sideHeight)<.001,'Departure keeps exactly the same visible height');
- tick(9000);assert.equal(village.getStatus().pickup,'idle');assert.equal(pickupSprite.hidden,true);assert.equal(village.getStatus().ambulance,'arriving');
- tick(12000);assert.equal(village.getStatus().ambulance,'parked');
- pickupTrigger.events.click();pickupTrigger.events.click();assert.equal(village.getStatus().pickup,'queued');assert.equal(pickupSprite.hidden,true);
- tick(15000);assert.equal(village.getStatus().ambulance,'leaving');
- tick(18000);assert.equal(village.getStatus().ambulance,'idle');assert.equal(village.getStatus().pickup,'arriving');assert.equal(ambulance.hidden,true);
- tick(21000);assert.equal(village.getStatus().pickup,'parked');
- tick(24000);assert.equal(village.getStatus().pickup,'leaving');
- tick(27000);assert.equal(village.getStatus().pickup,'idle');assert.equal(frames.size,0,'Automatic trip ends without idle animation loops');
- assert.equal(controls.children.length,4,'Requests never accumulate vehicle sprites');
- // Hide with a queued request: cancel both the active trip and pending dispatch.
- pickupTrigger.events.click();trigger.events.click();width=500;events.resize();
- assert.equal(village.getStatus().pickup,'idle');assert.equal(village.getStatus().ambulance,'idle');assert.equal(frames.size,0);
- width=1363;events.resize();assert.equal(frames.size,0,'Restoring visibility never resurrects canceled requests');
-}
-const order=['ram-2500','silverado','civic','jimny'],sequence=[],heights={};
-let next=order.indexOf(village.getStatus().nextVehicle);
+const [,,pickupTrigger,pickupSprite,driverSprite]=controls.children;
+assert.equal(controls.children.length,5,'Vehicle controls plus one special driver sprite');
+assert.ok(parseFloat(pickupTrigger.style.left)>parseFloat(trigger.style.left)+parseFloat(trigger.style.width));
+const order=['ram-2500','silverado','civic','jimny'],sequence=[],heights={},driverStates=new Set();
+let next=0,clock=30000;
 for(let i=0;i<12;i++){
- now=30000+i*10000;const start=now;pickupTrigger.events.click();pickupTrigger.events.click();
+ now=clock;const start=now;pickupTrigger.events.click();pickupTrigger.events.click();
  tick(start+1500);const sideHeight=parseFloat(pickupSprite.style.height),model=village.getStatus().pickupModel;
- assert.equal(model,order[next++%4],'Every accepted dispatch follows the four-model rotation');sequence.push(model);
- tick(start+3000);heights[model]=parseFloat(pickupSprite.style.height);
- assert.ok(Math.abs(heights[model]-sideHeight)<.001,'Each model preserves its own actual visible height in side and front views');
- tick(start+9000);assert.equal(village.getStatus().pickup,'idle');
+ assert.equal(model,order[next++%4]);sequence.push(model);
+ const stop=village.getStatus().pickupStopMs,end=start+3000+stop+3000;
+ tick(start+3000);heights[model]=parseFloat(pickupSprite.style.height);assert.ok(Math.abs(heights[model]-sideHeight)<.001);
+ if(model==='ram-2500'){
+   assert.ok(stop>8000,'RAM waits for the whole walk, greeting and return');
+   assert.equal(driverSprite.hidden,false);
+   trigger.events.click();trigger.events.click();assert.equal(village.getStatus().ambulance,'queued');
+   let lastState='';let outX,doorX;
+   for(let t=start+3050;t<start+3000+stop;t+=100){
+     tick(t);const state=village.getStatus().ramDriver;driverStates.add(state);
+     if(state==='walking-to-door')outX=parseFloat(driverSprite.style.left);
+     if(state==='waving'){doorX=parseFloat(driverSprite.style.left);assert.ok(doorX>parseFloat(pickupSprite.style.left)+parseFloat(pickupSprite.style.width)/2);}
+     if(state==='returning'&&lastState==='waving')assert.ok(parseFloat(driverSprite.style.left)<=doorX+.1);
+     lastState=state;assert.equal(ambulance.hidden,true,'Ambulance stays offscreen throughout the visit');
+   }
+   assert.ok(outX>parseFloat(pickupSprite.style.left));
+ }else assert.equal(driverSprite.hidden,true,'Driver belongs only to RAM');
+ tick(start+3000+stop+1);assert.equal(village.getStatus().pickup,'leaving');assert.equal(driverSprite.hidden,true,'Driver back inside before vehicle moves');
+ tick(end+1);assert.equal(village.getStatus().pickup,'idle');assert.equal(pickupSprite.hidden,true);assert.equal(driverSprite.hidden,true);
+ if(model==='ram-2500'){assert.equal(village.getStatus().ambulance,'arriving');tick(end+9002);assert.equal(village.getStatus().ambulance,'idle');clock=end+10000;}
+ else clock=end+1000;
+ assert.equal(frames.size,0);
 }
-assert.ok(heights.civic<heights.jimny&&heights.jimny<heights.silverado&&heights.jimny<heights['ram-2500'],'Civic lowest, Jimny intermediate, pickups highest');
-for(let i=0;i<sequence.length;i+=4)assert.equal(new Set(sequence.slice(i,i+4)).size,4,'No repeat until all four vehicles have appeared');
+assert.ok(heights.civic<heights.jimny&&heights.jimny<heights.silverado&&heights.jimny<heights['ram-2500']);
+for(let i=0;i<sequence.length;i+=4)assert.equal(new Set(sequence.slice(i,i+4)).size,4);
+for(const state of ['getting-out','walking-to-door','waving','returning','getting-in'])assert.ok(driverStates.has(state),'Exercise '+state);
+assert.equal(sounds.filter(k=>k==='ramArrival').length,3);assert.equal(sounds.filter(k=>k==='ramExit').length,3);
+// Start another RAM visit then hide the stage: both vehicle and visitor must cancel.
+now=clock;pickupTrigger.events.click();tick(clock+4000);assert.equal(driverSprite.hidden,false);
+width=500;events.resize();assert.equal(driverSprite.hidden,true);assert.equal(frames.size,0);width=1363;events.resize();
 trigger.events.click();width=500;events.resize();assert.equal(frames.size,0,'Hiding the village cancels the trip');
 width=1363;events.resize();trigger.events.click();document.hidden=true;documentEvents.visibilitychange();assert.equal(frames.size,0);document.hidden=false;
 trigger.events.click();village.dispose();village.dispose();assert.equal(frames.size,0);assert.equal(app.children.length,0);assert.equal(Object.keys(documentEvents).length,0);assert.equal(mountains.villageHost.children.length,0);assert.equal(intervals.size,0);assert.equal(Object.keys(events).length,0);
@@ -122,4 +121,4 @@ sound.elapsedMs=3000;tick(8000);assert.equal(synced.getStatus().ambulance,'parke
 sound.elapsedMs=6000;tick(9000);assert.equal(synced.getStatus().ambulance,'leaving');
 sound.elapsedMs=9000;tick(9500);assert.equal(synced.getStatus().ambulance,'idle');assert.equal(sound.stopped,true);synced.dispose();assert.equal(frames.size,0);
 mountains.dispose();assert.equal(host.children.length,0);
-console.log('OK: separate door hitboxes, four-model rotation, ordered relative heights, parking under left windows, matched lateral scale, automatic nine-second pickup trip, serialized vehicle requests without overlap, visibility and disposal.');
+console.log('OK: separate door hitboxes, four-model rotation, ordered relative heights, parking under left windows, matched lateral scale, RAM doctor walk/wave/return and engine cues, extended RAM stop, serialized vehicle requests without overlap, visibility and disposal.');

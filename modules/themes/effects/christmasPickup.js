@@ -1,3 +1,4 @@
+import {createRamDriver,ramVisitTiming} from './christmasRamDriver.js?v=3.66.0';
 /* One decorative pickup: independent from ambulance dispatch and clinical state. */
 const ASSETS=new URL('../../../assets/themes/christmas/scene/',import.meta.url);
 const ARRIVAL_MS=3000,STOP_MS=3000,EXIT_MS=3000;
@@ -6,25 +7,27 @@ const FRAMES={"ram-2500":[[15,115,334,166],[377,115,334,166],[739,115,334,166],[
 const VEHICLES=['ram-2500','silverado','civic','jimny'];
 const HEIGHT={"ram-2500":1,silverado:1,civic:.70,jimny:.86};
 const SHEETS={"ram-2500":[1448,1086],"silverado":[1448,1086],"civic":[1448,1086],"jimny":[1448,1086]};
-export function createChristmasPickup(controls,{getGeometry,isVisible,requestLane,releaseLane,ownsLane}){
+export function createChristmasPickup(controls,{getGeometry,isVisible,requestLane,releaseLane,ownsLane,audio}){
   const trigger=document.createElement('button');trigger.type='button';trigger.className='christmas-hospital-trigger';
   trigger.setAttribute('aria-label','Llamar un vehículo desde urgencias');trigger.title='Acceso peatonal de urgencias';
   const sprite=document.createElement('span');sprite.className='christmas-ambulance christmas-pickup';sprite.setAttribute('aria-hidden','true');sprite.hidden=true;
   controls.append(trigger,sprite);
+  const driver=createRamDriver(controls);
   let trip=null,frame=0,disposed=false,queued=false,nextModel=0;
-  function cancel(){const active=!!trip;if(frame)cancelAnimationFrame(frame);frame=0;trip=null;queued=false;sprite.hidden=true;trigger.disabled=false;if(active)releaseLane();}
+  function cancel(){const active=!!trip;if(frame)cancelAnimationFrame(frame);frame=0;trip?.sound?.stop();trip=null;driver.hide();queued=false;sprite.hidden=true;trigger.disabled=false;if(active)releaseLane();}
   function start(now){
     const model=VEHICLES[nextModel++%VEHICLES.length];
-    trip={model,direction:Math.random()<.5?1:-1,started:now,phase:'arriving'};
+    trip={model,direction:Math.random()<.5?1:-1,started:now,phase:'arriving',driverTiming:model==='ram-2500'?ramVisitTiming(getGeometry()):null,sound:model==='ram-2500'?audio?.play('ramArrival'):null};
     sprite.style.backgroundImage='url("'+new URL(model+'.webp',ASSETS).href+'")';trigger.disabled=true;
   }
   function paint(now){
     if(!trip)return;
-    if(!ownsLane()){sprite.hidden=true;return;}
+    if(!ownsLane()){sprite.hidden=true;driver.hide();return;}
     const {width,hospitalWidth,hospitalLeft,bottom}=getGeometry();
     const elapsed=Math.max(0,now-trip.started);
+    const stopMs=trip.driverTiming?.stopMs||STOP_MS;
     const baseSize=Math.min(108,hospitalWidth*115/720*.95);
-    const parked=elapsed>=ARRIVAL_MS&&elapsed<ARRIVAL_MS+STOP_MS;
+    const parked=elapsed>=ARRIVAL_MS&&elapsed<ARRIVAL_MS+stopMs;
     const visibleHeight=229*baseSize/362*HEIGHT[trip.model];
     let row=parked?2:trip.direction===1?0:1,column=parked?0:Math.floor(elapsed/120)%4;
     const [sourceX,sourceY,sourceWidth,sourceHeight]=FRAMES[trip.model][row*4+column];
@@ -34,9 +37,10 @@ export function createChristmasPickup(controls,{getGeometry,isVisible,requestLan
     if(elapsed<ARRIVAL_MS){
       const t=elapsed/ARRIVAL_MS,start=trip.direction===1?-size:width;
       x=start+(target-start)*(1-(1-t)**2);row=trip.direction===1?0:1;column=Math.floor(elapsed/120)%4;trip.phase='arriving';
-    }else if(parked){trip.phase='parked';}
-    else if(elapsed<ARRIVAL_MS+STOP_MS+EXIT_MS){
-      const t=(elapsed-ARRIVAL_MS-STOP_MS)/EXIT_MS,end=trip.direction===1?width:-size;
+    }else if(parked){trip.phase='parked';if(trip.driverTiming)driver.paint(elapsed-ARRIVAL_MS,getGeometry(),trip.driverTiming);}
+    else if(elapsed<ARRIVAL_MS+stopMs+EXIT_MS){
+      driver.hide();if(trip.model==='ram-2500'&&!trip.exitSoundStarted){trip.exitSoundStarted=true;trip.sound?.stop();trip.sound=audio?.play('ramExit');}
+      const t=(elapsed-ARRIVAL_MS-stopMs)/EXIT_MS,end=trip.direction===1?width:-size;
       x=target+(end-target)*t*t;row=trip.direction===1?0:1;column=Math.floor(elapsed/120)%4;trip.phase='leaving';
     }else {cancel();return;}
     sprite.style.width=size+'px';sprite.style.height=height+'px';sprite.style.left=x+'px';sprite.style.bottom=(bottom-3)+'px';
@@ -63,6 +67,6 @@ export function createChristmasPickup(controls,{getGeometry,isVisible,requestLan
     trigger.style.bottom=(bottom+hospitalWidth*26/720)+'px';trigger.style.height=(hospitalWidth*30/720)+'px';
     if(trip?.phase==='parked')paint(performance.now());
   }
-  return {layout,cancel,getStatus:()=>({pickup:queued?'queued':trip?.phase||'idle',pickupModel:trip?.model||null,pickupLimit:1,pickupParking:'three-left-windows',vehicleOrder:VEHICLES,nextVehicle:VEHICLES[nextModel%VEHICLES.length]}),
-    dispose(){disposed=true;cancel();trigger.removeEventListener('click',launch);trigger.remove();sprite.remove();}};
+  return {layout,cancel,getStatus:()=>({...driver.getStatus(),pickupStopMs:trip?.driverTiming?.stopMs||STOP_MS,pickup:queued?'queued':trip?.phase||'idle',pickupModel:trip?.model||null,pickupLimit:1,pickupParking:'three-left-windows',vehicleOrder:VEHICLES,nextVehicle:VEHICLES[nextModel%VEHICLES.length]}),
+    dispose(){disposed=true;cancel();trigger.removeEventListener('click',launch);trigger.remove();sprite.remove();driver.dispose();}};
 }
