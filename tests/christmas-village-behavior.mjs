@@ -81,7 +81,7 @@ for(let i=0;i<12;i++){
  now=clock;const start=now;pickupTrigger.events.click();pickupTrigger.events.click();
  tick(start+1500);const sideHeight=parseFloat(pickupSprite.style.height),model=village.getStatus().pickupModel;
  assert.equal(model,order[next++%4]);sequence.push(model);
- const stop=village.getStatus().pickupStopMs,end=start+3000+stop+3000;
+ const stop=village.getStatus().pickupStopMs,startMs=village.getStatus().pickupStartMs,end=start+3000+stop+startMs+3002;
  tick(start+3000);heights[model]=parseFloat(pickupSprite.style.height);assert.ok(Math.abs(heights[model]-sideHeight)<.001);
  if(model==='ram-2500'){
    assert.ok(stop>8000,'RAM waits for the whole walk, greeting and return');
@@ -97,7 +97,9 @@ for(let i=0;i<12;i++){
    }
    assert.ok(outX>parseFloat(pickupSprite.style.left));
  }else assert.equal(driverSprite.hidden,true,'Driver belongs only to RAM');
- tick(start+3000+stop+1);assert.equal(village.getStatus().pickup,'leaving');assert.equal(driverSprite.hidden,true,'Driver back inside before vehicle moves');
+ tick(start+3000+stop+1);assert.equal(village.getStatus().pickup,'starting');
+ const parkedLeft=pickupSprite.style.left;tick(start+3000+stop+startMs);assert.equal(village.getStatus().pickup,'starting');assert.equal(pickupSprite.style.left,parkedLeft,'Stay still until starter finishes');
+ tick(start+3000+stop+startMs+2);assert.equal(village.getStatus().pickup,'leaving');assert.equal(driverSprite.hidden,true,'Driver back inside before vehicle moves');
  tick(end+1);assert.equal(village.getStatus().pickup,'idle');assert.equal(pickupSprite.hidden,true);assert.equal(driverSprite.hidden,true);
  if(model==='ram-2500'){assert.equal(village.getStatus().ambulance,'arriving');tick(end+9002);assert.equal(village.getStatus().ambulance,'idle');clock=end+10000;}
  else clock=end+1000;
@@ -107,6 +109,7 @@ assert.ok(heights.civic<heights.jimny&&heights.jimny<heights.silverado&&heights.
 for(let i=0;i<sequence.length;i+=4)assert.equal(new Set(sequence.slice(i,i+4)).size,4);
 for(const state of ['getting-out','walking-to-door','waving','returning','getting-in'])assert.ok(driverStates.has(state),'Exercise '+state);
 assert.equal(sounds.filter(k=>k==='ramArrival').length,3);assert.equal(sounds.filter(k=>k==='ramExit').length,3);
+assert.equal(sounds.filter(k=>k==='silveradoStart').length,3);assert.equal(sounds.filter(k=>k==='civicStart').length,3);assert.equal(sounds.filter(k=>k==='vehicleStart').length,6);assert.equal(sounds.filter(k=>k==='jimnyDrive').length,6,'Jimny music plays only on arrival and departure');
 // Start another RAM visit then hide the stage: both vehicle and visitor must cancel.
 now=clock;pickupTrigger.events.click();tick(clock+4000);assert.equal(driverSprite.hidden,false);
 width=500;events.resize();assert.equal(driverSprite.hidden,true);assert.equal(frames.size,0);width=1363;events.resize();

@@ -1,7 +1,7 @@
 /* User-selected Mixkit effects. Local assets, shared sound preference, bounded voices. */
 export const AMBULANCE_DURATION_MS=9000;
 const ROOT=new URL('../../../assets/themes/christmas/audio/',import.meta.url);
-const SOURCES={ramArrival:{file:'ram-arrival.mp3',volume:.3},ramExit:{file:'ram-exit.mp3',volume:.3},bulb:{file:'bulb-glitch.mp3',volume:.35},tree:{file:'tree-shake.mp3',volume:.4},
+const SOURCES={vehicleStart:{file:'vehicle-start.mp3',volume:.3},silveradoStart:{file:'silverado-start-three.mp3',volume:.3},civicStart:{file:'civic-start.mp3',volume:.3},jimnyDrive:{file:'jimny-driving.mp3',volume:.2},ramArrival:{file:'ram-arrival.mp3',volume:.3},ramExit:{file:'ram-exit.mp3',volume:.3},bulb:{file:'bulb-glitch.mp3',volume:.35},tree:{file:'tree-shake.mp3',volume:.4},
   gift:{file:'gift-reveal.mp3',volume:.35},ambulance:{file:'ambulance-arrival.mp3?v=9s',volume:.3}};
 export function createChristmasAudio(env=globalThis){
   const active=new Set(),prepared=new Map(),lastPlayed=new Map();let disposed=false,monitor=0;
@@ -28,13 +28,13 @@ export function createChristmasAudio(env=globalThis){
       for(const voice of [...active])if(voice.kind===kind)release(voice);
       if(active.size>=4){const old=[...active].find(v=>v.kind!=='ambulance');if(old)release(old);else return null;}
       const media=base.cloneNode(true);media.volume=SOURCES[kind].volume;
-      const voice={kind,media,pending:true,stopped:false};active.add(voice);
-      const handle={get pending(){return voice.pending;},
+      const voice={kind,media,pending:true,stopped:false,ended:false};active.add(voice);
+      const handle={get pending(){return voice.pending;},get finished(){return voice.stopped||voice.ended;},
         get elapsedMs(){return voice.stopped?null:media.currentTime*1000;},
         get durationMs(){return Number.isFinite(media.duration)&&media.duration>0?media.duration*1000:AMBULANCE_DURATION_MS;},
         stop(){release(voice);}};
       // Keep the final clock sample through the last animation frame.
-      media.onended=()=>{voice.pending=false;active.delete(voice);if(!active.size&&monitor){env.clearInterval(monitor);monitor=0;}};
+      media.onended=()=>{voice.ended=true;voice.pending=false;active.delete(voice);if(!active.size&&monitor){env.clearInterval(monitor);monitor=0;}};
       media.onerror=()=>release(voice);
       if(!monitor)monitor=env.setInterval(check,100);
       Promise.resolve(media.play()).then(()=>{voice.pending=false;if(!enabled())release(voice);}).catch(()=>release(voice));
