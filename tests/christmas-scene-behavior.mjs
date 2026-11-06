@@ -29,7 +29,7 @@ globalThis.document={hidden:false,body:element(),createElement:element,
   getElementById:s=>s==='censoNewsBar'?news:table,
   addEventListener(k,fn){docEvents[k]=fn;},removeEventListener(k){delete docEvents[k];}};
 const originalRandom=Math.random;Math.random=()=>.5;
-const scene=createChristmasScene(app),root=app.children[0];
+const played=[];const scene=createChristmasScene(app,{audio:{play:kind=>played.push(kind)}}),root=app.children[0];
 assert.equal(scene.getStatus().characters,6);assert.equal(scene.getStatus().cast,12);assert.equal(scene.getStatus().gifts,6);
 assert.equal(root.style.bottom,'106px','Stage stands above the highest visible bottom bar');
 assert.equal(document.body.style['--christmas-floor-offset'],'100px');
@@ -55,7 +55,7 @@ assert.ok(Math.abs(giftCenters.reduce((a,b)=>a+b,0)/6-getChristmasStageLayout(in
 // Static presents open once and survive layout recalculation.
 const stationary=root.children[1];
 assert.equal(stationary.attributes['aria-label'],'Abrir regalo');
-stationary.onclick();assert.equal(stationary.attributes['aria-label'],'Regalo abierto');
+stationary.onclick();assert.equal(played.at(-1),'gift','Opening a gift requests the selected reveal sound');assert.equal(stationary.attributes['aria-label'],'Regalo abierto');
 assert.ok(Math.abs(parseFloat(stationary.style.backgroundPosition.split(' ')[1])+288*.65)<.001,'Static gift uses the open-box sprite row');
 const openPosition=stationary.style.backgroundPosition;
 [...timers.values()].forEach(fn=>fn());assert.equal(stationary.style.backgroundPosition,openPosition);
@@ -187,7 +187,7 @@ tableBottom=400;events.resize();assert.equal(tree.hidden,false);assert.ok(root.c
 reduced.matches=true;motion();assert.equal(frames.size,0);assert.equal(scene.getStatus().animated,false);
 snowman.events.click();assert.equal(scene.getStatus().snowmanFrame,11,'Reduced motion jumps to melted frame');
 advance(clock+10000);assert.equal(scene.getStatus().snowman,'ready','Reduced motion rebuilds after ten seconds');
-const shakesBefore=animations.length;tree.events.click();assert.equal(animations.length,shakesBefore,'Reduced motion suppresses tree shake');assert.equal(scene.getStatus().spawnedGifts,1,'Reduced motion still permits gifts without flight');
+const shakesBefore=animations.length;tree.events.click();assert.equal(played.at(-1),'tree','Pine shake requests its selected sound');assert.equal(animations.length,shakesBefore,'Reduced motion suppresses tree shake');assert.equal(scene.getStatus().spawnedGifts,1,'Reduced motion still permits gifts without flight');
 stationary.onclick();assert.equal(frames.size,0);
 reduced.matches=false;motion();assert.ok(frames.size);
 document.hidden=true;docEvents.visibilitychange();assert.equal(frames.size,0);

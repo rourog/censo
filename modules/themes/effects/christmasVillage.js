@@ -1,8 +1,9 @@
 /* Decorative village and local ambulance interaction; no clinical state. */
+import {AMBULANCE_DURATION_MS} from './christmasAudio.js';
 const ASSETS=new URL('../../../assets/themes/christmas/scene/',import.meta.url);
 import {HOSPITAL_RATIO,getChristmasStageLayout} from './christmasStageLayout.js';
-const ARRIVE_MS=1100,STOP_MS=3000,LEAVE_MS=850;
-export function createChristmasVillage(host,app){
+const ARRIVE_MS=1100,LEAVE_MS=850;
+export function createChristmasVillage(host,app,{audio}={}){
   if(!host||!app)return {getStatus:()=>({visible:false,buildings:0}),dispose(){}};
   const hospital=document.createElement('img');hospital.className='christmas-village-hospital';
   hospital.src=new URL('hospital-delicias-final-snow.png',ASSETS).href;hospital.alt='';hospital.draggable=false;
@@ -17,18 +18,27 @@ export function createChristmasVillage(host,app){
   controls.append(trigger,ambulance);app.append(controls);
   let disposed=false,visible=false,trip=null,frame=0,geometry=null;
   const rect=node=>node?.getClientRects?.().length?node.getBoundingClientRect():null;
-  function cancelTrip(){if(frame)cancelAnimationFrame(frame);frame=0;trip=null;ambulance.hidden=true;trigger.disabled=false;}
+  function cancelTrip(){if(frame)cancelAnimationFrame(frame);frame=0;trip?.sound?.stop();trip=null;ambulance.hidden=true;trigger.disabled=false;}
   function animate(now){
     frame=0;if(disposed||!visible||!trip||document.hidden){cancelTrip();return;}
-    const elapsed=now-trip.started,{width,hospitalWidth,hospitalLeft,bottom}=geometry;
+    if(trip.sound?.pending){
+      if(now-trip.started<2000){frame=requestAnimationFrame(animate);return;}
+      trip.sound.stop();trip.sound=null;trip.started=now;
+    }
+    const audioTime=trip.sound?.elapsedMs;
+    const elapsed=audioTime!=null?audioTime:now-trip.started;
+    if(audioTime!=null)trip.started=now-audioTime;
+    const duration=trip.sound?.durationMs||AMBULANCE_DURATION_MS;
+    const stopMs=Math.max(0,duration-ARRIVE_MS-LEAVE_MS);
+    const {width,hospitalWidth,hospitalLeft,bottom}=geometry;
     const size=Math.min(132,hospitalWidth/HOSPITAL_RATIO*1.1),height=size*.75;
     // The far-left entrance between the two blue pillars is the ambulance bay.
     const target=hospitalLeft+hospitalWidth*.16-size/2;
     const start=trip.direction===1?-size:width,end=trip.direction===1?width:-size;
     let x,row,phase;
     if(elapsed<ARRIVE_MS){const t=elapsed/ARRIVE_MS;x=start+(target-start)*(1-(1-t)**2);row=trip.direction===1?0:1;phase='arriving';}
-    else if(elapsed<ARRIVE_MS+STOP_MS){x=target;row=2;phase='parked';}
-    else if(elapsed<ARRIVE_MS+STOP_MS+LEAVE_MS){const t=(elapsed-ARRIVE_MS-STOP_MS)/LEAVE_MS;x=target+(end-target)*t*t;row=trip.direction===1?0:1;phase='leaving';}
+    else if(elapsed<ARRIVE_MS+stopMs){x=target;row=2;phase='parked';}
+    else if(elapsed<ARRIVE_MS+stopMs+LEAVE_MS){const t=(elapsed-ARRIVE_MS-stopMs)/LEAVE_MS;x=target+(end-target)*t*t;row=trip.direction===1?0:1;phase='leaving';}
     else {cancelTrip();return;}
     trip.phase=phase;
     ambulance.style.width=size+'px';ambulance.style.height=height+'px';
@@ -39,7 +49,7 @@ export function createChristmasVillage(host,app){
   }
   function launch(){
     if(disposed||!visible||trip||document.hidden)return;
-    trip={started:performance.now(),direction:Math.random()<.5?1:-1,phase:'arriving'};
+    trip={started:performance.now(),direction:Math.random()<.5?1:-1,phase:'arriving',sound:audio?.play('ambulance')||null};
     trigger.disabled=true;frame=requestAnimationFrame(animate);
   }
   function onVisibility(){if(document.hidden)cancelTrip();}
@@ -69,7 +79,7 @@ export function createChristmasVillage(host,app){
     trigger.style.width=hospitalWidth+'px';trigger.style.height=(hospitalWidth/HOSPITAL_RATIO)+'px';
   }
   const timer=window.setInterval(layout,500);window.addEventListener('resize',layout);layout();
-  return {getStatus:()=>({visible,buildings:1,hospital:'center',houses:'hidden',snowPlane:'in-front-of-snow',ambulance:trip?.phase||'idle'}),
+  return {getStatus:()=>({visible,buildings:1,hospital:'center',houses:'hidden',snowPlane:'in-front-of-snow',ambulance:trip?.phase||'idle',ambulanceDurationMs:AMBULANCE_DURATION_MS,ambulanceStopMs:AMBULANCE_DURATION_MS-ARRIVE_MS-LEAVE_MS}),
     dispose(){if(disposed)return;disposed=true;clearInterval(timer);window.removeEventListener('resize',layout);
       cancelTrip();trigger.removeEventListener('click',launch);document.removeEventListener('visibilitychange',onVisibility);
       controls.remove();hospital.remove();host.hidden=false;}};

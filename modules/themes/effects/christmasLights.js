@@ -37,7 +37,7 @@ function shuffledSlots(seed){
   }
   return entries;
 }
-export function createChristmasLights(header){
+export function createChristmasLights(header,{audio}={}){
   const root=document.createElement('div');
   root.className='christmas-lights';
   root.setAttribute('aria-label','Luces navideñas interactivas');
@@ -180,6 +180,7 @@ export function createChristmasLights(header){
     const fractureColor=bulb.dataset.pointerTint||bulb.dataset.color;
     resetBulbEnergy(bulb);
     bulb.classList.add('is-off');
+    audio?.play('bulb');
     labelBulb(bulb);
     if(!matchMedia('(prefers-reduced-motion: reduce)').matches){
       // Use visual bounds so fragments originate at the swaying glass itself.

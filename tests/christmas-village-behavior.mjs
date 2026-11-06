@@ -57,12 +57,19 @@ for(const direction of [.1,.9]){
  tick(1100);assert.equal(village.getStatus().ambulance,'parked');
  const parkedX=ambulance.style.left;
  assert.ok(Math.abs(parseFloat(parkedX)+parseFloat(ambulance.style.width)/2-(parseFloat(hospital.style.left)+parseFloat(hospital.style.width)*.16))<.01,'Ambulance centers on expanded bay');
- tick(4099);assert.equal(village.getStatus().ambulance,'parked');assert.equal(ambulance.style.left,parkedX,'Stopped for the entire three seconds');
- tick(4100);assert.equal(village.getStatus().ambulance,'leaving');
- tick(4950);assert.equal(village.getStatus().ambulance,'idle');assert.equal(ambulance.hidden,true);assert.equal(trigger.disabled,false);assert.equal(frames.size,0);
+ tick(12405);assert.equal(village.getStatus().ambulance,'parked');assert.equal(ambulance.style.left,parkedX,'Stopped until the departure interval of the selected audio');
+ tick(12406);assert.equal(village.getStatus().ambulance,'leaving');
+ tick(13256);assert.equal(village.getStatus().ambulance,'idle');assert.equal(ambulance.hidden,true);assert.equal(trigger.disabled,false);assert.equal(frames.size,0);
 }
 trigger.events.click();width=500;events.resize();assert.equal(frames.size,0,'Hiding the village cancels the trip');
 width=1363;events.resize();trigger.events.click();document.hidden=true;documentEvents.visibilitychange();assert.equal(frames.size,0);document.hidden=false;
 trigger.events.click();village.dispose();village.dispose();assert.equal(frames.size,0);assert.equal(app.children.length,0);assert.equal(Object.keys(documentEvents).length,0);assert.equal(mountains.villageHost.children.length,0);assert.equal(intervals.size,0);assert.equal(Object.keys(events).length,0);
+const sound={pending:true,elapsedMs:0,durationMs:13255.9410430839,stop(){this.stopped=true;}};
+const synced=createChristmasVillage(mountains.villageHost,app,{audio:{play:()=>sound}});
+now=0;const [syncTrigger,syncSprite]=app.children[0].children;syncTrigger.events.click();tick(500);assert.equal(syncSprite.hidden,true,'Wait offscreen while audio starts');
+sound.pending=false;tick(600);assert.equal(synced.getStatus().ambulance,'arriving');
+sound.elapsedMs=1100;tick(8000);assert.equal(synced.getStatus().ambulance,'parked','Use audio clock even if animation wall time advances');
+sound.elapsedMs=12406;tick(9000);assert.equal(synced.getStatus().ambulance,'leaving');
+sound.elapsedMs=13256;tick(9500);assert.equal(synced.getStatus().ambulance,'idle');assert.equal(sound.stopped,true);synced.dispose();assert.equal(frames.size,0);
 mountains.dispose();assert.equal(host.children.length,0);
-console.log('OK: centered hospital, safe area, snow order, ambulance from both sides, exact three-second stop, single active trip, exit, visibility cancellation and disposal.');
+console.log('OK: centered hospital, safe area, snow order, ambulance from both sides, audio-length stop, single active trip, exit, visibility cancellation and disposal.');

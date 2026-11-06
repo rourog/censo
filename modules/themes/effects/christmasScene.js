@@ -20,7 +20,7 @@ const SNOWMAN_WAIT=10000;
 const SNOWMAN_FRAME_MS=140;
 // Solid box edges in the 48px sprite cells; exclude transparent padding and bows.
 const GIFT_BOXES=[[3,3,42,45],[3,12,42,45],[6,6,39,45],[0,15,45,45],[9,21,36,45]];
-export function createChristmasScene(app){
+export function createChristmasScene(app,{audio}={}){
   if(!app)return {getStatus:()=>({characters:0,visible:false}),dispose(){}};
   const root=document.createElement('div');root.className='christmas-scene';root.setAttribute('aria-label','Escenario navideño interactivo');
   app.append(root);
@@ -177,6 +177,7 @@ export function createChristmasScene(app){
   function openGift(node){
     const state=giftStates.get(node);
     if(disposed||!visible||document.hidden||!state||state.flying||state.opened)return;
+    audio?.play('gift');
     state.opened=true;node.classList.add('is-open');paintGift(state);readyGift(state);
     state.closeTimer=setTimeout(()=>{
       state.closeTimer=0;if(disposed||!giftStates.has(node))return;
@@ -209,6 +210,7 @@ export function createChristmasScene(app){
   }
   const onTreeClick=()=>{
     if(disposed||!visible||tree.hidden||document.hidden)return;
+    audio?.play('tree');
     if(!reduced.matches){
       treeShake?.cancel();
       const animation=tree.animate([

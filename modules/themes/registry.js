@@ -30,12 +30,12 @@ export async function loadSeasonController(season,app) {
     return initNovemberTheme(app,{managed:true});
   }
   if (season.load==='christmas') {
-    const [{initChristmasTheme},{createSnowfall},{createSnowMountains},{createChristmasLights},{createChristmasFireworks},{createChristmasScene},{createChristmasSky},{createChristmasVillage}]=await Promise.all([
+    const [{initChristmasTheme},{createSnowfall},{createSnowMountains},{createChristmasLights},{createChristmasFireworks},{createChristmasScene},{createChristmasSky},{createChristmasVillage},{createChristmasAudio}]=await Promise.all([
       load('./seasons/christmas/visuals.js'),load('./effects/snowfall.js'),
       load('./effects/snowMountains.js'),load('./effects/christmasLights.js'),
-      load('./effects/christmasFireworks.js'),load('./effects/christmasScene.js'),load('./effects/christmasSky.js'),load('./effects/christmasVillage.js')
+      load('./effects/christmasFireworks.js'),load('./effects/christmasScene.js'),load('./effects/christmasSky.js'),load('./effects/christmasVillage.js'),load('./effects/christmasAudio.js')
     ]);
-    return initChristmasTheme(app,{config:season,createSnowfall,createSnowMountains,createChristmasLights,createChristmasFireworks,createChristmasScene,createChristmasSky,createChristmasVillage});
+    return initChristmasTheme(app,{config:season,createSnowfall,createSnowMountains,createChristmasLights,createChristmasFireworks,createChristmasScene,createChristmasSky,createChristmasVillage,createChristmasAudio});
   }
   throw new Error('Season has no registered renderer: '+season.id);
 }
