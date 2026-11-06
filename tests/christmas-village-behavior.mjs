@@ -77,14 +77,14 @@ assert.equal(controls.children.length,4,'One separate door and sprite per vehicl
 assert.ok(parseFloat(pickupTrigger.style.left)>parseFloat(trigger.style.left)+parseFloat(trigger.style.width),'Door hitboxes are separate');
 for(const choice of [.1,.9]){
  Math.random=()=>choice;now=0;pickupTrigger.events.click();pickupTrigger.events.click();assert.equal(frames.size,1);
- tick(1500);assert.equal(village.getStatus().pickup,'arriving');const sideWidth=parseFloat(pickupSprite.style.width);
+ tick(1500);assert.equal(village.getStatus().pickup,'arriving');const sideHeight=parseFloat(pickupSprite.style.height);
  tick(3000);assert.equal(village.getStatus().pickup,'parked');assert.equal(village.getStatus().pickupModel,choice<.5?'ram-2500':'silverado');
- assert.ok(Math.abs(sideWidth/parseFloat(pickupSprite.style.width)-1.35)<.001,'Lateral sprite enlarged to match frontal roof/wheel height');
+ assert.ok(Math.abs(sideHeight-parseFloat(pickupSprite.style.height))<.001,'Actual artwork has identical roof-to-tire height in side and front views');
  const target=parseFloat(pickupSprite.style.left)+parseFloat(pickupSprite.style.width)/2;
  assert.ok(Math.abs(target-(parseFloat(hospital.style.left)+parseFloat(hospital.style.width)*55/720))<.01,'Park under the three left windows');
  trigger.events.click();trigger.events.click();assert.equal(village.getStatus().ambulance,'queued');assert.equal(ambulance.hidden,true,'Ambulance waits offscreen while pickup occupies the route');
  tick(5999);assert.equal(village.getStatus().pickup,'parked');
- tick(6000);assert.equal(village.getStatus().pickup,'leaving');
+ tick(6000);assert.equal(village.getStatus().pickup,'leaving');assert.ok(Math.abs(parseFloat(pickupSprite.style.height)-sideHeight)<.001,'Departure keeps exactly the same visible height');
  tick(9000);assert.equal(village.getStatus().pickup,'idle');assert.equal(pickupSprite.hidden,true);assert.equal(village.getStatus().ambulance,'arriving');
  tick(12000);assert.equal(village.getStatus().ambulance,'parked');
  pickupTrigger.events.click();pickupTrigger.events.click();assert.equal(village.getStatus().pickup,'queued');assert.equal(pickupSprite.hidden,true);
