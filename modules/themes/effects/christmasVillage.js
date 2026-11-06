@@ -19,10 +19,21 @@ export function createChristmasVillage(host,app,{audio}={}){
   ambulance.setAttribute('aria-hidden','true');ambulance.hidden=true;
   ambulance.style.backgroundImage='url("'+new URL('ambulance-red-cross.png',ASSETS).href+'")';
   controls.append(trigger,ambulance);app.append(controls);
-  let disposed=false,visible=false,trip=null,frame=0,geometry=null;
-  const pickup=createChristmasPickup(controls,{getGeometry:()=>geometry,isVisible:()=>visible});
+  let disposed=false,visible=false,trip=null,frame=0,geometry=null,ambulanceQueued=false,laneOwner=null;
+  const vehicleQueue=[];
+  function requestVehicle(kind,start){
+    if(laneOwner===kind||vehicleQueue.some(item=>item.kind===kind))return;
+    if(laneOwner){vehicleQueue.push({kind,start});return;}laneOwner=kind;start();
+  }
+  function releaseVehicle(kind){
+    if(laneOwner!==kind)return;laneOwner=null;
+    const next=vehicleQueue.shift();
+    if(next&&visible&&!disposed&&!document.hidden){laneOwner=next.kind;next.start();}
+  }
+  function cancelVehicles(){vehicleQueue.length=0;laneOwner=null;cancelTrip();pickup.cancel();}
+  const pickup=createChristmasPickup(controls,{getGeometry:()=>geometry,isVisible:()=>visible,requestLane:start=>requestVehicle('pickup',start),releaseLane:()=>releaseVehicle('pickup')});
   const rect=node=>node?.getClientRects?.().length?node.getBoundingClientRect():null;
-  function cancelTrip(){if(frame)cancelAnimationFrame(frame);frame=0;trip?.sound?.stop();trip=null;ambulance.hidden=true;trigger.disabled=false;}
+  function cancelTrip(){const active=!!trip;ambulanceQueued=false;if(frame)cancelAnimationFrame(frame);frame=0;trip?.sound?.stop();trip=null;ambulance.hidden=true;trigger.disabled=false;if(active)releaseVehicle('ambulance');}
   function animate(now){
     frame=0;if(disposed||!visible||!trip||document.hidden){cancelTrip();return;}
     if(trip.sound?.pending){
@@ -51,11 +62,15 @@ export function createChristmasVillage(host,app,{audio}={}){
     ambulance.hidden=false;frame=requestAnimationFrame(animate);
   }
   function launch(){
-    if(disposed||!visible||trip||document.hidden)return;
-    trip={started:performance.now(),direction:Math.random()<.5?1:-1,phase:'arriving',sound:audio?.play('ambulance')||null};
-    trigger.disabled=true;frame=requestAnimationFrame(animate);
+    if(disposed||!visible||trip||ambulanceQueued||document.hidden)return;
+    ambulanceQueued=true;trigger.disabled=true;
+    requestVehicle('ambulance',()=>{
+      ambulanceQueued=false;
+      trip={started:performance.now(),direction:Math.random()<.5?1:-1,phase:'arriving',sound:audio?.play('ambulance')||null};
+      frame=requestAnimationFrame(animate);
+    });
   }
-  function onVisibility(){if(document.hidden){cancelTrip();pickup.cancel();}}
+  function onVisibility(){if(document.hidden)cancelVehicles();}
   trigger.addEventListener('click',launch);document.addEventListener('visibilitychange',onVisibility);
   function layout(){
     if(disposed)return;
@@ -71,7 +86,7 @@ export function createChristmasVillage(host,app,{audio}={}){
     const bottom=0,available=(bounds?.bottom||0)-top-bottom-14;
     const stage=getChristmasStageLayout(width);
     visible=!!appBounds&&width>=768&&available>=stage.hospitalHeight;
-    host.hidden=!visible;controls.hidden=!visible;if(!visible){cancelTrip();pickup.cancel();return;}
+    host.hidden=!visible;controls.hidden=!visible;if(!visible){cancelVehicles();return;}
     const {hospitalWidth}=stage;
     hospital.style.width=hospitalWidth+'px';hospital.style.height='auto';
     hospital.style.left=((width-hospitalWidth)/2)+'px';hospital.style.bottom=bottom+'px';
@@ -85,8 +100,8 @@ export function createChristmasVillage(host,app,{audio}={}){
     pickup.layout();
   }
   const timer=window.setInterval(layout,500);window.addEventListener('resize',layout);layout();
-  return {getStatus:()=>({...pickup.getStatus(),visible,buildings:1,hospital:'center',houses:'hidden',snowPlane:'in-front-of-snow',ambulance:trip?.phase||'idle',ambulanceDurationMs:AMBULANCE_DURATION_MS,ambulanceArrivalMs:ARRIVE_MS,ambulanceStopMs:STOP_MS,ambulanceExitMs:LEAVE_MS}),
+  return {getStatus:()=>({...pickup.getStatus(),visible,buildings:1,hospital:'center',houses:'hidden',snowPlane:'in-front-of-snow',ambulance:ambulanceQueued?'queued':trip?.phase||'idle',ambulanceDurationMs:AMBULANCE_DURATION_MS,ambulanceArrivalMs:ARRIVE_MS,ambulanceStopMs:STOP_MS,ambulanceExitMs:LEAVE_MS}),
     dispose(){if(disposed)return;disposed=true;clearInterval(timer);window.removeEventListener('resize',layout);
-      cancelTrip();trigger.removeEventListener('click',launch);document.removeEventListener('visibilitychange',onVisibility);
+      cancelVehicles();trigger.removeEventListener('click',launch);document.removeEventListener('visibilitychange',onVisibility);
       pickup.dispose();controls.remove();hospital.remove();host.hidden=false;}};
 }
