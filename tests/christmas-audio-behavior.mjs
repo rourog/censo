@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import {createChristmasAudio} from '../modules/themes/effects/christmasAudio.js';
 let on=false,now=0,next=0,rejectPlay=false;const events={},docEvents={},timers=new Map(),media=[];
 class FakeAudio{
- constructor(src){this.src=src;this.currentTime=0;this.duration=13.255941;this.paused=true;media.push(this);}
+ constructor(src){this.src=src;this.currentTime=0;this.duration=9;this.paused=true;media.push(this);}
  load(){} cloneNode(){return new FakeAudio(this.src);}pause(){this.paused=true;}
  play(){this.paused=false;return rejectPlay?Promise.reject(Error('blocked')):Promise.resolve();}
 }

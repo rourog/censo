@@ -78,13 +78,17 @@ Math.random=()=>.1;actors[2].events.click();advance(830);
 assert.equal(root.children.at(-1).attributes['data-kind'],'wreath','Jesus can throw a wreath');
 assert.equal(scene.getStatus().spawnedGifts,4);
 actors[3].events.click();assert.equal(scene.getStatus().spawnedGifts,4,'Other characters do not throw');
+// Each giver owns at most one object, including wreaths and airborne gifts.
+for(let round=0;round<3;round++)for(const actor of actors.slice(0,3))actor.events.click();
+advance(1060);
+assert.equal(scene.getStatus().spawnedGifts,4,'Repeated clicks never add a second object per giver');
 Math.random=()=>.5;
 for(let i=0;i<30;i++)tree.events.click();
 assert.equal(scene.getStatus().spawnedGifts,20,'Gift and wreath cap is shared');
 assert.equal([...timeouts.values()].filter(t=>t.expires>clock+5000).length,20,'The cap creates no extra expiry timers');
 assert.ok(animations.slice(0,-1).every(a=>a.cancelled),'Repeated clicks restart rather than accumulate tree shakes');
 assert.equal(scene.getStatus().gifts,6);
-advance(1000);advance(2000);
+advance(1100);advance(2000);
 const grounded=root.children.slice(14);
 assert.equal(grounded.length,20);
 assert.equal(new Set(grounded.map(n=>n.style.transform)).size,20);
@@ -128,14 +132,17 @@ stationary.onclick();assert.equal(stationary.attributes['aria-label'],'Regalo ab
 advance(12000);assert.equal(stationary.attributes['aria-label'],'Abrir regalo');
 advance(30149);assert.equal(scene.getStatus().spawnedGifts,20);
 treeGift.onclick();assert.equal(treeGift.attributes['aria-label'],'Regalo abierto');
-advance(30150);assert.ok(![...timeouts.values()].some(t=>t.expires===35149),'Expiry cancels the pending close timer');
-advance(30830);assert.equal(scene.getStatus().spawnedGifts,0,'Temporary gifts and wreaths expire');
+advance(31060);assert.ok(![...timeouts.values()].some(t=>t.expires===35149),'Expiry cancels the pending close timer');
+assert.equal(scene.getStatus().spawnedGifts,0,'Temporary gifts and wreaths expire');
 assert.equal(scene.getStatus().openedGifts,0,'Gifts have closed before temporary loot expires');
 assert.equal(timeouts.size,0);
+for(const actor of actors.slice(0,3))actor.events.click();advance(31290);
+assert.equal(scene.getStatus().spawnedGifts,3,'Expiry lets each giver throw again');
+advance(61290);assert.equal(scene.getStatus().spawnedGifts,0);
 const positions=actors.map(n=>n.style.transform);
 const people=activeFiles().slice(0,3),pets=new Set(['tuxedo-cat.png','husky-gray.png','husky-black.png']);
 let petSamples=0,deerSamples=0,changes=0;
-for(let t=30900;t<=130000;t+=50){
+for(let t=61300;t<=130000;t+=50){
   const before=actors.map(node=>({file:node.attributes['data-character'],x:Number(node.style.transform.match(/translateX\(([-.\d]+)px\)/)[1]),width:parseFloat(node.style.width)}));
   advance(t);
   const active=activeFiles();

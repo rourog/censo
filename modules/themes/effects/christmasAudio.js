@@ -1,8 +1,8 @@
 /* User-selected Mixkit effects. Local assets, shared sound preference, bounded voices. */
-export const AMBULANCE_DURATION_MS=13255.9410430839;
+export const AMBULANCE_DURATION_MS=9000;
 const ROOT=new URL('../../../assets/themes/christmas/audio/',import.meta.url);
 const SOURCES={bulb:{file:'bulb-glitch.mp3',volume:.35},tree:{file:'tree-shake.mp3',volume:.4},
-  gift:{file:'gift-reveal.mp3',volume:.35},ambulance:{file:'ambulance-arrival.mp3',volume:.3}};
+  gift:{file:'gift-reveal.mp3',volume:.35},ambulance:{file:'ambulance-arrival.mp3?v=9s',volume:.3}};
 export function createChristmasAudio(env=globalThis){
   const active=new Set(),prepared=new Map(),lastPlayed=new Map();let disposed=false,monitor=0;
   const enabled=()=>{try{return !disposed&&!env.document.hidden&&env.localStorage.getItem('censo-celebration-sound')==='on';}catch{return false;}};

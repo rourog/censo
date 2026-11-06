@@ -86,6 +86,7 @@ export function initChristmasTheme(app,{scope,config,createSnowfall,createSnowMo
  .christmas-village-controls[hidden],.christmas-ambulance[hidden]{display:none!important;}
  .christmas-hospital-trigger{position:absolute;border:0;padding:0;margin:0;background:transparent;
    box-shadow:none;border-radius:0;pointer-events:auto;cursor:pointer;}
+ .christmas-hospital-trigger:hover{box-shadow:inset 0 0 6px #ffe29390;}
  .christmas-hospital-trigger:disabled{pointer-events:none;}
  .christmas-hospital-trigger:focus-visible{outline:2px solid #ffe293;outline-offset:3px;}
  .christmas-ambulance{position:absolute;display:block;image-rendering:pixelated;background-repeat:no-repeat;pointer-events:none;}
@@ -214,7 +215,7 @@ export function initChristmasTheme(app,{scope,config,createSnowfall,createSnowMo
  return {
   syncPatients(patients){lights.syncPatients(patients);},
   salute:options=>fireworks.salute(options),
-  getStatus:()=>({revision:'christmas-v30',audio:audio?.getStatus(),village:village.getStatus(),sky:sky.getStatus(),lights:lights.getStatus(),snow:snow.getStatus(),mountains:mountains.getStatus(),
+  getStatus:()=>({revision:'christmas-v31',audio:audio?.getStatus(),village:village.getStatus(),sky:sky.getStatus(),lights:lights.getStatus(),snow:snow.getStatus(),mountains:mountains.getStatus(),
     fireworks:fireworks.getStatus(),scene:scene.getStatus()}),
   dispose(){
    if(disposed)return;

@@ -186,7 +186,7 @@ export function createChristmasScene(app,{audio}={}){
   }
   function tossGift(node,fromTree=false){
     if(disposed||!visible||document.hidden)return;
-    if(thrown.length>=GIFT_LIMIT)return;
+    if(thrown.length>=GIFT_LIMIT||(!fromTree&&thrown.some(gift=>gift.owner===node)))return;
     const bounds=root.getBoundingClientRect(),origin=node.getBoundingClientRect();
     const center=origin.left+origin.width/2-bounds.left;
     const giftScale=scale*.8,giftSize=48*giftScale;
@@ -199,7 +199,7 @@ export function createChristmasScene(app,{audio}={}){
     size(present,48,48,kind==='wreath'?192:240,kind==='wreath'?144:336,giftScale);
     present.style.backgroundPosition=(-column*48*giftScale)+'px '+(-(kind==='wreath'?96:240)*giftScale)+'px';
     const now=performance.now();
-    const gift={node:present,kind,column,opened:false,lootScale:giftScale,size:giftSize,x:target,desiredX:target,bottom:0,started:now,expires:now+GIFT_LIFETIME,
+    const gift={node:present,owner:fromTree?null:node,kind,column,opened:false,lootScale:giftScale,size:giftSize,x:target,desiredX:target,bottom:0,started:now,expires:now+GIFT_LIFETIME,
       duration:reduced.matches?0:random(650,950),arc:random(24,48),spin:direction*random(80,170),
       fromX:center-giftSize/2,fromY:clamp(origin.top-bounds.top+origin.height*(fromTree ? .4 : .48),0,stageHeight-giftSize),
       drawX:0,y:0,rotation:0,flying:!reduced.matches,timer:0};

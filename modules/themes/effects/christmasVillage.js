@@ -2,7 +2,9 @@
 import {AMBULANCE_DURATION_MS} from './christmasAudio.js';
 const ASSETS=new URL('../../../assets/themes/christmas/scene/',import.meta.url);
 import {HOSPITAL_RATIO,getChristmasStageLayout} from './christmasStageLayout.js';
-const ARRIVE_MS=1100,LEAVE_MS=850;
+const ARRIVE_MS=3000,STOP_MS=3000,LEAVE_MS=3000;
+// Door bounds in the 720 × 115 hospital sprite (excluding pillars and pavement).
+const BAY={left:97/720,bottom:26/115,width:37/720,height:30/115};
 export function createChristmasVillage(host,app,{audio}={}){
   if(!host||!app)return {getStatus:()=>({visible:false,buildings:0}),dispose(){}};
   const hospital=document.createElement('img');hospital.className='christmas-village-hospital';
@@ -11,7 +13,7 @@ export function createChristmasVillage(host,app,{audio}={}){
   // The decorative snow is aria-hidden and behind the app. Put the control in its safe empty area.
   const controls=document.createElement('div');controls.className='christmas-village-controls';
   const trigger=document.createElement('button');trigger.type='button';trigger.className='christmas-hospital-trigger';
-  trigger.setAttribute('aria-label','Llamar una ambulancia a urgencias');trigger.title='Llamar una ambulancia';
+  trigger.setAttribute('aria-label','Llamar una ambulancia a urgencias');trigger.title='Acceso de ambulancias';
   const ambulance=document.createElement('span');ambulance.className='christmas-ambulance';
   ambulance.setAttribute('aria-hidden','true');ambulance.hidden=true;
   ambulance.style.backgroundImage='url("'+new URL('ambulance-red-cross.png',ASSETS).href+'")';
@@ -28,8 +30,7 @@ export function createChristmasVillage(host,app,{audio}={}){
     const audioTime=trip.sound?.elapsedMs;
     const elapsed=audioTime!=null?audioTime:now-trip.started;
     if(audioTime!=null)trip.started=now-audioTime;
-    const duration=trip.sound?.durationMs||AMBULANCE_DURATION_MS;
-    const stopMs=Math.max(0,duration-ARRIVE_MS-LEAVE_MS);
+    const stopMs=STOP_MS;
     const {width,hospitalWidth,hospitalLeft,bottom}=geometry;
     const size=Math.min(132,hospitalWidth/HOSPITAL_RATIO*1.1),height=size*.75;
     // The far-left entrance between the two blue pillars is the ambulance bay.
@@ -75,11 +76,13 @@ export function createChristmasVillage(host,app,{audio}={}){
     geometry={width,hospitalWidth,hospitalLeft:(width-hospitalWidth)/2,bottom};
     controls.style.left=(bounds?.left||0)+'px';controls.style.top=(bounds?.top||0)+'px';
     controls.style.width=width+'px';controls.style.height=height+'px';
-    trigger.style.left=hospital.style.left;trigger.style.bottom=bottom+'px';
-    trigger.style.width=hospitalWidth+'px';trigger.style.height=(hospitalWidth/HOSPITAL_RATIO)+'px';
+    const hospitalHeight=hospitalWidth/HOSPITAL_RATIO;
+    trigger.style.left=(geometry.hospitalLeft+hospitalWidth*BAY.left)+'px';
+    trigger.style.bottom=(bottom+hospitalHeight*BAY.bottom)+'px';
+    trigger.style.width=(hospitalWidth*BAY.width)+'px';trigger.style.height=(hospitalHeight*BAY.height)+'px';
   }
   const timer=window.setInterval(layout,500);window.addEventListener('resize',layout);layout();
-  return {getStatus:()=>({visible,buildings:1,hospital:'center',houses:'hidden',snowPlane:'in-front-of-snow',ambulance:trip?.phase||'idle',ambulanceDurationMs:AMBULANCE_DURATION_MS,ambulanceStopMs:AMBULANCE_DURATION_MS-ARRIVE_MS-LEAVE_MS}),
+  return {getStatus:()=>({visible,buildings:1,hospital:'center',houses:'hidden',snowPlane:'in-front-of-snow',ambulance:trip?.phase||'idle',ambulanceDurationMs:AMBULANCE_DURATION_MS,ambulanceArrivalMs:ARRIVE_MS,ambulanceStopMs:STOP_MS,ambulanceExitMs:LEAVE_MS}),
     dispose(){if(disposed)return;disposed=true;clearInterval(timer);window.removeEventListener('resize',layout);
       cancelTrip();trigger.removeEventListener('click',launch);document.removeEventListener('visibilitychange',onVisibility);
       controls.remove();hospital.remove();host.hidden=false;}};
