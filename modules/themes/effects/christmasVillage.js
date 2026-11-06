@@ -1,3 +1,4 @@
+import {createChristmasPickup} from './christmasPickup.js';
 /* Decorative village and local ambulance interaction; no clinical state. */
 import {AMBULANCE_DURATION_MS} from './christmasAudio.js';
 const ASSETS=new URL('../../../assets/themes/christmas/scene/',import.meta.url);
@@ -19,6 +20,7 @@ export function createChristmasVillage(host,app,{audio}={}){
   ambulance.style.backgroundImage='url("'+new URL('ambulance-red-cross.png',ASSETS).href+'")';
   controls.append(trigger,ambulance);app.append(controls);
   let disposed=false,visible=false,trip=null,frame=0,geometry=null;
+  const pickup=createChristmasPickup(controls,{getGeometry:()=>geometry,isVisible:()=>visible});
   const rect=node=>node?.getClientRects?.().length?node.getBoundingClientRect():null;
   function cancelTrip(){if(frame)cancelAnimationFrame(frame);frame=0;trip?.sound?.stop();trip=null;ambulance.hidden=true;trigger.disabled=false;}
   function animate(now){
@@ -53,7 +55,7 @@ export function createChristmasVillage(host,app,{audio}={}){
     trip={started:performance.now(),direction:Math.random()<.5?1:-1,phase:'arriving',sound:audio?.play('ambulance')||null};
     trigger.disabled=true;frame=requestAnimationFrame(animate);
   }
-  function onVisibility(){if(document.hidden)cancelTrip();}
+  function onVisibility(){if(document.hidden){cancelTrip();pickup.cancel();}}
   trigger.addEventListener('click',launch);document.addEventListener('visibilitychange',onVisibility);
   function layout(){
     if(disposed)return;
@@ -69,7 +71,7 @@ export function createChristmasVillage(host,app,{audio}={}){
     const bottom=0,available=(bounds?.bottom||0)-top-bottom-14;
     const stage=getChristmasStageLayout(width);
     visible=!!appBounds&&width>=768&&available>=stage.hospitalHeight;
-    host.hidden=!visible;controls.hidden=!visible;if(!visible){cancelTrip();return;}
+    host.hidden=!visible;controls.hidden=!visible;if(!visible){cancelTrip();pickup.cancel();return;}
     const {hospitalWidth}=stage;
     hospital.style.width=hospitalWidth+'px';hospital.style.height='auto';
     hospital.style.left=((width-hospitalWidth)/2)+'px';hospital.style.bottom=bottom+'px';
@@ -80,10 +82,11 @@ export function createChristmasVillage(host,app,{audio}={}){
     trigger.style.left=(geometry.hospitalLeft+hospitalWidth*BAY.left)+'px';
     trigger.style.bottom=(bottom+hospitalHeight*BAY.bottom)+'px';
     trigger.style.width=(hospitalWidth*BAY.width)+'px';trigger.style.height=(hospitalHeight*BAY.height)+'px';
+    pickup.layout();
   }
   const timer=window.setInterval(layout,500);window.addEventListener('resize',layout);layout();
-  return {getStatus:()=>({visible,buildings:1,hospital:'center',houses:'hidden',snowPlane:'in-front-of-snow',ambulance:trip?.phase||'idle',ambulanceDurationMs:AMBULANCE_DURATION_MS,ambulanceArrivalMs:ARRIVE_MS,ambulanceStopMs:STOP_MS,ambulanceExitMs:LEAVE_MS}),
+  return {getStatus:()=>({...pickup.getStatus(),visible,buildings:1,hospital:'center',houses:'hidden',snowPlane:'in-front-of-snow',ambulance:trip?.phase||'idle',ambulanceDurationMs:AMBULANCE_DURATION_MS,ambulanceArrivalMs:ARRIVE_MS,ambulanceStopMs:STOP_MS,ambulanceExitMs:LEAVE_MS}),
     dispose(){if(disposed)return;disposed=true;clearInterval(timer);window.removeEventListener('resize',layout);
       cancelTrip();trigger.removeEventListener('click',launch);document.removeEventListener('visibilitychange',onVisibility);
-      controls.remove();hospital.remove();host.hidden=false;}};
+      pickup.dispose();controls.remove();hospital.remove();host.hidden=false;}};
 }

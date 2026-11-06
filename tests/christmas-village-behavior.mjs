@@ -72,6 +72,24 @@ for(const direction of [.1,.9]){
  tick(6000);assert.equal(village.getStatus().ambulance,'leaving');
  tick(9000);assert.equal(village.getStatus().ambulance,'idle');assert.equal(ambulance.hidden,true);assert.equal(trigger.disabled,false);assert.equal(frames.size,0);
 }
+const [,,pickupTrigger,pickupSprite]=controls.children;
+assert.equal(controls.children.length,4,'One separate door and sprite per vehicle type');
+assert.ok(parseFloat(pickupTrigger.style.left)>parseFloat(trigger.style.left)+parseFloat(trigger.style.width),'Door hitboxes are separate');
+for(const choice of [.1,.9]){
+ Math.random=()=>choice;now=0;pickupTrigger.events.click();pickupTrigger.events.click();assert.equal(frames.size,1);
+ tick(1500);assert.equal(village.getStatus().pickup,'arriving');
+ tick(3000);assert.equal(village.getStatus().pickup,'parked');assert.equal(village.getStatus().pickupModel,choice<.5?'ram-2500':'silverado');
+ assert.equal(frames.size,0,'Parked pickup uses no continuous animation loop');
+ const target=parseFloat(pickupSprite.style.left)+parseFloat(pickupSprite.style.width)/2;
+ assert.ok(Math.abs(target-(parseFloat(hospital.style.left)+parseFloat(hospital.style.width)*55/720))<.01,'Park centered under the three left windows');
+ assert.ok(target<parseFloat(trigger.style.left),'Parking spot stays left of the ambulance access');
+ trigger.events.click();tick(6000);assert.equal(village.getStatus().pickup,'parked','Ambulance does not replace the parked pickup');tick(12000);
+ assert.equal(village.getStatus().ambulance,'idle');
+ pickupTrigger.events.click();tick(15000);assert.equal(village.getStatus().pickup,'arriving','Old pickup exits fully before the next arrival');
+ tick(18000);assert.equal(village.getStatus().pickup,'parked');assert.equal(controls.children.length,4,'Repeated dispatch never accumulates sprites');
+ width=500;events.resize();assert.equal(village.getStatus().pickup,'idle');assert.equal(pickupSprite.hidden,true);assert.equal(frames.size,0);
+ width=1363;events.resize();
+}
 trigger.events.click();width=500;events.resize();assert.equal(frames.size,0,'Hiding the village cancels the trip');
 width=1363;events.resize();trigger.events.click();document.hidden=true;documentEvents.visibilitychange();assert.equal(frames.size,0);document.hidden=false;
 trigger.events.click();village.dispose();village.dispose();assert.equal(frames.size,0);assert.equal(app.children.length,0);assert.equal(Object.keys(documentEvents).length,0);assert.equal(mountains.villageHost.children.length,0);assert.equal(intervals.size,0);assert.equal(Object.keys(events).length,0);
@@ -83,4 +101,4 @@ sound.elapsedMs=3000;tick(8000);assert.equal(synced.getStatus().ambulance,'parke
 sound.elapsedMs=6000;tick(9000);assert.equal(synced.getStatus().ambulance,'leaving');
 sound.elapsedMs=9000;tick(9500);assert.equal(synced.getStatus().ambulance,'idle');assert.equal(sound.stopped,true);synced.dispose();assert.equal(frames.size,0);
 mountains.dispose();assert.equal(host.children.length,0);
-console.log('OK: centered hospital, safe area, snow order, ambulance from both sides, three-second arrival/stop/exit, single active trip, exit, visibility cancellation and disposal.');
+console.log('OK: separate door hitboxes, random RAM/Silverado, parking under left windows, single replacement without accumulation, independent ambulance timing, visibility and disposal.');
