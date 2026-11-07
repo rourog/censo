@@ -1,13 +1,13 @@
-import {createChristmasInterns} from './christmasInterns.js?v=3.72.0';
-import {createChristmasPickup} from './christmasPickup.js?v=3.71.0';
+import {createChristmasInterns} from './christmasInterns.js?v=3.73.0';
+import {createChristmasPickup} from './christmasPickup.js?v=3.73.0';
 /* Decorative village and local ambulance interaction; no clinical state. */
 import {AMBULANCE_DURATION_MS} from './christmasAudio.js';
 const ASSETS=new URL('../../../assets/themes/christmas/scene/',import.meta.url);
-import {HOSPITAL_RATIO,getChristmasStageLayout,getVehicleParkingPose} from './christmasStageLayout.js?v=3.71.0';
+import {HOSPITAL_RATIO,getChristmasStageLayout,getVehicleParkingPose} from './christmasStageLayout.js?v=3.73.0';
 const ARRIVE_MS=3000,STOP_MS=3000,LEAVE_MS=3000;
 // Door bounds in the 720 × 115 hospital sprite (excluding pillars and pavement).
 const BAY={left:97/720,bottom:26/115,width:37/720,height:30/115};
-export function createChristmasVillage(host,app,{audio}={}){
+export function createChristmasVillage(host,app,{audio,traffic}={}){
   if(!host||!app)return {getStatus:()=>({visible:false,buildings:0}),dispose(){}};
   const hospital=document.createElement('img');hospital.className='christmas-village-hospital';
   hospital.src=new URL('hospital-delicias-final-snow.png',ASSETS).href;hospital.alt='';hospital.draggable=false;
@@ -34,10 +34,10 @@ export function createChristmasVillage(host,app,{audio}={}){
     if(next&&visible&&!disposed&&!document.hidden){laneOwner=next.kind;next.start();}
   }
   function cancelVehicles(){vehicleQueue.length=0;laneOwner=null;cancelTrip();pickup.cancel();interns.cancel();}
-  const pickup=createChristmasPickup(controls,{getGeometry:()=>geometry,isVisible:()=>visible,requestLane:start=>requestVehicle('pickup',start),releaseLane:()=>releaseVehicle('pickup'),ownsLane:()=>laneOwner==='pickup'&&!trip,audio});
-  const interns=createChristmasInterns(controls,{getGeometry:()=>geometry,isVisible:()=>visible,requestLane:start=>requestVehicle('interns',start),releaseLane:()=>releaseVehicle('interns'),ownsLane:()=>laneOwner==='interns'});
+  const pickup=createChristmasPickup(controls,{getGeometry:()=>geometry,isVisible:()=>visible,requestLane:start=>requestVehicle('pickup',start),releaseLane:()=>releaseVehicle('pickup'),ownsLane:()=>laneOwner==='pickup'&&!trip,audio,traffic});
+  const interns=createChristmasInterns(controls,{getGeometry:()=>geometry,isVisible:()=>visible,requestLane:start=>requestVehicle('interns',start),releaseLane:()=>releaseVehicle('interns'),ownsLane:()=>laneOwner==='interns',traffic});
   const rect=node=>node?.getClientRects?.().length?node.getBoundingClientRect():null;
-  function cancelTrip(){const active=!!trip;ambulanceQueued=false;if(frame)cancelAnimationFrame(frame);frame=0;trip?.sound?.stop();trip=null;ambulance.hidden=true;trigger.disabled=false;if(active)releaseVehicle('ambulance');}
+  function cancelTrip(){const active=!!trip;ambulanceQueued=false;if(frame)cancelAnimationFrame(frame);frame=0;trip?.sound?.stop();trip=null;traffic?.setVehicle('ambulance',null);ambulance.hidden=true;trigger.disabled=false;if(active)releaseVehicle('ambulance');}
   function animate(now){
     frame=0;if(disposed||!visible||!trip||document.hidden||laneOwner!=='ambulance'){cancelTrip();return;}
     if(trip.sound?.pending){
@@ -60,6 +60,7 @@ export function createChristmasVillage(host,app,{audio}={}){
     else {cancelTrip();return;}
     trip.phase=phase;
     const pose=getVehicleParkingPose(elapsed,elapsed>=ARRIVE_MS+stopMs?elapsed-ARRIVE_MS-stopMs:null,geometry);
+    traffic?.setVehicle('ambulance',elapsed<ARRIVE_MS+stopMs+650?{left:target+size*.12,right:target+size*.88}:null);
     if(pose.front)row=2;
     ambulance.style.transformOrigin='50% 100%';ambulance.style.transform='translateY(-'+pose.lift+'px) scale('+pose.scale+')';
     ambulance.style.width=size+'px';ambulance.style.height=height+'px';
@@ -74,6 +75,7 @@ export function createChristmasVillage(host,app,{audio}={}){
     requestVehicle('ambulance',()=>{
       ambulanceQueued=false;
       trip={started:performance.now(),direction:Math.random()<.5?1:-1,phase:'arriving',sound:audio?.play('ambulance')||null};
+      const size=Math.min(132,geometry.hospitalWidth/HOSPITAL_RATIO*1.1),center=geometry.hospitalLeft+geometry.hospitalWidth*.16;traffic?.setVehicle('ambulance',{left:center-size*.38,right:center+size*.38});
       frame=requestAnimationFrame(animate);
     });
   }

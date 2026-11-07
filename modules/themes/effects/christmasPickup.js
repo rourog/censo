@@ -1,5 +1,5 @@
-import {getVehicleParkingPose} from './christmasStageLayout.js?v=3.71.0';
-import {createRamDriver,ramVisitTiming} from './christmasRamDriver.js?v=3.71.0';
+import {getVehicleParkingPose} from './christmasStageLayout.js?v=3.73.0';
+import {createRamDriver,ramVisitTiming} from './christmasRamDriver.js?v=3.73.0';
 /* One decorative pickup: independent from ambulance dispatch and clinical state. */
 const ASSETS=new URL('../../../assets/themes/christmas/scene/',import.meta.url);
 const ARRIVAL_MS=3000,STOP_MS=3000,EXIT_MS=3000;
@@ -9,18 +9,24 @@ const VEHICLES=['ram-2500','silverado','civic','jimny'];
 const STARTS={'ram-2500':['vehicleStart',4920],silverado:['silveradoStart',9000],civic:['civicStart',3945],jimny:['vehicleStart',4920]};
 const HEIGHT={"ram-2500":1,silverado:1,civic:.70,jimny:.86};
 const SHEETS={"ram-2500":[1448,1086],"silverado":[1448,1086],"civic":[1448,1086],"jimny":[1448,1086]};
-export function createChristmasPickup(controls,{getGeometry,isVisible,requestLane,releaseLane,ownsLane,audio}){
+export function createChristmasPickup(controls,{getGeometry,isVisible,requestLane,releaseLane,ownsLane,audio,traffic}){
   const trigger=document.createElement('button');trigger.type='button';trigger.className='christmas-hospital-trigger';
   trigger.setAttribute('aria-label','Llamar un vehículo desde urgencias');trigger.title='Acceso peatonal de urgencias';
   const sprite=document.createElement('span');sprite.className='christmas-ambulance christmas-pickup';sprite.setAttribute('aria-hidden','true');sprite.hidden=true;
   controls.append(trigger,sprite);
   const driver=createRamDriver(controls);
   let trip=null,frame=0,disposed=false,queued=false,nextModel=0;
-  function cancel(){const active=!!trip;if(frame)cancelAnimationFrame(frame);frame=0;trip?.sound?.stop();trip?.startSound?.stop();trip=null;driver.hide();queued=false;sprite.hidden=true;trigger.disabled=false;if(active)releaseLane();}
+  function cancel(){const active=!!trip;if(frame)cancelAnimationFrame(frame);frame=0;trip?.sound?.stop();trip?.startSound?.stop();trip=null;traffic?.setVehicle('pickup',null);traffic?.setGuests('ram-driver',[]);driver.hide();queued=false;sprite.hidden=true;trigger.disabled=false;if(active)releaseLane();}
   function start(now){
     const model=VEHICLES[nextModel++%VEHICLES.length];
     trip={model,direction:Math.random()<.5?1:-1,started:now,phase:'arriving',driverTiming:model==='ram-2500'?ramVisitTiming(getGeometry()):null,sound:audio?.play(model==='ram-2500'?'ramArrival':model==='jimny'?'jimnyDrive':'')};
     sprite.style.backgroundImage='url("'+new URL(model+'.webp',ASSETS).href+'")';trigger.disabled=true;
+    reserveBay();
+  }
+  function reserveBay(){
+    if(!trip)return;const g=getGeometry(),base=Math.min(108,g.hospitalWidth*115/720*.95),height=229*base/362*HEIGHT[trip.model];
+    const box=FRAMES[trip.model][8],half=box[2]*height/box[3]*.44,center=g.hospitalLeft+g.hospitalWidth*55/720;
+    traffic?.setVehicle('pickup',trip.departedAt==null||performance.now()-trip.departedAt<650?{left:center-half,right:center+half}:null);
   }
   function paint(now){
     if(!trip)return;
@@ -61,6 +67,7 @@ export function createChristmasPickup(controls,{getGeometry,isVisible,requestLan
       const t=Math.max(0,(departureElapsed-650)/(EXIT_MS-650)),end=trip.direction===1?width:-size;
       x=target+(end-target)*t*t;trip.phase='leaving';
     }else {cancel();return;}
+    reserveBay();traffic?.setGuests('ram-driver',driver.getFootprint());
     sprite.style.transformOrigin='50% 100%';sprite.style.transform='translateY(-'+pose.lift+'px) scale('+pose.scale+')';
     sprite.style.width=size+'px';sprite.style.height=height+'px';sprite.style.left=x+'px';sprite.style.bottom=(getGeometry().vehicleBottom)+'px';
     sprite.style.backgroundSize=(SHEETS[trip.model][0]*factor)+'px '+(SHEETS[trip.model][1]*factor)+'px';sprite.style.backgroundPosition=(-sourceX*factor)+'px '+(-sourceY*factor)+'px';sprite.hidden=false;

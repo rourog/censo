@@ -14,7 +14,7 @@ const EYES={'xmas_santa_3.png':52,'xmas_misses_3.png':52,'xmas_jesus_3.png':53,'
   'doctor-coat.webp':59,'doctor-navy.webp':60,'doctor-pink-chestnut.webp':59,'doctor-pink-blonde.webp':59,'doctor-olive.webp':59};
 for(const cast of PERSON_CAST){cast.eyeHeight=EYES[cast.file];cast.scale=cast.file==='gnomea_mv.png'?1:EYE_HEIGHT/cast.eyeHeight;}
 export const PEOPLE_PORTALS=['left','right','urgencias','principal'];
-export function createPeopleTraffic(actors,{random,stage}){
+export function createPeopleTraffic(actors,{random,stage,traffic}){
   const holiday=PERSON_CAST.filter(c=>c.holiday),medical=PERSON_CAST.filter(c=>!c.holiday);
   let nextHoliday=2,nextMedical=2;
   const actorWidth=actor=>actor.cast.width*stage().scale*actor.cast.scale;
@@ -41,6 +41,7 @@ export function createPeopleTraffic(actors,{random,stage}){
   function update(actor,dt){
     if(!actor.state)reset(actor);
     actor.stateTime+=dt;
+    const move=next=>{const resolved=traffic?traffic.move(actor,next,dt):next;if(resolved===actor.x&&next!==actor.x)actor.stateTime-=dt;actor.x=resolved;};
     if(actor.state==='walking'){
       if(actor.rest>0){actor.rest=Math.max(0,actor.rest-dt);return;}
       const w=actorWidth(actor),viewport=stage().width;
@@ -50,12 +51,12 @@ export function createPeopleTraffic(actors,{random,stage}){
         const target=portal(actor),distance=target-actor.x;
         actor.direction=distance<0?-1:1;
         const step=actor.speed*dt;
-        if(Math.abs(distance)<=step){actor.x=target;actor.state='entering';actor.stateTime=0;actor.rest=0;}
-        else actor.x+=actor.direction*step;
+        if(Math.abs(distance)<=step){move(target);if(Math.abs(actor.x-target)<.01){actor.state='entering';actor.stateTime=0;actor.rest=0;}}
+        else move(actor.x+actor.direction*step);
       }else{
         if(isDoor(actor.point)){actor.point=actor.direction<0?'left':'right';}
         actor.direction=actor.point==='left'?-1:1;
-        actor.x+=actor.direction*actor.speed*dt;
+        move(actor.x+actor.direction*actor.speed*dt);
         if(actor.x+w<=0||actor.x>=viewport)disappear(actor);
       }
     }else if(actor.state==='entering'){
@@ -64,10 +65,11 @@ export function createPeopleTraffic(actors,{random,stage}){
       actor.shrink=1-.2*t;actor.opacity=t<.65?1:(1-t)/.35;
       if(t===1)disappear(actor);
     }else if(actor.state==='inside'){
+      if(traffic&&isDoor(actor.point)&&!traffic.canSpawn(actor,portal(actor)))return;
       if(actor.stateTime>=actor.wait){
         actor.cast=choose(actor);actor.point=selectPoint();actor.stateTime=0;actor.clip=0;actor.depth=0;actor.rest=0;
         if(isDoor(actor.point)&&stage().hospitalVisible){
-          actor.x=portal(actor);actor.state='exiting';actor.shrink=.8;actor.opacity=0;
+          if(traffic&&!traffic.canSpawn(actor,portal(actor)))return;actor.x=portal(actor);actor.state='exiting';actor.shrink=.8;actor.opacity=0;
         }else{
           if(isDoor(actor.point))actor.point=random(0,1)<.5?'left':'right';
           actor.direction=actor.point==='left'?1:-1;actor.x=actor.point==='left'?-actorWidth(actor):stage().width;
@@ -81,7 +83,7 @@ export function createPeopleTraffic(actors,{random,stage}){
       if(t===1){actor.state='arriving';actor.stateTime=0;actor.direction=random(0,1)<.5?-1:1;}
     }else if(actor.state==='arriving'){
       // Walk clear of the entry at normal speed before selecting the next destination.
-      actor.x+=actor.direction*actor.speed*dt;
+      move(actor.x+actor.direction*actor.speed*dt);
       if(actor.stateTime>=2)reset(actor);
     }
   }

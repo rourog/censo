@@ -12,8 +12,8 @@ export function ramVisitTiming(geometry){
 export function createRamDriver(controls){
   const node=document.createElement('span');node.className='christmas-ambulance christmas-ram-driver';node.setAttribute('aria-hidden','true');node.hidden=true;
   node.style.backgroundImage='url("'+SHEET.href+'")';controls.append(node);
-  let state='hidden';
-  function hide(){node.hidden=true;state='hidden';}
+  let state='hidden',footprint=null;
+  function hide(){node.hidden=true;state='hidden';footprint=null;}
   function paint(elapsed,geometry,timing){
     if(elapsed<0||elapsed>=timing.stopMs){hide();return;}
     const from=geometry.hospitalLeft+geometry.hospitalWidth*83/720,to=geometry.hospitalLeft+geometry.hospitalWidth*224/720;
@@ -26,10 +26,11 @@ export function createRamDriver(controls){
     // Walk diagonally from the parked vehicle onto the raised pedestrian plane.
     const progress=to===from?0:Math.max(0,Math.min(1,(x-from)/(to-from)));
     const ground=(geometry.parkingBottom??geometry.bottom)+(geometry.bottom-(geometry.parkingBottom??geometry.bottom))*progress;
+    footprint={x,ground:ground+4,halfWidth:11,lane:0};
     const factor=108/300*SCALE,[left,top]=FRAMES[index];
     node.style.width=(96*SCALE)+'px';node.style.height=(108*SCALE)+'px';node.style.left=(x-48*SCALE)+'px';node.style.bottom=(ground+4)+'px';
     node.style.backgroundSize=(887*factor)+'px '+(1774*factor)+'px';node.style.backgroundPosition=(-left*factor)+'px '+(-top*factor)+'px';
     node.style.transformOrigin='50% 100%';node.style.transform='scale('+shrink+')';node.style.opacity=String(Math.max(0,Math.min(1,opacity)));node.hidden=false;
   }
-  return {paint,hide,getStatus:()=>({ramDriver:state,ramDriverVisible:!node.hidden}),dispose(){hide();node.remove();}};
+  return {paint,hide,getFootprint:()=>footprint?[footprint]:[],getStatus:()=>({ramDriver:state,ramDriverVisible:!node.hidden}),dispose(){hide();node.remove();}};
 }

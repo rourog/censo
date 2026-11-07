@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import {createSidewalkTraffic} from '../modules/themes/effects/christmasSidewalkTraffic.js';
 import {createChristmasScene} from '../modules/themes/effects/christmasScene.js';
 import {getChristmasStageLayout} from '../modules/themes/effects/christmasStageLayout.js';
 let id=0,tableBottom=400,newsTop=800,footerTop=840,motion;
@@ -29,7 +30,7 @@ globalThis.document={hidden:false,body:element(),createElement:element,
   getElementById:s=>s==='censoNewsBar'?news:table,
   addEventListener(k,fn){docEvents[k]=fn;},removeEventListener(k){delete docEvents[k];}};
 const originalRandom=Math.random;Math.random=()=>.5;
-const played=[];const scene=createChristmasScene(app,{audio:{play:kind=>played.push(kind)}}),root=app.children[0];
+const played=[];const scene=createChristmasScene(app,{traffic:createSidewalkTraffic(),audio:{play:kind=>played.push(kind)}}),root=app.children[0];
 assert.equal(scene.getStatus().characters,6);assert.equal(scene.getStatus().people,3);assert.equal(scene.getStatus().reservedDriverSlots,1,'Fourth person slot is reserved for the RAM visitor');assert.equal(scene.getStatus().cast,18);assert.equal(scene.getStatus().gifts,6);
 assert.equal(root.style.bottom,'106px','Stage stands above the highest visible bottom bar');
 assert.equal(document.body.style['--christmas-floor-offset'],'100px');

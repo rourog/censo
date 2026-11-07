@@ -1,4 +1,4 @@
-import {PERSON_CAST,createPeopleTraffic} from './christmasPeople.js';
+import {PERSON_CAST,createPeopleTraffic} from './christmasPeople.js?v=3.73.0';
 import {CHARACTER_SCALE,TREE_SCALE,getChristmasStageLayout} from './christmasStageLayout.js?v=3.71.0';
 /* Interactive Christmas stage. Reads layout only; never reads or writes patient records. */
 const ASSETS=new URL('../../../assets/themes/christmas/scene/',import.meta.url);
@@ -21,7 +21,7 @@ const SNOWMAN_WAIT=10000;
 const SNOWMAN_FRAME_MS=140;
 // Solid box edges in the 48px sprite cells; exclude transparent padding and bows.
 const GIFT_BOXES=[[3,3,42,45],[3,12,42,45],[6,6,39,45],[0,15,45,45],[9,21,36,45]];
-export function createChristmasScene(app,{audio}={}){
+export function createChristmasScene(app,{audio,traffic}={}){
   if(!app)return {getStatus:()=>({characters:0,visible:false}),dispose(){}};
   const root=document.createElement('div');root.className='christmas-scene';root.setAttribute('aria-label','Escenario navideño interactivo');
   app.append(root);
@@ -42,7 +42,8 @@ export function createChristmasScene(app,{audio}={}){
   const random=(min,max)=>min+Math.random()*(max-min);
   const actors=INITIAL_CAST.map((cast,i)=>({node:sprite(cast.file,true),cast,
     x:0,direction:i%2?-1:1,speed:random(24,42),lane:i%2,rest:0,nextRest:random(6,15),phase:i*.37,interactive:null}));
-  const peopleTraffic=createPeopleTraffic(actors,{random,stage:()=>({...getChristmasStageLayout(width),width,scale,hospitalVisible:stageHeight>=getChristmasStageLayout(width).hospitalHeight+getChristmasStageLayout(width).roadHeight})});
+  const peopleTraffic=createPeopleTraffic(actors,{random,traffic,stage:()=>({...getChristmasStageLayout(width),width,scale,hospitalVisible:stageHeight>=getChristmasStageLayout(width).hospitalHeight+getChristmasStageLayout(width).roadHeight})});
+  traffic?.attach(actors,()=>({...getChristmasStageLayout(width),scale,visible:visible&&!document.hidden&&!reduced.matches}));
   const snowman=sprite('snowman-melt.png',true);snowman.classList.add('christmas-scene-snowman');
   let snowmanFrame=0,snowmanState='ready',snowmanTimer=0;
   function paintSnowman(){
@@ -87,13 +88,13 @@ export function createChristmasScene(app,{audio}={}){
       else{actor.node.setAttribute('aria-hidden','true');actor.node.removeAttribute('aria-label');actor.node.title='';}
     }
     actor.node.disabled=!giver||!!actor.catReaction;
-    const resting=reduced.matches||actor.rest>0;
+    const resting=reduced.matches||actor.rest>0||actor.trafficBlocked;
     const column=resting?1:WALK[Math.floor((time+actor.phase)*(actor.catReaction?.phase==='running'?14:7))%WALK.length];
     const row=actor.state==='entering'?3:actor.state==='exiting'?0:resting?0:actor.direction<0?1:2;
     const atlas=actor.cast.frames?.[row*3+column];
     actor.node.style.backgroundPosition=atlas?(-atlas[0]*s)+'px '+(-atlas[1]*s)+'px':(-column*w*s)+'px '+(-row*h*s)+'px';
-    actor.node.style.bottom=(getChristmasStageLayout(width).pedestrianBottom+(actor.cast.animal&&!actor.lane?6:0))+'px';
-    actor.node.style.zIndex=actor.cast.animal?(actor.lane?'5':'2'):'2';
+    actor.node.style.bottom=(getChristmasStageLayout(width).pedestrianBottom+(actor.cast.animal?(!actor.lane?6:0):(actor.guideOffset||0)))+'px';
+    actor.node.style.zIndex=actor.cast.animal?(actor.lane?'5':'2'):String(20-Math.round(actor.guideOffset||0));
     actor.node.style.transformOrigin='50% 100%';
     actor.node.style.transform=actor.cast.animal?'translateX('+actor.x.toFixed(2)+'px)':
       'translateX('+actor.x.toFixed(2)+'px) translateY('+(-(actor.depth||0)).toFixed(2)+'px) scale('+(actor.shrink??1).toFixed(4)+')';
@@ -121,6 +122,7 @@ export function createChristmasScene(app,{audio}={}){
     frame=0;if(disposed||!visible||document.hidden||(reduced.matches&&!thrown.some(g=>g.flying))){last=0;return;}
     if(last&&now-last<33){frame=requestAnimationFrame(tick);return;}
     const dt=last?Math.min(.06,(now-last)/1000):0;last=now;time+=dt;
+    traffic?.beginFrame(dt);
     if(!reduced.matches)for(const actor of actors){
       if(!actor.cast.animal){peopleTraffic.update(actor,dt);drawActor(actor);continue;}
       if(actor.catReaction){
@@ -309,7 +311,7 @@ export function createChristmasScene(app,{audio}={}){
   window.addEventListener('resize',layout);document.addEventListener('visibilitychange',onVisibility);
   reduced.addEventListener?.('change',onMotion);layout();
   return {
-    getStatus:()=>({visible,characters:actors.filter(a=>a.state!=='inside').length,people:actors.filter(a=>!a.cast.animal&&a.state!=='inside').length,peopleLimit:4,reservedDriverSlots:1,holidayPeople:actors.filter(a=>a.cast.holiday&&a.state!=='inside').length,holidayLimit:2,personStates:actors.filter(a=>!a.cast.animal).map(a=>({file:a.cast.file,state:a.state||'walking',point:a.point||'pending'})),catReaction:actors.find(actor=>actor.cast.file===CAT)?.catReaction?.phase||'idle',animals:actors.filter(actor=>actor.cast.animal).length,animalLimit:3,cast:CAST.length,gifts:gifts.length,tree:'left',snowman:snowmanState,snowmanFrame,snowmanWaitMs:SNOWMAN_WAIT,spawnedGifts:thrown.length,wreaths:thrown.filter(g=>g.kind==='wreath').length,openedGifts:[...giftStates.values()].filter(g=>g.opened).length,giftLimit:GIFT_LIMIT,giftLifetimeMs:GIFT_LIFETIME,giftOpenMs:GIFT_OPEN_TIME,animated:visible&&!document.hidden&&!reduced.matches}),
+    getStatus:()=>({sidewalk:traffic?.getStatus(),visible,characters:actors.filter(a=>a.state!=='inside').length,people:actors.filter(a=>!a.cast.animal&&a.state!=='inside').length,peopleLimit:4,reservedDriverSlots:1,holidayPeople:actors.filter(a=>a.cast.holiday&&a.state!=='inside').length,holidayLimit:2,personStates:actors.filter(a=>!a.cast.animal).map(a=>({file:a.cast.file,state:a.state||'walking',point:a.point||'pending'})),catReaction:actors.find(actor=>actor.cast.file===CAT)?.catReaction?.phase||'idle',animals:actors.filter(actor=>actor.cast.animal).length,animalLimit:3,cast:CAST.length,gifts:gifts.length,tree:'left',snowman:snowmanState,snowmanFrame,snowmanWaitMs:SNOWMAN_WAIT,spawnedGifts:thrown.length,wreaths:thrown.filter(g=>g.kind==='wreath').length,openedGifts:[...giftStates.values()].filter(g=>g.opened).length,giftLimit:GIFT_LIMIT,giftLifetimeMs:GIFT_LIFETIME,giftOpenMs:GIFT_OPEN_TIME,animated:visible&&!document.hidden&&!reduced.matches}),
     dispose(){if(disposed)return;disposed=true;stopFrame();clearInterval(timer);treeShake?.cancel();treeShake=null;
       window.removeEventListener('resize',layout);document.removeEventListener('visibilitychange',onVisibility);
       reduced.removeEventListener?.('change',onMotion);tree.removeEventListener('click',onTreeClick);
