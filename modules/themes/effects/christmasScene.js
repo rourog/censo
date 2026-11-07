@@ -1,5 +1,5 @@
 import {PERSON_CAST,createPeopleTraffic} from './christmasPeople.js';
-import {CHARACTER_SCALE,TREE_SCALE,getChristmasStageLayout} from './christmasStageLayout.js';
+import {CHARACTER_SCALE,TREE_SCALE,getChristmasStageLayout} from './christmasStageLayout.js?v=3.69.0';
 /* Interactive Christmas stage. Reads layout only; never reads or writes patient records. */
 const ASSETS=new URL('../../../assets/themes/christmas/scene/',import.meta.url);
 const DEER=['rudolph_adult_3.png','reindeer_3.png','reindeerb_3.png','reindeer_child_3.png','rudolph_adultb_3.png','rudolph_child_3.png'];
@@ -42,7 +42,7 @@ export function createChristmasScene(app,{audio}={}){
   const random=(min,max)=>min+Math.random()*(max-min);
   const actors=INITIAL_CAST.map((cast,i)=>({node:sprite(cast.file,true),cast,
     x:0,direction:i%2?-1:1,speed:random(24,42),lane:i%2,rest:0,nextRest:random(6,15),phase:i*.37,interactive:null}));
-  const peopleTraffic=createPeopleTraffic(actors,{random,stage:()=>({...getChristmasStageLayout(width),width,scale,hospitalVisible:stageHeight>=getChristmasStageLayout(width).hospitalHeight})});
+  const peopleTraffic=createPeopleTraffic(actors,{random,stage:()=>({...getChristmasStageLayout(width),width,scale,hospitalVisible:stageHeight>=getChristmasStageLayout(width).hospitalHeight+getChristmasStageLayout(width).roadHeight})});
   const snowman=sprite('snowman-melt.png',true);snowman.classList.add('christmas-scene-snowman');
   let snowmanFrame=0,snowmanState='ready',snowmanTimer=0;
   function paintSnowman(){
@@ -79,7 +79,7 @@ export function createChristmasScene(app,{audio}={}){
     actor.node.setAttribute('data-state',actor.catReaction?.phase||actor.state||'walking');
     actor.node.setAttribute('data-person',String(!actor.cast.animal));
     actor.node.setAttribute('data-holiday',String(!!actor.cast.holiday));
-    actor.node.hidden=actor.state==='inside'||(!actor.cast.animal&&stageHeight<getChristmasStageLayout(width).hospitalHeight);
+    actor.node.hidden=actor.state==='inside'||(!actor.cast.animal&&stageHeight<getChristmasStageLayout(width).hospitalHeight+getChristmasStageLayout(width).roadHeight);
     const giver=GIVERS[actor.cast.file]||(actor.cast.file===CAT?'cat':null);
     if(actor.interactive!==giver){
       actor.interactive=giver;actor.node.classList.toggle('is-giver',!!giver);actor.node.disabled=!giver;
@@ -92,7 +92,7 @@ export function createChristmasScene(app,{audio}={}){
     const row=actor.state==='entering'?3:actor.state==='exiting'?0:resting?0:actor.direction<0?1:2;
     const atlas=actor.cast.frames?.[row*3+column];
     actor.node.style.backgroundPosition=atlas?(-atlas[0]*s)+'px '+(-atlas[1]*s)+'px':(-column*w*s)+'px '+(-row*h*s)+'px';
-    actor.node.style.bottom=(actor.cast.animal?(actor.lane?0:8):0)+'px';
+    actor.node.style.bottom=(getChristmasStageLayout(width).pedestrianBottom+(actor.cast.animal&&!actor.lane?6:0))+'px';
     actor.node.style.zIndex=actor.cast.animal?(actor.lane?'5':'2'):'2';
     actor.node.style.transformOrigin='50% 100%';
     actor.node.style.transform=actor.cast.animal?'translateX('+actor.x.toFixed(2)+'px)':
@@ -153,6 +153,7 @@ export function createChristmasScene(app,{audio}={}){
       const s=state.lootScale,size=48*s;
       return {left:x-size/2+left*s,right:x-size/2+right*s,top:bottom+(48-top)*s,base:bottom+(48-base)*s};
     };
+    const ground=getChristmasStageLayout(width).pedestrianBottom;
     const supports=gifts.map(node=>box(giftStates.get(node),
       parseFloat(node.style.left)+parseFloat(node.style.width)/2,parseFloat(node.style.bottom)));
     for(const gift of thrown){
@@ -167,7 +168,7 @@ export function createChristmasScene(app,{audio}={}){
         const x=clamp(gift.desiredX+offset*gift.size*.9,gift.size/2,width-gift.size/2);
         const bounds=box(gift,x,0);
         const overlaps=supports.filter(other=>Math.min(other.right,bounds.right)-Math.max(other.left,bounds.left)>.1);
-        const bottom=Math.max(0,...overlaps.map(other=>other.top))-bounds.base;
+        const bottom=Math.max(ground,...overlaps.map(other=>other.top))-bounds.base;
         if(bottom<=maxBottom){gift.x=x;gift.bottom=bottom;break;}
       }
       supports.push(box(gift,gift.x,gift.bottom));
@@ -279,20 +280,20 @@ export function createChristmasScene(app,{audio}={}){
     else for(const section of app.querySelectorAll('#content > .section')){
       const box=rect(section);if(box&&box.right>0&&box.left<width)top=Math.max(top,box.bottom);
     }
-    const height=Math.min(180,Math.max(0,floor-top-14));stageHeight=height;
-    visible=!!appRect&&width>=768&&height>=95;
+    const height=Math.min(224,Math.max(0,floor-top-14));stageHeight=height;
+    visible=!!appRect&&width>=768&&height>=95+getChristmasStageLayout(width).roadHeight;
     root.hidden=!visible;root.style.height=height+'px';root.style.bottom=(innerHeight-floor+6)+'px';
     const previousScale=scale;scale=CHARACTER_SCALE;
     const treeScale=TREE_SCALE;
     const stage=getChristmasStageLayout(width);
     const treeCenter=stage.treeCenter;
-    tree.hidden=height<192*treeScale;
-    size(tree,136,192,136,192,treeScale);tree.style.left=(treeCenter-68*treeScale)+'px';tree.style.bottom=(-14*treeScale)+'px';
+    tree.hidden=height<192*treeScale+stage.roadHeight;
+    size(tree,136,192,136,192,treeScale);tree.style.left=(treeCenter-68*treeScale)+'px';tree.style.bottom=(stage.pedestrianBottom-14*treeScale)+'px';
     tree.style.backgroundPosition='0px 0px';
-    paintSnowman();snowman.style.left=stage.snowmanLeft+'px';snowman.style.bottom='0px';
+    paintSnowman();snowman.style.left=stage.snowmanLeft+'px';snowman.style.bottom=stage.pedestrianBottom+'px';
     const offsets=[-180,-128,-77,77,128,180];
     gifts.forEach((gift,i)=>{gift.hidden=tree.hidden;size(gift,48,48,240,336,scale);gift.style.left=(treeCenter+(offsets[i]-24)*scale)+'px';
-      gift.style.bottom=((i%2?3:0)-4)*scale+'px';
+      gift.style.bottom=stage.pedestrianBottom+((i%2?3:0)-4)*scale+'px';
       const state=giftStates.get(gift);state.lootScale=scale;paintGift(state);});
     actors.forEach((actor,i)=>{
       if(!actor.initialized){actor.x=width*(i+.3)/actors.length;actor.initialized=true;}

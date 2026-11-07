@@ -1,4 +1,4 @@
-import {createRamDriver,ramVisitTiming} from './christmasRamDriver.js?v=3.66.0';
+import {createRamDriver,ramVisitTiming} from './christmasRamDriver.js?v=3.69.0';
 /* One decorative pickup: independent from ambulance dispatch and clinical state. */
 const ASSETS=new URL('../../../assets/themes/christmas/scene/',import.meta.url);
 const ARRIVAL_MS=3000,STOP_MS=3000,EXIT_MS=3000;
@@ -58,7 +58,7 @@ export function createChristmasPickup(controls,{getGeometry,isVisible,requestLan
       const t=(now-trip.departedAt)/EXIT_MS,end=trip.direction===1?width:-size;
       x=target+(end-target)*t*t;row=trip.direction===1?0:1;column=Math.floor(elapsed/120)%4;trip.phase='leaving';
     }else {cancel();return;}
-    sprite.style.width=size+'px';sprite.style.height=height+'px';sprite.style.left=x+'px';sprite.style.bottom=(bottom-3)+'px';
+    sprite.style.width=size+'px';sprite.style.height=height+'px';sprite.style.left=x+'px';sprite.style.bottom=(getGeometry().vehicleBottom)+'px';
     sprite.style.backgroundSize=(SHEETS[trip.model][0]*factor)+'px '+(SHEETS[trip.model][1]*factor)+'px';sprite.style.backgroundPosition=(-sourceX*factor)+'px '+(-sourceY*factor)+'px';sprite.hidden=false;
   }
   function animate(now){

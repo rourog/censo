@@ -41,6 +41,7 @@ const activeFiles=()=>actors.map(n=>n.attributes['data-character']);
 assert.equal(new Set(activeFiles()).size,actors.length,'Every initial character has a unique identity');
 assert.deepEqual(activeFiles().slice(3),['tuxedo-cat.png','husky-gray.png','husky-black.png']);
 assert.ok(parseFloat(actors[3].style.width)<parseFloat(actors[4].style.width)*.7,'Cat is at most 70% of husky scale');
+assert.ok(actors.every(n=>parseFloat(n.style.bottom)>=getChristmasStageLayout(innerWidth).pedestrianBottom),'Walkers remain above the road');
 assert.equal(actors[4].style.width,actors[5].style.width,'Both huskies use the same proportions');
 assert.ok(Math.abs(parseFloat(actors[3].style.backgroundPosition.split(' ')[1])+96*.65*.62)<.001,'Cat uses the left-walk row');
 assert.ok(Math.abs(parseFloat(actors[4].style.backgroundPosition.split(' ')[1])+192*.65*.9)<.001,'Husky uses the right-walk row');
@@ -109,7 +110,7 @@ for(const node of grounded){
   const left=Number(position[1]),top=Number(position[2]);
   const bounds={left:left+l*scale,right:left+r*scale,top:top+t*scale,bottom:top+b*scale};
   const overlaps=supportRects.filter(other=>Math.min(other.right,bounds.right)-Math.max(other.left,bounds.left)>.1);
-  const surface=Math.min(stageHeight,...overlaps.map(other=>other.top));
+  const surface=Math.min(stageHeight-getChristmasStageLayout(innerWidth).pedestrianBottom,...overlaps.map(other=>other.top));
   assert.ok(Math.abs(bounds.bottom-surface)<.02,'Visible gift base touches the ground or the highest overlapping box');
   if(surface<stageHeight-.02)stacked++;
   supportRects.push(bounds);
@@ -200,7 +201,7 @@ for(const viewport of [768,1000,1363,1920,2560]){
  assert.ok(parseFloat(snowman.style.left)>=geometry.hospitalRight+19.9,'Snowman stays right of hospital with a gap');
  assert.equal(tree.style.width,fixedTreeWidth);assert.equal(snowman.style.width,fixedSnowmanWidth);
 }
-innerWidth=1300;tableBottom=690;events.resize();
+innerWidth=1300;tableBottom=630;events.resize();
 assert.equal(tree.hidden,true,'Hide pine rather than shrinking it');assert.equal(scene.getStatus().visible,true,'Smaller characters still fit');
 assert.equal(tree.style.width,fixedTreeWidth);assert.equal(snowman.style.width,fixedSnowmanWidth);assert.equal(actors[0].style.width,fixedActorWidth);
 assert.ok(root.children.slice(1,7).every(g=>g.hidden),'Tree gifts hide with the pine');

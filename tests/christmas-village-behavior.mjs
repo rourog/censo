@@ -25,9 +25,9 @@ const mountains=createSnowMountains(host),wrapper=host.children[0];
 assert.equal(wrapper.children[0].children.length,2,'Two snow layers are behind the village');
 assert.equal(wrapper.children[1],mountains.villageHost);
 assert.equal(wrapper.children[2].children.length,1,'Only the closest snow layer covers the buildings');
-const sounds=[];const village=createChristmasVillage(mountains.villageHost,app,{audio:{play(kind){sounds.push(kind);return {stop(){}};}}}),[hospital,...houses]=mountains.villageHost.children;
+const sounds=[];const village=createChristmasVillage(mountains.villageHost,app,{audio:{play(kind){sounds.push(kind);return {stop(){}};}}}),[hospital,road,...houses]=mountains.villageHost.children;
 assert.ok(hospital.src.endsWith('/hospital-delicias-final-snow.png'));
-assert.equal(parseFloat(hospital.style.bottom),0,'Curb rests at the scene floor');
+assert.equal(parseFloat(hospital.style.bottom),44,'Curb rests at the upper road edge');assert.equal(road.className,'christmas-village-road');assert.equal(parseFloat(road.style.width),width);assert.equal(parseFloat(road.style.height),44);assert.ok(road.style.backgroundImage.includes('snowy-road.webp'));
 assert.equal(village.getStatus().snowPlane,'in-front-of-snow');
 assert.equal(village.getStatus().buildings,1);assert.equal(houses.length,0,'Houses are absent from the DOM');assert.equal(village.getStatus().houses,'hidden');
 function checkLayout(){
@@ -42,7 +42,7 @@ checkLayout();
 for(width of [768,1000,1920,2560]){innerWidth=width;events.resize();checkLayout();}
 width=1363;innerWidth=width;events.resize();
 const stableWidth=hospital.style.width;
-tableBottom=680;events.resize();checkLayout();assert.equal(hospital.style.width,stableWidth,'Census growth never shrinks the hospital');
+tableBottom=630;events.resize();checkLayout();assert.equal(hospital.style.width,stableWidth,'Census growth never shrinks the hospital');
 tableBottom=720;events.resize();assert.equal(village.getStatus().visible,false,'Hide instead of shrinking when the fixed hospital no longer fits');
 tableBottom=750;events.resize();assert.equal(mountains.villageHost.hidden,true,'Hide when no safe room remains');
 tableBottom=400;events.resize();checkLayout();
@@ -55,7 +55,7 @@ const hospitalWidth=parseFloat(hospital.style.width),hospitalHeight=hospitalWidt
 assert.ok(Math.abs(doorLeft/hospitalWidth-97/720)<.00001);
 assert.ok(Math.abs(parseFloat(trigger.style.width)/hospitalWidth-37/720)<.00001);
 assert.ok(Math.abs(parseFloat(trigger.style.height)/hospitalHeight-30/115)<.00001);
-assert.ok(Math.abs(parseFloat(trigger.style.bottom)/hospitalHeight-26/115)<.00001);
+assert.ok(Math.abs((parseFloat(trigger.style.bottom)-44)/hospitalHeight-26/115)<.00001);
 assert.equal(hospital.events?.click,undefined,'Facade has no click handler');
 assert.equal(village.getStatus().ambulanceArrivalMs,3000);
 assert.equal(village.getStatus().ambulanceStopMs,3000);
@@ -65,7 +65,7 @@ for(const direction of [.1,.9]){
  assert.equal(frames.size,1,'Repeated clicks cannot duplicate the ambulance');
  tick(0);assert.equal(village.getStatus().ambulance,'arriving');
  assert.equal(ambulance.style.backgroundPosition.split(' ')[1],(direction<.5?0:-parseFloat(ambulance.style.height))+'px');
- tick(3000);assert.equal(village.getStatus().ambulance,'parked');
+ tick(3000);assert.equal(village.getStatus().ambulance,'parked');assert.equal(parseFloat(ambulance.style.bottom),4,'Ambulance drives below the pedestrian curb');
  const parkedX=ambulance.style.left;
  assert.ok(Math.abs(parseFloat(parkedX)+parseFloat(ambulance.style.width)/2-(parseFloat(hospital.style.left)+parseFloat(hospital.style.width)*.16))<.01,'Ambulance centers on expanded bay');
  tick(5999);assert.equal(village.getStatus().ambulance,'parked');assert.equal(ambulance.style.left,parkedX,'Stopped for exactly three seconds');
@@ -82,7 +82,7 @@ for(let i=0;i<12;i++){
  tick(start+1500);const sideHeight=parseFloat(pickupSprite.style.height),model=village.getStatus().pickupModel;
  assert.equal(model,order[next++%4]);sequence.push(model);
  const stop=village.getStatus().pickupStopMs,startMs=village.getStatus().pickupStartMs,end=start+3000+stop+startMs+3002;
- tick(start+3000);heights[model]=parseFloat(pickupSprite.style.height);assert.ok(Math.abs(heights[model]-sideHeight)<.001);
+ tick(start+3000);assert.equal(parseFloat(pickupSprite.style.bottom),4,'All civilian vehicles share the street plane');heights[model]=parseFloat(pickupSprite.style.height);assert.ok(Math.abs(heights[model]-sideHeight)<.001);
  if(model==='ram-2500'){
    assert.ok(stop>8000,'RAM waits for the whole walk, greeting and return');
    assert.equal(driverSprite.hidden,false);
@@ -91,7 +91,7 @@ for(let i=0;i<12;i++){
    for(let t=start+3050;t<start+3000+stop;t+=100){
      tick(t);const state=village.getStatus().ramDriver;driverStates.add(state);
      if(state==='walking-to-door')outX=parseFloat(driverSprite.style.left);
-     if(state==='waving'){doorX=parseFloat(driverSprite.style.left);assert.ok(doorX>parseFloat(pickupSprite.style.left)+parseFloat(pickupSprite.style.width)/2);}
+     if(state==='waving'){assert.equal(parseFloat(driverSprite.style.bottom),48,'RAM driver reaches the pedestrian plane');doorX=parseFloat(driverSprite.style.left);assert.ok(doorX>parseFloat(pickupSprite.style.left)+parseFloat(pickupSprite.style.width)/2);}
      if(state==='returning'&&lastState==='waving')assert.ok(parseFloat(driverSprite.style.left)<=doorX+.1);
      lastState=state;assert.equal(ambulance.hidden,true,'Ambulance stays offscreen throughout the visit');
    }

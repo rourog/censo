@@ -1,8 +1,8 @@
-import {createChristmasPickup} from './christmasPickup.js?v=3.67.0';
+import {createChristmasPickup} from './christmasPickup.js?v=3.69.0';
 /* Decorative village and local ambulance interaction; no clinical state. */
 import {AMBULANCE_DURATION_MS} from './christmasAudio.js';
 const ASSETS=new URL('../../../assets/themes/christmas/scene/',import.meta.url);
-import {HOSPITAL_RATIO,getChristmasStageLayout} from './christmasStageLayout.js';
+import {HOSPITAL_RATIO,getChristmasStageLayout} from './christmasStageLayout.js?v=3.69.0';
 const ARRIVE_MS=3000,STOP_MS=3000,LEAVE_MS=3000;
 // Door bounds in the 720 × 115 hospital sprite (excluding pillars and pavement).
 const BAY={left:97/720,bottom:26/115,width:37/720,height:30/115};
@@ -10,7 +10,9 @@ export function createChristmasVillage(host,app,{audio}={}){
   if(!host||!app)return {getStatus:()=>({visible:false,buildings:0}),dispose(){}};
   const hospital=document.createElement('img');hospital.className='christmas-village-hospital';
   hospital.src=new URL('hospital-delicias-final-snow.png',ASSETS).href;hospital.alt='';hospital.draggable=false;
-  host.append(hospital);
+  const road=document.createElement('div');road.className='christmas-village-road';road.setAttribute('aria-hidden','true');
+  road.style.backgroundImage='url("'+new URL('snowy-road.webp',ASSETS).href+'")';
+  host.append(hospital,road);
   // The decorative snow is aria-hidden and behind the app. Put the control in its safe empty area.
   const controls=document.createElement('div');controls.className='christmas-village-controls';
   const trigger=document.createElement('button');trigger.type='button';trigger.className='christmas-hospital-trigger';
@@ -56,7 +58,7 @@ export function createChristmasVillage(host,app,{audio}={}){
     else {cancelTrip();return;}
     trip.phase=phase;
     ambulance.style.width=size+'px';ambulance.style.height=height+'px';
-    ambulance.style.left=x+'px';ambulance.style.bottom=(bottom-3)+'px';
+    ambulance.style.left=x+'px';ambulance.style.bottom=(geometry.vehicleBottom)+'px';
     ambulance.style.backgroundSize=(size*4)+'px '+(height*3)+'px';
     ambulance.style.backgroundPosition=(-Math.floor(elapsed/85)%4*size)+'px '+(-row*height)+'px';
     ambulance.hidden=false;frame=requestAnimationFrame(animate);
@@ -82,15 +84,17 @@ export function createChristmasVillage(host,app,{audio}={}){
       const box=rect(section);if(box&&box.right>0&&box.left<innerWidth)top=Math.max(top,box.bottom);
     }
     const width=bounds?.width||0,height=bounds?.height||0;
-    // Anchor the curb to the scene floor, retaining usable space as patient rows grow.
-    const bottom=0,available=(bounds?.bottom||0)-top-bottom-14;
     const stage=getChristmasStageLayout(width);
+    // The curb sits above the street; retain fixed sizes and hide when room runs out.
+    const bottom=stage.hospitalBottom,available=(bounds?.bottom||0)-top-bottom-14;
     visible=!!appBounds&&width>=768&&available>=stage.hospitalHeight;
     host.hidden=!visible;controls.hidden=!visible;if(!visible){cancelVehicles();return;}
     const {hospitalWidth}=stage;
+    road.style.left='0px';road.style.width=width+'px';road.style.bottom='0px';road.style.height=stage.roadHeight+'px';
+    road.style.backgroundSize='auto '+stage.roadHeight+'px';
     hospital.style.width=hospitalWidth+'px';hospital.style.height='auto';
     hospital.style.left=((width-hospitalWidth)/2)+'px';hospital.style.bottom=bottom+'px';
-    geometry={width,hospitalWidth,hospitalLeft:(width-hospitalWidth)/2,bottom};
+    geometry={width,hospitalWidth,hospitalLeft:(width-hospitalWidth)/2,bottom,vehicleBottom:stage.vehicleBottom};
     controls.style.left=(bounds?.left||0)+'px';controls.style.top=(bounds?.top||0)+'px';
     controls.style.width=width+'px';controls.style.height=height+'px';
     const hospitalHeight=hospitalWidth/HOSPITAL_RATIO;
@@ -100,8 +104,8 @@ export function createChristmasVillage(host,app,{audio}={}){
     pickup.layout();
   }
   const timer=window.setInterval(layout,500);window.addEventListener('resize',layout);layout();
-  return {getStatus:()=>({...pickup.getStatus(),visible,buildings:1,hospital:'center',houses:'hidden',snowPlane:'in-front-of-snow',ambulance:ambulanceQueued?'queued':trip?.phase||'idle',ambulanceDurationMs:AMBULANCE_DURATION_MS,ambulanceArrivalMs:ARRIVE_MS,ambulanceStopMs:STOP_MS,ambulanceExitMs:LEAVE_MS}),
+  return {getStatus:()=>({...pickup.getStatus(),visible,buildings:1,hospital:'center',houses:'hidden',snowPlane:'in-front-of-snow',roadWidth:geometry?.width||0,roadHeight:getChristmasStageLayout(innerWidth).roadHeight,hospitalBottom:geometry?.bottom||0,vehicleBottom:geometry?.vehicleBottom||0,ambulance:ambulanceQueued?'queued':trip?.phase||'idle',ambulanceDurationMs:AMBULANCE_DURATION_MS,ambulanceArrivalMs:ARRIVE_MS,ambulanceStopMs:STOP_MS,ambulanceExitMs:LEAVE_MS}),
     dispose(){if(disposed)return;disposed=true;clearInterval(timer);window.removeEventListener('resize',layout);
       cancelVehicles();trigger.removeEventListener('click',launch);document.removeEventListener('visibilitychange',onVisibility);
-      pickup.dispose();controls.remove();hospital.remove();host.hidden=false;}};
+      pickup.dispose();controls.remove();hospital.remove();road.remove();host.hidden=false;}};
 }
