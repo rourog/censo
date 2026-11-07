@@ -9,6 +9,8 @@ const CAST=[...PERSON_CAST,...DEER.map(file=>({file,width:156,height:159,sheetWi
 // Pets get three chances per deer turn, without duplicating an active animal.
 const ANIMAL_ROTATION=DEER.flatMap(file=>[...PETS,file]).map(file=>CAST.find(c=>c.file===file));
 const WALK=[0,1,2,1];
+const CAT='tuxedo-cat.png',CAT_JUMP_SECONDS=.8,CAT_RUN_SECONDS=2;
+const CAT_FRAMES=[0,.09,.15,.23,.33,.44,.54,.65];
 const GIVERS=Object.freeze({'xmas_santa_3.png':'Santa','xmas_misses_3.png':'la señora Claus','xmas_jesus_3.png':'Jesús'});
 const INITIAL_CAST=[...PERSON_CAST.slice(0,2),...PERSON_CAST.slice(4,5),...PETS.map(file=>CAST.find(c=>c.file===file))];
 const STATIC_COLUMNS=[0,1,2,3,4,1];
@@ -74,18 +76,19 @@ export function createChristmasScene(app,{audio}={}){
     size(actor.node,w,h,sw,sh,s);
     actor.node.setAttribute('data-character',actor.cast.file);
     actor.node.style.backgroundImage='url("'+new URL(actor.cast.file+(actor.cast.imageVersion?'?v=walk-'+actor.cast.imageVersion:''),ASSETS).href+'")';
-    actor.node.setAttribute('data-state',actor.state||'walking');
+    actor.node.setAttribute('data-state',actor.catReaction?.phase||actor.state||'walking');
     actor.node.setAttribute('data-person',String(!actor.cast.animal));
     actor.node.setAttribute('data-holiday',String(!!actor.cast.holiday));
     actor.node.hidden=actor.state==='inside'||(!actor.cast.animal&&stageHeight<getChristmasStageLayout(width).hospitalHeight);
-    const giver=GIVERS[actor.cast.file];
+    const giver=GIVERS[actor.cast.file]||(actor.cast.file===CAT?'cat':null);
     if(actor.interactive!==giver){
       actor.interactive=giver;actor.node.classList.toggle('is-giver',!!giver);actor.node.disabled=!giver;
-      if(giver){actor.node.removeAttribute('aria-hidden');actor.node.setAttribute('aria-label','Llamar a '+giver);actor.node.title='¡Llama su atención!';}
+      if(giver){actor.node.removeAttribute('aria-hidden');actor.node.setAttribute('aria-label',giver==='cat'?'Asustar al gato':'Llamar a '+giver);actor.node.title=giver==='cat'?'¡Un sobresalto!':'¡Llama su atención!';}
       else{actor.node.setAttribute('aria-hidden','true');actor.node.removeAttribute('aria-label');actor.node.title='';}
     }
+    actor.node.disabled=!giver||!!actor.catReaction;
     const resting=reduced.matches||actor.rest>0;
-    const column=resting?1:WALK[Math.floor((time+actor.phase)*7)%WALK.length];
+    const column=resting?1:WALK[Math.floor((time+actor.phase)*(actor.catReaction?.phase==='running'?14:7))%WALK.length];
     const row=actor.state==='entering'?3:actor.state==='exiting'?0:resting?0:actor.direction<0?1:2;
     const atlas=actor.cast.frames?.[row*3+column];
     actor.node.style.backgroundPosition=atlas?(-atlas[0]*s)+'px '+(-atlas[1]*s)+'px':(-column*w*s)+'px '+(-row*h*s)+'px';
@@ -94,6 +97,14 @@ export function createChristmasScene(app,{audio}={}){
     actor.node.style.transformOrigin='50% 100%';
     actor.node.style.transform=actor.cast.animal?'translateX('+actor.x.toFixed(2)+'px)':
       'translateX('+actor.x.toFixed(2)+'px) translateY('+(-(actor.depth||0)).toFixed(2)+'px) scale('+(actor.shrink??1).toFixed(4)+')';
+    if(actor.catReaction?.phase==='jumping'){
+      const index=Math.max(0,CAT_FRAMES.findLastIndex(t=>actor.catReaction.elapsed>=t));
+      size(actor.node,96,120,384,240,s);
+      actor.node.style.backgroundImage='url("'+new URL('tuxedo-cat-startle.png',ASSETS).href+'")';
+      actor.node.style.backgroundPosition=(-(index%4)*96*s)+'px '+(-Math.floor(index/4)*120*s)+'px';
+      // Same ground baseline as the walking sheet; extra lift makes the small jump legible.
+      actor.node.style.transform='translateX('+actor.x.toFixed(2)+'px) translateY(-'+[0,0,3,12,7,0,0,0][index]+'px) scaleX('+(actor.direction<0?1:-1)+')';
+    }
     actor.node.style.clipPath='none';
     actor.node.style.opacity=String(actor.opacity??1);
   }
@@ -112,13 +123,19 @@ export function createChristmasScene(app,{audio}={}){
     const dt=last?Math.min(.06,(now-last)/1000):0;last=now;time+=dt;
     if(!reduced.matches)for(const actor of actors){
       if(!actor.cast.animal){peopleTraffic.update(actor,dt);drawActor(actor);continue;}
+      if(actor.catReaction){
+        const reaction=actor.catReaction;reaction.elapsed+=dt;
+        if(reaction.elapsed<CAT_JUMP_SECONDS){drawActor(actor);continue;}
+        reaction.phase='running';actor.rest=0;actor.nextRest=time+3;
+        if(reaction.elapsed>=CAT_JUMP_SECONDS+CAT_RUN_SECONDS)actor.catReaction=null;
+      }
       if(actor.rest>0)actor.rest=Math.max(0,actor.rest-dt);
       else{
-        actor.x+=actor.direction*actor.speed*dt;
+        actor.x+=actor.direction*actor.speed*dt*(actor.catReaction?.phase==='running'?3.2:1);
         if(time>actor.nextRest){actor.rest=random(.8,2.4);actor.nextRest=time+random(8,18);}
         const actorWidth=actor.cast.width*scale*actor.cast.scale;
         if(actor.x>width+actorWidth||actor.x<-actorWidth*2){
-          actor.direction=actor.x<0?1:-1;
+          actor.catReaction=null;actor.direction=actor.x<0?1:-1;
           actor.cast=pickCast(actor);actor.node.style.backgroundImage='url("'+new URL(actor.cast.file+(actor.cast.imageVersion?'?v=walk-'+actor.cast.imageVersion:''),ASSETS).href+'")';
           actor.x=actor.direction>0?-actor.cast.width*scale*actor.cast.scale:width;actor.speed=random(24,42);
         }
@@ -235,6 +252,11 @@ export function createChristmasScene(app,{audio}={}){
   };tree.addEventListener('click',onTreeClick);
   for(const actor of actors){
     actor.onClick=()=>{
+      if(actor.cast.file===CAT){
+        if(disposed||!visible||document.hidden||actor.catReaction||reduced.matches)return;
+        actor.catReaction={phase:'jumping',elapsed:0};actor.rest=0;drawActor(actor);
+        if(!frame)frame=requestAnimationFrame(tick);return;
+      }
       if(!GIVERS[actor.cast.file]||disposed||!visible||document.hidden||(actor.state&&actor.state!=='walking'))return;
       actor.rest=Math.max(actor.rest,1.2);drawActor(actor);
       if(actor.attentionTimer)return;
@@ -278,15 +300,15 @@ export function createChristmasScene(app,{audio}={}){
       if(previousScale!==scale||!frame)drawActor(actor);
     });
     stackGifts();drawGifts();
-    if(!visible||document.hidden||reduced.matches)stopFrame();else if(!frame)frame=requestAnimationFrame(tick);
+    if(!visible||document.hidden||reduced.matches){actors.forEach(actor=>{actor.catReaction=null;drawActor(actor);});stopFrame();}else if(!frame)frame=requestAnimationFrame(tick);
   }
-  function onVisibility(){if(document.hidden)stopFrame();else layout();}
+  function onVisibility(){if(document.hidden){actors.forEach(actor=>{actor.catReaction=null;drawActor(actor);});stopFrame();}else layout();}
   function onMotion(){stopFrame();if(reduced.matches){treeShake?.cancel();treeShake=null;}if(reduced.matches)for(const gift of thrown){gift.flying=false;readyGift(gift);}actors.forEach(drawActor);layout();}
   const timer=window.setInterval(layout,500);
   window.addEventListener('resize',layout);document.addEventListener('visibilitychange',onVisibility);
   reduced.addEventListener?.('change',onMotion);layout();
   return {
-    getStatus:()=>({visible,characters:actors.filter(a=>a.state!=='inside').length,people:actors.filter(a=>!a.cast.animal&&a.state!=='inside').length,peopleLimit:4,reservedDriverSlots:1,holidayPeople:actors.filter(a=>a.cast.holiday&&a.state!=='inside').length,holidayLimit:2,personStates:actors.filter(a=>!a.cast.animal).map(a=>({file:a.cast.file,state:a.state||'walking',point:a.point||'pending'})),animals:actors.filter(actor=>actor.cast.animal).length,animalLimit:3,cast:CAST.length,gifts:gifts.length,tree:'left',snowman:snowmanState,snowmanFrame,snowmanWaitMs:SNOWMAN_WAIT,spawnedGifts:thrown.length,wreaths:thrown.filter(g=>g.kind==='wreath').length,openedGifts:[...giftStates.values()].filter(g=>g.opened).length,giftLimit:GIFT_LIMIT,giftLifetimeMs:GIFT_LIFETIME,giftOpenMs:GIFT_OPEN_TIME,animated:visible&&!document.hidden&&!reduced.matches}),
+    getStatus:()=>({visible,characters:actors.filter(a=>a.state!=='inside').length,people:actors.filter(a=>!a.cast.animal&&a.state!=='inside').length,peopleLimit:4,reservedDriverSlots:1,holidayPeople:actors.filter(a=>a.cast.holiday&&a.state!=='inside').length,holidayLimit:2,personStates:actors.filter(a=>!a.cast.animal).map(a=>({file:a.cast.file,state:a.state||'walking',point:a.point||'pending'})),catReaction:actors.find(actor=>actor.cast.file===CAT)?.catReaction?.phase||'idle',animals:actors.filter(actor=>actor.cast.animal).length,animalLimit:3,cast:CAST.length,gifts:gifts.length,tree:'left',snowman:snowmanState,snowmanFrame,snowmanWaitMs:SNOWMAN_WAIT,spawnedGifts:thrown.length,wreaths:thrown.filter(g=>g.kind==='wreath').length,openedGifts:[...giftStates.values()].filter(g=>g.opened).length,giftLimit:GIFT_LIMIT,giftLifetimeMs:GIFT_LIFETIME,giftOpenMs:GIFT_OPEN_TIME,animated:visible&&!document.hidden&&!reduced.matches}),
     dispose(){if(disposed)return;disposed=true;stopFrame();clearInterval(timer);treeShake?.cancel();treeShake=null;
       window.removeEventListener('resize',layout);document.removeEventListener('visibilitychange',onVisibility);
       reduced.removeEventListener?.('change',onMotion);tree.removeEventListener('click',onTreeClick);

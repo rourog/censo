@@ -219,4 +219,25 @@ assert.equal(app.children.length,0);assert.equal(timeouts.size,0);
 assert.equal(Object.keys(tree.events).length,0);assert.equal(stationary.onclick,null);assert.ok(actors.every(a=>Object.keys(a.events).length===0));assert.equal(timers.size,0);assert.equal(frames.size,0);
 assert.equal(Object.keys(events).length,0);assert.equal(Object.keys(docEvents).length,0);assert.equal(motion,null);
 assert.equal(document.body.style['--christmas-floor-offset'],undefined);
+// Cat interaction: anchored jump, no re-entry, brief sprint, then ordinary walking.
+document.hidden=false;reduced.matches=false;
+const catScene=createChristmasScene(app),catRoot=app.children[0];
+const cat=catRoot.children.find(n=>n.attributes['data-character']==='tuxedo-cat.png');
+assert.equal(cat.disabled,false);assert.equal(cat.attributes['aria-label'],'Asustar al gato');
+const catX=()=>Number(cat.style.transform.match(/translateX\(([-.\d]+)px\)/)[1]);
+const catStart=catX(),catClock=clock;
+cat.events.click();assert.equal(catScene.getStatus().catReaction,'jumping');assert.equal(cat.disabled,true);
+assert.ok(cat.style.backgroundImage.includes('tuxedo-cat-startle.png'));
+for(let n=1;n<=15;n++){advance(catClock+n*50);cat.events.click();assert.equal(catX(),catStart,'Jump never slides along the ground');}
+for(let n=16;n<=19;n++)advance(catClock+n*50);
+assert.equal(catScene.getStatus().catReaction,'running','Repeated clicks cannot restart jump');
+assert.ok(cat.style.backgroundImage.includes('tuxedo-cat.png'),'Sprint restores original walking atlas');
+const sprintX=catX();advance(clock+50);const sprintDistance=Math.abs(catX()-sprintX);
+for(let n=0;n<42;n++)advance(clock+50);
+assert.equal(catScene.getStatus().catReaction,'idle');assert.equal(cat.disabled,false);
+const walkX=catX();advance(clock+50);assert.ok(sprintDistance>Math.abs(catX()-walkX)*2.5,'Sprint is faster than normal walking');
+cat.events.click();assert.equal(catScene.getStatus().catReaction,'jumping');
+document.hidden=true;docEvents.visibilitychange();assert.equal(catScene.getStatus().catReaction,'idle');assert.equal(frames.size,0);
+document.hidden=false;docEvents.visibilitychange();reduced.matches=true;motion();cat.events.click();assert.equal(catScene.getStatus().catReaction,'idle','Reduced motion suppresses startle');
+catScene.dispose();assert.equal(frames.size,0);assert.equal(timeouts.size,0);assert.equal(timers.size,0);
 console.log('OK: four people/two holiday limits, nine unique rotating people, four portals, modest door fade, three prioritized animals, gift cap/expiry, layout, reduced motion and disposal.');
