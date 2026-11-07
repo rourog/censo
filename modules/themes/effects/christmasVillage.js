@@ -1,8 +1,8 @@
-import {createChristmasPickup} from './christmasPickup.js?v=3.70.0';
+import {createChristmasPickup} from './christmasPickup.js?v=3.71.0';
 /* Decorative village and local ambulance interaction; no clinical state. */
 import {AMBULANCE_DURATION_MS} from './christmasAudio.js';
 const ASSETS=new URL('../../../assets/themes/christmas/scene/',import.meta.url);
-import {HOSPITAL_RATIO,getChristmasStageLayout,getVehicleParkingPose} from './christmasStageLayout.js?v=3.70.0';
+import {HOSPITAL_RATIO,getChristmasStageLayout,getVehicleParkingPose} from './christmasStageLayout.js?v=3.71.0';
 const ARRIVE_MS=3000,STOP_MS=3000,LEAVE_MS=3000;
 // Door bounds in the 720 × 115 hospital sprite (excluding pillars and pavement).
 const BAY={left:97/720,bottom:26/115,width:37/720,height:30/115};
@@ -52,12 +52,13 @@ export function createChristmasVillage(host,app,{audio}={}){
     const target=hospitalLeft+hospitalWidth*.16-size/2;
     const start=trip.direction===1?-size:width,end=trip.direction===1?width:-size;
     let x,row,phase;
-    if(elapsed<ARRIVE_MS){const t=elapsed/ARRIVE_MS;x=start+(target-start)*(1-(1-t)**2);row=trip.direction===1?0:1;phase='arriving';}
+    if(elapsed<ARRIVE_MS){const t=Math.min(1,elapsed/(ARRIVE_MS-650));x=start+(target-start)*(1-(1-t)**2);row=trip.direction===1?0:1;phase='arriving';}
     else if(elapsed<ARRIVE_MS+stopMs){x=target;row=2;phase='parked';}
-    else if(elapsed<ARRIVE_MS+stopMs+LEAVE_MS){const t=(elapsed-ARRIVE_MS-stopMs)/LEAVE_MS;x=target+(end-target)*t*t;row=trip.direction===1?0:1;phase='leaving';}
+    else if(elapsed<ARRIVE_MS+stopMs+LEAVE_MS){const t=Math.max(0,(elapsed-ARRIVE_MS-stopMs-650)/(LEAVE_MS-650));x=target+(end-target)*t*t;row=trip.direction===1?0:1;phase='leaving';}
     else {cancelTrip();return;}
     trip.phase=phase;
     const pose=getVehicleParkingPose(elapsed,elapsed>=ARRIVE_MS+stopMs?elapsed-ARRIVE_MS-stopMs:null,geometry);
+    if(pose.front)row=2;
     ambulance.style.transformOrigin='50% 100%';ambulance.style.transform='translateY(-'+pose.lift+'px) scale('+pose.scale+')';
     ambulance.style.width=size+'px';ambulance.style.height=height+'px';
     ambulance.style.left=x+'px';ambulance.style.bottom=(geometry.vehicleBottom)+'px';

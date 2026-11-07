@@ -1,5 +1,5 @@
 import {PERSON_CAST,createPeopleTraffic} from './christmasPeople.js';
-import {CHARACTER_SCALE,TREE_SCALE,getChristmasStageLayout} from './christmasStageLayout.js?v=3.70.0';
+import {CHARACTER_SCALE,TREE_SCALE,getChristmasStageLayout} from './christmasStageLayout.js?v=3.71.0';
 /* Interactive Christmas stage. Reads layout only; never reads or writes patient records. */
 const ASSETS=new URL('../../../assets/themes/christmas/scene/',import.meta.url);
 const DEER=['rudolph_adult_3.png','reindeer_3.png','reindeerb_3.png','reindeer_child_3.png','rudolph_adultb_3.png','rudolph_child_3.png'];

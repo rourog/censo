@@ -1,5 +1,5 @@
-import {getVehicleParkingPose} from './christmasStageLayout.js?v=3.70.0';
-import {createRamDriver,ramVisitTiming} from './christmasRamDriver.js?v=3.70.0';
+import {getVehicleParkingPose} from './christmasStageLayout.js?v=3.71.0';
+import {createRamDriver,ramVisitTiming} from './christmasRamDriver.js?v=3.71.0';
 /* One decorative pickup: independent from ambulance dispatch and clinical state. */
 const ASSETS=new URL('../../../assets/themes/christmas/scene/',import.meta.url);
 const ARRIVAL_MS=3000,STOP_MS=3000,EXIT_MS=3000;
@@ -44,22 +44,23 @@ export function createChristmasPickup(controls,{getGeometry,isVisible,requestLan
     }
     const baseSize=Math.min(108,hospitalWidth*115/720*.95);
     const parked=elapsed>=ARRIVAL_MS&&trip.departedAt==null;
+    const departureElapsed=trip.departedAt==null?null:now-trip.departedAt;
+    const pose=getVehicleParkingPose(elapsed,departureElapsed,getGeometry());
     const visibleHeight=229*baseSize/362*HEIGHT[trip.model];
-    let row=parked?2:trip.direction===1?0:1,column=parked?0:Math.floor(elapsed/120)%4;
+    let row=pose.front?2:trip.direction===1?0:1,column=pose.front?0:Math.floor(elapsed/120)%4;
     const [sourceX,sourceY,sourceWidth,sourceHeight]=FRAMES[trip.model][row*4+column];
     const factor=visibleHeight/sourceHeight,size=sourceWidth*factor,height=visibleHeight;
     const center=hospitalLeft+hospitalWidth*55/720,target=center-size/2;
     let x=target;
     if(elapsed<ARRIVAL_MS){
-      const t=elapsed/ARRIVAL_MS,start=trip.direction===1?-size:width;
-      x=start+(target-start)*(1-(1-t)**2);row=trip.direction===1?0:1;column=Math.floor(elapsed/120)%4;trip.phase='arriving';
+      const t=Math.min(1,elapsed/(ARRIVAL_MS-650)),start=trip.direction===1?-size:width;
+      x=start+(target-start)*(1-(1-t)**2);trip.phase='arriving';
     }else if(parked){trip.phase=elapsed<parkEnd?'parked':'starting';if(trip.driverTiming&&elapsed<parkEnd)driver.paint(elapsed-ARRIVAL_MS,getGeometry(),trip.driverTiming);}
     else if(now-trip.departedAt<EXIT_MS){
       driver.hide();
-      const t=(now-trip.departedAt)/EXIT_MS,end=trip.direction===1?width:-size;
-      x=target+(end-target)*t*t;row=trip.direction===1?0:1;column=Math.floor(elapsed/120)%4;trip.phase='leaving';
+      const t=Math.max(0,(departureElapsed-650)/(EXIT_MS-650)),end=trip.direction===1?width:-size;
+      x=target+(end-target)*t*t;trip.phase='leaving';
     }else {cancel();return;}
-    const pose=getVehicleParkingPose(elapsed,trip.departedAt==null?null:now-trip.departedAt,getGeometry());
     sprite.style.transformOrigin='50% 100%';sprite.style.transform='translateY(-'+pose.lift+'px) scale('+pose.scale+')';
     sprite.style.width=size+'px';sprite.style.height=height+'px';sprite.style.left=x+'px';sprite.style.bottom=(getGeometry().vehicleBottom)+'px';
     sprite.style.backgroundSize=(SHEETS[trip.model][0]*factor)+'px '+(SHEETS[trip.model][1]*factor)+'px';sprite.style.backgroundPosition=(-sourceX*factor)+'px '+(-sourceY*factor)+'px';sprite.hidden=false;

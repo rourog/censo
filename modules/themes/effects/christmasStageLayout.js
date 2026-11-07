@@ -9,7 +9,7 @@ export const VEHICLE_BOTTOM=4;
 export function getVehicleParkingPose(elapsed,departureElapsed,geometry){
   const t=Math.max(0,Math.min(1,departureElapsed==null?(elapsed-2350)/650:1-departureElapsed/650));
   const depth=t*t*(3-2*t);
-  return {depth,scale:1-.12*depth,lift:(geometry.parkingBottom-geometry.vehicleBottom)*depth};
+  return {front:elapsed>=2350&&(departureElapsed==null||departureElapsed<650),depth,scale:1-.12*depth,lift:(geometry.parkingBottom-geometry.vehicleBottom)*depth};
 }
 export function getChristmasStageLayout(width){
   const hospitalWidth=Math.min(720,width*.48,width*.52-108);

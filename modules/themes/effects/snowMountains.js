@@ -1,3 +1,4 @@
+import {ROAD_HEIGHT} from './christmasStageLayout.js?v=3.71.0';
 /* Three opaque stationary sinusoidal snow bands with phase offsets.
  * Two rear SVG bands, a village slot, then the closest SVG band. No per-frame work or clinical data.
  */
@@ -22,7 +23,7 @@ export function createSnowMountains(host){
   svg.setAttribute('aria-hidden','true');
   const foreground=svg.cloneNode(false);
   foreground.setAttribute('viewBox','0 0 1200 24');
-  foreground.style.top='auto';foreground.style.bottom='0px';foreground.style.height='14px';
+  foreground.style.top='auto';foreground.style.bottom=(ROAD_HEIGHT-7)+'px';foreground.style.height='14px';
   const villageHost=document.createElement('div');villageHost.className='christmas-village';
   const layers=[
     {base:176,amplitude:11,cycles:2.1,phase:0.25,fill:'#8dbbdc'},
