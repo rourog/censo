@@ -1,3 +1,4 @@
+import {createChristmasInterns} from './christmasInterns.js?v=3.72.0';
 import {createChristmasPickup} from './christmasPickup.js?v=3.71.0';
 /* Decorative village and local ambulance interaction; no clinical state. */
 import {AMBULANCE_DURATION_MS} from './christmasAudio.js';
@@ -32,8 +33,9 @@ export function createChristmasVillage(host,app,{audio}={}){
     const next=vehicleQueue.shift();
     if(next&&visible&&!disposed&&!document.hidden){laneOwner=next.kind;next.start();}
   }
-  function cancelVehicles(){vehicleQueue.length=0;laneOwner=null;cancelTrip();pickup.cancel();}
+  function cancelVehicles(){vehicleQueue.length=0;laneOwner=null;cancelTrip();pickup.cancel();interns.cancel();}
   const pickup=createChristmasPickup(controls,{getGeometry:()=>geometry,isVisible:()=>visible,requestLane:start=>requestVehicle('pickup',start),releaseLane:()=>releaseVehicle('pickup'),ownsLane:()=>laneOwner==='pickup'&&!trip,audio});
+  const interns=createChristmasInterns(controls,{getGeometry:()=>geometry,isVisible:()=>visible,requestLane:start=>requestVehicle('interns',start),releaseLane:()=>releaseVehicle('interns'),ownsLane:()=>laneOwner==='interns'});
   const rect=node=>node?.getClientRects?.().length?node.getBoundingClientRect():null;
   function cancelTrip(){const active=!!trip;ambulanceQueued=false;if(frame)cancelAnimationFrame(frame);frame=0;trip?.sound?.stop();trip=null;ambulance.hidden=true;trigger.disabled=false;if(active)releaseVehicle('ambulance');}
   function animate(now){
@@ -104,11 +106,11 @@ export function createChristmasVillage(host,app,{audio}={}){
     trigger.style.left=(geometry.hospitalLeft+hospitalWidth*BAY.left)+'px';
     trigger.style.bottom=(bottom+hospitalHeight*BAY.bottom)+'px';
     trigger.style.width=(hospitalWidth*BAY.width)+'px';trigger.style.height=(hospitalHeight*BAY.height)+'px';
-    pickup.layout();
+    pickup.layout();interns.layout();
   }
   const timer=window.setInterval(layout,500);window.addEventListener('resize',layout);layout();
-  return {getStatus:()=>({...pickup.getStatus(),visible,buildings:1,hospital:'center',houses:'hidden',snowPlane:'in-front-of-snow',roadWidth:geometry?.width||0,roadHeight:getChristmasStageLayout(innerWidth).roadHeight,hospitalBottom:geometry?.bottom||0,vehicleBottom:geometry?.vehicleBottom||0,ambulance:ambulanceQueued?'queued':trip?.phase||'idle',ambulanceDurationMs:AMBULANCE_DURATION_MS,ambulanceArrivalMs:ARRIVE_MS,ambulanceStopMs:STOP_MS,ambulanceExitMs:LEAVE_MS}),
+  return {getStatus:()=>({...pickup.getStatus(),...interns.getStatus(),visible,buildings:1,hospital:'center',houses:'hidden',snowPlane:'in-front-of-snow',roadWidth:geometry?.width||0,roadHeight:getChristmasStageLayout(innerWidth).roadHeight,hospitalBottom:geometry?.bottom||0,vehicleBottom:geometry?.vehicleBottom||0,ambulance:ambulanceQueued?'queued':trip?.phase||'idle',ambulanceDurationMs:AMBULANCE_DURATION_MS,ambulanceArrivalMs:ARRIVE_MS,ambulanceStopMs:STOP_MS,ambulanceExitMs:LEAVE_MS}),
     dispose(){if(disposed)return;disposed=true;clearInterval(timer);window.removeEventListener('resize',layout);
       cancelVehicles();trigger.removeEventListener('click',launch);document.removeEventListener('visibilitychange',onVisibility);
-      pickup.dispose();controls.remove();hospital.remove();road.remove();host.hidden=false;}};
+      pickup.dispose();interns.dispose();controls.remove();hospital.remove();road.remove();host.hidden=false;}};
 }

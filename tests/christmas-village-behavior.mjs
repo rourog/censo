@@ -76,7 +76,7 @@ for(const direction of [.1,.9]){
  tick(9000);assert.equal(village.getStatus().ambulance,'idle');assert.equal(ambulance.hidden,true);assert.equal(trigger.disabled,false);assert.equal(frames.size,0);
 }
 const [,,pickupTrigger,pickupSprite,driverSprite]=controls.children;
-assert.equal(controls.children.length,5,'Vehicle controls plus one special driver sprite');
+assert.equal(controls.children.length,11,'Vehicle controls, RAM driver and five intern slots with a main-door trigger');
 assert.ok(parseFloat(pickupTrigger.style.left)>parseFloat(trigger.style.left)+parseFloat(trigger.style.width));
 const order=['ram-2500','silverado','civic','jimny'],sequence=[],heights={},driverStates=new Set();
 let next=0,clock=30000;
@@ -115,9 +115,39 @@ for(let i=0;i<sequence.length;i+=4)assert.equal(new Set(sequence.slice(i,i+4)).s
 for(const state of ['getting-out','walking-to-door','waving','returning','getting-in'])assert.ok(driverStates.has(state),'Exercise '+state);
 assert.equal(sounds.filter(k=>k==='ramArrival').length,3);assert.equal(sounds.filter(k=>k==='ramExit').length,3);
 assert.equal(sounds.filter(k=>k==='silveradoStart').length,3);assert.equal(sounds.filter(k=>k==='civicStart').length,3);assert.equal(sounds.filter(k=>k==='vehicleStart').length,6);assert.equal(sounds.filter(k=>k==='jimnyDrive').length,6,'Jimny music plays only on arrival and departure');
+// Main door: one shuffled group, delayed single-file departures, same route on return.
+const mainDoor=controls.children[5],internNodes=controls.children.slice(6);
+assert.ok(parseFloat(mainDoor.style.left)>parseFloat(pickupTrigger.style.left));
+now=clock;const internStart=clock;mainDoor.events.click();mainDoor.events.click();
+assert.equal(village.getStatus().internCount,5);assert.equal(mainDoor.disabled,true);
+const identities=village.getStatus().internMembers.map(m=>m.identity);assert.equal(new Set(identities).size,5,'No duplicate intern appearance within one group');
+trigger.events.click();assert.equal(village.getStatus().ambulance,'queued','Vehicles wait for the crossing group');
+const exits=new Map(),returns=new Set(),internPhases=new Set();let groupEnd=clock;
+for(let t=clock+50;t<internStart+60000;t+=50){
+ tick(t);const state=village.getStatus();groupEnd=t;
+ if(state.internGroup==='idle')break;
+ assert.equal(ambulance.hidden,true,'No moving vehicle intersects the pedestrian crossing');
+ state.internMembers.forEach((member,index)=>{
+  internPhases.add(member.phase);
+  if(member.phase==='exiting'&&!exits.has(index))exits.set(index,t);
+  if(member.phase==='returning-crossing')returns.add(member.identity);
+  if(member.phase==='crossing'||member.phase==='returning-crossing'){
+   const expected=parseFloat(hospital.style.left)+parseFloat(hospital.style.width)*224/720;
+   assert.ok(Math.abs(member.x-expected)<.01,'Cross only at urgent-care doorway');assert.equal(member.row,member.phase==='crossing'?0:3);
+  }
+  if(member.phase==='walking-left'&&member.row===1)assert.ok(member.x<=parseFloat(mainDoor.style.left)+parseFloat(mainDoor.style.width));
+ });
+}
+assert.equal(village.getStatus().internGroup,'idle');assert.equal(exits.size,5);assert.equal(returns.size,5,'Every departing intern comes back');
+for(let i=1;i<5;i++)assert.ok(Math.abs(exits.get(i)-exits.get(i-1)-1500)<=50,'Interns leave one by one at fixed spacing');
+for(const phase of ['exiting','walking-left','crossing','away','returning-crossing','walking-right','entering','inside'])assert.ok(internPhases.has(phase),'Exercise intern phase '+phase);
+assert.ok(internNodes.every(n=>n.hidden));assert.equal(mainDoor.disabled,false);
+assert.equal(village.getStatus().ambulance,'arriving','Queued vehicle starts after every intern has returned');tick(groupEnd+9001);clock=groupEnd+10000;
 // Start another RAM visit then hide the stage: both vehicle and visitor must cancel.
 now=clock;pickupTrigger.events.click();tick(clock+4000);assert.equal(driverSprite.hidden,false);
 width=500;events.resize();assert.equal(driverSprite.hidden,true);assert.equal(frames.size,0);width=1363;events.resize();
+mainDoor.events.click();tick(now+100);assert.equal(village.getStatus().internCount,5);
+trigger.events.click();document.hidden=true;documentEvents.visibilitychange();assert.equal(village.getStatus().internGroup,'idle');assert.ok(internNodes.every(n=>n.hidden));assert.equal(frames.size,0,'Hiding a group cancels its queued vehicles too');document.hidden=false;
 trigger.events.click();width=500;events.resize();assert.equal(frames.size,0,'Hiding the village cancels the trip');
 width=1363;events.resize();trigger.events.click();document.hidden=true;documentEvents.visibilitychange();assert.equal(frames.size,0);document.hidden=false;
 trigger.events.click();village.dispose();village.dispose();assert.equal(frames.size,0);assert.equal(app.children.length,0);assert.equal(Object.keys(documentEvents).length,0);assert.equal(mountains.villageHost.children.length,0);assert.equal(intervals.size,0);assert.equal(Object.keys(events).length,0);
@@ -129,4 +159,4 @@ sound.elapsedMs=3000;tick(8000);assert.equal(synced.getStatus().ambulance,'parke
 sound.elapsedMs=6000;tick(9000);assert.equal(synced.getStatus().ambulance,'leaving');
 sound.elapsedMs=9000;tick(9500);assert.equal(synced.getStatus().ambulance,'idle');assert.equal(sound.stopped,true);synced.dispose();assert.equal(frames.size,0);
 mountains.dispose();assert.equal(host.children.length,0);
-console.log('OK: separate door hitboxes, four-model rotation, ordered relative heights, parking under left windows, matched lateral scale, RAM doctor walk/wave/return and engine cues, extended RAM stop, serialized vehicle requests without overlap, visibility and disposal.');
+console.log('OK: separate door hitboxes, four-model rotation, ordered relative heights, parking under left windows, matched lateral scale, RAM doctor walk/wave/return and engine cues, five unique interns in a staggered round trip, crossing/vehicle serialization, extended RAM stop, serialized vehicle requests without overlap, visibility and disposal.');
