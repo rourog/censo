@@ -1,8 +1,8 @@
-import {createChristmasPickup} from './christmasPickup.js?v=3.69.0';
+import {createChristmasPickup} from './christmasPickup.js?v=3.70.0';
 /* Decorative village and local ambulance interaction; no clinical state. */
 import {AMBULANCE_DURATION_MS} from './christmasAudio.js';
 const ASSETS=new URL('../../../assets/themes/christmas/scene/',import.meta.url);
-import {HOSPITAL_RATIO,getChristmasStageLayout} from './christmasStageLayout.js?v=3.69.0';
+import {HOSPITAL_RATIO,getChristmasStageLayout,getVehicleParkingPose} from './christmasStageLayout.js?v=3.70.0';
 const ARRIVE_MS=3000,STOP_MS=3000,LEAVE_MS=3000;
 // Door bounds in the 720 × 115 hospital sprite (excluding pillars and pavement).
 const BAY={left:97/720,bottom:26/115,width:37/720,height:30/115};
@@ -57,6 +57,8 @@ export function createChristmasVillage(host,app,{audio}={}){
     else if(elapsed<ARRIVE_MS+stopMs+LEAVE_MS){const t=(elapsed-ARRIVE_MS-stopMs)/LEAVE_MS;x=target+(end-target)*t*t;row=trip.direction===1?0:1;phase='leaving';}
     else {cancelTrip();return;}
     trip.phase=phase;
+    const pose=getVehicleParkingPose(elapsed,elapsed>=ARRIVE_MS+stopMs?elapsed-ARRIVE_MS-stopMs:null,geometry);
+    ambulance.style.transformOrigin='50% 100%';ambulance.style.transform='translateY(-'+pose.lift+'px) scale('+pose.scale+')';
     ambulance.style.width=size+'px';ambulance.style.height=height+'px';
     ambulance.style.left=x+'px';ambulance.style.bottom=(geometry.vehicleBottom)+'px';
     ambulance.style.backgroundSize=(size*4)+'px '+(height*3)+'px';
@@ -94,7 +96,7 @@ export function createChristmasVillage(host,app,{audio}={}){
     road.style.backgroundSize='auto '+stage.roadHeight+'px';
     hospital.style.width=hospitalWidth+'px';hospital.style.height='auto';
     hospital.style.left=((width-hospitalWidth)/2)+'px';hospital.style.bottom=bottom+'px';
-    geometry={width,hospitalWidth,hospitalLeft:(width-hospitalWidth)/2,bottom,vehicleBottom:stage.vehicleBottom};
+    geometry={width,hospitalWidth,hospitalLeft:(width-hospitalWidth)/2,bottom,vehicleBottom:stage.vehicleBottom,parkingBottom:stage.parkingBottom};
     controls.style.left=(bounds?.left||0)+'px';controls.style.top=(bounds?.top||0)+'px';
     controls.style.width=width+'px';controls.style.height=height+'px';
     const hospitalHeight=hospitalWidth/HOSPITAL_RATIO;

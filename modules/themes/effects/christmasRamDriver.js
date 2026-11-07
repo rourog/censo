@@ -25,7 +25,7 @@ export function createRamDriver(controls){
     else{t-=timing.walkMs;state='getting-in';opacity=1-t/600;shrink=.85+.15*opacity;}
     // Walk diagonally from the parked vehicle onto the raised pedestrian plane.
     const progress=to===from?0:Math.max(0,Math.min(1,(x-from)/(to-from)));
-    const ground=(geometry.vehicleBottom??geometry.bottom)+(geometry.bottom-(geometry.vehicleBottom??geometry.bottom))*progress;
+    const ground=(geometry.parkingBottom??geometry.bottom)+(geometry.bottom-(geometry.parkingBottom??geometry.bottom))*progress;
     const factor=108/300*SCALE,[left,top]=FRAMES[index];
     node.style.width=(96*SCALE)+'px';node.style.height=(108*SCALE)+'px';node.style.left=(x-48*SCALE)+'px';node.style.bottom=(ground+4)+'px';
     node.style.backgroundSize=(887*factor)+'px '+(1774*factor)+'px';node.style.backgroundPosition=(-left*factor)+'px '+(-top*factor)+'px';

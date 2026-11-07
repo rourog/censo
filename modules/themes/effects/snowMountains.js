@@ -21,11 +21,13 @@ export function createSnowMountains(host){
   svg.setAttribute('focusable','false');
   svg.setAttribute('aria-hidden','true');
   const foreground=svg.cloneNode(false);
+  foreground.setAttribute('viewBox','0 0 1200 24');
+  foreground.style.top='auto';foreground.style.bottom='0px';foreground.style.height='14px';
   const villageHost=document.createElement('div');villageHost.className='christmas-village';
   const layers=[
     {base:176,amplitude:11,cycles:2.1,phase:0.25,fill:'#8dbbdc'},
     {base:196,amplitude:13,cycles:2.1,phase:1.05,fill:'#bfdef4'},
-    {base:215,amplitude:10,cycles:2.1,phase:1.88,fill:'#f8fcff'}
+    {base:9,amplitude:3,cycles:2.1,phase:1.88,fill:'#f8fcff',height:24}
   ];
   for(const [index,layer] of layers.entries()){
     const path=document.createElementNS(SVG_NS,'path');

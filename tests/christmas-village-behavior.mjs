@@ -24,7 +24,7 @@ globalThis.document={createElement:element,createElementNS:element,getElementByI
 const mountains=createSnowMountains(host),wrapper=host.children[0];
 assert.equal(wrapper.children[0].children.length,2,'Two snow layers are behind the village');
 assert.equal(wrapper.children[1],mountains.villageHost);
-assert.equal(wrapper.children[2].children.length,1,'Only the closest snow layer covers the buildings');
+assert.equal(wrapper.children[2].children.length,1,'Closest snow band remains independent');assert.equal(wrapper.children[2].attributes.viewBox,'0 0 1200 24');assert.equal(wrapper.children[2].style.height,'14px','Foreground snow has a fixed shallow road-edge height');
 const sounds=[];const village=createChristmasVillage(mountains.villageHost,app,{audio:{play(kind){sounds.push(kind);return {stop(){}};}}}),[hospital,road,...houses]=mountains.villageHost.children;
 assert.ok(hospital.src.endsWith('/hospital-delicias-final-snow.png'));
 assert.equal(parseFloat(hospital.style.bottom),44,'Curb rests at the upper road edge');assert.equal(road.className,'christmas-village-road');assert.equal(parseFloat(road.style.width),width);assert.equal(parseFloat(road.style.height),44);assert.ok(road.style.backgroundImage.includes('snowy-road.webp'));
@@ -65,11 +65,13 @@ for(const direction of [.1,.9]){
  assert.equal(frames.size,1,'Repeated clicks cannot duplicate the ambulance');
  tick(0);assert.equal(village.getStatus().ambulance,'arriving');
  assert.equal(ambulance.style.backgroundPosition.split(' ')[1],(direction<.5?0:-parseFloat(ambulance.style.height))+'px');
- tick(3000);assert.equal(village.getStatus().ambulance,'parked');assert.equal(parseFloat(ambulance.style.bottom),4,'Ambulance drives below the pedestrian curb');
+ tick(2700);assert.ok(/scale\(0\.9/.test(ambulance.style.transform),'Ambulance eases toward the sidewalk before parking');
+ tick(3000);assert.equal(ambulance.style.transform,'translateY(-32px) scale(0.88)');assert.equal(village.getStatus().ambulance,'parked');assert.equal(parseFloat(ambulance.style.bottom),4,'Ambulance drives below the pedestrian curb');
  const parkedX=ambulance.style.left;
  assert.ok(Math.abs(parseFloat(parkedX)+parseFloat(ambulance.style.width)/2-(parseFloat(hospital.style.left)+parseFloat(hospital.style.width)*.16))<.01,'Ambulance centers on expanded bay');
  tick(5999);assert.equal(village.getStatus().ambulance,'parked');assert.equal(ambulance.style.left,parkedX,'Stopped for exactly three seconds');
  tick(6000);assert.equal(village.getStatus().ambulance,'leaving');
+ tick(6650);assert.equal(ambulance.style.transform,'translateY(-0px) scale(1)','Departure returns to full street size');
  tick(9000);assert.equal(village.getStatus().ambulance,'idle');assert.equal(ambulance.hidden,true);assert.equal(trigger.disabled,false);assert.equal(frames.size,0);
 }
 const [,,pickupTrigger,pickupSprite,driverSprite]=controls.children;
@@ -82,7 +84,7 @@ for(let i=0;i<12;i++){
  tick(start+1500);const sideHeight=parseFloat(pickupSprite.style.height),model=village.getStatus().pickupModel;
  assert.equal(model,order[next++%4]);sequence.push(model);
  const stop=village.getStatus().pickupStopMs,startMs=village.getStatus().pickupStartMs,end=start+3000+stop+startMs+3002;
- tick(start+3000);assert.equal(parseFloat(pickupSprite.style.bottom),4,'All civilian vehicles share the street plane');heights[model]=parseFloat(pickupSprite.style.height);assert.ok(Math.abs(heights[model]-sideHeight)<.001);
+ tick(start+3000);assert.equal(pickupSprite.style.transform,'translateY(-32px) scale(0.88)','Every model uses the same parking depth');assert.equal(parseFloat(pickupSprite.style.bottom),4,'All civilian vehicles share the street plane');heights[model]=parseFloat(pickupSprite.style.height);assert.ok(Math.abs(heights[model]-sideHeight)<.001);
  if(model==='ram-2500'){
    assert.ok(stop>8000,'RAM waits for the whole walk, greeting and return');
    assert.equal(driverSprite.hidden,false);
@@ -100,6 +102,7 @@ for(let i=0;i<12;i++){
  tick(start+3000+stop+1);assert.equal(village.getStatus().pickup,'starting');
  const parkedLeft=pickupSprite.style.left;tick(start+3000+stop+startMs);assert.equal(village.getStatus().pickup,'starting');assert.equal(pickupSprite.style.left,parkedLeft,'Stay still until starter finishes');
  tick(start+3000+stop+startMs+2);assert.equal(village.getStatus().pickup,'leaving');assert.equal(driverSprite.hidden,true,'Driver back inside before vehicle moves');
+ tick(start+3000+stop+startMs+652);assert.equal(pickupSprite.style.transform,'translateY(-0px) scale(1)');
  tick(end+1);assert.equal(village.getStatus().pickup,'idle');assert.equal(pickupSprite.hidden,true);assert.equal(driverSprite.hidden,true);
  if(model==='ram-2500'){assert.equal(village.getStatus().ambulance,'arriving');tick(end+9002);assert.equal(village.getStatus().ambulance,'idle');clock=end+10000;}
  else clock=end+1000;
