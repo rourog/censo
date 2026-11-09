@@ -90,11 +90,14 @@ for(let i=0;i<12;i++){
  tick(start+3000);assert.ok(Math.abs(parseFloat(pickupSprite.style.left)+parseFloat(pickupSprite.style.width)/2-parkingCenter)<.001,'Frontal parking has no lateral travel');assert.equal(pickupSprite.style.transform,'translateY(-32px) scale(0.88)','Every model uses the same parking depth');assert.equal(parseFloat(pickupSprite.style.bottom),4,'All civilian vehicles share the street plane');heights[model]=parseFloat(pickupSprite.style.height);assert.ok(Math.abs(heights[model]-sideHeight)<.001);
  if(model==='ram-2500'){
    assert.ok(stop>8000,'RAM waits for the whole walk, greeting and return');
-   assert.equal(driverSprite.hidden,false);
+   assert.equal(driverSprite.hidden,false,'Driver appears on the first parked frame');
+   assert.equal(Number(driverSprite.style.opacity||1),1,'Driver appears fully opaque');
+   assert.ok(!driverSprite.style.transform||driverSprite.style.transform==='scale(1)','Driver appears at full size');
    trigger.events.click();trigger.events.click();assert.equal(village.getStatus().ambulance,'queued');
    let lastState='';let outX,doorX;
    for(let t=start+3050;t<start+3000+stop;t+=100){
      tick(t);const state=village.getStatus().ramDriver;driverStates.add(state);
+     if(state==='getting-in')assert.equal(driverSprite.hidden,true,'Driver disappears immediately upon reaching the pickup');
      if(state==='walking-to-door')outX=parseFloat(driverSprite.style.left);
      if(state==='waving'){assert.equal(parseFloat(driverSprite.style.bottom),48,'RAM driver reaches the pedestrian plane');doorX=parseFloat(driverSprite.style.left);assert.ok(doorX>parseFloat(pickupSprite.style.left)+parseFloat(pickupSprite.style.width)/2);}
      if(state==='returning'&&lastState==='waving')assert.ok(parseFloat(driverSprite.style.left)<=doorX+.1);

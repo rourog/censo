@@ -1,5 +1,5 @@
 import {createChristmasInterns} from './christmasInterns.js?v=3.73.0';
-import {createChristmasPickup} from './christmasPickup.js?v=3.73.0';
+import {createChristmasPickup} from './christmasPickup.js?v=3.75.0';
 /* Decorative village and local ambulance interaction; no clinical state. */
 import {AMBULANCE_DURATION_MS} from './christmasAudio.js';
 const ASSETS=new URL('../../../assets/themes/christmas/scene/',import.meta.url);

@@ -1,5 +1,5 @@
 import {getVehicleParkingPose} from './christmasStageLayout.js?v=3.73.0';
-import {createRamDriver,ramVisitTiming} from './christmasRamDriver.js?v=3.73.0';
+import {createRamDriver,ramVisitTiming} from './christmasRamDriver.js?v=3.75.0';
 /* One decorative pickup: independent from ambulance dispatch and clinical state. */
 const ASSETS=new URL('../../../assets/themes/christmas/scene/',import.meta.url);
 const ARRIVAL_MS=3000,STOP_MS=3000,EXIT_MS=3000;

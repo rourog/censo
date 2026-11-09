@@ -17,12 +17,12 @@ export function createRamDriver(controls){
   function paint(elapsed,geometry,timing){
     if(elapsed<0||elapsed>=timing.stopMs){hide();return;}
     const from=geometry.hospitalLeft+geometry.hospitalWidth*83/720,to=geometry.hospitalLeft+geometry.hospitalWidth*224/720;
-    let x=from,index=1,opacity=1,shrink=1,t=elapsed;
-    if(t<600){state='getting-out';opacity=t/600;shrink=.85+.15*opacity;}
+    let x=from,index=7,t=elapsed;
+    if(t<600){state='getting-out';}
     else if((t-=600)<timing.walkMs){state='walking-to-door';x=from+(to-from)*t/timing.walkMs;index=6+WALK[Math.floor(t/145)%4];}
     else if((t-=timing.walkMs)<2400){state='waving';x=to;index=WAVE[Math.min(8,Math.floor(t/2400*9))];}
     else if((t-=2400)<timing.walkMs){state='returning';x=to+(from-to)*t/timing.walkMs;index=3+WALK[Math.floor(t/145)%4];}
-    else{t-=timing.walkMs;state='getting-in';opacity=1-t/600;shrink=.85+.15*opacity;}
+    else{hide();state='getting-in';return;}
     // Walk diagonally from the parked vehicle onto the raised pedestrian plane.
     const progress=to===from?0:Math.max(0,Math.min(1,(x-from)/(to-from)));
     const ground=(geometry.parkingBottom??geometry.bottom)+(geometry.bottom-(geometry.parkingBottom??geometry.bottom))*progress;
@@ -30,7 +30,7 @@ export function createRamDriver(controls){
     const factor=108/300*SCALE,[left,top]=FRAMES[index];
     node.style.width=(96*SCALE)+'px';node.style.height=(108*SCALE)+'px';node.style.left=(x-48*SCALE)+'px';node.style.bottom=(ground+4)+'px';
     node.style.backgroundSize=(887*factor)+'px '+(1774*factor)+'px';node.style.backgroundPosition=(-left*factor)+'px '+(-top*factor)+'px';
-    node.style.transformOrigin='50% 100%';node.style.transform='scale('+shrink+')';node.style.opacity=String(Math.max(0,Math.min(1,opacity)));node.hidden=false;
+    node.hidden=false;
   }
   return {paint,hide,getFootprint:()=>footprint?[footprint]:[],getStatus:()=>({ramDriver:state,ramDriverVisible:!node.hidden}),dispose(){hide();node.remove();}};
 }
