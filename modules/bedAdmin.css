@@ -215,6 +215,11 @@
   border-color: var(--accent);
   box-shadow: 0 0 0 2px var(--accent-soft);
 }
+.censo-bed-add-row select,
+.censo-bed-add-row select option {
+  background-color: var(--panel);
+  color: var(--text);
+}
 .censo-bed-add {
   height: 38px;
   padding: 0 16px;
