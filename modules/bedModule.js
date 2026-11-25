@@ -178,6 +178,8 @@ export const destinosGlobal = [
 // La administración nunca modifica el nivel basal. Las temporales se guardan
 // por separado; una lista temporal vacía es válida y no repone las camas 6–10.
 const freezeBeds = beds => Object.freeze(beds.map(bed => Object.freeze(bed)));
+export const SALA_2 = 'SALA 2';
+
 export const basalBeds = freezeBeds([
   { area: 'SALA DE CHOQUE', cama: 'CAMA 1' },
   ...Array.from({ length: 5 }, (_, i) => [
@@ -231,6 +233,7 @@ export const areaVisuals = {
   'SALA DE CHOQUE': { icon: healthIcons.salaChoque, emoji: '❤️', class: 'icon-heartbeat' },
   'OBSERVACION': { icon: healthIcons.observacion, emoji: '👀', class: 'icon-look' },
   'OBSERVACIÓN': { icon: healthIcons.observacion, emoji: '👀', class: 'icon-look' },
+  [SALA_2]: { icon: healthIcons.observacion, emoji: '👀', class: '' },
   'TRAUMA MENOR': { icon: healthIcons.traumaMenor, emoji: '🦴', class: 'icon-spin' },
   'PEDIATRIA': { icon: healthIcons.areaPediatria, emoji: '🧸', class: 'icon-wiggle' },
   'PEDIATRÍA': { icon: healthIcons.areaPediatria, emoji: '🧸', class: 'icon-wiggle' },

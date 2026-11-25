@@ -670,6 +670,7 @@ export function createRenderModule(app) {
     const ordenEstricto = [
       'SALA DE CHOQUE',
       'OBSERVACIÓN', 'OBSERVACION',
+      'SALA 2',
       'TRAUMA MENOR',
       'PEDIATRÍA', 'PEDIATRIA',
       'PEDILUVIO', "EFE'S",
