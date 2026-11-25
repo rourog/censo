@@ -705,8 +705,12 @@ export function createModalModule(app) {
       movimientosCamaPendientes.add(String(filaId));
 
       try {
-        await comprobarCamaDisponible(nuevaArea, nuevaCama, filaId);
-        await updateDoc(doc(db, 'pacientes', filaId), { cama: nuevaCama, area: nuevaArea });
+        if (nuevaArea === app.bed.SALA_2) {
+          await app.saveSala2Assignment({ cama: nuevaCama, area: nuevaArea }, filaId);
+        } else {
+          await comprobarCamaDisponible(nuevaArea, nuevaCama, filaId);
+          await updateDoc(doc(db, 'pacientes', filaId), { cama: nuevaCama, area: nuevaArea });
+        }
         const pacienteLocal = state.pacientesGlobal.find(p => String(p.fila) === String(filaId));
         if (pacienteLocal) {
           pacienteLocal.cama = nuevaCama;
@@ -901,14 +905,15 @@ export function createModalModule(app) {
       if (moverAFila && moverAFila !== "") {
           const nuevaCamaObj = state.camasLibresGlobal.find(c => c.fila === moverAFila);
           if (!nuevaCamaObj) throw new Error('ESA UBICACIÓN YA NO ESTÁ DISPONIBLE. VUELVE A SELECCIONAR UNA CAMA.');
-          if (nuevaCamaObj) {
-              await comprobarCamaDisponible(nuevaCamaObj.area, nuevaCamaObj.cama, filaId);
-              updateData.cama = nuevaCamaObj.cama.toUpperCase();
-              updateData.area = nuevaCamaObj.area.toUpperCase();
+          updateData.cama = nuevaCamaObj.cama.toUpperCase();
+          updateData.area = nuevaCamaObj.area.toUpperCase();
+          if (updateData.area !== app.bed.SALA_2) {
+            await comprobarCamaDisponible(nuevaCamaObj.area, nuevaCamaObj.cama, filaId);
           }
       }
 
-      await updateDoc(doc(db, "pacientes", filaId), updateData);
+      if (updateData.area && updateData.area === app.bed.SALA_2) await app.saveSala2Assignment(updateData, filaId);
+      else await updateDoc(doc(db, "pacientes", filaId), updateData);
       vibrar(20); 
       cerrarModal('editModal');
     } catch (error) {
@@ -1037,8 +1042,7 @@ export function createModalModule(app) {
       const fechaCreacion = fechaInput ? new Date(fechaInput) : new Date();
       if (Number.isNaN(fechaCreacion.getTime())) throw new Error('La fecha de ingreso no es válida.');
 
-      await comprobarCamaDisponible(areaReal, nombreCamaReal);
-      await addDoc(collection(db, "pacientes"), {
+      const patient = {
           nombre: nom,
           edad: document.getElementById('addEdad').value.toUpperCase(),
           diagnostico: document.getElementById('addDiagnostico').value.toUpperCase(),
@@ -1049,7 +1053,13 @@ export function createModalModule(app) {
           creado: fechaCreacion,
           alerta: false,
           observacionAlerta: ''
-      });
+      };
+      if (areaReal === app.bed.SALA_2) {
+        await app.saveSala2Assignment(patient);
+      } else {
+        await comprobarCamaDisponible(areaReal, nombreCamaReal);
+        await addDoc(collection(db, "pacientes"), patient);
+      }
       vibrar(20); 
       cerrarModal('addModal');
     } catch (error) {

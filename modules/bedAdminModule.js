@@ -27,6 +27,7 @@ function cleanText(value, maxLength) {
 
 // Modelo sin DOM ni Firebase, también utilizado por las pruebas de migración.
 export function createBedCatalogModel(bedModule) {
+  const { SALA_2 } = bedModule;
   const bedKey = bedModule.claveCama;
   const basalBeds = bedModule.basalBeds.map(bed => ({ ...bed }));
   const basalKeys = new Set(basalBeds.map(bedKey));
@@ -83,7 +84,7 @@ export function createBedCatalogModel(bedModule) {
 
   function fromForm(area, type, number) {
     const bed = normalizeBed({ area, cama: `${type} ${number}` });
-    if (!temporaryAreas.includes(bed.area)) throw new Error('Selecciona un área válida para la ubicación temporal.');
+    if (bed.area !== SALA_2 && !temporaryAreas.includes(bed.area)) throw new Error('Selecciona un área válida para la ubicación temporal.');
     if (!['CAMA', 'SILLA', 'CUNA'].includes(type) || !/^[1-9]\d{0,2}$/u.test(String(number))) {
       throw new Error('Selecciona un tipo y un número entero entre 1 y 999.');
     }
@@ -119,6 +120,7 @@ export function createBedCatalogModel(bedModule) {
 
 export function createBedAdminModule(app) {
   const { state } = app;
+  const { SALA_2, normalizarUbicacion } = app.bed;
   const {
     db,
     auth,
@@ -146,6 +148,17 @@ export function createBedAdminModule(app) {
   let syncError = '';
   let busy = false;
   let ui = null;
+
+  const inSala2 = bed => normalizarUbicacion(bed).area === SALA_2;
+
+  async function hasServerOccupant(matches) {
+    const patients = await getDocsFromServer(collection(db, 'pacientes'));
+    let occupied = false;
+    patients.forEach(snapshot => {
+      if (matches(snapshot.data(), snapshot.id)) occupied = true;
+    });
+    return occupied;
+  }
 
   function isOccupied(bed) {
     const key = bedKey(bed);
@@ -258,6 +271,33 @@ export function createBedAdminModule(app) {
     if (!data.beds.some(bed => bedKey(bed) === bedKey({ area, cama }))) throw new Error('ESA UBICACIÓN FUE RETIRADA. VUELVE A SELECCIONAR UNA CAMA.');
   }
 
+  async function saveSala2Assignment(patient, patientId = null) {
+    const uid = auth.currentUser?.uid;
+    if (!uid || syncState !== 'ready') throw new Error('ESPERA A QUE SE SINCRONICEN LAS CAMAS CON FIREBASE.');
+
+    const catalogRef = doc(db, SETTINGS_COLLECTION, SETTINGS_DOC);
+    const patients = collection(db, 'pacientes');
+    const patientRef = patientId === null ? doc(patients) : doc(patients, patientId);
+    const key = bedKey(patient);
+    await runTransaction(db, async transaction => {
+      const snapshot = await transaction.get(catalogRef);
+      const data = snapshot.exists() ? snapshot.data() : null;
+      if (!model.isSharedDocument(data) || !data.beds.some(bed => bedKey(bed) === key)) {
+        throw new Error('ESA UBICACIÓN FUE RETIRADA. VUELVE A SELECCIONAR UNA CAMA.');
+      }
+      if (await hasServerOccupant((bed, id) => id !== patientId && bedKey(bed) === key)) {
+        throw new Error('LA CAMA ESTÁ OCUPADA. VUELVE A SELECCIONAR UNA CAMA LIBRE.');
+      }
+      if (auth.currentUser?.uid !== uid || currentUid !== uid) throw new Error('La sesión cambió. Vuelve a intentarlo.');
+
+      // Comparte la revisión con las bajas para obligar a releer la ocupación
+      // si otro cliente asignó a Sala 2 mientras se estaba retirando.
+      transaction.set(catalogRef, model.sharedDocument(readTemporaryBeds(data), data, uid, serverTimestamp()));
+      if (patientId === null) transaction.set(patientRef, patient);
+      else transaction.update(patientRef, patient);
+    });
+  }
+
   function initBedCatalogAuthBridge() {
     if (authUnsubscribe) return;
     authUnsubscribe = onAuthStateChanged(auth, user => {
@@ -295,6 +335,7 @@ export function createBedAdminModule(app) {
     if (area === 'TRAUMA MENOR') return 'Trauma';
     if (area === 'PEDIATRÍA') return 'Pediatría';
     if (area === 'EXTRAS') return 'Extras';
+    if (area === SALA_2) return 'Sala 2';
     return area;
   }
 
@@ -324,11 +365,20 @@ export function createBedAdminModule(app) {
           <div id="censoBedStatus" class="censo-bed-status" role="status"></div>
           <button id="censoBedRetry" class="censo-bed-retry" type="button" hidden>Reintentar conexión</button>
 
-          <div id="censoBedList" class="censo-bed-grid" aria-label="Ubicaciones activas"></div>
-
-          <div class="censo-bed-help">
-            La × aparece únicamente en ubicaciones temporales libres.
-          </div>
+          <form id="censoBedSalaForm" class="censo-bed-sala">
+            <div>
+              <h3>Sala 2</h3>
+              <span id="censoBedSalaStatus"></span>
+            </div>
+            <div class="censo-bed-add-row censo-bed-sala__controls">
+              <label id="censoBedSalaCountField">
+                <span>Camas iniciales</span>
+                <input id="censoBedSalaCount" type="number" min="1" max="${MAX_BEDS - basalBeds.length}" step="1" required inputmode="numeric" value="1">
+              </label>
+              <button id="censoBedSalaCreate" class="censo-bed-add" type="submit">Crear Sala 2</button>
+              <button id="censoBedSalaRemove" class="censo-bed-add censo-bed-sala__remove" type="button" hidden>Retirar Sala 2</button>
+            </div>
+          </form>
 
           <form id="censoBedForm" class="censo-bed-add-form">
             <div class="censo-bed-add-title">Agregar ubicación</div>
@@ -337,6 +387,7 @@ export function createBedAdminModule(app) {
                 <span>Área</span>
                 <select id="censoBedArea" required>
                   ${model.temporaryAreas.map(area => `<option value="${esc(area)}">${esc(areaLabel(area))}</option>`).join('')}
+                  <option id="censoBedSalaOption" value="${SALA_2}" hidden disabled>Sala 2</option>
                 </select>
               </label>
               <label>
@@ -353,8 +404,11 @@ export function createBedAdminModule(app) {
               </label>
               <button id="censoBedAdd" class="censo-bed-add" type="submit">Agregar</button>
             </div>
-            <p id="censoBedMessage" class="censo-bed-message" role="status" aria-live="polite"></p>
           </form>
+          <p id="censoBedMessage" class="censo-bed-message" role="status" aria-live="polite"></p>
+          <div id="censoBedList" class="censo-bed-grid" aria-label="Ubicaciones activas"></div>
+          <p class="censo-bed-help">La × retira ubicaciones temporales libres.</p>
+          <p id="censoBedOutsideCatalog" class="censo-bed-help" role="status" hidden></p>
         </div>
       </section>`;
 
@@ -369,11 +423,19 @@ export function createBedAdminModule(app) {
       retry: get('Retry'),
       count: get('Count'),
       list: get('List'),
+      salaForm: get('SalaForm'),
+      salaStatus: get('SalaStatus'),
+      salaCountField: get('SalaCountField'),
+      salaCount: get('SalaCount'),
+      salaCreate: get('SalaCreate'),
+      salaRemove: get('SalaRemove'),
+      salaOption: get('SalaOption'),
       form: get('Form'),
       area: get('Area'),
       type: get('Type'),
       number: get('Number'),
       message: get('Message'),
+      outsideCatalog: get('OutsideCatalog'),
       add: get('Add')
     };
 
@@ -381,6 +443,30 @@ export function createBedAdminModule(app) {
     ui.close.addEventListener('click', closeBedManager);
     ui.modal.addEventListener('click', event => {
       if (event.target === ui.modal) closeBedManager();
+    });
+
+    ui.salaForm.addEventListener('submit', async event => {
+      event.preventDefault();
+      if (ui.salaCreate.disabled || ui.salaCreate.hidden) return;
+      try {
+        ui.message.textContent = 'Creando Sala 2…';
+        await mutate({ type: 'create-sala', count: ui.salaCount.valueAsNumber });
+        ui.message.textContent = 'Sala 2 creada.';
+      } catch (error) {
+        ui.message.textContent = saveError(error);
+      }
+    });
+
+    ui.salaRemove.addEventListener('click', async () => {
+      if (ui.salaRemove.disabled || ui.salaRemove.hidden) return;
+      if (!confirm('¿Retirar Sala 2 y todas sus ubicaciones del censo?')) return;
+      try {
+        ui.message.textContent = 'Retirando Sala 2…';
+        await mutate({ type: 'remove-sala', revision });
+        ui.message.textContent = 'Sala 2 retirada.';
+      } catch (error) {
+        ui.message.textContent = saveError(error);
+      }
     });
 
     ui.form.addEventListener('submit', async event => {
@@ -451,17 +537,6 @@ export function createBedAdminModule(app) {
     renderAdmin();
 
     try {
-      // Una instantánea local puede estar atrasada. La consulta es de solo
-      // lectura y falla cerrada sin red; no modifica ni elimina pacientes.
-      if (action.type === 'remove') {
-        if (basalBeds.some(bed => bedKey(bed) === action.key)) throw new Error('El nivel basal está protegido y no puede retirarse.');
-        const patients = await getDocsFromServer(collection(db, 'pacientes'));
-        let occupied = false;
-        patients.forEach(snapshot => {
-          if (bedKey(snapshot.data()) === action.key) occupied = true;
-        });
-        if (occupied) throw new Error('La cama está ocupada y no puede retirarse.');
-      }
       await runTransaction(db, async transaction => {
         const snapshot = await transaction.get(ref);
         if (auth.currentUser?.uid !== uid || currentUid !== uid) {
@@ -474,19 +549,41 @@ export function createBedAdminModule(app) {
 
         if (action.type === 'add') {
           const bed = model.normalizeBed(action.bed);
+          if (inSala2(bed) && !current.some(inSala2)) throw new Error('Crea Sala 2 antes de agregar ubicaciones.');
           if (isBasal(bed) || next.some(item => bedKey(item) === bedKey(bed))) {
             throw new Error('Esa cama o silla ya existe en el área seleccionada.');
           }
           next.push(bed);
         } else if (action.type === 'remove') {
+          if (basalBeds.some(bed => bedKey(bed) === action.key)) throw new Error('El nivel basal está protegido y no puede retirarse.');
           const target = next.find(item => bedKey(item) === action.key);
           if (!target) return;
-          if (isOccupied(target)) throw new Error('La cama está ocupada y no puede retirarse.');
           next = next.filter(item => bedKey(item) !== action.key);
+          if (inSala2(target) && !next.some(inSala2)) throw new Error('Usa «Retirar Sala 2» para quitar la última ubicación.');
+          if (await hasServerOccupant(bed => bedKey(bed) === action.key) || isOccupied(target)) {
+            throw new Error('La cama está ocupada y no puede retirarse.');
+          }
+        } else if (action.type === 'create-sala') {
+          if (current.some(inSala2)) throw new Error('Sala 2 ya está activa.');
+          const capacity = MAX_BEDS - basalBeds.length - current.length;
+          if (!Number.isInteger(action.count) || action.count < 1 || action.count > capacity) {
+            throw new Error(`Quedan ${capacity} ubicaciones disponibles en el catálogo.`);
+          }
+          for (let number = 1; number <= action.count; number++) {
+            next.push(model.fromForm(SALA_2, 'CAMA', number));
+          }
+        } else if (action.type === 'remove-sala') {
+          if (!current.some(inSala2)) return;
+          if (await hasServerOccupant(inSala2) || state.pacientesGlobal.some(inSala2)) {
+            throw new Error('Traslada o egresa a todos los pacientes de Sala 2 antes de retirarla.');
+          }
+          if (data.revision !== action.revision) throw new Error('El catálogo cambió. Revisa las ubicaciones y vuelve a confirmar.');
+          next = next.filter(bed => !inSala2(bed));
         } else {
           throw new Error('Acción de camas desconocida.');
         }
 
+        if (auth.currentUser?.uid !== uid || currentUid !== uid) throw new Error('La sesión cambió. Vuelve a intentarlo.');
         transaction.set(ref, model.sharedDocument(next, data, uid, serverTimestamp()));
       });
     } finally {
@@ -518,7 +615,26 @@ export function createBedAdminModule(app) {
         : syncError;
     ui.retry.hidden = !['error', 'waiting'].includes(syncState);
 
-    ui.add.disabled = busy || !auth.currentUser || !ready;
+    const canChange = ready && Boolean(auth.currentUser) && !busy;
+    const salaBeds = temporaryBeds.filter(inSala2);
+    const salaActive = salaBeds.length > 0;
+    const salaOccupied = state.pacientesGlobal.some(inSala2);
+    const capacity = MAX_BEDS - catalog.length;
+    ui.salaStatus.textContent = salaActive
+      ? (salaOccupied ? 'Traslada o egresa a los pacientes para retirarla.' : `${salaBeds.length} ubicaciones activas`)
+      : 'Inactiva';
+    ui.salaCountField.hidden = salaActive;
+    ui.salaCount.disabled = salaActive || !canChange;
+    ui.salaCount.max = String(Math.max(1, capacity));
+    ui.salaCreate.hidden = salaActive;
+    ui.salaCreate.disabled = !canChange || capacity === 0;
+    ui.salaRemove.hidden = !salaActive;
+    ui.salaRemove.disabled = !canChange || salaOccupied;
+    ui.salaOption.hidden = !salaActive;
+    ui.salaOption.disabled = !salaActive;
+    if (!salaActive && ui.area.value === SALA_2) ui.area.value = model.temporaryAreas[0];
+
+    ui.add.disabled = !canChange;
     ui.add.textContent = busy ? 'Guardando…' : 'Agregar';
     ui.area.disabled = busy;
     ui.type.disabled = busy;
@@ -527,11 +643,13 @@ export function createBedAdminModule(app) {
     const columns = [
       { label: 'Choque', areas: ['SALA DE CHOQUE'] },
       { label: 'Observación', areas: ['OBSERVACIÓN'] },
+      ...(salaActive ? [{ label: 'Sala 2', areas: [SALA_2] }] : []),
       { label: 'Trauma', areas: ['TRAUMA MENOR'] },
       { label: 'Pediatría', areas: ['PEDIATRÍA'] },
       { label: 'Extras', areas: ['EXTRAS', 'PEDILUVIO', "EFE'S"] }
     ];
 
+    ui.list.className = salaActive ? 'censo-bed-grid has-sala-2' : 'censo-bed-grid';
     ui.list.innerHTML = columns.map(column => {
       const beds = catalog.filter(bed => column.areas.includes(bed.area));
       return `
@@ -542,7 +660,7 @@ export function createBedAdminModule(app) {
               const occupant = occupantFor(bed);
               const occupied = Boolean(occupant);
               const temporary = !isBasal(bed);
-              const removable = temporary && !occupied;
+              const removable = temporary && !occupied && (!inSala2(bed) || salaBeds.length > 1);
               const title = occupied
                 ? `${bed.cama} · ocupada${occupant?.nombre ? ` por ${occupant.nombre}` : ''}`
                 : temporary
@@ -566,12 +684,11 @@ export function createBedAdminModule(app) {
         </section>`;
     }).join('');
 
-    const outsideCatalog = state.pacientesGlobal.filter(patient =>
+    const outsideCount = state.pacientesGlobal.filter(patient =>
       !catalog.some(bed => bedKey(bed) === bedKey(patient))
-    );
-    if (outsideCatalog.length) {
-      ui.message.textContent = `${outsideCatalog.length} paciente(s) permanecen en ubicaciones antiguas fuera del catálogo.`;
-    }
+    ).length;
+    ui.outsideCatalog.hidden = outsideCount === 0;
+    ui.outsideCatalog.textContent = `${outsideCount} paciente(s) permanecen en ubicaciones antiguas fuera del catálogo.`;
   }
 
   return {
@@ -580,6 +697,7 @@ export function createBedAdminModule(app) {
     refreshBedAdmin: renderAdmin,
     isBedCatalogReady: () => syncState === 'ready',
     requireSharedBed,
+    saveSala2Assignment,
     getBedCatalog: () => catalog.map(bed => ({ ...bed }))
   };
 }

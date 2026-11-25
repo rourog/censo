@@ -91,6 +91,7 @@
   border-radius: 12px;
   background: var(--line);
 }
+.censo-bed-grid.has-sala-2 { grid-template-columns: repeat(6, minmax(0, 1fr)); }
 .censo-bed-column {
   min-width: 0;
   background: var(--panel);
@@ -170,9 +171,7 @@
 }
 
 .censo-bed-add-form {
-  margin-top: 16px;
-  padding-top: 14px;
-  border-top: 1px solid var(--line);
+  margin-top: 14px;
 }
 .censo-bed-add-title {
   margin-bottom: 9px;
@@ -227,9 +226,34 @@
   cursor: pointer;
 }
 .censo-bed-add:disabled { opacity: .5; cursor: not-allowed; }
+.censo-bed-sala {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+}
+.censo-bed-sala h3 { margin: 0 0 3px; font-size: .88rem; }
+.censo-bed-sala span { color: var(--muted); font-size: .72rem; }
+.censo-bed-sala .censo-bed-sala__controls {
+  display: flex;
+  gap: 8px;
+  align-items: end;
+}
+.censo-bed-sala__controls label { width: 96px; }
+.censo-bed-sala [hidden] { display: none; }
+.censo-bed-sala__remove {
+  background: var(--field);
+  border-color: var(--line);
+  color: var(--text);
+}
 .censo-bed-message {
   min-height: 1.2em;
-  margin: 8px 0 0;
+  margin: 8px 0;
   color: var(--muted);
   font-size: .72rem;
 }
@@ -242,6 +266,8 @@
     grid-template-columns: repeat(5, minmax(145px, 1fr));
     overflow-x: auto;
   }
+  .censo-bed-grid.has-sala-2 { grid-template-columns: repeat(6, minmax(145px, 1fr)); }
   .censo-bed-add-row { grid-template-columns: 1fr 1fr; }
   .censo-bed-add { width: 100%; }
+  .censo-bed-sala__controls .censo-bed-add { width: auto; white-space: nowrap; }
 }

@@ -85,6 +85,8 @@ globalThis.sessionStorage = { getItem: k => storage.get(k), setItem: (k, v) => s
 let data = { beds: [...legacy.masterCamas, obs('CAMA 11')] };
 let writes = 0;
 let remotePatients = [];
+const patientDocuments = new Map();
+let nextPatientId = 0;
 let failRemote = false;
 let onGet = null;
 let conflict = null;
@@ -94,7 +96,11 @@ const auth = { currentUser: { uid: 'test' } };
 const snapshot = () => ({ exists: () => data !== null, data: () => structuredClone(data), metadata: { fromCache: false, hasPendingWrites: false } });
 const broadcast = () => observers.filter(o => o.active).forEach(o => o.next(snapshot()));
 const firebase = {
-  db: {}, auth, doc: (_, collection, id) => ({ collection, id }), collection: (_, name) => name,
+  db: {}, auth,
+  doc: (ref, collection, id) => ref === 'pacientes'
+    ? { collection: ref, id: collection ?? `new-${++nextPatientId}` }
+    : { collection, id },
+  collection: (_, name) => name,
   serverTimestamp: () => 'TIME',
   onAuthStateChanged(_, fn) { authObservers.push(fn); fn(auth.currentUser); return () => {}; },
   onSnapshot(ref, options, next, error) { assert.equal(ref.collection, 'settings'); assert.equal(ref.id, 'bedCatalog'); assert.equal(options.includeMetadataChanges, true); const observer = { next, error, active: true }; observers.push(observer); next(snapshot()); return () => { observer.active = false; }; },
@@ -102,16 +108,32 @@ const firebase = {
   async getDocsFromServer(name) {
     assert.equal(name, 'pacientes');
     if (failRemote) throw Object.assign(new Error('offline'), { code: 'unavailable' });
-    return { forEach: fn => remotePatients.forEach(p => fn({ data: () => p })) };
+    return { forEach: fn => {
+      remotePatients.forEach((p, i) => fn({ id: `remote-${i}`, data: () => p }));
+      patientDocuments.forEach((p, id) => fn({ id, data: () => p }));
+    } };
   },
   async runTransaction(_, fn) {
     for (let attempt = 0; attempt < 2; attempt++) {
       let staged;
+      let stagedPatient;
       await fn({
         async get() { onGet?.(); return snapshot(); },
-        set(ref, next) { assert.equal(ref.collection, 'settings'); assert.equal(ref.id, 'bedCatalog'); staged = structuredClone(next); }
+        set(ref, next) {
+          if (ref.collection === 'pacientes') stagedPatient = [ref.id, structuredClone(next)];
+          else {
+            assert.equal(ref.collection, 'settings');
+            assert.equal(ref.id, 'bedCatalog');
+            staged = structuredClone(next);
+          }
+        },
+        update(ref, next) {
+          assert.ok(patientDocuments.has(ref.id));
+          stagedPatient = [ref.id, { ...patientDocuments.get(ref.id), ...structuredClone(next) }];
+        }
       });
       if (conflict) { const action = conflict; conflict = null; action(); broadcast(); continue; }
+      if (stagedPatient) patientDocuments.set(...stagedPatient);
       if (staged) { data = staged; writes++; broadcast(); }
       return;
     }
@@ -136,7 +158,7 @@ assert.ok(!field('Description'));
 assert.equal(appBed.masterCamas, sharedReference);
 assert.equal(admin.getBedCatalog().length, 28);
 assert.match(field('Count').textContent, /28 ubicaciones · 6 temporales/);
-assert.match(field('Message').textContent, /fuera del catálogo/);
+assert.match(field('OutsideCatalog').textContent, /fuera del catálogo/);
 assert.doesNotMatch(field('List').innerHTML, /data-bed-remove="OBSERVACION\|CAMA 1"/);
 assert.match(field('List').innerHTML, /data-bed-remove="OBSERVACION\|CAMA 6"/);
 
@@ -203,6 +225,56 @@ assert.equal(second.getBedCatalog().length, 22, 'Otro equipo respeta las tempora
 await add('CAMA', '6');
 assert.equal(second.getBedCatalog().length, 23, 'El alta se sincroniza a otros equipos.');
 assert.equal(appBed.masterCamas, sharedReference);
+
+// Sala 2 comparte el catálogo y nunca se retira con un paciente vigente.
+const sala = cama => location('SALA 2', cama);
+const bedsInSala = () => second.getBedCatalog().filter(b => b.area === 'SALA 2');
+const removeSala = () => field('SalaRemove').fire('click');
+const createSala = async count => {
+  field('SalaCount').valueAsNumber = count;
+  await field('SalaForm').fire('submit');
+};
+assert.equal(field('SalaOption').disabled, true);
+await add('CAMA', '1', 'SALA 2');
+await createSala(0);
+assert.deepEqual(bedsInSala(), []);
+await createSala(2);
+assert.deepEqual(bedsInSala(), [sala('CAMA 1'), sala('CAMA 2')]);
+assert.equal(field('SalaOption').disabled, false);
+assert.ok(state.camasLibresGlobal.some(b => key(b) === key(sala('CAMA 1'))));
+await add('SILLA', '1', 'SALA 2');
+await remove(sala('CAMA 2'));
+assert.deepEqual(bedsInSala(), [sala('CAMA 1'), sala('SILLA 1')]);
+
+await second.saveSala2Assignment({ ...sala('CAMA 1'), nombre: 'PRUEBA SALA' });
+await assert.rejects(admin.saveSala2Assignment(sala('CAMA 1')), /OCUPADA/);
+const [[patientId]] = patientDocuments;
+await second.saveSala2Assignment(sala('SILLA 1'), patientId);
+assert.deepEqual(patientDocuments.get(patientId), { ...sala('SILLA 1'), nombre: 'PRUEBA SALA' });
+await removeSala();
+assert.match(field('Message').textContent, /pacientes de Sala 2/);
+assert.equal(bedsInSala().length, 2);
+patientDocuments.clear();
+
+// Una asignación durante una baja obliga a releer el catálogo y la ocupación.
+conflict = () => {
+  patientDocuments.set(patientId, sala('CAMA 1'));
+  data = model.sharedDocument(data.temporaryBeds, data, 'other-device', 'TIME');
+};
+await removeSala();
+assert.match(field('Message').textContent, /pacientes de Sala 2/);
+assert.deepEqual(patientDocuments.get(patientId), sala('CAMA 1'));
+patientDocuments.clear();
+await remove(sala('SILLA 1'));
+await remove(sala('CAMA 1'));
+assert.deepEqual(bedsInSala(), [sala('CAMA 1')]);
+await removeSala();
+assert.deepEqual(bedsInSala(), []);
+assert.equal(field('SalaOption').disabled, true);
+assert.equal(field('Area').value, 'OBSERVACIÓN');
+await assert.rejects(second.saveSala2Assignment(sala('CAMA 1')), /RETIRADA/);
+assert.ok(data.beds.some(b => key(b) === key(obs('CAMA 6'))));
+
 const lastValid = admin.getBedCatalog();
 const saved = structuredClone(data);
 data = { schemaVersion: 99, temporaryBeds: [] };

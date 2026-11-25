@@ -23,6 +23,7 @@ export function createPrintModule(app) {
   const ORDEN_AREAS = [
     'SALA DE CHOQUE',
     'OBSERVACIÓN', 'OBSERVACION',
+    'SALA 2',
     'TRAUMA MENOR',
     'PEDIATRÍA', 'PEDIATRIA',
     'PEDILUVIO', "EFE'S",
