@@ -12,6 +12,7 @@ on:
   workflow_dispatch:
 
 permissions:
+  actions: read
   contents: read
   pages: write
   id-token: write
@@ -69,6 +70,22 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: public
+
+      - name: Wait for Pages artifact metadata
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          endpoint="repos/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/artifacts?name=github-pages"
+          for attempt in {1..12}; do
+            if artifact_count=$(gh api "$endpoint" --jq '[.artifacts[] | select(.expired == false)] | length') \
+              && [[ "$artifact_count" == 1 ]]; then
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "::error::GitHub Pages artifact metadata did not become available."
+          exit 1
 
       - name: Deploy GitHub Pages
         id: deployment
